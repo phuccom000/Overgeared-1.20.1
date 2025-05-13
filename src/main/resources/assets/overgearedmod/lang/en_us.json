@@ -1,6 +1,10 @@
 {
+  "item.overgearedmod.steel_compound": "Steel Compound",
+  "item.overgearedmod.steel_ingot": "Steel Ingot",
   "item.overgearedmod.heated_iron_ingot": "Heated Iron Ingot",
+  "item.overgearedmod.heated_steel_ingot": "Heated Steel Ingot",
   "item.overgearedmod.iron_tongs": "Iron Tongs",
+  "item.overgearedmod.steel_tongs": "Steel Tongs",
   "creativetab.overgeared_tab": "Overgeared",
   "item.overgearedmod.stone_sword_blade": "Stone Sword Blade",
   "item.overgearedmod.iron_sword_blade": "Iron Sword Blade",
