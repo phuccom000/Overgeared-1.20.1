@@ -17,46 +17,47 @@ public class ModCreativeModeTabs {
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.IRON_TONGS.get()))
                     .title(Component.translatable("creativetab.overgeared_tab"))
                     .displayItems((pParameters, pOutput) -> {
+                        // General materials/tools
                         pOutput.accept(ModItems.STEEL_COMPOUND.get());
                         pOutput.accept(ModItems.STEEL_INGOT.get());
-                        pOutput.accept(ModItems.IRON_TONGS.get());
-                        pOutput.accept(ModItems.STEEL_TONGS.get());
                         pOutput.accept(ModItems.HEATED_IRON_INGOT.get());
                         pOutput.accept(ModItems.HEATED_STEEL_INGOT.get());
+                        pOutput.accept(ModItems.IRON_TONGS.get());
+                        pOutput.accept(ModItems.STEEL_TONGS.get());
 
-                        // Sword blades
+                        // === STONE ===
                         pOutput.accept(ModItems.STONE_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.IRON_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.GOLD_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.STEEL_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.DIAMOND_SWORD_BLADE.get());
-
-                        // Pickaxe heads
                         pOutput.accept(ModItems.STONE_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.IRON_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.GOLD_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.STEEL_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.DIAMOND_PICKAXE_HEAD.get());
-
-                        // Axe heads
                         pOutput.accept(ModItems.STONE_AXE_HEAD.get());
-                        pOutput.accept(ModItems.IRON_AXE_HEAD.get());
-                        pOutput.accept(ModItems.GOLD_AXE_HEAD.get());
-                        pOutput.accept(ModItems.STEEL_AXE_HEAD.get());
-                        pOutput.accept(ModItems.DIAMOND_AXE_HEAD.get());
-
-                        // Shovel heads
                         pOutput.accept(ModItems.STONE_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.IRON_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.GOLD_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.STEEL_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.DIAMOND_SHOVEL_HEAD.get());
-
-                        // Hoe heads
                         pOutput.accept(ModItems.STONE_HOE_HEAD.get());
+
+                        // === IRON ===
+                        pOutput.accept(ModItems.IRON_SWORD_BLADE.get());
+                        pOutput.accept(ModItems.IRON_PICKAXE_HEAD.get());
+                        pOutput.accept(ModItems.IRON_AXE_HEAD.get());
+                        pOutput.accept(ModItems.IRON_SHOVEL_HEAD.get());
                         pOutput.accept(ModItems.IRON_HOE_HEAD.get());
+
+                        // === GOLD ===
+                        pOutput.accept(ModItems.GOLD_SWORD_BLADE.get());
+                        pOutput.accept(ModItems.GOLD_PICKAXE_HEAD.get());
+                        pOutput.accept(ModItems.GOLD_AXE_HEAD.get());
+                        pOutput.accept(ModItems.GOLD_SHOVEL_HEAD.get());
                         pOutput.accept(ModItems.GOLD_HOE_HEAD.get());
+
+                        // === STEEL ===
+                        pOutput.accept(ModItems.STEEL_SWORD_BLADE.get());
+                        pOutput.accept(ModItems.STEEL_PICKAXE_HEAD.get());
+                        pOutput.accept(ModItems.STEEL_AXE_HEAD.get());
+                        pOutput.accept(ModItems.STEEL_SHOVEL_HEAD.get());
                         pOutput.accept(ModItems.STEEL_HOE_HEAD.get());
+
+                        // === DIAMOND ===
+                        pOutput.accept(ModItems.DIAMOND_SWORD_BLADE.get());
+                        pOutput.accept(ModItems.DIAMOND_PICKAXE_HEAD.get());
+                        pOutput.accept(ModItems.DIAMOND_AXE_HEAD.get());
+                        pOutput.accept(ModItems.DIAMOND_SHOVEL_HEAD.get());
                         pOutput.accept(ModItems.DIAMOND_HOE_HEAD.get());
 
                         //pOutput.accept(Items.DIAMOND); //.get() only for custom items
