@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "overgearedmod:block/smithing_anvil"
+    },
+    "facing=east": {
+      "model": "overgearedmod:block/smithing_anvil",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "overgearedmod:block/smithing_anvil",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "overgearedmod:block/smithing_anvil",
+      "y": 90
+    }
+  }
+}

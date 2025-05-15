@@ -8,6 +8,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgearedmod.OvergearedMod;
+import net.stirdrem.overgearedmod.block.ModBlocks;
 
 public class ModCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
@@ -18,12 +19,13 @@ public class ModCreativeModeTabs {
                     .title(Component.translatable("creativetab.overgeared_tab"))
                     .displayItems((pParameters, pOutput) -> {
                         // General materials/tools
-                        pOutput.accept(ModItems.STEEL_COMPOUND.get());
+                        pOutput.accept(ModItems.STEEL_ALLOY.get());
                         pOutput.accept(ModItems.STEEL_INGOT.get());
                         pOutput.accept(ModItems.HEATED_IRON_INGOT.get());
                         pOutput.accept(ModItems.HEATED_STEEL_INGOT.get());
                         pOutput.accept(ModItems.IRON_TONGS.get());
                         pOutput.accept(ModItems.STEEL_TONGS.get());
+                        pOutput.accept(ModItems.SMITHING_HAMMER.get());
 
                         // === STONE ===
                         pOutput.accept(ModItems.STONE_SWORD_BLADE.get());
@@ -40,11 +42,11 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.IRON_HOE_HEAD.get());
 
                         // === GOLD ===
-                        pOutput.accept(ModItems.GOLD_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.GOLD_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.GOLD_AXE_HEAD.get());
-                        pOutput.accept(ModItems.GOLD_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.GOLD_HOE_HEAD.get());
+                        pOutput.accept(ModItems.GOLDEN_SWORD_BLADE.get());
+                        pOutput.accept(ModItems.GOLDEN_PICKAXE_HEAD.get());
+                        pOutput.accept(ModItems.GOLDEN_AXE_HEAD.get());
+                        pOutput.accept(ModItems.GOLDEN_SHOVEL_HEAD.get());
+                        pOutput.accept(ModItems.GOLDEN_HOE_HEAD.get());
 
                         // === STEEL ===
                         pOutput.accept(ModItems.STEEL_SWORD_BLADE.get());
@@ -59,6 +61,9 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.DIAMOND_AXE_HEAD.get());
                         pOutput.accept(ModItems.DIAMOND_SHOVEL_HEAD.get());
                         pOutput.accept(ModItems.DIAMOND_HOE_HEAD.get());
+
+                        pOutput.accept(ModBlocks.SMITHING_ANVIL.get());
+                        pOutput.accept(ModBlocks.STEEL_BLOCK.get());
 
                         //pOutput.accept(Items.DIAMOND); //.get() only for custom items
 

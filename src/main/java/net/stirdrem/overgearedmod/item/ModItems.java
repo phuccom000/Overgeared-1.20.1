@@ -6,12 +6,14 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgearedmod.OvergearedMod;
+import net.stirdrem.overgearedmod.item.custom.SmithingHammer;
+import net.stirdrem.overgearedmod.item.custom.Tongs;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, OvergearedMod.MOD_ID);
 
-    public static final RegistryObject<Item> STEEL_COMPOUND = ITEMS.register("steel_compound",
+    public static final RegistryObject<Item> STEEL_ALLOY = ITEMS.register("steel_alloy",
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register("steel_ingot",
@@ -24,17 +26,20 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> IRON_TONGS = ITEMS.register("iron_tongs",
-            () -> new Item(new Item.Properties()));
+            () -> new Tongs(new Item.Properties().durability(512)));
 
     public static final RegistryObject<Item> STEEL_TONGS = ITEMS.register("steel_tongs",
-            () -> new Item(new Item.Properties()));
+            () -> new Tongs(new Item.Properties().durability(1024)));
+
+    public static final RegistryObject<Item> SMITHING_HAMMER = ITEMS.register("smithing_hammer",
+            () -> new SmithingHammer(new Item.Properties().durability(256)));
 
     // Add these inside your ModItems class
     public static final RegistryObject<Item> STONE_SWORD_BLADE = ITEMS.register("stone_sword_blade",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_SWORD_BLADE = ITEMS.register("iron_sword_blade",
             () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> GOLD_SWORD_BLADE = ITEMS.register("gold_sword_blade",
+    public static final RegistryObject<Item> GOLDEN_SWORD_BLADE = ITEMS.register("golden_sword_blade",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_SWORD_BLADE = ITEMS.register("steel_sword_blade",
             () -> new Item(new Item.Properties()));
@@ -45,7 +50,7 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_PICKAXE_HEAD = ITEMS.register("iron_pickaxe_head",
             () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> GOLD_PICKAXE_HEAD = ITEMS.register("gold_pickaxe_head",
+    public static final RegistryObject<Item> GOLDEN_PICKAXE_HEAD = ITEMS.register("golden_pickaxe_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_PICKAXE_HEAD = ITEMS.register("steel_pickaxe_head",
             () -> new Item(new Item.Properties()));
@@ -56,7 +61,7 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_AXE_HEAD = ITEMS.register("iron_axe_head",
             () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> GOLD_AXE_HEAD = ITEMS.register("gold_axe_head",
+    public static final RegistryObject<Item> GOLDEN_AXE_HEAD = ITEMS.register("golden_axe_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_AXE_HEAD = ITEMS.register("steel_axe_head",
             () -> new Item(new Item.Properties()));
@@ -67,7 +72,7 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_SHOVEL_HEAD = ITEMS.register("iron_shovel_head",
             () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> GOLD_SHOVEL_HEAD = ITEMS.register("gold_shovel_head",
+    public static final RegistryObject<Item> GOLDEN_SHOVEL_HEAD = ITEMS.register("golden_shovel_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_SHOVEL_HEAD = ITEMS.register("steel_shovel_head",
             () -> new Item(new Item.Properties()));
@@ -78,7 +83,7 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_HOE_HEAD = ITEMS.register("iron_hoe_head",
             () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> GOLD_HOE_HEAD = ITEMS.register("gold_hoe_head",
+    public static final RegistryObject<Item> GOLDEN_HOE_HEAD = ITEMS.register("golden_hoe_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_HOE_HEAD = ITEMS.register("steel_hoe_head",
             () -> new Item(new Item.Properties()));

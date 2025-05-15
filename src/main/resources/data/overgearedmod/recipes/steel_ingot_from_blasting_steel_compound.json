@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 150,
+  "experience": 1,
+  "group": "steel_ingot",
+  "ingredient": {
+    "item": "overgearedmod:steel_alloy"
+  },
+  "result": "overgearedmod:steel_ingot"
+}

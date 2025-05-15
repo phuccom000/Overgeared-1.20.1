@@ -48,10 +48,12 @@ public class OvergearedMod {
 
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        /*if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
-            event.accept(ModItems.HEATED_IRON_INGOT);
+        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModItems.IRON_TONGS);
-        }*/
+            event.accept(ModItems.STEEL_TONGS);
+            event.accept(ModItems.SMITHING_HAMMER);
+
+        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
