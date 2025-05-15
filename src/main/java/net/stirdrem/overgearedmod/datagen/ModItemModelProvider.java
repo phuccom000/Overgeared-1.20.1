@@ -24,6 +24,11 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleHandheld(ModItems.IRON_TONGS);
         simpleHandheld(ModItems.STEEL_TONGS);
         simpleHandheld(ModItems.SMITHING_HAMMER);
+        simpleHandheld(ModItems.STEEL_SWORD);
+        simpleHandheld(ModItems.STEEL_PICKAXE);
+        simpleHandheld(ModItems.STEEL_AXE);
+        simpleHandheld(ModItems.STEEL_SHOVEL);
+        simpleHandheld(ModItems.STEEL_HOE);
 
         // Sword Blades
         simpleItem(ModItems.STONE_SWORD_BLADE);
@@ -59,6 +64,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.GOLDEN_HOE_HEAD);
         simpleItem(ModItems.STEEL_HOE_HEAD);
         simpleItem(ModItems.DIAMOND_HOE_HEAD);
+
     }
 
 

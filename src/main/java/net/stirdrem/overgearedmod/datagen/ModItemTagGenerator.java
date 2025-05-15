@@ -3,6 +3,8 @@ package net.stirdrem.overgearedmod.datagen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -67,6 +69,17 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.IRON_TONGS.get(),
                         ModItems.STEEL_TONGS.get(),
                         ModItems.SMITHING_HAMMER.get()
+                );
+        this.tag(ModTags.Items.HEATABLE_METALS)
+                .add(
+                        ModItems.STEEL_INGOT.get(),
+                        Items.IRON_INGOT,
+                        Items.GOLD_INGOT
+                );
+        this.tag(ModTags.Items.HEATED_METALS)
+                .add(
+                        ModItems.HEATED_STEEL_INGOT.get(),
+                        ModItems.HEATED_IRON_INGOT.get()
                 );
     }
 }

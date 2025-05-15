@@ -26,6 +26,11 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.IRON_TONGS.get());
                         pOutput.accept(ModItems.STEEL_TONGS.get());
                         pOutput.accept(ModItems.SMITHING_HAMMER.get());
+                        pOutput.accept(ModItems.STEEL_SWORD.get());
+                        pOutput.accept(ModItems.STEEL_PICKAXE.get());
+                        pOutput.accept(ModItems.STEEL_AXE.get());
+                        pOutput.accept(ModItems.STEEL_SHOVEL.get());
+                        pOutput.accept(ModItems.STEEL_HOE.get());
 
                         // === STONE ===
                         pOutput.accept(ModItems.STONE_SWORD_BLADE.get());

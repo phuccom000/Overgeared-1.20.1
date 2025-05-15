@@ -34,5 +34,10 @@
   "item.overgearedmod.diamond_hoe_head": "Diamond Hoe Head",
   "block.overgearedmod.steel_block": "Block of Steel",
   "block.overgearedmod.smithing_anvil": "Smithing Anvil",
-  "tooltip.overgearedmod.tongs.tooltip": "Prevent players from burning themselves when handling hot metals."
+  "tooltip.overgearedmod.tongs.tooltip": "Prevent players from burning themselves when handling hot metals.",
+  "item.overgearedmod.steel_sword": "Steel Sword",
+  "item.overgearedmod.steel_pickaxe": "Steel Pickaxe",
+  "item.overgearedmod.steel_axe": "Steel Axe",
+  "item.overgearedmod.steel_hoe": "Steel Hoe",
+  "item.overgearedmod.steel_shovel": "Steel Shovel"
 }
