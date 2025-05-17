@@ -1,3 +1,4 @@
+/*
 package net.stirdrem.overgearedmod.event;
 
 import net.minecraft.core.BlockPos;
@@ -37,9 +38,10 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
 public class ModEvents {
     private static int TICK = 0;
-    private static final int perTick = 30;
+    private static final int perTick = 1;
+    private static boolean hasTongs = false;
 
-/*    @SubscribeEvent
+    @SubscribeEvent
     public static void onLevelTick(TickEvent.LevelTickEvent event) {
         if (event.phase != TickEvent.Phase.END || event.level.isClientSide()) return;
 
@@ -96,19 +98,18 @@ public class ModEvents {
                 }
             }
         }
-    }*/
+    }
 
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             Player player = event.player;
             Level level = player.level();
-            TICK = TICK + 1;
             //player.sendSystemMessage(Component.literal(String.valueOf(TICK)));
             boolean hasHeatedIngot = false;
             // Check inventory
-            if (level.isClientSide()) return; // Ensure this runs only on the server side
+            //if (level.isClientSide()) return; // Ensure this runs only on the server side
 
             for (ItemStack stack : player.getInventory().items) {
                 if (!stack.isEmpty() && stack.is(ModTags.Items.HEATED_METALS)) {
@@ -125,7 +126,6 @@ public class ModEvents {
 
             // Apply effect if player has heated ingot
             if (hasHeatedIngot) {
-                boolean hasTongs = false;
                 ItemStack offhand = player.getOffhandItem();
                 if (!offhand.isEmpty() && offhand.is(ModTags.Items.TONGS)) {
                     hasTongs = true;
@@ -136,7 +136,8 @@ public class ModEvents {
                     player.hurt(player.damageSources().hotFloor(), 1.0F); // Apply burn damage
             }
 
-           /* for (ItemStack stack : player.getInventory().items) {
+            */
+/*for (ItemStack stack : player.getInventory().items) {
                 if (!stack.isEmpty() && stack.is(ModTags.Items.HEATABLE_METALS)
                         && stack.hasTag() && stack.getTag().contains("heat")) {
                     // Decrease durability over time
@@ -145,14 +146,14 @@ public class ModEvents {
                     //}
 
                     // Send debug message to the player
-                    //int currentDurability = stack.getMaxDamage() - stack.getDamageValue();
+                    int currentDurability = stack.getMaxDamage() - stack.getDamageValue();
                     //player.sendSystemMessage(Component.literal("Item: " + stack.getItem().getDescription().getString() +
-                    //", Durability: " + currentDurability + "/" + stack.getMaxDamage()));
+                            //", Durability: " + currentDurability + "/" + stack.getMaxDamage()));
                 }
-            }*/
+            }*//*
 
 
-            /*for (ItemStack stack : player.getInventory().items) {
+            for (ItemStack stack : player.getInventory().items) {
                 if (!stack.isEmpty() && stack.is(ModTags.Items.HEATED_METALS)) {
                     if (stack.getDamageValue() == stack.getMaxDamage() - 1) {
                         Item cooledItem = getCooledIngot(stack.getItem());
@@ -169,12 +170,11 @@ public class ModEvents {
                             }
                         }
                     } else {
-                        if (level.getGameTime() % 20 == 0)
-                            stack.hurtAndBreak(1, event.player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+                        stack.hurtAndBreak(1, event.player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                     }
                     break;
                 }
-            }*/
+            }
         }
     }
 
@@ -199,3 +199,4 @@ public class ModEvents {
         return null;
     }
 }
+*/

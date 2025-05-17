@@ -3,6 +3,7 @@
   "item.overgearedmod.steel_ingot": "Steel Ingot",
   "item.overgearedmod.heated_iron_ingot": "Heated Iron Ingot",
   "item.overgearedmod.heated_steel_ingot": "Heated Steel Ingot",
+  "item.overgearedmod.heated_gold_ingot": "Heated Gold Ingot",
   "item.overgearedmod.iron_tongs": "Iron Tongs",
   "item.overgearedmod.steel_tongs": "Steel Tongs",
   "item.overgearedmod.smithing_hammer": "Smithing Hammer",
@@ -34,10 +35,12 @@
   "item.overgearedmod.diamond_hoe_head": "Diamond Hoe Head",
   "block.overgearedmod.steel_block": "Block of Steel",
   "block.overgearedmod.smithing_anvil": "Smithing Anvil",
+  "block.overgearedmod.smithing_anvil.gui": "Forging",
   "tooltip.overgearedmod.tongs.tooltip": "Prevent players from burning themselves when handling hot metals.",
   "item.overgearedmod.steel_sword": "Steel Sword",
   "item.overgearedmod.steel_pickaxe": "Steel Pickaxe",
   "item.overgearedmod.steel_axe": "Steel Axe",
   "item.overgearedmod.steel_hoe": "Steel Hoe",
-  "item.overgearedmod.steel_shovel": "Steel Shovel"
+  "item.overgearedmod.steel_shovel": "Steel Shovel",
+  "tooltip.overgearedmod.heatedingots.tooltip": "It burns your hand! Use tongs to safely handle."
 }

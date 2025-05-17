@@ -2,6 +2,7 @@ package net.stirdrem.overgearedmod.item.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -18,11 +19,11 @@ public class SmithingHammer extends Item {
         super(properties);
     }
 
-    @Override
+    /*@Override
     public InteractionResult useOn(UseOnContext pContext) {
+        Player player = pContext.getPlayer();
         if (!pContext.getLevel().isClientSide()) {
             BlockPos posClicked = pContext.getClickedPos();
-            Player player = pContext.getPlayer();
             boolean foundBlock = false;
             BlockState state = pContext.getLevel().getBlockState(posClicked);
 
@@ -30,12 +31,14 @@ public class SmithingHammer extends Item {
                 outputResult(player, state.getBlock());
             }
         }
-/*
+*//*
         pContext.getItemInHand().hurtAndBreak(1, pContext.getPlayer(),
-                player -> player.broadcastBreakEvent(player.getUsedItemHand()));*/
-
+                player -> player.broadcastBreakEvent(player.getUsedItemHand()));*//*
+        for (int i = 0; i < 3; i++) {
+            player.swing(InteractionHand.MAIN_HAND);
+        }
         return InteractionResult.SUCCESS;
-    }
+    }*/
 
     private void outputResult(Player player, Block block) {
         player.sendSystemMessage(Component.literal("Right clicked on anvil"));

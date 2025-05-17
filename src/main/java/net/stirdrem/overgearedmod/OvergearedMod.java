@@ -1,6 +1,7 @@
 package net.stirdrem.overgearedmod;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -13,8 +14,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.stirdrem.overgearedmod.block.ModBlocks;
+import net.stirdrem.overgearedmod.block.entity.ModBlockEntities;
 import net.stirdrem.overgearedmod.item.ModCreativeModeTabs;
 import net.stirdrem.overgearedmod.item.ModItems;
+import net.stirdrem.overgearedmod.recipe.ModRecipes;
+import net.stirdrem.overgearedmod.screen.ModMenuTypes;
+import net.stirdrem.overgearedmod.screen.SmithingAnvilScreen;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -33,6 +38,12 @@ public class OvergearedMod {
         ModItems.register(modEventBus);
 
         ModBlocks.register(modEventBus);
+
+        ModBlockEntities.register(modEventBus);
+        
+        ModMenuTypes.register(modEventBus);
+
+        ModRecipes.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
 
@@ -67,6 +78,8 @@ public class OvergearedMod {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+
+            MenuScreens.register(ModMenuTypes.SMITHING_ANVIL_MENU.get(), SmithingAnvilScreen::new);
 
         }
     }

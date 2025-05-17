@@ -6,12 +6,19 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgearedmod.OvergearedMod;
+import net.stirdrem.overgearedmod.item.custom.HeatableItem;
+import net.stirdrem.overgearedmod.item.custom.HeatedIngots;
 import net.stirdrem.overgearedmod.item.custom.SmithingHammer;
 import net.stirdrem.overgearedmod.item.custom.Tongs;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, OvergearedMod.MOD_ID);
+    public static final DeferredRegister<Item> ITEMS_MINECRAFT =
+            DeferredRegister.create(ForgeRegistries.ITEMS, "minecraft");
+
+    /*public static final RegistryObject<Item> IRON_INGOT = ITEMS_MINECRAFT.register("iron_ingot",
+            () -> new Item(new Item.Properties()));*/
 
     public static final RegistryObject<Item> STEEL_ALLOY = ITEMS.register("steel_alloy",
             () -> new Item(new Item.Properties()));
@@ -20,10 +27,11 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> HEATED_IRON_INGOT = ITEMS.register("heated_iron_ingot",
-            () -> new Item(new Item.Properties()));
+            () -> new HeatedIngots(new Item.Properties().durability(100)));
 
     public static final RegistryObject<Item> HEATED_STEEL_INGOT = ITEMS.register("heated_steel_ingot",
-            () -> new Item(new Item.Properties()));
+            () -> new HeatedIngots(new Item.Properties().durability(100)));
+
 
     public static final RegistryObject<Item> IRON_TONGS = ITEMS.register("iron_tongs",
             () -> new Tongs(new Item.Properties().durability(512)));
@@ -32,7 +40,7 @@ public class ModItems {
             () -> new Tongs(new Item.Properties().durability(1024)));
 
     public static final RegistryObject<Item> SMITHING_HAMMER = ITEMS.register("smithing_hammer",
-            () -> new SmithingHammer(new Item.Properties().durability(256)));
+            () -> new SmithingHammer(new Item.Properties().durability(512)));
 
     // Add these inside your ModItems class
     public static final RegistryObject<Item> STONE_SWORD_BLADE = ITEMS.register("stone_sword_blade",
@@ -106,5 +114,5 @@ public class ModItems {
         ITEMS.register(eventBus);
     }
 
-    
+
 }

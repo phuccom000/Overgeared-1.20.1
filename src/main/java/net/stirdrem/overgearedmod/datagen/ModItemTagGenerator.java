@@ -73,8 +73,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.HEATABLE_METALS)
                 .add(
                         ModItems.STEEL_INGOT.get(),
-                        Items.IRON_INGOT,
-                        Items.GOLD_INGOT
+                        Items.IRON_INGOT
                 );
         this.tag(ModTags.Items.HEATED_METALS)
                 .add(

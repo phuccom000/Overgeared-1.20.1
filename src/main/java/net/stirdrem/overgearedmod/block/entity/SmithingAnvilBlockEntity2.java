@@ -1,3 +1,4 @@
+/*
 package net.stirdrem.overgearedmod.block.entity;
 
 import net.minecraft.core.BlockPos;
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
+public class SmithingAnvilBlockEntity2 extends BlockEntity implements MenuProvider {
     private final ItemStackHandler itemHandler = new ItemStackHandler(10);
 
     private static final int INPUT_SLOT = 0;
@@ -41,14 +42,15 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private int progress = 0;
     private int maxProgress = 5;
 
-    public SmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
+    public SmithingAnvilBlockEntity2(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.SMITHING_TABLE_BE.get(), pPos, pBlockState);
         this.data = new ContainerData() {
             @Override
             public int get(int pIndex) {
                 return switch (pIndex) {
-                    case 0 -> progress;
-                    case 1 -> maxProgress;
+                    case 0 -> SmithingAnvilBlockEntity2.this.progress;
+                    case 1 -> SmithingAnvilBlockEntity2.this.maxProgress;
+
                     default -> 0;
                 };
             }
@@ -56,8 +58,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             @Override
             public void set(int pIndex, int pValue) {
                 switch (pIndex) {
-                    case 0 -> progress = pValue;
-                    case 1 -> maxProgress = pValue;
+                    case 0 -> SmithingAnvilBlockEntity2.this.progress = pIndex;
+                    case 1 -> SmithingAnvilBlockEntity2.this.maxProgress = pIndex;
                 }
             }
 
@@ -73,7 +75,6 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return lazyItemHandler.cast();
         }
-
         return super.getCapability(cap, side);
     }
 
@@ -102,9 +103,9 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return Component.translatable("block.overgearedmod.smithing_anvil.gui");
     }
 
-    @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
+
+    public @Nullable AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
         return new SmithingAnvilMenu(pContainerId, pPlayerInventory, this, this.data);
     }
 
@@ -112,7 +113,6 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     protected void saveAdditional(CompoundTag pTag) {
         pTag.put("inventory", itemHandler.serializeNBT());
         pTag.putInt("smithing_anvil.progress", progress);
-
         super.saveAdditional(pTag);
     }
 
@@ -142,31 +142,57 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
     private void craftItem() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
+       */
+/* Optional<ForgingRecipe> recipe = getCurrentRecipe();
+        if (recipe.isEmpty()) return;
+
         ItemStack result = recipe.get().getResultItem(null);
 
-        for (int i = 0; i < this.itemHandler.getSlots(); i++)
-            this.itemHandler.extractItem(i, 1, false);
+        // Only consume items from slots that are part of the recipe pattern
+        for (int slot = 0; slot < this.itemHandler.getSlots(); slot++) {
+            Ingredient required = recipe.get().getIngredients().get(slot);
+            if (!required.isEmpty()) {
+                this.itemHandler.extractItem(slot, 1, false);
+            }
+        }*//*
 
+        ItemStack result = new ItemStack(ModItems.HEATED_IRON_INGOT.get(), 1);
+        this.itemHandler.extractItem(INPUT_SLOT, 1, false);
+        // Handle output - either add to existing stack or create new one
         this.itemHandler.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
                 this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + result.getCount()));
     }
 
-    public boolean hasRecipe() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-
+    private boolean hasRecipe() {
+       */
+/* Optional<ForgingRecipe> recipe = getCurrentRecipe();
         if (recipe.isEmpty()) {
             return false;
         }
-        ItemStack result = recipe.get().getResultItem(getLevel().registryAccess());
+        //setMaxProgress(recipe.get().getHammeringRequired());
 
-        return canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
+        // Check if we've reached the required hammer strikes
+        if (progress < maxProgress) {
+            return false;
+        }
+
+        ItemStack result = recipe.get().getResultItem(null);
+        return canInsertAmountIntoOutputSlot(result.getCount()) &&
+                canInsertItemIntoOutputSlot(result.getItem());*//*
+
+
+        boolean hasCraftingItem = this.itemHandler.getStackInSlot(INPUT_SLOT).getItem() == ModItems.IRON_AXE_HEAD.get();
+        ItemStack result = new ItemStack(ModItems.HEATED_IRON_INGOT.get());
+
+        return hasCraftingItem && canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
     }
 
     private Optional<ForgingRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots());
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots()); // Only check the 3x3 grid
+
+        // Load all 9 crafting slots (0-8) into the inventory
+        for (int slot = 0; slot < this.itemHandler.getSlots(); slot++) {
+            inventory.setItem(slot, this.itemHandler.getStackInSlot(slot));
         }
 
         return this.level.getRecipeManager().getRecipeFor(ForgingRecipe.Type.INSTANCE, inventory, level);
@@ -180,9 +206,12 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.itemHandler.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();
     }
 
-
     private boolean hasProgressFinished() {
         return progress >= maxProgress;
+    }
+
+    private void setMaxProgress(int maxProgress) {
+        this.maxProgress = maxProgress;
     }
 
     private void increaseCraftingProgress() {
@@ -203,3 +232,4 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         }
     }
 }
+*/

@@ -1,0 +1,18 @@
+{
+  "type": "overgearedmod:forging",
+  "hammering": 5,
+  "key": {
+    "#": {
+      "item": "overgearedmod:steel_ingot"
+    }
+  },
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "result": {
+    "item": "overgearedmod:steel_block"
+  },
+  "show_notification": true
+}
