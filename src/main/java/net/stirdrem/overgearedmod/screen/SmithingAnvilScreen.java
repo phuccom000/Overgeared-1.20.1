@@ -1,6 +1,7 @@
 package net.stirdrem.overgearedmod.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -47,7 +48,20 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
+        renderHitsRemaining(guiGraphics);
         renderTooltip(guiGraphics, mouseX, mouseY);
+
+
     }
 
+    private void renderHitsRemaining(GuiGraphics guiGraphics) {
+        // Draw remaining hits label
+        if (menu.getRemainingHits() == 0) return;
+        else {
+            String hitsText = "Hits left: " + menu.getRemainingHits();
+            int x = (width - imageWidth) / 2;
+            int y = (height - imageHeight) / 2;
+            guiGraphics.drawString(font, hitsText, x + 89, y + 60, 4210752, false); // White color
+        }
+    }
 }

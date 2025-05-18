@@ -1,5 +1,6 @@
 package net.stirdrem.overgearedmod.item.custom;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -96,7 +97,8 @@ public class HeatedIngots extends Item {
 
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(Component.translatable("tooltip.overgearedmod.heatedingots.tooltip"));
+        pTooltipComponents.add(Component.translatable("tooltip.overgearedmod.heatedingots.tooltip").withStyle(ChatFormatting.GRAY)
+        );
 
     }
 

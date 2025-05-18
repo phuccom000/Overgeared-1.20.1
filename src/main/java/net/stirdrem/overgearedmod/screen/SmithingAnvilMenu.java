@@ -11,7 +11,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 import net.stirdrem.overgearedmod.block.ModBlocks;
 import net.stirdrem.overgearedmod.block.entity.SmithingAnvilBlockEntity;
-import org.jetbrains.annotations.Nullable;
 
 public class SmithingAnvilMenu extends AbstractContainerMenu {
     public final SmithingAnvilBlockEntity blockEntity;
@@ -43,7 +42,12 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
             this.addSlot(new SlotItemHandler(iItemHandler, 6, 30, 53));
             this.addSlot(new SlotItemHandler(iItemHandler, 7, 48, 53));
             this.addSlot(new SlotItemHandler(iItemHandler, 8, 66, 53));
-            this.addSlot(new SlotItemHandler(iItemHandler, 9, 124, 35));
+            this.addSlot(new SlotItemHandler(iItemHandler, 9, 124, 35) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return false; // Prevent inserting any item
+                }
+            });
         });
 
         addDataSlots(data);
@@ -78,7 +82,7 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
         if (pIndex < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
             // This is a vanilla container slot so merge the stack into the tile inventory
             if (!moveItemStackTo(sourceStack, TE_INVENTORY_FIRST_SLOT_INDEX, TE_INVENTORY_FIRST_SLOT_INDEX
-                    + TE_INVENTORY_SLOT_COUNT, false)) {
+                    + TE_INVENTORY_SLOT_COUNT - 1, false)) {
                 return ItemStack.EMPTY;  // EMPTY_ITEM
             }
         } else if (pIndex < TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT) {
@@ -131,4 +135,11 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
     }
+
+    public int getRemainingHits() {
+        int progress = this.data.get(0);
+        int maxProgress = this.data.get(1);
+        return maxProgress - progress;
+    }
+
 }

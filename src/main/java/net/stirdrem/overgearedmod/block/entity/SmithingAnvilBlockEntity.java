@@ -4,6 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -21,7 +24,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.stirdrem.overgearedmod.item.ModItems;
 import net.stirdrem.overgearedmod.recipe.ForgingRecipe;
 import net.stirdrem.overgearedmod.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
@@ -30,25 +32,38 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
-    private final ItemStackHandler itemHandler = new ItemStackHandler(10);
+    private final ItemStackHandler itemHandler = new ItemStackHandler(10) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+            if (!level.isClientSide()) {
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+        }
+    };
 
     private static final int INPUT_SLOT = 0;
     private static final int OUTPUT_SLOT = 9;
+
 
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     protected final ContainerData data;
     private int progress = 0;
-    private int maxProgress = 5;
+    private int maxProgress = 0;
+    private int hitRemains;
+    private long busyUntilGameTime = 0L;
+
 
     public SmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.SMITHING_TABLE_BE.get(), pPos, pBlockState);
+        super(ModBlockEntities.SMITHING_ANVIL_BE.get(), pPos, pBlockState);
         this.data = new ContainerData() {
             @Override
             public int get(int pIndex) {
                 return switch (pIndex) {
                     case 0 -> progress;
                     case 1 -> maxProgress;
+                    case 2 -> hitRemains;
                     default -> 0;
                 };
             }
@@ -66,6 +81,12 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
                 return 2;
             }
         };
+    }
+
+    public ItemStack getRenderStack(int index) {
+        if (itemHandler.getStackInSlot(OUTPUT_SLOT).isEmpty()) {
+            return itemHandler.getStackInSlot(index);
+        } else return itemHandler.getStackInSlot(OUTPUT_SLOT);
     }
 
     @Override
@@ -125,6 +146,10 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         if (hasRecipe()) {
+            Optional<ForgingRecipe> recipe = getCurrentRecipe();
+            ForgingRecipe currentRecipe = recipe.get();
+            maxProgress = currentRecipe.getHammeringRequired();
+
             increaseCraftingProgress();
             setChanged(pLevel, pPos, pState);
 
@@ -139,17 +164,17 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
     private void resetProgress() {
         progress = 0;
+        maxProgress = 0;
     }
 
     private void craftItem() {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
         ItemStack result = recipe.get().getResultItem(null);
 
-        for (int i = 0; i < this.itemHandler.getSlots(); i++)
+        for (int i = 0; i < this.itemHandler.getSlots() - 1; i++)
             this.itemHandler.extractItem(i, 1, false);
-
         this.itemHandler.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
-                this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + result.getCount()));
+                this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + 1));
     }
 
     public boolean hasRecipe() {
@@ -191,6 +216,11 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
     public void increaseCraftingProgressIfValid() {
         if (hasRecipe()) {
+            Optional<ForgingRecipe> recipe = getCurrentRecipe();
+
+            ForgingRecipe currentRecipe = recipe.get();
+            maxProgress = currentRecipe.getHammeringRequired();
+
             increaseCraftingProgress();
             //setChanged(pLevel, pPos, pState);
 
@@ -202,4 +232,44 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             resetProgress();
         }
     }
+
+    public boolean isBusy(long currentGameTime) {
+        return currentGameTime < busyUntilGameTime;
+    }
+
+    public void setBusyUntil(long time) {
+        this.busyUntilGameTime = time;
+        setChanged(level, worldPosition, getBlockState());
+    }
+
+
+    public void updateHitsRemaining(Level lvl, BlockPos pos, BlockState st) {
+        if (hasRecipe()) {
+            Optional<ForgingRecipe> recipe = getCurrentRecipe();
+            ForgingRecipe currentRecipe = recipe.get();
+            maxProgress = currentRecipe.getHammeringRequired();
+            hitRemains = maxProgress - progress;
+            setChanged(lvl, pos, st);
+            if (hasProgressFinished()) {
+                resetProgress();
+            }
+        } else {
+            resetProgress();
+        }
+    }
+
+    public int getHitsRemaining() {
+        return hitRemains;
+    }
+
+    @Override
+    public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
+    }
+
 }

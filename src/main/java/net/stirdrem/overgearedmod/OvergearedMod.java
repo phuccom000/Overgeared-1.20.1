@@ -20,6 +20,7 @@ import net.stirdrem.overgearedmod.item.ModItems;
 import net.stirdrem.overgearedmod.recipe.ModRecipes;
 import net.stirdrem.overgearedmod.screen.ModMenuTypes;
 import net.stirdrem.overgearedmod.screen.SmithingAnvilScreen;
+import net.stirdrem.overgearedmod.util.TickScheduler;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -40,10 +41,12 @@ public class OvergearedMod {
         ModBlocks.register(modEventBus);
 
         ModBlockEntities.register(modEventBus);
-        
+
         ModMenuTypes.register(modEventBus);
 
         ModRecipes.register(modEventBus);
+
+        MinecraftForge.EVENT_BUS.register(TickScheduler.class);
 
         modEventBus.addListener(this::commonSetup);
 

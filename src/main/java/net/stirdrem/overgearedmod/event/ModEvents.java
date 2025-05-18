@@ -39,7 +39,7 @@ public class ModEvents {
     private static int TICK = 0;
     private static final int perTick = 30;
 
-/*    @SubscribeEvent
+    /*@SubscribeEvent
     public static void onLevelTick(TickEvent.LevelTickEvent event) {
         if (event.phase != TickEvent.Phase.END || event.level.isClientSide()) return;
 
@@ -58,7 +58,7 @@ public class ModEvents {
             BlockState state = level.getBlockState(pos);
             ItemStack itemStack = itemEntity.getItem();
 
-            if (!itemStack.is(ModTags.Items.HEATED_METALS)) continue;
+            if (!itemStack.is(ModTags.Items.HEATED_METALS)) return;
 
             // Check if the item is in water or in a water cauldron
             boolean inWater = itemEntity.isInWater();

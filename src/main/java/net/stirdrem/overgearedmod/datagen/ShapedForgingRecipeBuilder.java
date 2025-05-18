@@ -22,6 +22,7 @@ import net.minecraft.core.NonNullList;
 import net.stirdrem.overgearedmod.recipe.ForgingRecipe;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,28 +111,99 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
 
         int width = this.rows.get(0).length();
         int height = this.rows.size();
-        NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
 
+        boolean needsVariants = width < 3 || height < 3;
+
+        if (needsVariants) {
+            generateAll3x3Variants(pRecipeOutput, pRecipeId);
+        } else {
+            NonNullList<Ingredient> ingredients = getIngredients(width, height);
+            pRecipeOutput.accept(new Result(
+                    ingredients, this.hammering, new ItemStack(this.result, this.count),
+                    pRecipeId, this.rows, this.key, this.advancement,
+                    pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/"),
+                    this.showNotification
+            ));
+        }
+    }
+
+    private void generateAll3x3Variants(Consumer<FinishedRecipe> pRecipeOutput, ResourceLocation baseId) {
+        int originalWidth = this.rows.isEmpty() ? 0 : this.rows.get(0).length();
+        int originalHeight = this.rows.size();
+
+        int padX = 3 - originalWidth;
+        int padY = 3 - originalHeight;
+
+        List<String> baseRows = new ArrayList<>(this.rows);
+
+        // Ensure all rows are same width
+        for (int i = 0; i < baseRows.size(); i++) {
+            baseRows.set(i, padRight(baseRows.get(i), originalWidth));
+        }
+
+        int variantId = 0;
+
+        for (int top = 0; top <= padY; top++) {
+            for (int left = 0; left <= padX; left++) {
+                List<String> padded = new ArrayList<>();
+
+                // Add top empty rows
+                for (int i = 0; i < top; i++) padded.add("   ");
+
+                // Add existing rows with left/right padding
+                for (String row : baseRows) {
+                    String paddedRow = padLeft(row, left);
+                    paddedRow = padRight(paddedRow, 3);
+                    padded.add(paddedRow);
+                }
+
+                // Add bottom empty rows
+                while (padded.size() < 3) padded.add("   ");
+
+                // Now create variant recipe
+                int width = 3, height = 3;
+                NonNullList<Ingredient> ingredients = NonNullList.withSize(9, Ingredient.EMPTY);
+
+                for (int i = 0; i < 3; i++) {
+                    String row = padded.get(i);
+                    for (int j = 0; j < 3; j++) {
+                        char c = row.charAt(j);
+                        Ingredient ingredient = this.key.getOrDefault(c, Ingredient.EMPTY);
+                        ingredients.set(i * 3 + j, ingredient);
+                    }
+                }
+
+                ResourceLocation variantIdLoc = ResourceLocation.tryBuild(baseId.getNamespace(), baseId.getPath() + "_variant" + (++variantId));
+
+                pRecipeOutput.accept(new Result(
+                        ingredients, this.hammering, new ItemStack(this.result, this.count),
+                        variantIdLoc, padded, this.key, this.advancement,
+                        variantIdLoc.withPrefix("recipes/" + this.category.getFolderName() + "/"),
+                        this.showNotification
+                ));
+            }
+        }
+    }
+
+    private String padLeft(String s, int n) {
+        return " ".repeat(n) + s;
+    }
+
+    private String padRight(String s, int n) {
+        return s + " ".repeat(n - s.length());
+    }
+
+    private NonNullList<Ingredient> getIngredients(int width, int height) {
+        NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
         for (int i = 0; i < height; ++i) {
-            String patternLine = this.rows.get(i);
+            String row = this.rows.get(i);
             for (int j = 0; j < width; ++j) {
-                char symbol = patternLine.charAt(j);
-                Ingredient ingredient = this.key.getOrDefault(symbol, Ingredient.EMPTY);
+                char c = row.charAt(j);
+                Ingredient ingredient = this.key.getOrDefault(c, Ingredient.EMPTY);
                 ingredients.set(i * width + j, ingredient);
             }
         }
-
-        pRecipeOutput.accept(new ShapedForgingRecipeBuilder.Result(
-                ingredients,
-                this.hammering,
-                new ItemStack(this.result, this.count),
-                pRecipeId,
-                this.rows,
-                this.key,
-                this.advancement,
-                pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/"),
-                this.showNotification
-        ));
+        return ingredients;
     }
 
 

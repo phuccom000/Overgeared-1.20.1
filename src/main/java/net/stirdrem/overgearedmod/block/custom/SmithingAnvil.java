@@ -2,15 +2,15 @@ package net.stirdrem.overgearedmod.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -31,19 +31,30 @@ import net.minecraftforge.network.NetworkHooks;
 import net.stirdrem.overgearedmod.block.entity.ModBlockEntities;
 import net.stirdrem.overgearedmod.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgearedmod.item.ModItems;
+import net.stirdrem.overgearedmod.util.TickScheduler;
 import org.jetbrains.annotations.Nullable;
 
 public class SmithingAnvil extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-    private static final VoxelShape BASE = Block.box(2.0D, 0.0D, 2.0D, 14.0D, 4.0D, 14.0D);
-    private static final VoxelShape X_LEG1 = Block.box(3.0D, 4.0D, 4.0D, 13.0D, 5.0D, 12.0D);
-    private static final VoxelShape X_LEG2 = Block.box(4.0D, 5.0D, 6.0D, 12.0D, 10.0D, 10.0D);
-    private static final VoxelShape X_TOP = Block.box(0.0D, 10.0D, 3.0D, 16.0D, 16.0D, 13.0D);
-    private static final VoxelShape Z_LEG1 = Block.box(4.0D, 4.0D, 3.0D, 12.0D, 5.0D, 13.0D);
-    private static final VoxelShape Z_LEG2 = Block.box(6.0D, 5.0D, 4.0D, 10.0D, 10.0D, 12.0D);
-    private static final VoxelShape Z_TOP = Block.box(3.0D, 10.0D, 0.0D, 13.0D, 16.0D, 16.0D);
-    private static final VoxelShape X_AXIS_AABB = Shapes.or(BASE, X_LEG1, X_LEG2, X_TOP);
-    private static final VoxelShape Z_AXIS_AABB = Shapes.or(BASE, Z_LEG1, Z_LEG2, Z_TOP);
+    private static final VoxelShape Z1 = Block.box(3, 9, 0, 13, 16, 16);
+    private static final VoxelShape Z2 = Block.box(3, 0, 1, 13, 3, 15);
+    private static final VoxelShape Z3 = Block.box(4, 0, 4, 12, 3, 12);
+    private static final VoxelShape Z4 = Block.box(5, 3, 3, 11, 4, 13);
+    private static final VoxelShape Z5 = Block.box(6, 4, 4, 10, 9, 12);
+    private static final VoxelShape X1 = Block.box(0, 9, 3, 16, 16, 13);
+    private static final VoxelShape X2 = Block.box(1, 0, 3, 15, 3, 13);
+    private static final VoxelShape X3 = Block.box(4, 0, 4, 12, 3, 12);
+    private static final VoxelShape X4 = Block.box(3, 3, 5, 13, 4, 11);
+    private static final VoxelShape X5 = Block.box(4, 4, 6, 12, 9, 10);
+
+    // X-axis oriented shape
+    private static final VoxelShape X_AXIS_AABB = Shapes.or(X1, X2, X3, X4, X5);
+
+    // Z-axis oriented shape
+    private static final VoxelShape Z_AXIS_AABB = Shapes.or(Z1, Z2, Z3, Z4, Z5);
+
+    private static final int HAMMER_SOUND_DURATION_TICKS = 20; // adjust to match your sound
+
 
     public SmithingAnvil(Properties properties) {
         super(properties);
@@ -92,7 +103,7 @@ public class SmithingAnvil extends BaseEntityBlock {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 
-    @Override
+    /*@Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos,
                                  Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide()) {
@@ -139,8 +150,74 @@ public class SmithingAnvil extends BaseEntityBlock {
             }
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
+    }*/
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos,
+                                 Player player, InteractionHand hand, BlockHitResult hit) {
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+
+        long now = level.getGameTime();
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof SmithingAnvilBlockEntity anvil)) {
+            return InteractionResult.PASS;
+        }
+
+        // 1) Reject if still playing hammer sound
+        if (anvil.isBusy(now)) {
+            return InteractionResult.CONSUME;
+        }
+
+        ItemStack held = player.getItemInHand(hand);
+        boolean isHammer = held.getItem() == ModItems.SMITHING_HAMMER.get();
+        if (isHammer && anvil.hasRecipe()) {
+            // 2) Perform one hammer “unit” after sound
+            anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
+            for (int i = 0; i < 3; i++) {
+                int delay = 7 * i; // 0 ticks, 20 ticks, 40 ticks
+                TickScheduler.schedule(delay, () -> {
+                    //player.sendSystemMessage(Component.literal("swing hand"));
+                    //player.swing(hand);
+                    //spawnAnvilParticles(level, pos);
+                });
+            }
+            level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1f);
+            // damage & cooldown
+            held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+            // Swing animation on client
+            player.getCooldowns().addCooldown(ModItems.SMITHING_HAMMER.get(), HAMMER_SOUND_DURATION_TICKS);
+            anvil.tick(level, pos, state);
+
+
+            // actual progress increment is delayed until next tick:
+            // we’ll pick it up in the block-entity tick() after busy expires.
+
+            return InteractionResult.SUCCESS;
+        }
+
+        // otherwise open GUI
+        NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
+    private void spawnAnvilParticles(Level level, BlockPos pos) {
+        RandomSource random = level.getRandom();
+        for (int i = 0; i < 10; i++) {
+            double offsetX = 0.5 + (random.nextDouble() - 0.5);
+            double offsetY = 1.0 + random.nextDouble() * 0.5;
+            double offsetZ = 0.5 + (random.nextDouble() - 0.5);
+            double velocityX = (random.nextDouble() - 0.5) * 0.1;
+            double velocityY = random.nextDouble() * 0.1;
+            double velocityZ = (random.nextDouble() - 0.5) * 0.1;
+
+            // For orange-colored dust particles
+            level.addParticle(ParticleTypes.FLAME,
+                    pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ,
+                    velocityX, velocityY, velocityZ);
+        }
+    }
 
     @Nullable
     @Override
@@ -158,5 +235,17 @@ public class SmithingAnvil extends BaseEntityBlock {
 
         return createTickerHelper(pBlockEntityType, ModBlockEntities.SMITHING_TABLE_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
-    }*/
+    }
+*/
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
+        if (!pLevel.isClientSide && pBlockEntityType == ModBlockEntities.SMITHING_ANVIL_BE.get()) {
+            return createTickerHelper(pBlockEntityType, ModBlockEntities.SMITHING_ANVIL_BE.get(),
+                    (pLevel1, pPos, pState1, pBlockEntity) ->
+                            pBlockEntity.updateHitsRemaining(pLevel, pPos, pState1));
+
+        }
+        return null;
+    }
 }

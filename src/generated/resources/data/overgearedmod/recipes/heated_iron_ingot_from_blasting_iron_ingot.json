@@ -1,7 +1,7 @@
 {
-  "type": "minecraft:smoking",
-  "category": "food",
-  "cookingtime": 140,
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 70,
   "experience": 0.5,
   "group": "iron_ingot",
   "ingredient": {

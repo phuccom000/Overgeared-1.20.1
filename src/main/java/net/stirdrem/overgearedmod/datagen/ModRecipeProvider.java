@@ -47,33 +47,226 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         CompoundTag nbtTag = new CompoundTag();
         nbtTag.putString("heat", "200");
 
-        oreSmoking(pWriter, STEEL_SMELTABLES, RecipeCategory.MISC, ModItems.STEEL_INGOT.get(), 0.7f, 140, "");
-        oreSmoking(pWriter, IRON_INGOT, RecipeCategory.MISC, ModItems.HEATED_IRON_INGOT.get(), 0.5f, 140, "iron_ingot");
-        oreSmoking(pWriter, STEEL_INGOT, RecipeCategory.MISC, ModItems.HEATED_STEEL_INGOT.get(), 0.7f, 140, "steel_ingot");
+        //oreSmoking(pWriter, STEEL_SMELTABLES, RecipeCategory.MISC, ModItems.STEEL_INGOT.get(), 0.7f, 140, "");
+        //oreSmoking(pWriter, IRON_INGOT, RecipeCategory.MISC, ModItems.HEATED_IRON_INGOT.get(), 0.5f, 140, "iron_ingot");
+        //oreSmoking(pWriter, STEEL_INGOT, RecipeCategory.MISC, ModItems.HEATED_STEEL_INGOT.get(), 0.7f, 140, "steel_ingot");
         oreBlasting(pWriter, STEEL_SMELTABLES, RecipeCategory.MISC, ModItems.STEEL_INGOT.get(), 0.7f, 70, "steel_ingot");
         oreBlasting(pWriter, IRON_INGOT, RecipeCategory.MISC, ModItems.HEATED_IRON_INGOT.get(), 0.5f, 70, "iron_ingot");
         oreBlasting(pWriter, STEEL_INGOT, RecipeCategory.MISC, ModItems.HEATED_STEEL_INGOT.get(), 0.7f, 70, "steel_ingot");
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.STEEL_BLOCK.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModBlocks.STEEL_BLOCK.get())
                 .pattern("###")
                 .pattern("###")
                 .pattern("###")
                 .define('#', ModItems.STEEL_INGOT.get())
                 .unlockedBy(getHasName(ModItems.STEEL_INGOT.get()), has(ModItems.STEEL_INGOT.get()))
                 .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.IRON_AXE)
+                .requires(ModItems.IRON_AXE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.IRON_AXE_HEAD.get()), has(ModItems.IRON_AXE_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.IRON_PICKAXE)
+                .requires(ModItems.IRON_PICKAXE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.IRON_PICKAXE_HEAD.get()), has(ModItems.IRON_PICKAXE_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.IRON_SHOVEL)
+                .requires(ModItems.IRON_SHOVEL_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.IRON_SHOVEL_HEAD.get()), has(ModItems.IRON_SHOVEL_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.IRON_HOE)
+                .requires(ModItems.IRON_HOE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.IRON_HOE_HEAD.get()), has(ModItems.IRON_HOE_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.IRON_SWORD)
+                .requires(ModItems.IRON_SWORD_BLADE.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.IRON_SWORD_BLADE.get()), has(ModItems.IRON_SWORD_BLADE.get()))
+                .save(pWriter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.STEEL_AXE.get())
+                .requires(ModItems.STEEL_AXE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.STEEL_AXE_HEAD.get()), has(ModItems.STEEL_AXE_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.STEEL_PICKAXE.get())
+                .requires(ModItems.STEEL_PICKAXE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.STEEL_PICKAXE_HEAD.get()), has(ModItems.STEEL_PICKAXE_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.STEEL_SHOVEL.get())
+                .requires(ModItems.STEEL_SHOVEL_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.STEEL_SHOVEL_HEAD.get()), has(ModItems.STEEL_SHOVEL_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.STEEL_HOE.get())
+                .requires(ModItems.STEEL_HOE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.STEEL_HOE_HEAD.get()), has(ModItems.STEEL_HOE_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.STEEL_SWORD.get())
+                .requires(ModItems.STEEL_SWORD_BLADE.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.STEEL_SWORD_BLADE.get()), has(ModItems.STEEL_SWORD_BLADE.get()))
+                .save(pWriter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.GOLDEN_AXE)
+                .requires(ModItems.GOLDEN_AXE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.GOLDEN_AXE_HEAD.get()), has(ModItems.GOLDEN_AXE_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.GOLDEN_PICKAXE)
+                .requires(ModItems.GOLDEN_PICKAXE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.GOLDEN_PICKAXE_HEAD.get()), has(ModItems.GOLDEN_PICKAXE_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.GOLDEN_SHOVEL)
+                .requires(ModItems.GOLDEN_SHOVEL_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.GOLDEN_SHOVEL_HEAD.get()), has(ModItems.GOLDEN_SHOVEL_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.GOLDEN_HOE)
+                .requires(ModItems.GOLDEN_HOE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.GOLDEN_HOE_HEAD.get()), has(ModItems.GOLDEN_HOE_HEAD.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.GOLDEN_SWORD)
+                .requires(ModItems.GOLDEN_SWORD_BLADE.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.GOLDEN_SWORD_BLADE.get()), has(ModItems.GOLDEN_SWORD_BLADE.get()))
+                .save(pWriter);
+
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.STEEL_INGOT.get(), 9)
                 .requires(ModBlocks.STEEL_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.STEEL_BLOCK.get()), has(ModBlocks.STEEL_BLOCK.get()))
                 .save(pWriter);
 
-        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.STEEL_BLOCK.get(), 5)
+        /*ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.STEEL_BLOCK.get(), 5)
                 .pattern("###")
                 .pattern("###")
                 .pattern("###")
                 .define('#', ModItems.STEEL_INGOT.get())
                 .unlockedBy(getHasName(ModItems.STEEL_INGOT.get()), has(ModItems.STEEL_INGOT.get()))
-                .save(pWriter, OvergearedMod.MOD_ID + ":" + getItemName(ModBlocks.STEEL_BLOCK.get()) + "_from_forging_" + getItemName(ModItems.STEEL_INGOT.get()));
+                .save(pWriter, OvergearedMod.MOD_ID + ":" + getItemName(ModBlocks.STEEL_BLOCK.get()) + "_from_forging_" + getItemName(ModItems.STEEL_INGOT.get()));*/
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_PICKAXE_HEAD.get(), 3)
+                .pattern("###")
+                .define('#', ModItems.HEATED_IRON_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_IRON_INGOT.get()), has(ModItems.HEATED_IRON_INGOT.get()))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_SWORD_BLADE.get(), 3)
+                .pattern("#")
+                .pattern("#")
+                .define('#', ModItems.HEATED_IRON_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_IRON_INGOT.get()), has(ModItems.HEATED_IRON_INGOT.get()))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_SHOVEL_HEAD.get(), 3)
+                .pattern("#")
+                .define('#', ModItems.HEATED_IRON_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_IRON_INGOT.get()), has(ModItems.HEATED_IRON_INGOT.get()))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_HOE_HEAD.get(), 3)
+                .pattern("##")
+                .define('#', ModItems.HEATED_IRON_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_IRON_INGOT.get()), has(ModItems.HEATED_IRON_INGOT.get()))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_AXE_HEAD.get(), 3)
+                .pattern("##")
+                .pattern("# ")
+                .define('#', ModItems.HEATED_IRON_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_IRON_INGOT.get()), has(ModItems.HEATED_IRON_INGOT.get()))
+                .save(pWriter);
+// Steel Pickaxe Head
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_PICKAXE_HEAD.get(), 3)
+                .pattern("###")
+                .define('#', ModItems.HEATED_STEEL_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_STEEL_INGOT.get()), has(ModItems.HEATED_STEEL_INGOT.get()))
+                .save(pWriter);
+
+// Steel Sword Blade
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_SWORD_BLADE.get(), 3)
+                .pattern("#")
+                .pattern("#")
+                .define('#', ModItems.HEATED_STEEL_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_STEEL_INGOT.get()), has(ModItems.HEATED_STEEL_INGOT.get()))
+                .save(pWriter);
+
+// Steel Shovel Head
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_SHOVEL_HEAD.get(), 3)
+                .pattern("#")
+                .define('#', ModItems.HEATED_STEEL_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_STEEL_INGOT.get()), has(ModItems.HEATED_STEEL_INGOT.get()))
+                .save(pWriter);
+
+// Steel Hoe Head
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_HOE_HEAD.get(), 3)
+                .pattern("##")
+                .define('#', ModItems.HEATED_STEEL_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_STEEL_INGOT.get()), has(ModItems.HEATED_STEEL_INGOT.get()))
+                .save(pWriter);
+
+// Steel Axe Head
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_AXE_HEAD.get(), 3)
+                .pattern("##")
+                .pattern("# ")
+                .define('#', ModItems.HEATED_STEEL_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_STEEL_INGOT.get()), has(ModItems.HEATED_STEEL_INGOT.get()))
+                .save(pWriter);
+// Gold Pickaxe Head
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GOLDEN_PICKAXE_HEAD.get(), 3)
+                .pattern("###")
+                .define('#', Items.GOLD_INGOT)
+                .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
+                .save(pWriter);
+
+// Gold Sword Blade
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GOLDEN_SWORD_BLADE.get(), 3)
+                .pattern("#")
+                .pattern("#")
+                .define('#', Items.GOLD_INGOT)
+                .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
+                .save(pWriter);
+
+// Gold Shovel Head
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GOLDEN_SHOVEL_HEAD.get(), 3)
+                .pattern("#")
+                .define('#', Items.GOLD_INGOT)
+                .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
+                .save(pWriter);
+
+// Gold Hoe Head
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GOLDEN_HOE_HEAD.get(), 3)
+                .pattern("##")
+                .define('#', Items.GOLD_INGOT)
+                .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
+                .save(pWriter);
+
+// Gold Axe Head
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GOLDEN_AXE_HEAD.get(), 3)
+                .pattern("##")
+                .pattern("# ")
+                .define('#', Items.GOLD_INGOT)
+                .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
+                .save(pWriter);
 
     }
 

@@ -1,5 +1,6 @@
 package net.stirdrem.overgearedmod.item.custom;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -16,7 +17,8 @@ public class Tongs extends Item {
 
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(Component.translatable("tooltip.overgearedmod.tongs.tooltip"));
+        pTooltipComponents.add(Component.translatable("tooltip.overgearedmod.tongs.tooltip").withStyle(ChatFormatting.GRAY)
+        );
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
 }

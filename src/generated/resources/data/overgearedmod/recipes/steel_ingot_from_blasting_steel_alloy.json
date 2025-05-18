@@ -1,8 +1,9 @@
 {
-  "type": "minecraft:smoking",
-  "category": "food",
-  "cookingtime": 140,
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 70,
   "experience": 0.7,
+  "group": "steel_ingot",
   "ingredient": {
     "item": "overgearedmod:steel_alloy"
   },

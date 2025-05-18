@@ -24,7 +24,7 @@ public class ForgingRecipe implements Recipe<SimpleContainer> {
     private final ItemStack output;
     private final ResourceLocation id;
     private final int hammeringRequired;
-    private static final int hammering = 5;
+    //private static final int hammering = 5;
 
     public ForgingRecipe(NonNullList<Ingredient> inputItems, int hammeringRequired, ItemStack output, ResourceLocation id) {
         this.inputItems = inputItems;
@@ -40,7 +40,7 @@ public class ForgingRecipe implements Recipe<SimpleContainer> {
         }
 
         // Convert 3x3 grid to linear slots
-        for (int slot = 0; slot < 10; slot++) {
+        for (int slot = 0; slot < 9; slot++) {
             if (!inputItems.get(slot).test(pContainer.getItem(slot))) {
                 return false;
             }
@@ -187,15 +187,18 @@ public class ForgingRecipe implements Recipe<SimpleContainer> {
 
         @Override
         public @Nullable ForgingRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
-            NonNullList<Ingredient> inputs = NonNullList.withSize(pBuffer.readInt(), Ingredient.EMPTY);
+            int inputSize = pBuffer.readInt();
+            NonNullList<Ingredient> inputs = NonNullList.withSize(inputSize, Ingredient.EMPTY);
 
-            for (int i = 0; i < inputs.size(); i++) {
+            for (int i = 0; i < inputSize; i++) {
                 inputs.set(i, Ingredient.fromNetwork(pBuffer));
             }
 
             ItemStack output = pBuffer.readItem();
+            int hammering = pBuffer.readVarInt(); // Read the hammering value from the buffer
             return new ForgingRecipe(inputs, hammering, output, pRecipeId);
         }
+
 
         @Override
         public void toNetwork(FriendlyByteBuf pBuffer, ForgingRecipe pRecipe) {
@@ -206,6 +209,8 @@ public class ForgingRecipe implements Recipe<SimpleContainer> {
             }
 
             pBuffer.writeItemStack(pRecipe.getResultItem(null), false);
+            pBuffer.writeVarInt(pRecipe.getHammeringRequired()); // Write the hammering value to the buffer
         }
+
     }
 }
