@@ -4,7 +4,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -23,8 +22,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class HeatedIngots extends Item {
-    public HeatedIngots(Properties properties) {
+public class HeatedItem extends Item {
+    public HeatedItem(Properties properties) {
         super(properties);
     }
 
@@ -97,6 +96,10 @@ public class HeatedIngots extends Item {
 
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+        String quality = pStack.getOrCreateTag().getString("ForgingQuality");
+        if (!quality.isEmpty()) {
+            pTooltipComponents.add(Component.literal(getDisplayQuality(quality)).withStyle(ChatFormatting.GRAY));
+        }
         pTooltipComponents.add(Component.translatable("tooltip.overgearedmod.heatedingots.tooltip").withStyle(ChatFormatting.GRAY)
         );
 
@@ -120,5 +123,16 @@ public class HeatedIngots extends Item {
         float durabilityRatio = 1.0F - (float) stack.getDamageValue() / stack.getMaxDamage();
         float hue = 0.05F * durabilityRatio; // Adjust hue for color transition
         return 0xFF000000 | java.awt.Color.HSBtoRGB(hue, 1.0F, 1.0F);
+    }
+
+
+    private String getDisplayQuality(String key) {
+        return switch (key) {
+            case "poor" -> "Poorly Forged";
+            case "well" -> "Well Forged";
+            case "expert" -> "Expertly Forged";
+            case "perfect" -> "Perfectly Forged";
+            default -> "";
+        };
     }
 }

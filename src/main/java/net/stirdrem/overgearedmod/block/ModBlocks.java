@@ -12,6 +12,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgearedmod.OvergearedMod;
 import net.stirdrem.overgearedmod.block.custom.SmithingAnvil;
+import net.stirdrem.overgearedmod.block.custom.WaterBarrel;
 import net.stirdrem.overgearedmod.item.ModItems;
 
 import java.util.function.Supplier;
@@ -23,6 +24,11 @@ public class ModBlocks {
             () -> new SmithingAnvil(BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
     public static final RegistryObject<Block> STEEL_BLOCK = registerBlock("steel_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final RegistryObject<Block> WATER_BARREL_FULL = registerBlock("water_barrel_full",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()));
+    public static final RegistryObject<Block> WATER_BARREL = registerBlock("water_barrel",
+            () -> new WaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()));
+
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

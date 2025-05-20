@@ -1,6 +1,5 @@
 package net.stirdrem.overgearedmod.block.entity.renderer;
 
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -11,11 +10,17 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.stirdrem.overgearedmod.block.entity.SmithingAnvilBlockEntity;
 
 public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<SmithingAnvilBlockEntity> {
@@ -23,56 +28,95 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
     }
 
     @Override
-    public void render(SmithingAnvilBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
+    public void render(SmithingAnvilBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack,
+                       MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        ItemStack itemStack1 = ItemStack.EMPTY, itemStack2 = ItemStack.EMPTY, itemStack3 = ItemStack.EMPTY;
-        int num1 = -1, num2 = -1, num3 = -1;
-        boolean hasOutput = !pBlockEntity.getRenderStack(9).isEmpty();
 
-        for (int i = 0; i < 9; i++) {
+        // Render the output item from slot 11
+        ItemStack output = pBlockEntity.getRenderStack(11);
+        if (!output.isEmpty()) {
+            float yOffset = isBlockItem(output) ? 1.05f : 1.025f;
+            renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, 0f, 120f, 0.5f);
+        }
+
+        // Render up to three input items from slots 0 to 8
+        int rendered = 0;
+        for (int i = 0; i < 9 && rendered < 3; i++) {
             ItemStack stack = pBlockEntity.getRenderStack(i);
             if (!stack.isEmpty()) {
-                if (num1 == -1) {
-                    itemStack1 = stack;
-                    num1 = i;
-                } else if (num2 == -1) {
-                    itemStack2 = stack;
-                    num2 = i;
-                } else if (num3 == -1) {
-                    itemStack3 = stack;
-                    num3 = i;
-                    break;
-                }
+                float baseYOffset = 1.025f + (rendered * 0.025f);
+                float yOffset = isBlockItem(stack) ? baseYOffset + 0.02f : baseYOffset;
+                float rotation = 96f - (rendered * 14f);
+                renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, 0.43f, rotation, 0.35f);
+                rendered++;
             }
         }
 
-        renderStack(pPoseStack, pBuffer, itemRenderer, itemStack1, pBlockEntity, 1.025f, 96f);
-        if (!hasOutput) {// flat
-            renderStack(pPoseStack, pBuffer, itemRenderer, itemStack2, pBlockEntity, 1.05f, 110f);  // rotated 45°
-            renderStack(pPoseStack, pBuffer, itemRenderer, itemStack3, pBlockEntity, 1.075f, 125f);
-        }// rotated 90°
+        // Render the hammer from slot 9
+        ItemStack hammer = pBlockEntity.getRenderStack(9);
+        renderStack(pPoseStack, pBuffer, itemRenderer, hammer, pBlockEntity, 0f, 1.025f, -0.43f, 135f, 0.5f);
     }
+
+    // Helper method to determine if an ItemStack is a block item
+    private boolean isBlockItem(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        Item item = stack.getItem();
+        Block block = Block.byItem(item);
+        return block != Blocks.AIR;
+    }
+
 
     private void renderStack(PoseStack poseStack, MultiBufferSource buffer, ItemRenderer itemRenderer,
                              ItemStack itemStack, SmithingAnvilBlockEntity blockEntity,
-                             float yOffset, float rotationDegrees) {
+                             float xOffset, float yOffset, float zOffset, float rotationDegrees, float scale) {
+
         if (itemStack == null || itemStack.isEmpty()) return;
 
         poseStack.pushPose();
-        poseStack.translate(0.5f, yOffset, 0.5f);
 
-        // Check if the item is a block
+        // Get block facing direction
+        BlockState state = blockEntity.getBlockState();
+        Direction facing = state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
+                ? state.getValue(BlockStateProperties.HORIZONTAL_FACING)
+                : Direction.NORTH; // default fallback
+
+        // Determine rotation based on facing
+        float facingRotationDegrees = switch (facing) {
+            case NORTH -> 180f;
+            case SOUTH -> 0f;
+            case WEST -> 270f;
+            case EAST -> 90f;
+            default -> 0f;
+        };
+
+        // Calculate rotation matrix components
+        double radians = Math.toRadians(facingRotationDegrees);
+        double cos = Math.cos(radians);
+        double sin = Math.sin(radians);
+
+        // Apply rotation to xOffset and zOffset
+        float rotatedX = (float) (xOffset * cos - zOffset * sin);
+        float rotatedZ = (float) (xOffset * sin + zOffset * cos);
+
+        // Translate to center plus rotated offset, keep yOffset as is
+        poseStack.translate(0.5f - rotatedX, yOffset, 0.5f + rotatedZ);
+
+        // Apply facing rotation
+        poseStack.mulPose(Axis.YP.rotationDegrees(facingRotationDegrees));
+
+        // Check if item is a block
         boolean isBlock = itemStack.getItem() instanceof BlockItem;
 
-        // Rotate and scale differently based on item type
+        // Additional rotation (e.g., 45°) if needed
         poseStack.mulPose(Axis.YP.rotationDegrees(rotationDegrees));
-        poseStack.mulPose(Axis.XP.rotationDegrees(isBlock ? 180 : 90)); // flip block upright
-        poseStack.scale(
-                isBlock ? 0.35f : 0.5f, // blocks might be taller
-                isBlock ? 0.35f : 0.5f,
-                isBlock ? 0.35f : 0.5f
-        );
 
+        // Flip non-block items upright
+        poseStack.mulPose(Axis.XP.rotationDegrees(isBlock ? 0 : 90));
+
+        // Scale depending on type
+        poseStack.scale(scale, scale, scale);
+
+        // Render the item
         itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED,
                 getLightLevel(blockEntity.getLevel(), blockEntity.getBlockPos()),
                 OverlayTexture.NO_OVERLAY, poseStack, buffer, blockEntity.getLevel(), 1);

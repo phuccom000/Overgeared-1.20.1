@@ -6,8 +6,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgearedmod.OvergearedMod;
-import net.stirdrem.overgearedmod.item.custom.HeatableItem;
-import net.stirdrem.overgearedmod.item.custom.HeatedIngots;
+import net.stirdrem.overgearedmod.item.custom.HeatedItem;
 import net.stirdrem.overgearedmod.item.custom.SmithingHammer;
 import net.stirdrem.overgearedmod.item.custom.Tongs;
 
@@ -27,10 +26,10 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> HEATED_IRON_INGOT = ITEMS.register("heated_iron_ingot",
-            () -> new HeatedIngots(new Item.Properties().durability(100)));
+            () -> new HeatedItem(new Item.Properties().durability(100)));
 
     public static final RegistryObject<Item> HEATED_STEEL_INGOT = ITEMS.register("heated_steel_ingot",
-            () -> new HeatedIngots(new Item.Properties().durability(100)));
+            () -> new HeatedItem(new Item.Properties().durability(100)));
 
 
     public static final RegistryObject<Item> IRON_TONGS = ITEMS.register("iron_tongs",

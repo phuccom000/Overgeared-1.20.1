@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
-    private final ItemStackHandler itemHandler = new ItemStackHandler(10) {
+    private final ItemStackHandler itemHandler = new ItemStackHandler(12) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -43,7 +43,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     };
 
     private static final int INPUT_SLOT = 0;
-    private static final int OUTPUT_SLOT = 9;
+    private static final int OUTPUT_SLOT = 11;
 
 
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
@@ -84,9 +84,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
     public ItemStack getRenderStack(int index) {
-        if (itemHandler.getStackInSlot(OUTPUT_SLOT).isEmpty()) {
-            return itemHandler.getStackInSlot(index);
-        } else return itemHandler.getStackInSlot(OUTPUT_SLOT);
+        return itemHandler.getStackInSlot(index);
     }
 
     @Override
@@ -271,5 +269,11 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     public CompoundTag getUpdateTag() {
         return saveWithoutMetadata();
     }
+
+    public static void applyForgingQuality(ItemStack stack, String quality) {
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.putString("ForgingQuality", quality);
+    }
+
 
 }

@@ -2,8 +2,10 @@ package net.stirdrem.overgearedmod.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -33,6 +35,8 @@ import net.stirdrem.overgearedmod.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgearedmod.item.ModItems;
 import net.stirdrem.overgearedmod.util.TickScheduler;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Random;
+import org.joml.Vector3f;
 
 public class SmithingAnvil extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -180,7 +184,7 @@ public class SmithingAnvil extends BaseEntityBlock {
                 TickScheduler.schedule(delay, () -> {
                     //player.sendSystemMessage(Component.literal("swing hand"));
                     //player.swing(hand);
-                    //spawnAnvilParticles(level, pos);
+                    spawnAnvilParticles(level, pos);
                 });
             }
             level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1f);
@@ -203,19 +207,28 @@ public class SmithingAnvil extends BaseEntityBlock {
     }
 
     private void spawnAnvilParticles(Level level, BlockPos pos) {
-        RandomSource random = level.getRandom();
-        for (int i = 0; i < 10; i++) {
-            double offsetX = 0.5 + (random.nextDouble() - 0.5);
-            double offsetY = 1.0 + random.nextDouble() * 0.5;
-            double offsetZ = 0.5 + (random.nextDouble() - 0.5);
-            double velocityX = (random.nextDouble() - 0.5) * 0.1;
-            double velocityY = random.nextDouble() * 0.1;
-            double velocityZ = (random.nextDouble() - 0.5) * 0.1;
+        if (level instanceof ServerLevel serverLevel) {
 
-            // For orange-colored dust particles
-            level.addParticle(ParticleTypes.FLAME,
-                    pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ,
-                    velocityX, velocityY, velocityZ);
+            Random random = new Random();
+            for (int i = 0; i < 10; i++) {
+                double offsetX = 0.5 + (random.nextFloat() - 0.5);
+                double offsetY = 1.0 + random.nextFloat() * 0.5;
+                double offsetZ = 0.5 + (random.nextFloat() - 0.5);
+                double velocityX = (random.nextFloat() - 0.5) * 0.1;
+                double velocityY = random.nextFloat() * 0.1;
+                double velocityZ = (random.nextFloat() - 0.5) * 0.1;
+
+                // For orange-colored dust particles
+                /*serverLevel.sendParticles(ParticleTypes.FLAME,
+                        pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ,
+                        velocityX, velocityY, velocityZ);*/
+                serverLevel.sendParticles(new DustParticleOptions(new Vector3f(1.0f, 0.5f, 0.0f), 1.0f),
+                        pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, 1,
+                        velocityX, velocityY, velocityZ, 1);
+                serverLevel.sendParticles(ParticleTypes.CRIT,
+                        pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, 1,
+                        velocityX, velocityY, velocityZ, 1);
+            }
         }
     }
 
