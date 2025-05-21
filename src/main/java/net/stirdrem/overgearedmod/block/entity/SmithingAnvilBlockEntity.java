@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
-    private final ItemStackHandler itemHandler = new ItemStackHandler(12) {
+    private final ItemStackHandler itemHandler = new ItemStackHandler(11) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -43,7 +43,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     };
 
     private static final int INPUT_SLOT = 0;
-    private static final int OUTPUT_SLOT = 11;
+    private static final int OUTPUT_SLOT = 10;
 
 
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
@@ -124,7 +124,10 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
-        return new SmithingAnvilMenu(pContainerId, pPlayerInventory, this, this.data);
+        if (!pPlayer.isCrouching()) {
+            return new SmithingAnvilMenu(pContainerId, pPlayerInventory, this, this.data);
+        } else return null;
+
     }
 
     @Override

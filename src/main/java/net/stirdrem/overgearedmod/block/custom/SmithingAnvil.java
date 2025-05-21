@@ -4,12 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -29,10 +27,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkHooks;
 import net.stirdrem.overgearedmod.block.entity.ModBlockEntities;
 import net.stirdrem.overgearedmod.block.entity.SmithingAnvilBlockEntity;
+import net.stirdrem.overgearedmod.client.AnvilMinigameOverlay;
 import net.stirdrem.overgearedmod.item.ModItems;
+import net.stirdrem.overgearedmod.screen.ClientHooks;
 import net.stirdrem.overgearedmod.util.TickScheduler;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Random;
@@ -173,12 +175,18 @@ public class SmithingAnvil extends BaseEntityBlock {
         if (anvil.isBusy(now)) {
             return InteractionResult.CONSUME;
         }
-
+       /* if (player.isCrouching()) {
+            if ((be instanceof SmithingAnvilBlockEntity)) {
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientHooks.openSmithingMinigameScreen(pos));
+                return InteractionResult.SUCCESS;
+            }
+        }*/
         ItemStack held = player.getItemInHand(hand);
         boolean isHammer = held.getItem() == ModItems.SMITHING_HAMMER.get();
         if (isHammer && anvil.hasRecipe()) {
             // 2) Perform one hammer “unit” after sound
-            anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
+            //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
+            AnvilMinigameOverlay.isVisible = !AnvilMinigameOverlay.isVisible;
             for (int i = 0; i < 3; i++) {
                 int delay = 7 * i; // 0 ticks, 20 ticks, 40 ticks
                 TickScheduler.schedule(delay, () -> {

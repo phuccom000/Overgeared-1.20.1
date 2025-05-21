@@ -23,12 +23,11 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
 
     @Override
     protected void init() {
-        this.imageHeight = 207;
         super.init();
         //this.titleLabelY = -18;
         //this.inventoryLabelY = 18;
         this.titleLabelX = 29;
-        this.inventoryLabelY = this.imageHeight - 93;
+        //this.inventoryLabelY = this.imageHeight - 93;
 
         /*// Button size and spacing
         int buttonWidth = 16;
@@ -58,12 +57,12 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
 
             this.addRenderableWidget(button);
         }*/
-        // Starting position (adjust if needed)
+      /*  // Starting position (adjust if needed)
         int startX = (this.width - this.imageWidth) / 2 + 54;
         int startY = (this.height - this.imageHeight) / 2 + 95;
         Component tooltip = Component.literal("Baller"); // No text inside 16x16 button
         TooltipButton button = new TooltipButton(startX, startY, 68, 15, tooltip, b -> onTechniqueButtonPressed(1));
-        this.addRenderableWidget(button);
+        this.addRenderableWidget(button);*/
 
     }
 

@@ -20,13 +20,13 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
     private final ContainerData data;
 
     public SmithingAnvilMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(12));
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(11));
     }
 
 
     public SmithingAnvilMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
         super(ModMenuTypes.SMITHING_ANVIL_MENU.get(), pContainerId);
-        checkContainerSize(inv, 12);
+        checkContainerSize(inv, 11);
         blockEntity = (SmithingAnvilBlockEntity) entity;
         this.level = inv.player.level();
         this.data = data;
@@ -35,7 +35,7 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
         addPlayerHotbar(inv);
 
         this.blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
-            this.addSlot(new SlotItemHandler(iItemHandler, 9, 152, 26) {
+            this.addSlot(new SlotItemHandler(iItemHandler, 9, 152, 61) {
                 @Override
                 public boolean mayPlace(@NotNull ItemStack stack) {
                     if (stack.getItem() == ModItems.SMITHING_HAMMER.get()) {
@@ -43,7 +43,6 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
                     } else return false;
                 }
             }); //hammer
-            this.addSlot(new SlotItemHandler(iItemHandler, 10, 152, 44)); //flux
             //crafting slot
             this.addSlot(new SlotItemHandler(iItemHandler, 0, 30, 17));
             this.addSlot(new SlotItemHandler(iItemHandler, 1, 48, 17));
@@ -62,7 +61,7 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
             });*/
 
 
-            this.addSlot(new SlotItemHandler(iItemHandler, 11, 124, 35) {
+            this.addSlot(new SlotItemHandler(iItemHandler, 10, 124, 35) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return false; // Prevent inserting any item
@@ -89,7 +88,7 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
 
     // THIS YOU HAVE TO DEFINE!
-    private static final int TE_INVENTORY_SLOT_COUNT = 12;  // must be the number of slots you have!
+    private static final int TE_INVENTORY_SLOT_COUNT = 11;  // must be the number of slots you have!
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int pIndex) {
@@ -145,14 +144,14 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 125 + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 84 + i * 18));
             }
         }
     }
 
     private void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 183));
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
     }
 
