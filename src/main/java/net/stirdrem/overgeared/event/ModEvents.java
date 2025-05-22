@@ -36,8 +36,7 @@ import java.util.List;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
 public class ModEvents {
-    private static int TICK = 0;
-    private static final int perTick = 30;
+
 
     /*@SubscribeEvent
     public static void onLevelTick(TickEvent.LevelTickEvent event) {
@@ -103,8 +102,11 @@ public class ModEvents {
         if (event.phase != TickEvent.Phase.END || event.level.isClientSide()) return;
 
         Level level = event.level;
-        
+
     }
+
+    private static int TICK = 0;
+    private static final int perTick = 30;
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -136,7 +138,7 @@ public class ModEvents {
                 ItemStack offhand = player.getOffhandItem();
                 if (!offhand.isEmpty() && offhand.is(ModTags.Items.TONGS)) {
                     hasTongs = true;
-                    if (TICK % perTick == 0)
+                    if (level.getGameTime() % 40 == 0)
                         offhandStack.hurtAndBreak(1, event.player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 }
                 if (!hasTongs)            //player.sendSystemMessage(Component.literal("Player does not have tongs!"));

@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.util.ModTags;
 
 public class SmithingHammer extends Item {
@@ -30,7 +31,7 @@ public class SmithingHammer extends Item {
         BlockState state = level.getBlockState(pos);
         ItemStack held = player.getItemInHand(hand);
 
-        if (player.isShiftKeyDown() && held.is(ModTags.Items.SMITHING_HAMMERS)) {
+        if (player.isCrouching() && held.is(ModItems.SMITHING_HAMMER.get())) {
             if (state.is(ModBlocks.SMITHING_ANVIL.get())) {
                 if (!level.isClientSide()) {
                     level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1f);
@@ -49,7 +50,7 @@ public class SmithingHammer extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack held = player.getItemInHand(hand);
 
-        if (player.isShiftKeyDown() && held.is(ModTags.Items.SMITHING_HAMMERS)) {
+        if (player.isCrouching() && held.is(ModItems.SMITHING_HAMMER.get())) {
             if (!level.isClientSide()) {
                 level.playSound(null, player.blockPosition(), SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1f);
                 held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));

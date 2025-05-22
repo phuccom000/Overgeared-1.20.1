@@ -16,12 +16,15 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLConfig;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
 import net.stirdrem.overgeared.item.ModItems;
-import net.stirdrem.overgeared.platform.Services;
+
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
 import net.stirdrem.overgeared.screen.SmithingAnvilScreen;
@@ -38,7 +41,9 @@ public class OvergearedMod {
 
     public OvergearedMod(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
-        Services.CONFIG.init();
+        
+        ServerConfig.loadConfig(ServerConfig.SERVER_CONFIG, FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath()).resolve(MOD_ID + "-server.toml"));
+
         ModCreativeModeTabs.register(modEventBus);
 
         ModItems.register(modEventBus);

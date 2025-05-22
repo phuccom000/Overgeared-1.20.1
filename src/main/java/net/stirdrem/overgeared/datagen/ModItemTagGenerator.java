@@ -3,6 +3,8 @@ package net.stirdrem.overgeared.datagen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -16,8 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 public class ModItemTagGenerator extends ItemTagsProvider {
-    public ModItemTagGenerator(PackOutput p_275343_, CompletableFuture<HolderLookup.Provider> p_275729_, CompletableFuture<TagLookup<Block>> p_275322_, @Nullable ExistingFileHelper existingFileHelper) {
-        super(p_275343_, p_275729_, p_275322_, OvergearedMod.MOD_ID, existingFileHelper);
+    public ModItemTagGenerator(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> completableFuture, CompletableFuture<TagLookup<Block>> future, @Nullable ExistingFileHelper existingFileHelper) {
+        super(packOutput, completableFuture, future, OvergearedMod.MOD_ID, existingFileHelper);
     }
 
     @Override
@@ -84,6 +86,8 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                 .add(
                         ModItems.SMITHING_HAMMER.get()
                 );
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel")))
+                .add(ModItems.STEEL_INGOT.get());
     }
 }
 
