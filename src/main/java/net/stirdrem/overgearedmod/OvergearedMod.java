@@ -15,6 +15,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.stirdrem.overgearedmod.block.ModBlocks;
 import net.stirdrem.overgearedmod.block.entity.ModBlockEntities;
+import net.stirdrem.overgearedmod.core.waterbarrel.BarrelInteraction;
 import net.stirdrem.overgearedmod.item.ModCreativeModeTabs;
 import net.stirdrem.overgearedmod.item.ModItems;
 import net.stirdrem.overgearedmod.recipe.ModRecipes;
@@ -81,9 +82,10 @@ public class OvergearedMod {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-
             MenuScreens.register(ModMenuTypes.SMITHING_ANVIL_MENU.get(), SmithingAnvilScreen::new);
             //MenuScreens.register(ModMenuTypes.SMITHING_ANVIL_MG_MENU.get(), SmithingAnvilMinigameScreen::new);
+            BarrelInteraction.bootStrap();
+
 
         }
     }

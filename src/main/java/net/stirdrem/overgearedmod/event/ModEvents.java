@@ -98,6 +98,13 @@ public class ModEvents {
         }
     }*/
 
+    @SubscribeEvent
+    public static void onLevelTick(TickEvent.LevelTickEvent event) {
+        if (event.phase != TickEvent.Phase.END || event.level.isClientSide()) return;
+
+        Level level = event.level;
+        
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {

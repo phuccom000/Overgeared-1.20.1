@@ -17,6 +17,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.stirdrem.overgearedmod.block.ModBlocks;
+import net.stirdrem.overgearedmod.block.custom.LayeredWaterBarrel;
 import net.stirdrem.overgearedmod.util.ModTags;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,8 +71,41 @@ public class HeatedItem extends Item {
                     return InteractionResult.SUCCESS;
                 }
             }
-        }
+        } else if (state.is(ModBlocks.WATER_BARREL_FULL.get())) {
+            IntegerProperty levelProperty = LayeredWaterBarrel.LEVEL;
+            int waterLevel = state.getValue(levelProperty);
 
+            if (waterLevel > 0 && heldStack.is(ModTags.Items.HEATED_METALS)) {
+                // Decrease water level by 1
+                if (waterLevel == 1) {
+                    // Replace Water Cauldron with normal (empty) Cauldron
+                    level.setBlockAndUpdate(pos, ModBlocks.WATER_BARREL.get().defaultBlockState());
+                } else {
+                    // Decrease water level by 1
+                    level.setBlockAndUpdate(pos, state.setValue(levelProperty, waterLevel - 1));
+                }
+                level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+
+                // Determine the cooled ingot
+                Item cooledItem = getCooledIngot(heldStack.getItem());
+                if (cooledItem != null) {
+                    ItemStack cooledIngot = new ItemStack(cooledItem);
+                    heldStack.shrink(1);
+                    if (heldStack.isEmpty()) {
+                        player.setItemInHand(context.getHand(), cooledIngot);
+                    } else {
+                        if (!player.getInventory().add(cooledIngot)) {
+                            player.drop(cooledIngot, false);
+                        }
+                    }
+                    if (player != null) {
+                        //player.sendSystemMessage(Component.literal("The heated ingot has been cooled in the cauldron."));
+                        player.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
+                    }
+                    return InteractionResult.SUCCESS;
+                }
+            }
+        }
         return InteractionResult.PASS;
     }
 

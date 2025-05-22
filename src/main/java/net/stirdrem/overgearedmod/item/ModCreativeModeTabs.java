@@ -70,6 +70,8 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModBlocks.SMITHING_ANVIL.get());
                         pOutput.accept(ModBlocks.STEEL_BLOCK.get());
                         pOutput.accept(ModBlocks.WATER_BARREL.get());
+                        pOutput.accept(ModBlocks.WATER_BARREL_FULL.get());
+
                         //pOutput.accept(Items.DIAMOND); //.get() only for custom items
 
                     })

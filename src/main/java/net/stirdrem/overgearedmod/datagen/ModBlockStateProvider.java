@@ -21,7 +21,8 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
         simpleBlock(ModBlocks.WATER_BARREL.get(),
                 new ModelFile.UncheckedModelFile(modLoc("block/water_barrel")));
-
+        simpleBlock(ModBlocks.WATER_BARREL_FULL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/water_barrel_full")));
     }
 
     private void blockWithItem(RegistryObject<Block> blockRegistryObject) {

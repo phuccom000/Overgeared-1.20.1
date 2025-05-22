@@ -181,12 +181,14 @@ public class SmithingAnvil extends BaseEntityBlock {
                 return InteractionResult.SUCCESS;
             }
         }*/
+
         ItemStack held = player.getItemInHand(hand);
         boolean isHammer = held.getItem() == ModItems.SMITHING_HAMMER.get();
-        if (isHammer && anvil.hasRecipe()) {
+        if (isHammer && anvil.hasRecipe() && player.isCrouching()) {
             // 2) Perform one hammer “unit” after sound
             //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
             AnvilMinigameOverlay.isVisible = !AnvilMinigameOverlay.isVisible;
+
             for (int i = 0; i < 3; i++) {
                 int delay = 7 * i; // 0 ticks, 20 ticks, 40 ticks
                 TickScheduler.schedule(delay, () -> {

@@ -42,5 +42,7 @@
   "item.overgearedmod.steel_axe": "Steel Axe",
   "item.overgearedmod.steel_hoe": "Steel Hoe",
   "item.overgearedmod.steel_shovel": "Steel Shovel",
-  "tooltip.overgearedmod.heatedingots.tooltip": "It burns your hand! Use tongs to safely handle."
+  "tooltip.overgearedmod.heatedingots.tooltip": "It burns your hand! Use tongs to safely handle.",
+  "block.overgearedmod.water_barrel": "Water Barrel",
+  "block.overgearedmod.water_barrel_full": "Water Barrel Full"
 }

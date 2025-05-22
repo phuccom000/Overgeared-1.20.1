@@ -89,7 +89,7 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
-        //renderHitsRemaining(guiGraphics);
+        renderHitsRemaining(guiGraphics);
         for (var widget : this.renderables) {
             if (widget instanceof TooltipButton button && button.isHovered()) {
                 guiGraphics.renderTooltip(this.font, button.getTooltipComponent(), mouseX, mouseY);

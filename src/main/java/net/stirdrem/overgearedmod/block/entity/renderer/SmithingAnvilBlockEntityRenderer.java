@@ -32,8 +32,8 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
                        MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
-        // Render the output item from slot 11
-        ItemStack output = pBlockEntity.getRenderStack(11);
+        // Render the output item from slot 10
+        ItemStack output = pBlockEntity.getRenderStack(10);
         if (!output.isEmpty()) {
             float yOffset = isBlockItem(output) ? 1.05f : 1.025f;
             renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, 0f, 120f, 0.5f);

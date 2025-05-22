@@ -4,31 +4,39 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.CauldronBlock;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgearedmod.OvergearedMod;
 import net.stirdrem.overgearedmod.block.custom.SmithingAnvil;
+import net.stirdrem.overgearedmod.block.custom.LayeredWaterBarrel;
 import net.stirdrem.overgearedmod.block.custom.WaterBarrel;
+import net.stirdrem.overgearedmod.core.waterbarrel.BarrelInteraction;
 import net.stirdrem.overgearedmod.item.ModItems;
 
 import java.util.function.Supplier;
 
 public class ModBlocks {
+    private BlockState defaultBlockState;
+
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, OvergearedMod.MOD_ID);
     public static final RegistryObject<Block> SMITHING_ANVIL = registerBlock("smithing_anvil",
             () -> new SmithingAnvil(BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
     public static final RegistryObject<Block> STEEL_BLOCK = registerBlock("steel_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
-    public static final RegistryObject<Block> WATER_BARREL_FULL = registerBlock("water_barrel_full",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()));
     public static final RegistryObject<Block> WATER_BARREL = registerBlock("water_barrel",
-            () -> new WaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()));
-
+            () -> new WaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL).requiresCorrectToolForDrops().strength(2.0F).noOcclusion()));
+    public static final RegistryObject<Block> WATER_BARREL_FULL = registerBlock("water_barrel_full",
+            () -> new LayeredWaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL), LayeredCauldronBlock.RAIN, BarrelInteraction.WATER));
+    /*public static final RegistryObject<Block> WATER_BARREL_FULL = registerBlock("water_barrel_full",
+            () -> new WaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL).requiresCorrectToolForDrops().strength(2.0F).noOcclusion()));*/
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
@@ -38,6 +46,10 @@ public class ModBlocks {
 
     private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block) {
         ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+    }
+
+    public final BlockState defaultBlockState() {
+        return this.defaultBlockState;
     }
 
     public static void register(IEventBus eventBus) {
