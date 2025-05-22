@@ -3,7 +3,7 @@
   "category": "equipment",
   "ingredients": [
     {
-      "item": "overgearedmod:golden_sword_blade"
+      "item": "overgeared:golden_sword_blade"
     },
     {
       "item": "minecraft:stick"

@@ -3,7 +3,7 @@
   "category": "equipment",
   "ingredients": [
     {
-      "item": "overgearedmod:iron_sword_blade"
+      "item": "overgeared:iron_sword_blade"
     },
     {
       "item": "minecraft:stick"

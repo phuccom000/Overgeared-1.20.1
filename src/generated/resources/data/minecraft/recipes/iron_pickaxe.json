@@ -3,7 +3,7 @@
   "category": "equipment",
   "ingredients": [
     {
-      "item": "overgearedmod:iron_pickaxe_head"
+      "item": "overgeared:iron_pickaxe_head"
     },
     {
       "item": "minecraft:stick"

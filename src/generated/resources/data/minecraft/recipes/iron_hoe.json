@@ -3,7 +3,7 @@
   "category": "equipment",
   "ingredients": [
     {
-      "item": "overgearedmod:iron_hoe_head"
+      "item": "overgeared:iron_hoe_head"
     },
     {
       "item": "minecraft:stick"

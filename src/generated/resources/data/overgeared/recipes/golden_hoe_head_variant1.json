@@ -1,0 +1,18 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 3,
+  "key": {
+    "#": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "pattern": [
+    "## ",
+    "   ",
+    "   "
+  ],
+  "result": {
+    "item": "overgeared:golden_hoe_head"
+  },
+  "show_notification": true
+}

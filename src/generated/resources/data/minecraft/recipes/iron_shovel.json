@@ -3,7 +3,7 @@
   "category": "equipment",
   "ingredients": [
     {
-      "item": "overgearedmod:iron_shovel_head"
+      "item": "overgeared:iron_shovel_head"
     },
     {
       "item": "minecraft:stick"
