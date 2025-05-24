@@ -1,0 +1,16 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 3,
+  "key": {
+    "#": {
+      "item": "overgeared:heated_iron_ingot"
+    }
+  },
+  "pattern": [
+    "#"
+  ],
+  "result": {
+    "item": "overgeared:iron_shovel_head"
+  },
+  "show_notification": true
+}

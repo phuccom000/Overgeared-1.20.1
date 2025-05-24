@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "cookingtime": 140,
+  "experience": 0.7,
+  "ingredient": {
+    "item": "overgeared:steel_alloy"
+  },
+  "result": "overgeared:steel_ingot"
+}

@@ -2,6 +2,7 @@ package net.stirdrem.overgeared.recipe;
 
 
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -19,3 +20,4 @@ public class ModRecipes {
         SERIALIZERS.register(eventBus);
     }
 }
+

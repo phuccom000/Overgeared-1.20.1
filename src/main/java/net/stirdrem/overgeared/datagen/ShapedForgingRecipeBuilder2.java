@@ -4,30 +4,29 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.core.NonNullList;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class ShapedForgingRecipeBuilder implements RecipeBuilder {
+public class ShapedForgingRecipeBuilder2 implements RecipeBuilder {
     private final RecipeCategory category;
     private final Item result;
     private final int count;
@@ -41,30 +40,30 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private boolean showNotification = true;
 
 
-    public ShapedForgingRecipeBuilder(RecipeCategory category, ItemLike result, int count, int hammering) {
+    public ShapedForgingRecipeBuilder2(RecipeCategory category, ItemLike result, int count, int hammering) {
         this.category = category;
         this.result = result.asItem();
         this.count = count;
         this.hammering = hammering;
     }
 
-    public static ShapedForgingRecipeBuilder shaped(RecipeCategory category, ItemLike result, int hammering) {
-        return new ShapedForgingRecipeBuilder(category, result, 1, hammering);
+    public static ShapedForgingRecipeBuilder2 shaped(RecipeCategory category, ItemLike result, int hammering) {
+        return new ShapedForgingRecipeBuilder2(category, result, 1, hammering);
     }
 
-    public static ShapedForgingRecipeBuilder shaped(RecipeCategory category, ItemLike result, int count, int hammering) {
-        return new ShapedForgingRecipeBuilder(category, result, count, hammering);
+    public static ShapedForgingRecipeBuilder2 shaped(RecipeCategory category, ItemLike result, int count, int hammering) {
+        return new ShapedForgingRecipeBuilder2(category, result, count, hammering);
     }
 
-    public ShapedForgingRecipeBuilder define(Character pSymbol, TagKey<Item> pTag) {
+    public ShapedForgingRecipeBuilder2 define(Character pSymbol, TagKey<Item> pTag) {
         return this.define(pSymbol, Ingredient.of(pTag));
     }
 
-    public ShapedForgingRecipeBuilder define(Character symbol, ItemLike item) {
+    public ShapedForgingRecipeBuilder2 define(Character symbol, ItemLike item) {
         return this.define(symbol, Ingredient.of(item));
     }
 
-    public ShapedForgingRecipeBuilder define(Character pSymbol, Ingredient pIngredient) {
+    public ShapedForgingRecipeBuilder2 define(Character pSymbol, Ingredient pIngredient) {
         if (this.key.containsKey(pSymbol)) {
             throw new IllegalArgumentException("Symbol '" + pSymbol + "' is already defined!");
         } else if (pSymbol == ' ') {
@@ -75,7 +74,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    public ShapedForgingRecipeBuilder pattern(String pPattern) {
+    public ShapedForgingRecipeBuilder2 pattern(String pPattern) {
         if (!this.rows.isEmpty() && pPattern.length() != this.rows.get(0).length()) {
             throw new IllegalArgumentException("Pattern must be the same width on every line!");
         } else {
@@ -84,17 +83,17 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    public ShapedForgingRecipeBuilder unlockedBy(String pCriterionName, CriterionTriggerInstance pCriterionTrigger) {
+    public ShapedForgingRecipeBuilder2 unlockedBy(String pCriterionName, CriterionTriggerInstance pCriterionTrigger) {
         this.advancement.addCriterion(pCriterionName, pCriterionTrigger);
         return this;
     }
 
-    public ShapedForgingRecipeBuilder group(@Nullable String pGroupName) {
+    public ShapedForgingRecipeBuilder2 group(@Nullable String pGroupName) {
         this.group = pGroupName;
         return this;
     }
 
-    public ShapedForgingRecipeBuilder showNotification(boolean pShowNotification) {
+    public ShapedForgingRecipeBuilder2 showNotification(boolean pShowNotification) {
         this.showNotification = pShowNotification;
         return this;
     }
@@ -110,28 +109,99 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
 
         int width = this.rows.get(0).length();
         int height = this.rows.size();
-        NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
 
+        boolean needsVariants = width < 3 || height < 3;
+
+        if (needsVariants) {
+            generateAll3x3Variants(pRecipeOutput, pRecipeId);
+        } else {
+            NonNullList<Ingredient> ingredients = getIngredients(width, height);
+            pRecipeOutput.accept(new Result(
+                    ingredients, this.hammering, new ItemStack(this.result, this.count),
+                    pRecipeId, this.rows, this.key, this.advancement,
+                    pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/"),
+                    this.showNotification
+            ));
+        }
+    }
+
+    private void generateAll3x3Variants(Consumer<FinishedRecipe> pRecipeOutput, ResourceLocation baseId) {
+        int originalWidth = this.rows.isEmpty() ? 0 : this.rows.get(0).length();
+        int originalHeight = this.rows.size();
+
+        int padX = 3 - originalWidth;
+        int padY = 3 - originalHeight;
+
+        List<String> baseRows = new ArrayList<>(this.rows);
+
+        // Ensure all rows are same width
+        for (int i = 0; i < baseRows.size(); i++) {
+            baseRows.set(i, padRight(baseRows.get(i), originalWidth));
+        }
+
+        int variantId = 0;
+
+        for (int top = 0; top <= padY; top++) {
+            for (int left = 0; left <= padX; left++) {
+                List<String> padded = new ArrayList<>();
+
+                // Add top empty rows
+                for (int i = 0; i < top; i++) padded.add("   ");
+
+                // Add existing rows with left/right padding
+                for (String row : baseRows) {
+                    String paddedRow = padLeft(row, left);
+                    paddedRow = padRight(paddedRow, 3);
+                    padded.add(paddedRow);
+                }
+
+                // Add bottom empty rows
+                while (padded.size() < 3) padded.add("   ");
+
+                // Now create variant recipe
+                int width = 3, height = 3;
+                NonNullList<Ingredient> ingredients = NonNullList.withSize(9, Ingredient.EMPTY);
+
+                for (int i = 0; i < 3; i++) {
+                    String row = padded.get(i);
+                    for (int j = 0; j < 3; j++) {
+                        char c = row.charAt(j);
+                        Ingredient ingredient = this.key.getOrDefault(c, Ingredient.EMPTY);
+                        ingredients.set(i * 3 + j, ingredient);
+                    }
+                }
+
+                ResourceLocation variantIdLoc = ResourceLocation.tryBuild(baseId.getNamespace(), baseId.getPath() + "_variant" + (++variantId));
+
+                pRecipeOutput.accept(new Result(
+                        ingredients, this.hammering, new ItemStack(this.result, this.count),
+                        variantIdLoc, padded, this.key, this.advancement,
+                        variantIdLoc.withPrefix("recipes/" + this.category.getFolderName() + "/"),
+                        this.showNotification
+                ));
+            }
+        }
+    }
+
+    private String padLeft(String s, int n) {
+        return " ".repeat(n) + s;
+    }
+
+    private String padRight(String s, int n) {
+        return s + " ".repeat(n - s.length());
+    }
+
+    private NonNullList<Ingredient> getIngredients(int width, int height) {
+        NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
         for (int i = 0; i < height; ++i) {
-            String patternLine = this.rows.get(i);
+            String row = this.rows.get(i);
             for (int j = 0; j < width; ++j) {
-                char symbol = patternLine.charAt(j);
-                Ingredient ingredient = this.key.getOrDefault(symbol, Ingredient.EMPTY);
+                char c = row.charAt(j);
+                Ingredient ingredient = this.key.getOrDefault(c, Ingredient.EMPTY);
                 ingredients.set(i * width + j, ingredient);
             }
         }
-
-        pRecipeOutput.accept(new ShapedForgingRecipeBuilder.Result(
-                ingredients,
-                this.hammering,
-                new ItemStack(this.result, this.count),
-                pRecipeId,
-                this.rows,
-                this.key,
-                this.advancement,
-                pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/"),
-                this.showNotification
-        ));
+        return ingredients;
     }
 
 
