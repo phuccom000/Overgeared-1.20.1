@@ -1,14 +1,6 @@
 /*
 package net.stirdrem.overgeared.screen;
 
-*/
-/*
- * Copyright (c) Forge Development LLC and contributors
- * SPDX-License-Identifier: LGPL-2.1-only
- *//*
-
-
-
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -42,12 +34,12 @@ import net.stirdrem.overgeared.recipe.ForgingRecipe;
 public class ModRecipeBookExtension {
     public static final boolean ENABLED = false;
 
-    public static final String MOD_ID = "recipe_book_extension_test";
-    public static final RecipeBookType TEST_TYPE = RecipeBookType.create("TESTING");
+    public static final String MOD_ID = OvergearedMod.MOD_ID;
+    public static final RecipeBookType FORGING = RecipeBookType.create("FORGING");
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, MOD_ID);
-    public static final RegistryObject<RecipeSerializer<ForgingRecipe>> RECIPE_BOOK_TEST_RECIPE_SERIALIZER =
-            RECIPE_SERIALIZER.register("test_recipe", ForgingRecipeSerializer::new);
+    public static final RegistryObject<RecipeSerializer<ForgingRecipe>> FORGING_SERIALIZER =
+            RECIPE_SERIALIZER.register("forging", () -> ForgingRecipe.Serializer.INSTANCE);
 
     public static final DeferredRegister<MenuType<?>> MENU_TYPE = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);
     public static final RegistryObject<MenuType<SmithingAnvilMenu>> RECIPE_BOOK_TEST_MENU_TYPE =
@@ -87,7 +79,7 @@ public class ModRecipeBookExtension {
                 return;
             event.enqueueWork(() ->
             {
-                MenuScreens.register(RECIPE_BOOK_TEST_MENU_TYPE.get(), RecipeBookTestScreen::new);
+                MenuScreens.register(RECIPE_BOOK_TEST_MENU_TYPE.get(), SmithingAnvilScreen::new);
             });
         }
 
@@ -104,4 +96,5 @@ public class ModRecipeBookExtension {
             super(8);
         }
     }
-}*/
+}
+*/

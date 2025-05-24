@@ -44,22 +44,17 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
                 }
             }); //hammer
             //crafting slot
-            this.addSlot(new SlotItemHandler(iItemHandler, 0, 30, 17));
-            this.addSlot(new SlotItemHandler(iItemHandler, 1, 48, 17));
-            this.addSlot(new SlotItemHandler(iItemHandler, 2, 66, 17));
-            this.addSlot(new SlotItemHandler(iItemHandler, 3, 30, 35));
-            this.addSlot(new SlotItemHandler(iItemHandler, 4, 48, 35));
-            this.addSlot(new SlotItemHandler(iItemHandler, 5, 66, 35));
-            this.addSlot(new SlotItemHandler(iItemHandler, 6, 30, 53));
-            this.addSlot(new SlotItemHandler(iItemHandler, 7, 48, 53));
-            this.addSlot(new SlotItemHandler(iItemHandler, 8, 66, 53));
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    this.addSlot(new SlotItemHandler(iItemHandler, j + i * 3, 30 + j * 18, 17 + i * 18));
+                }
+            }
             /*this.addSlot(new SlotItemHandler(iItemHandler, 9, 124, 35) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return false; // Prevent inserting any item
                 }
             });*/
-
 
             this.addSlot(new SlotItemHandler(iItemHandler, 10, 124, 35) {
                 @Override

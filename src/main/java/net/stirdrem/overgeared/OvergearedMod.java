@@ -25,6 +25,7 @@ import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
 import net.stirdrem.overgeared.item.ModItems;
 
+import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
 import net.stirdrem.overgeared.screen.SmithingAnvilScreen;
@@ -41,7 +42,7 @@ public class OvergearedMod {
 
     public OvergearedMod(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
-        
+
         ServerConfig.loadConfig(ServerConfig.SERVER_CONFIG, FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath()).resolve(MOD_ID + "-server.toml"));
 
         ModCreativeModeTabs.register(modEventBus);
@@ -55,6 +56,8 @@ public class OvergearedMod {
         ModMenuTypes.register(modEventBus);
 
         ModRecipes.register(modEventBus);
+        
+        ModRecipeTypes.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(TickScheduler.class);
 

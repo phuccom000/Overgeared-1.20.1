@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.recipe;
 
+import ca.weblite.objc.Runtime;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -9,60 +10,127 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.OvergearedMod;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
-public class ForgingRecipe implements Recipe<SimpleContainer> {
-    private final NonNullList<Ingredient> inputItems;
-    private final ItemStack output;
+public class ForgingRecipe implements Recipe<Container> {
     private final ResourceLocation id;
-    private final int hammeringRequired;
-    //private static final int hammering = 5;
+    private final String group;
+    private final NonNullList<Ingredient> ingredients;
+    private final ItemStack result;
+    private final int hammering;
+    private final boolean showNotification;
+    private final int width;
+    private final int height;
 
-    public ForgingRecipe(NonNullList<Ingredient> inputItems, int hammeringRequired, ItemStack output, ResourceLocation id) {
-        this.inputItems = inputItems;
-        this.output = output;
+    public ForgingRecipe(ResourceLocation id, String group, NonNullList<Ingredient> ingredients,
+                         ItemStack result, int hammering, boolean showNotification, int width, int height) {
         this.id = id;
-        this.hammeringRequired = hammeringRequired;
+        this.group = group;
+        this.ingredients = ingredients;
+        this.result = result;
+        this.hammering = hammering;
+        this.showNotification = showNotification;
+        this.width = width;
+        this.height = height;
     }
 
     @Override
-    public boolean matches(SimpleContainer pContainer, Level pLevel) {
-        if (pLevel.isClientSide()) {
-            return false;
+    public boolean matches(Container inv, Level world) {
+        ForgingRecipe bestMatch = null;
+        int bestPriority = -1;
+
+        // Check all possible positions for all possible recipes
+        for (int y = 0; y <= 3 - height; y++) {
+            for (int x = 0; x <= 3 - width; x++) {
+                if (matchesPattern(inv, x, y) && checkSurroundingBlanks(inv, x, y)) {
+                    int currentPriority = calculatePriority();
+                    if (currentPriority > bestPriority) {
+                        bestPriority = currentPriority;
+                        bestMatch = this;
+                    }
+                }
+            }
         }
 
-        // Convert 3x3 grid to linear slots
-        for (int slot = 0; slot < 9; slot++) {
-            if (!inputItems.get(slot).test(pContainer.getItem(slot))) {
-                return false;
+        return bestMatch == this;
+    }
+
+    private boolean checkSurroundingBlanks(Container inv, int xOffset, int yOffset) {
+        // Check if slots outside the recipe pattern are empty
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                // Skip slots that are part of the recipe
+                if (x >= xOffset && x < xOffset + width &&
+                        y >= yOffset && y < yOffset + height) {
+                    continue;
+                }
+
+                // Check if non-recipe slots are empty
+                int invSlot = y * 3 + x;
+                if (!inv.getItem(invSlot).isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private int calculatePriority() {
+        // Calculate priority based on recipe size (bigger recipes have higher priority)
+        // Add a small bonus for recipes that use more items to break ties
+        int itemCount = 0;
+        for (Ingredient ingredient : ingredients) {
+            if (!ingredient.isEmpty()) {
+                itemCount++;
+            }
+        }
+        return width * height * 100 + itemCount; // Multiplier ensures size dominates
+    }
+
+    private boolean matchesPattern(Container inv, int xOffset, int yOffset) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int invSlot = (y + yOffset) * 3 + (x + xOffset);
+                Ingredient ingredient = ingredients.get(y * width + x);
+
+                // If recipe expects empty, inventory slot must be empty
+                if (ingredient.isEmpty()) {
+                    if (!inv.getItem(invSlot).isEmpty()) {
+                        return false;
+                    }
+                }
+                // If recipe expects item, must match and have at least 1 count
+                else if (!ingredient.test(inv.getItem(invSlot))) {
+                    return false;
+                }
             }
         }
         return true;
     }
 
     @Override
-    public ItemStack assemble(SimpleContainer pContainer, RegistryAccess pRegistryAccess) {
-        return output.copy();
+    public ItemStack assemble(Container inv, RegistryAccess registryAccess) {
+        return result.copy();
     }
 
     @Override
-    public boolean canCraftInDimensions(int pWidth, int pHeight) {
-        return true;
+    public boolean canCraftInDimensions(int width, int height) {
+        return width >= this.width && height >= this.height;
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
-        return output.copy();
+    public ItemStack getResultItem(RegistryAccess registryAccess) {
+        return result.copy();
     }
-
 
     @Override
     public ResourceLocation getId() {
@@ -71,12 +139,24 @@ public class ForgingRecipe implements Recipe<SimpleContainer> {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return Serializer.INSTANCE;
+        return ModRecipes.FORGING_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return Type.INSTANCE;
+        return ModRecipeTypes.FORGING.get();
+    }
+
+    public int getHammeringRequired() {
+        return hammering;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public boolean showNotification() {
+        return showNotification;
     }
 
     public static class Type implements RecipeType<ForgingRecipe> {
@@ -84,133 +164,99 @@ public class ForgingRecipe implements Recipe<SimpleContainer> {
         public static final String ID = "forging";
     }
 
-    public int getHammeringRequired() {
-        return hammeringRequired;
-    }
-
     public static class Serializer implements RecipeSerializer<ForgingRecipe> {
         public static final Serializer INSTANCE = new Serializer();
         public static final ResourceLocation ID = ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "forging");
 
         @Override
-        public ForgingRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
-            // Parse hammering requirement, defaulting to 1 if not specified
-            int hammering = GsonHelper.getAsInt(pSerializedRecipe, "hammering", 1);
+        public ForgingRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+            String group = GsonHelper.getAsString(json, "group", "");
+            int hammering = GsonHelper.getAsInt(json, "hammering", 1);
+            boolean showNotification = GsonHelper.getAsBoolean(json, "show_notification", true);
 
-            // Parse the 'key' object mapping symbols to ingredients
-            JsonObject keyJson = GsonHelper.getAsJsonObject(pSerializedRecipe, "key");
+            Map<Character, Ingredient> keyMap = parseKey(GsonHelper.getAsJsonObject(json, "key"));
+            JsonArray pattern = GsonHelper.getAsJsonArray(json, "pattern");
+
+            int width = pattern.get(0).getAsString().length();
+            int height = pattern.size();
+            NonNullList<Ingredient> ingredients = dissolvePattern(pattern, keyMap, width, height);
+
+            ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
+            return new ForgingRecipe(recipeId, group, ingredients, result, hammering, showNotification, width, height);
+        }
+
+        private static Map<Character, Ingredient> parseKey(JsonObject keyJson) {
             Map<Character, Ingredient> keyMap = new HashMap<>();
             for (Map.Entry<String, JsonElement> entry : keyJson.entrySet()) {
-                String key = entry.getKey();
-                if (key.length() != 1) {
-                    throw new JsonSyntaxException("Invalid key entry: '" + key + "' is not a single character.");
+                if (entry.getKey().length() != 1) {
+                    throw new JsonSyntaxException("Invalid key entry: '" + entry.getKey() + "' is not a single character");
                 }
-                keyMap.put(key.charAt(0), Ingredient.fromJson(entry.getValue()));
+                keyMap.put(entry.getKey().charAt(0), Ingredient.fromJson(entry.getValue()));
             }
+            return keyMap;
+        }
 
-            // Parse the 'pattern' array
-            JsonArray patternJson = GsonHelper.getAsJsonArray(pSerializedRecipe, "pattern");
-            int patternHeight = patternJson.size();
-            if (patternHeight == 0 || patternHeight > 3) {
-                throw new JsonSyntaxException("Invalid pattern: must have between 1 and 3 rows.");
-            }
-
-            String[] pattern = new String[patternHeight];
-            for (int i = 0; i < patternHeight; i++) {
-                String line = GsonHelper.convertToString(patternJson.get(i), "pattern[" + i + "]");
-                if (line.length() == 0 || line.length() > 3) {
-                    throw new JsonSyntaxException("Invalid pattern line: '" + line + "'. Each line must have between 1 and 3 characters.");
+        private static NonNullList<Ingredient> dissolvePattern(JsonArray pattern, Map<Character, Ingredient> keys, int width, int height) {
+            NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
+            for (int y = 0; y < height; y++) {
+                String row = GsonHelper.convertToString(pattern.get(y), "pattern[" + y + "]");
+                if (row.length() != width) {
+                    throw new JsonSyntaxException("Pattern row width mismatch");
                 }
-                pattern[i] = line;
-            }
-
-            // Initialize ingredients list
-            NonNullList<Ingredient> inputs = NonNullList.withSize(10, Ingredient.EMPTY);
-            for (int row = 0; row < 3; row++) {
-                for (int col = 0; col < 3; col++) {
-                    Ingredient ingredient = Ingredient.EMPTY;
-                    if (row < patternHeight && col < pattern[row].length()) {
-                        char symbol = pattern[row].charAt(col);
-                        if (symbol != ' ') {
-                            ingredient = keyMap.getOrDefault(symbol, Ingredient.EMPTY);
-                        }
+                for (int x = 0; x < width; x++) {
+                    char c = row.charAt(x);
+                    if (!keys.containsKey(c)) {
+                        throw new JsonSyntaxException("Pattern references undefined symbol: '" + c + "'");
                     }
-                    inputs.set(row * 3 + col, ingredient);
+                    ingredients.set(y * width + x, keys.get(c));
                 }
             }
-
-            // Parse the 'result' object
-            JsonObject resultJson = GsonHelper.getAsJsonObject(pSerializedRecipe, "result");
-            ItemStack output = ShapedRecipe.itemStackFromJson(resultJson);
-
-            return new ForgingRecipe(inputs, hammering, output, pRecipeId);
-        }
-
-        /*@Override
-        public ForgingRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
-            ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "output"));
-
-            JsonArray ingredients = GsonHelper.getAsJsonArray(pSerializedRecipe, "ingredients");
-            NonNullList<Ingredient> inputs = NonNullList.withSize(10, Ingredient.EMPTY);
-
-            for (int i = 0; i < inputs.size(); i++) {
-                inputs.set(i, Ingredient.fromJson(ingredients.get(i)));
-            }
-
-            return new ForgingRecipe(inputs, hammering, output, pRecipeId);
-        }*/
-
-        /*@Override
-        public @Nullable ForgingRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
-            NonNullList<Ingredient> inputs = NonNullList.withSize(pBuffer.readInt(), Ingredient.EMPTY);
-
-            for (int i = 0; i < inputs.size(); i++) {
-                inputs.set(i, Ingredient.fromNetwork(pBuffer));
-            }
-
-            ItemStack output = pBuffer.readItem();
-            int hammering = pBuffer.readVarInt();
-            return new ForgingRecipe(inputs, hammering, output, pRecipeId);
+            return ingredients;
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf pBuffer, ForgingRecipe pRecipe) {
-            pBuffer.writeInt(pRecipe.inputItems.size());
+        public ForgingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+            String group = buffer.readUtf();
+            int hammering = buffer.readVarInt();
+            boolean showNotification = buffer.readBoolean();
+            int width = buffer.readVarInt();
+            int height = buffer.readVarInt();
 
-            for (Ingredient ingredient : pRecipe.getIngredients()) {
-                ingredient.toNetwork(pBuffer);
+            NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
+            for (int i = 0; i < ingredients.size(); i++) {
+                ingredients.set(i, Ingredient.fromNetwork(buffer));
             }
 
-            pBuffer.writeItemStack(pRecipe.getResultItem(null), false);
-            pBuffer.writeVarInt(pRecipe.hammeringRequired);
-        }*/
-
-        @Override
-        public @Nullable ForgingRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
-            int inputSize = pBuffer.readInt();
-            NonNullList<Ingredient> inputs = NonNullList.withSize(inputSize, Ingredient.EMPTY);
-
-            for (int i = 0; i < inputSize; i++) {
-                inputs.set(i, Ingredient.fromNetwork(pBuffer));
-            }
-
-            ItemStack output = pBuffer.readItem();
-            int hammering = pBuffer.readVarInt(); // Read the hammering value from the buffer
-            return new ForgingRecipe(inputs, hammering, output, pRecipeId);
+            ItemStack result = buffer.readItem();
+            return new ForgingRecipe(recipeId, group, ingredients, result, hammering, showNotification, width, height);
         }
 
-
         @Override
-        public void toNetwork(FriendlyByteBuf pBuffer, ForgingRecipe pRecipe) {
-            pBuffer.writeInt(pRecipe.inputItems.size());
+        public void toNetwork(FriendlyByteBuf buffer, ForgingRecipe recipe) {
+            buffer.writeUtf(recipe.group);
+            buffer.writeVarInt(recipe.hammering);
+            buffer.writeBoolean(recipe.showNotification);
+            buffer.writeVarInt(recipe.width);
+            buffer.writeVarInt(recipe.height);
 
-            for (Ingredient ingredient : pRecipe.getIngredients()) {
-                ingredient.toNetwork(pBuffer);
+            for (Ingredient ingredient : recipe.ingredients) {
+                ingredient.toNetwork(buffer);
             }
 
-            pBuffer.writeItemStack(pRecipe.getResultItem(null), false);
-            pBuffer.writeVarInt(pRecipe.getHammeringRequired()); // Write the hammering value to the buffer
+            buffer.writeItem(recipe.result);
         }
-
     }
+
+    public static Optional<ForgingRecipe> findBestMatch(Level world, Container inv) {
+        return world.getRecipeManager().getAllRecipesFor(ModRecipeTypes.FORGING.get())
+                .stream()
+                .filter(recipe -> recipe.matches(inv, world))
+                .max(Comparator.comparingInt(ForgingRecipe::getRecipeSize));
+    }
+
+    private int getRecipeSize() {
+        return width * height;
+    }
+
+
 }

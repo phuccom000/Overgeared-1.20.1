@@ -2,6 +2,7 @@ package net.stirdrem.overgeared.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -16,6 +17,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -146,8 +148,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+        Optional<ForgingRecipe> recipe = getCurrentRecipe();
         if (hasRecipe()) {
-            Optional<ForgingRecipe> recipe = getCurrentRecipe();
             ForgingRecipe currentRecipe = recipe.get();
             maxProgress = currentRecipe.getHammeringRequired();
 
@@ -169,33 +171,66 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
     private void craftItem() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        ItemStack result = recipe.get().getResultItem(null);
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isPresent()) {
+            ForgingRecipe recipe = recipeOptional.get();
+            ItemStack result = recipe.getResultItem(getLevel().registryAccess());
 
-        for (int i = 0; i < this.itemHandler.getSlots() - 1; i++)
-            this.itemHandler.extractItem(i, 1, false);
-        this.itemHandler.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
-                this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + 1));
+            for (int i = 0; i < this.itemHandler.getSlots() - 1; i++) {
+                this.itemHandler.extractItem(i, 1, false);
+            }
+            this.itemHandler.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
+                    this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + 1));
+        }
     }
 
     public boolean hasRecipe() {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
+        return recipe.isPresent()
+                && canInsertItemIntoOutputSlot(recipe.get().getResultItem(level.registryAccess()).getItem())
+                && canInsertAmountIntoOutputSlot(recipe.get().getResultItem(level.registryAccess()).getCount());
+    }
 
-        if (recipe.isEmpty()) {
-            return false;
+    private boolean hasEnoughIngredients(ForgingRecipe recipe) {
+        NonNullList<Ingredient> ingredients = recipe.getIngredients();
+        SimpleContainer inventory = new SimpleContainer(9);
+        for (int i = 0; i < 9; i++) {
+            inventory.setItem(i, itemHandler.getStackInSlot(i));
         }
-        ItemStack result = recipe.get().getResultItem(getLevel().registryAccess());
 
-        return canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
+        // Create a copy of the inventory to track consumed items
+        SimpleContainer inventoryCopy = new SimpleContainer(9);
+        for (int i = 0; i < 9; i++) {
+            inventoryCopy.setItem(i, inventory.getItem(i).copy());
+        }
+
+        // Check each ingredient requirement
+        for (Ingredient ingredient : ingredients) {
+            boolean found = false;
+            for (int i = 0; i < 9; i++) {
+                ItemStack stack = inventoryCopy.getItem(i);
+                if (ingredient.test(stack) && stack.getCount() > 0) {
+                    stack.shrink(1);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Optional<ForgingRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots());
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(9);
+        for (int i = 0; i < 9; i++) {
+            inventory.setItem(i, itemHandler.getStackInSlot(i));
         }
 
-        return this.level.getRecipeManager().getRecipeFor(ForgingRecipe.Type.INSTANCE, inventory, level);
+        return ForgingRecipe.findBestMatch(level, inventory)
+                .filter(this::matchesRecipeExactly)
+                .filter(this::hasEnoughIngredients);
     }
 
     private boolean canInsertItemIntoOutputSlot(Item item) {
@@ -216,14 +251,11 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
     public void increaseCraftingProgressIfValid() {
+        Optional<ForgingRecipe> recipe = getCurrentRecipe();
         if (hasRecipe()) {
-            Optional<ForgingRecipe> recipe = getCurrentRecipe();
-
             ForgingRecipe currentRecipe = recipe.get();
             maxProgress = currentRecipe.getHammeringRequired();
-
             increaseCraftingProgress();
-            //setChanged(pLevel, pPos, pState);
 
             if (hasProgressFinished()) {
                 craftItem();
@@ -245,8 +277,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
 
     public void updateHitsRemaining(Level lvl, BlockPos pos, BlockState st) {
+        Optional<ForgingRecipe> recipe = getCurrentRecipe();
         if (hasRecipe()) {
-            Optional<ForgingRecipe> recipe = getCurrentRecipe();
             ForgingRecipe currentRecipe = recipe.get();
             maxProgress = currentRecipe.getHammeringRequired();
             hitRemains = maxProgress - progress;
@@ -278,5 +310,13 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         tag.putString("ForgingQuality", quality);
     }
 
+    private boolean matchesRecipeExactly(ForgingRecipe recipe) {
+        SimpleContainer inventory = new SimpleContainer(9); // 3x3 grid
+        // Copy items from input slots (0-8) to our 3x3 grid
+        for (int i = 0; i < 9; i++) {
+            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
+        }
+        return recipe.matches(inventory, level);
+    }
 
 }
