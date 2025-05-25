@@ -88,6 +88,12 @@ public class LayeredWaterBarrel extends AbstractWaterBarrel {
         pLevel.gameEvent(GameEvent.BLOCK_CHANGE, pPos, GameEvent.Context.of(blockstate));
     }
 
+    public static void emptyBarrel(BlockState pState, Level pLevel, BlockPos pPos) {
+        BlockState blockstate = ModBlocks.WATER_BARREL.get().defaultBlockState();
+        pLevel.setBlockAndUpdate(pPos, blockstate);
+        pLevel.gameEvent(GameEvent.BLOCK_CHANGE, pPos, GameEvent.Context.of(blockstate));
+    }
+
     @Override
 
     public void handlePrecipitation(BlockState pState, Level pLevel, BlockPos pPos, Biome.Precipitation pPrecipitation) {

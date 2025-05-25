@@ -22,7 +22,7 @@ public class SmithingHammer extends Item {
         super(properties);
     }
 
-    @Override
+    /*@Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         Player player = context.getPlayer();
@@ -44,7 +44,7 @@ public class SmithingHammer extends Item {
             }
         }
         return InteractionResult.PASS;
-    }
+    }*/
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {

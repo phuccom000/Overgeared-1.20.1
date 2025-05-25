@@ -25,27 +25,30 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.stirdrem.overgeared.block.custom.LayeredWaterBarrel;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BannerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.stirdrem.overgeared.block.ModBlocks;
+import net.stirdrem.overgeared.item.ModItems;
 
 public interface BarrelInteraction {
     Map<Item, BarrelInteraction> EMPTY = newInteractionMap();
     Map<Item, BarrelInteraction> WATER = newInteractionMap();
     Map<Item, BarrelInteraction> LAVA = newInteractionMap();
     Map<Item, BarrelInteraction> POWDER_SNOW = newInteractionMap();
+
     BarrelInteraction FILL_WATER = (p_175683_, p_175684_, p_175685_, p_175686_, p_175687_, p_175688_) -> {
         return emptyBucket(p_175684_, p_175685_, p_175686_, p_175687_, p_175688_, ModBlocks.WATER_BARREL_FULL.get().defaultBlockState().setValue(LayeredWaterBarrel.LEVEL, Integer.valueOf(2)), SoundEvents.BUCKET_EMPTY);
     };
-    /*BarrelInteraction FILL_LAVA = (p_175676_, p_175677_, p_175678_, p_175679_, p_175680_, p_175681_) -> {
-       return emptyBucket(p_175677_, p_175678_, p_175679_, p_175680_, p_175681_, Blocks.LAVA_CAULDRON.defaultBlockState(), SoundEvents.BUCKET_EMPTY_LAVA);
-    };
-    BarrelInteraction FILL_POWDER_SNOW = (p_175669_, p_175670_, p_175671_, p_175672_, p_175673_, p_175674_) -> {
-       return emptyBucket(p_175670_, p_175671_, p_175672_, p_175673_, p_175674_, Blocks.POWDER_SNOW_CAULDRON.defaultBlockState().setValue(LayeredWaterBarrel.LEVEL, Integer.valueOf(2)), SoundEvents.BUCKET_EMPTY_POWDER_SNOW);
-    };*/
+
     BarrelInteraction SHULKER_BOX = (p_175662_, p_175663_, p_175664_, p_175665_, p_175666_, p_175667_) -> {
         Block block = Block.byItem(p_175667_.getItem());
         if (!(block instanceof ShulkerBoxBlock)) {
@@ -65,6 +68,7 @@ public interface BarrelInteraction {
             return InteractionResult.sidedSuccess(p_175663_.isClientSide);
         }
     };
+
     BarrelInteraction BANNER = (p_278890_, p_278891_, p_278892_, p_278893_, p_278894_, p_278895_) -> {
         if (BannerBlockEntity.getPatternCount(p_278895_) <= 0) {
             return InteractionResult.PASS;
@@ -91,6 +95,7 @@ public interface BarrelInteraction {
             return InteractionResult.sidedSuccess(p_278891_.isClientSide);
         }
     };
+
     BarrelInteraction DYED_ITEM = (p_175629_, p_175630_, p_175631_, p_175632_, p_175633_, p_175634_) -> {
         Item item = p_175634_.getItem();
         if (!(item instanceof DyeableLeatherItem dyeableleatheritem)) {
@@ -106,6 +111,39 @@ public interface BarrelInteraction {
 
             return InteractionResult.sidedSuccess(p_175630_.isClientSide);
         }
+    };
+
+    BarrelInteraction FLUID_ITEM = (blockState, level, pos, player, hand, stack) -> {
+        LazyOptional<IFluidHandlerItem> fluidHandlerLazy = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM);
+        if (!fluidHandlerLazy.isPresent()) return InteractionResult.PASS;
+        IFluidHandlerItem fluidHandlerItem = fluidHandlerLazy.orElse(null);
+
+        // Check if the wooden bucket can accept water
+        int simulatedFill = fluidHandlerItem.fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.SIMULATE);
+        if (simulatedFill > 0 && level.getBlockState(pos) == ModBlocks.WATER_BARREL_FULL.get().defaultBlockState().setValue(LayeredWaterBarrel.LEVEL, 2)) {
+            // Actually fill the bucket
+            int filled = fluidHandlerItem.fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+            if (filled > 0) {
+                // Reduce water level in barrel
+                //LayeredWaterBarrel.emptyBarrel(blockState, level, pos);
+                level.setBlockAndUpdate(pos, ModBlocks.WATER_BARREL.get().defaultBlockState());
+                level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+                player.setItemInHand(hand, fluidHandlerItem.getContainer());
+                player.awardStat(Stats.USE_CAULDRON);
+                level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
+            }
+        } else if (level.getBlockState(pos) != ModBlocks.WATER_BARREL_FULL.get().defaultBlockState().setValue(LayeredWaterBarrel.LEVEL, 2)) {
+            FluidStack drained = fluidHandlerItem.drain(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+            if (!drained.isEmpty()) {
+                // Update barrel state
+                level.setBlockAndUpdate(pos, ModBlocks.WATER_BARREL_FULL.get().defaultBlockState().setValue(LayeredWaterBarrel.LEVEL, 2));
+                level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+                player.setItemInHand(hand, fluidHandlerItem.getContainer());
+                player.awardStat(Stats.FILL_CAULDRON);
+                level.gameEvent(null, GameEvent.FLUID_PLACE, pos);
+            }
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     };
 
     static Object2ObjectOpenHashMap<Item, BarrelInteraction> newInteractionMap() {
@@ -137,12 +175,14 @@ public interface BarrelInteraction {
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         });
+
         addDefaultInteractions(WATER);
         WATER.put(Items.BUCKET, (p_175725_, p_175726_, p_175727_, p_175728_, p_175729_, p_175730_) -> {
             return fillBucket(p_175725_, p_175726_, p_175727_, p_175728_, p_175729_, p_175730_, new ItemStack(Items.WATER_BUCKET), (p_175660_) -> {
                 return p_175660_.getValue(LayeredWaterBarrel.LEVEL) == 2;
             }, SoundEvents.BUCKET_FILL);
         });
+
         WATER.put(Items.GLASS_BOTTLE, (p_175718_, p_175719_, p_175720_, p_175721_, p_175722_, p_175723_) -> {
             if (!p_175719_.isClientSide) {
                 Item item = p_175723_.getItem();
@@ -156,6 +196,7 @@ public interface BarrelInteraction {
 
             return InteractionResult.sidedSuccess(p_175719_.isClientSide);
         });
+
         WATER.put(Items.POTION, (p_175704_, p_175705_, p_175706_, p_175707_, p_175708_, p_175709_) -> {
             if (p_175704_.getValue(LayeredWaterBarrel.LEVEL) != 2 && PotionUtils.getPotion(p_175709_) == Potions.WATER) {
                 if (!p_175705_.isClientSide) {
@@ -172,6 +213,8 @@ public interface BarrelInteraction {
                 return InteractionResult.PASS;
             }
         });
+
+        // Add all the dyeable items and banners
         WATER.put(Items.LEATHER_BOOTS, DYED_ITEM);
         WATER.put(Items.LEATHER_LEGGINGS, DYED_ITEM);
         WATER.put(Items.LEATHER_CHESTPLATE, DYED_ITEM);
@@ -209,27 +252,23 @@ public interface BarrelInteraction {
         WATER.put(Items.PURPLE_SHULKER_BOX, SHULKER_BOX);
         WATER.put(Items.RED_SHULKER_BOX, SHULKER_BOX);
         WATER.put(Items.YELLOW_SHULKER_BOX, SHULKER_BOX);
-        LAVA.put(Items.BUCKET, (p_175697_, p_175698_, p_175699_, p_175700_, p_175701_, p_175702_) -> {
-            return fillBucket(p_175697_, p_175698_, p_175699_, p_175700_, p_175701_, p_175702_, new ItemStack(Items.LAVA_BUCKET), (p_175651_) -> {
-                return true;
-            }, SoundEvents.BUCKET_FILL_LAVA);
-        });
+
+        // Wooden Bucket Interactions
+        WATER.put(ModItems.WOODEN_BUCKET.get(), FLUID_ITEM);
+
+        EMPTY.put(ModItems.WOODEN_BUCKET.get(), FLUID_ITEM);
+
         addDefaultInteractions(LAVA);
-        POWDER_SNOW.put(Items.BUCKET, (p_175690_, p_175691_, p_175692_, p_175693_, p_175694_, p_175695_) -> {
-            return fillBucket(p_175690_, p_175691_, p_175692_, p_175693_, p_175694_, p_175695_, new ItemStack(Items.POWDER_SNOW_BUCKET), (p_175627_) -> {
-                return p_175627_.getValue(LayeredWaterBarrel.LEVEL) == 2;
-            }, SoundEvents.BUCKET_FILL_POWDER_SNOW);
-        });
         addDefaultInteractions(POWDER_SNOW);
     }
 
     static void addDefaultInteractions(Map<Item, BarrelInteraction> pInteractionsMap) {
-        //pInteractionsMap.put(Items.LAVA_BUCKET, FILL_LAVA);
         pInteractionsMap.put(Items.WATER_BUCKET, FILL_WATER);
-        //pInteractionsMap.put(Items.POWDER_SNOW_BUCKET, FILL_POWDER_SNOW);
     }
 
-    static InteractionResult fillBucket(BlockState pBlockState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, ItemStack pEmptyStack, ItemStack pFilledStack, Predicate<BlockState> pStatePredicate, SoundEvent pFillSound) {
+    static InteractionResult fillBucket(BlockState pBlockState, Level pLevel, BlockPos pPos, Player
+            pPlayer, InteractionHand pHand, ItemStack pEmptyStack, ItemStack
+                                                pFilledStack, Predicate<BlockState> pStatePredicate, SoundEvent pFillSound) {
         if (!pStatePredicate.test(pBlockState)) {
             return InteractionResult.PASS;
         } else {
@@ -247,7 +286,8 @@ public interface BarrelInteraction {
         }
     }
 
-    static InteractionResult emptyBucket(Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, ItemStack pFilledStack, BlockState pState, SoundEvent pEmptySound) {
+    static InteractionResult emptyBucket(Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand
+            pHand, ItemStack pFilledStack, BlockState pState, SoundEvent pEmptySound) {
         if (!pLevel.isClientSide) {
             Item item = pFilledStack.getItem();
             pPlayer.setItemInHand(pHand, ItemUtils.createFilledResult(pFilledStack, pPlayer, new ItemStack(Items.BUCKET)));

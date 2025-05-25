@@ -175,12 +175,6 @@ public class SmithingAnvil extends BaseEntityBlock {
 
         ItemStack held = player.getItemInHand(hand);
         boolean isHammer = held.is(ModTags.Items.SMITHING_HAMMERS);  // Tag-based check
-        if (player.isCrouching()) {
-            if (isHammer) {
-                level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1f);
-                AnvilMinigameOverlay.isVisible = !AnvilMinigameOverlay.isVisible;
-            }
-        }
 
         if (isHammer && anvil.hasRecipe()) {
             // Hammer logic (particles, sound, cooldown)

@@ -133,6 +133,11 @@ public class ForgingRecipe implements Recipe<Container> {
     }
 
     @Override
+    public NonNullList<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    @Override
     public ResourceLocation getId() {
         return id;
     }
@@ -205,14 +210,18 @@ public class ForgingRecipe implements Recipe<Container> {
                 }
                 for (int x = 0; x < width; x++) {
                     char c = row.charAt(x);
-                    if (!keys.containsKey(c)) {
+                    Ingredient ingredient = keys.getOrDefault(c, c == ' ' ? Ingredient.EMPTY : null);
+
+                    if (ingredient == null) {
                         throw new JsonSyntaxException("Pattern references undefined symbol: '" + c + "'");
                     }
-                    ingredients.set(y * width + x, keys.get(c));
+
+                    ingredients.set(y * width + x, ingredient);
                 }
             }
             return ingredients;
         }
+
 
         @Override
         public ForgingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {

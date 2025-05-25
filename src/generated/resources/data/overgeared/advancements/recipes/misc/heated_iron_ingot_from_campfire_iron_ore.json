@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "overgeared:heated_iron_ingot_from_smoking_iron_ore"
+        "recipe": "overgeared:heated_iron_ingot_from_campfire_iron_ore"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "overgeared:heated_iron_ingot_from_smoking_iron_ore"
+      "overgeared:heated_iron_ingot_from_campfire_iron_ore"
     ]
   },
   "sends_telemetry_event": false

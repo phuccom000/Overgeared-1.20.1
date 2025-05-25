@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_iron_ingot": {
+    "has_steel_ingot": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:iron_ingot"
+              "overgeared:steel_ingot"
             ]
           }
         ]
@@ -15,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "overgeared:heated_iron_ingot_from_smoking_iron_ingot"
+        "recipe": "overgeared:heated_steel_ingot_from_campfire_steel_ingot"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_iron_ingot",
+      "has_steel_ingot",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "overgeared:heated_iron_ingot_from_smoking_iron_ingot"
+      "overgeared:heated_steel_ingot_from_campfire_steel_ingot"
     ]
   },
   "sends_telemetry_event": false

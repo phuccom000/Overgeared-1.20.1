@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.block.entity;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -27,6 +28,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
+import net.stirdrem.overgeared.screen.ForgingMinigameScreen;
 import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -319,4 +321,9 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return recipe.matches(inventory, level);
     }
 
+    public void startForgingMinigame(Player player, ItemStack result) {
+        if (player.level().isClientSide) {
+            Minecraft.getInstance().setScreen(new ForgingMinigameScreen(result));
+        }
+    }
 }

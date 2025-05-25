@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_raw_iron": {
+    "has_deepslate_iron_ore": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:raw_iron"
+              "minecraft:deepslate_iron_ore"
             ]
           }
         ]
@@ -15,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "overgeared:heated_iron_ingot_from_smoking_raw_iron"
+        "recipe": "overgeared:heated_iron_ingot_from_campfire_deepslate_iron_ore"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_raw_iron",
+      "has_deepslate_iron_ore",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "overgeared:heated_iron_ingot_from_smoking_raw_iron"
+      "overgeared:heated_iron_ingot_from_campfire_deepslate_iron_ore"
     ]
   },
   "sends_telemetry_event": false

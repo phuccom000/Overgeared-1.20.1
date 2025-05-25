@@ -104,10 +104,10 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
         // Draw remaining hits label
         if (menu.getRemainingHits() == 0) return;
         else {
-            String hitsText = "Hits left: " + menu.getRemainingHits();
+            String hitsText = "Remaining Hits: " + menu.getRemainingHits();
             int x = (width - imageWidth) / 2;
             int y = (height - imageHeight) / 2;
-            guiGraphics.drawString(font, hitsText, x + 89, y + 60, 4210752, false); // White color
+            guiGraphics.drawString(font, hitsText, x + 89, y + 17, 4210752, false); // White color
         }
     }
 

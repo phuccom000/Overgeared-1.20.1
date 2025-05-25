@@ -182,6 +182,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
 
             json.add("pattern", patternArray);
             JsonObject jsonobject = new JsonObject();
+            //json.addProperty("category", this.category);
 
             json.addProperty("hammering", this.hammering);
             for (Map.Entry<Character, Ingredient> entry : this.key.entrySet()) {
