@@ -8,6 +8,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.util.ForgingQualityShapelessRecipe;
 
 public class ModRecipes {
     public static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS =
@@ -15,6 +16,8 @@ public class ModRecipes {
 
     public static final RegistryObject<RecipeSerializer<ForgingRecipe>> FORGING_SERIALIZER =
             SERIALIZERS.register("forging", () -> ForgingRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<ForgingQualityShapelessRecipe>> CRAFTING_SHAPELESS =
+            SERIALIZERS.register("crafting_shapeless", () -> ForgingQualityShapelessRecipe.Serializer.INSTANCE);
 
     public static void register(IEventBus eventBus) {
         SERIALIZERS.register(eventBus);

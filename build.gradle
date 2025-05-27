@@ -4,6 +4,8 @@ plugins {
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
+
 }
 
 version = mod_version
@@ -156,6 +158,7 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     compileOnly fg.deobf("com.github.cech12:BucketLib:${bucketlib_version}:api")
     runtimeOnly fg.deobf("com.github.cech12:BucketLib:${bucketlib_version}")
@@ -177,6 +180,19 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 }
 
+mixin {
+    // MixinGradle Settings
+    add sourceSets.main, 'mixins.overgeared.refmap.json'
+    config 'mixins.overgeared.json'
+    debug.verbose = true
+    debug.export = true
+}
+
+sourceSets {
+    main {
+        ext.refMap = "mixins.overgeared.refmap.json"
+    }
+}
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 // When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.

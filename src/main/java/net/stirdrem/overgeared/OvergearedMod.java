@@ -25,6 +25,7 @@ import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
 import net.stirdrem.overgeared.item.ModItems;
 
+import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
@@ -56,7 +57,7 @@ public class OvergearedMod {
         ModMenuTypes.register(modEventBus);
 
         ModRecipes.register(modEventBus);
-        
+
         ModRecipeTypes.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(TickScheduler.class);
@@ -71,6 +72,7 @@ public class OvergearedMod {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
+        ModMessages.register();
     }
 
     // Add the example block item to the building blocks tab
@@ -79,7 +81,11 @@ public class OvergearedMod {
             event.accept(ModItems.IRON_TONGS);
             event.accept(ModItems.STEEL_TONGS);
             event.accept(ModItems.SMITHING_HAMMER);
-
+            event.accept(ModItems.STEEL_SWORD.get());
+            event.accept(ModItems.STEEL_PICKAXE.get());
+            event.accept(ModItems.STEEL_AXE.get());
+            event.accept(ModItems.STEEL_SHOVEL.get());
+            event.accept(ModItems.STEEL_HOE.get());
         }
     }
 

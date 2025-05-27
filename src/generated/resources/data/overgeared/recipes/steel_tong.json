@@ -1,0 +1,18 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 2,
+  "key": {
+    "x": {
+      "item": "overgeared:heated_steel_ingot"
+    }
+  },
+  "pattern": [
+    "  x",
+    "xxx",
+    "x  "
+  ],
+  "result": {
+    "item": "overgeared:steel_tong"
+  },
+  "show_notification": true
+}

@@ -11,8 +11,12 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.networking.packet.UpdateAnvilProgressC2SPacket;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
 
 public class SmithingAnvilMenu extends AbstractContainerMenu {
     public final SmithingAnvilBlockEntity blockEntity;
@@ -153,7 +157,26 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
     public int getRemainingHits() {
         int progress = this.data.get(0);
         int maxProgress = this.data.get(1);
+        //ModMessages.sendToServer(new UpdateAnvilProgressC2SPacket(maxProgress - progress));
         return maxProgress - progress;
     }
 
+    public SmithingAnvilBlockEntity getBlockEntity() {
+        return blockEntity;
+    }
+
+    public ItemStack getResultItem() {
+        // Check if the block entity exists and has an item handler
+        if (blockEntity != null) {
+            return blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
+                    .map(handler -> {
+                        // Slot 10 is the output slot based on your menu setup
+                        ItemStack result = handler.getStackInSlot(10);
+                        // Return a copy to prevent modification of the original stack
+                        return result.copy();
+                    })
+                    .orElse(ItemStack.EMPTY);
+        }
+        return ItemStack.EMPTY;
+    }
 }

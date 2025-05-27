@@ -1,15 +1,18 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "equipment",
-  "ingredients": [
-    {
-      "item": "overgeared:iron_sword_blade"
-    },
-    {
-      "item": "minecraft:stick"
+  "key": {
+    "#": {
+      "item": "overgeared:steel_ingot"
     }
+  },
+  "pattern": [
+    "###",
+    "###",
+    "###"
   ],
   "result": {
     "item": "minecraft:iron_sword"
-  }
+  },
+  "show_notification": true
 }

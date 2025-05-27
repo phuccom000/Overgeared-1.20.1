@@ -58,9 +58,14 @@ public class SmithingAnvil extends BaseEntityBlock {
 
     private static final int HAMMER_SOUND_DURATION_TICKS = 20; // adjust to match your sound
 
+    private static String quality;
 
     public SmithingAnvil(Properties properties) {
         super(properties);
+    }
+
+    public static String getQuality() {
+        return quality;
     }
 
     @Override
@@ -176,9 +181,9 @@ public class SmithingAnvil extends BaseEntityBlock {
         ItemStack held = player.getItemInHand(hand);
         boolean isHammer = held.is(ModTags.Items.SMITHING_HAMMERS);  // Tag-based check
 
-        if (isHammer && anvil.hasRecipe()) {
+        if (isHammer && anvil.hasRecipe() && AnvilMinigameOverlay.isVisible) {
             // Hammer logic (particles, sound, cooldown)
-
+            //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
             for (int i = 0; i < 3; i++) {
                 int delay = 7 * i;
                 TickScheduler.schedule(delay, () -> spawnAnvilParticles(level, pos));
@@ -187,15 +192,16 @@ public class SmithingAnvil extends BaseEntityBlock {
             level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1f);
             held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
             player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
+            quality = AnvilMinigameOverlay.handleHit();
             anvil.tick(level, pos, state);
 
             return InteractionResult.SUCCESS;
-        }
-
+        } //else AnvilMinigameOverlay.endMinigame();
         // Open GUI if not hammering
         NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
+
 
     private void spawnAnvilParticles(Level level, BlockPos pos) {
         if (level instanceof ServerLevel serverLevel) {

@@ -28,8 +28,8 @@ public class ForgingRecipe implements Recipe<Container> {
     private final ItemStack result;
     private final int hammering;
     private final boolean showNotification;
-    private final int width;
-    private final int height;
+    public final int width;
+    public final int height;
 
     public ForgingRecipe(ResourceLocation id, String group, NonNullList<Ingredient> ingredients,
                          ItemStack result, int hammering, boolean showNotification, int width, int height) {
@@ -162,6 +162,10 @@ public class ForgingRecipe implements Recipe<Container> {
 
     public boolean showNotification() {
         return showNotification;
+    }
+
+    public int getRemainingHits() {
+        return hammering;
     }
 
     public static class Type implements RecipeType<ForgingRecipe> {

@@ -1,0 +1,17 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 3,
+  "key": {
+    "#": {
+      "item": "overgeared:heated_iron_ingot"
+    }
+  },
+  "pattern": [
+    "###",
+    "# #"
+  ],
+  "result": {
+    "item": "minecraft:iron_helmet"
+  },
+  "show_notification": true
+}

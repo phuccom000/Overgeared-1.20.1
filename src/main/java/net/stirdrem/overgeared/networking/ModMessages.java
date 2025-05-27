@@ -7,6 +7,8 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.networking.packet.FinalizeForgingC2SPacket;
+import net.stirdrem.overgeared.networking.packet.UpdateAnvilProgressC2SPacket;
 
 public class ModMessages {
     private static SimpleChannel INSTANCE;
@@ -27,17 +29,17 @@ public class ModMessages {
 
         INSTANCE = net;
 
-        /*net.messageBuilder(ExampleC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(ExampleC2SPacket::new)
-                .encoder(ExampleC2SPacket::toBytes)
-                .consumerMainThread(ExampleC2SPacket::handle)
+        net.messageBuilder(UpdateAnvilProgressC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(UpdateAnvilProgressC2SPacket::new)
+                .encoder(UpdateAnvilProgressC2SPacket::toBytes)
+                .consumerMainThread(UpdateAnvilProgressC2SPacket::handle)
                 .add();
 
-        net.messageBuilder(DrinkWaterC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(DrinkWaterC2SPacket::new)
-                .encoder(DrinkWaterC2SPacket::toBytes)
-                .consumerMainThread(DrinkWaterC2SPacket::handle)
-                .add();*/
+        net.messageBuilder(FinalizeForgingC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(FinalizeForgingC2SPacket::new)
+                .encoder(FinalizeForgingC2SPacket::toBytes)
+                .consumerMainThread(FinalizeForgingC2SPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {

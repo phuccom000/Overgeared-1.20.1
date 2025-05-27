@@ -6,6 +6,7 @@
   "item.overgeared.heated_gold_ingot": "Heated Gold Ingot",
   "item.overgeared.iron_tongs": "Iron Tongs",
   "item.overgeared.steel_tongs": "Steel Tongs",
+  "item.overgeared.steel_tong": "Steel Tong Single",
   "item.overgeared.smithing_hammer": "Smithing Hammer",
   "creativetab.overgeared_tab": "Overgeared",
   "item.overgeared.stone_sword_blade": "Stone Sword Blade",
@@ -47,5 +48,12 @@
   "block.overgeared.water_barrel_full": "Water Barrel Full",
   "item.overgeared.wooden_bucket": "Wooden Bucket",
   "item.overgeared.wooden_bucket.entity": "Wooden Bucket of %s",
-  "item.overgeared.wooden_bucket.filled": "Wooden Bucket of %s"
+  "item.overgeared.wooden_bucket.filled": "Wooden Bucket of %s",
+  "tooltip.overgeared.poor": "Poorly Forged",
+  "tooltip.overgeared.well": "Well Forged",
+  "tooltip.overgeared.expert": "Expertly Forged",
+  "tooltip.overgeared.perfect": "Perfectly Forged",
+  "tooltip.overgeared.smithing_hammer.advanced_tooltip.line1": "§7Crouch right click the §f§lSmithing Anvil§7 to start forging when you have a valid recipe.",
+  "tooltip.overgeared.smithing_hammer.advanced_tooltip.line2": "Left click while forging to exit the minigame temporarily.",
+  "tooltip.overgeared.smithing_hammer.hold_shift": "§7Hold §f§lSHIFT§7 for more information"
 }

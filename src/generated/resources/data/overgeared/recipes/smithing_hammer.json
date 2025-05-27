@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "item": "minecraft:stick"
+    },
+    "x": {
+      "item": "overgeared:steel_ingot"
+    }
+  },
+  "pattern": [
+    " x ",
+    " #x",
+    "#  "
+  ],
+  "result": {
+    "item": "overgeared:smithing_hammer"
+  },
+  "show_notification": true
+}

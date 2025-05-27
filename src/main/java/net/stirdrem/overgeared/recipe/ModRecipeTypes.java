@@ -14,6 +14,8 @@ public class ModRecipeTypes {
 
     public static final RegistryObject<RecipeType<ForgingRecipe>> FORGING =
             RECIPE_TYPES.register(ForgingRecipe.Type.ID, () -> ForgingRecipe.Type.INSTANCE);
+    /*public static final RegistryObject<RecipeType<ForgingRecipe>> CRAFTING_SHAPELESS =
+            RECIPE_TYPES.register(ForgingRecipe.Type.ID, () -> ForgingRecipe.Type.INSTANCE);*/
 
     public static void register(IEventBus eventBus) {
         RECIPE_TYPES.register(eventBus);

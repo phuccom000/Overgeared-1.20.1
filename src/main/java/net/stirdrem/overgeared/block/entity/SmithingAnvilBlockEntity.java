@@ -1,6 +1,5 @@
 package net.stirdrem.overgeared.block.entity;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -27,8 +26,9 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.stirdrem.overgeared.ForgingQuality;
+import net.stirdrem.overgeared.block.custom.SmithingAnvil;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
-import net.stirdrem.overgeared.screen.ForgingMinigameScreen;
 import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +56,11 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private int progress = 0;
     private int maxProgress = 0;
     private int hitRemains;
+    private int hitRemainsMG;
     private long busyUntilGameTime = 0L;
+    private int perfectHits = 0;
+    private int goodHits = 0;
+    private int missedHits = 0;
 
 
     public SmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
@@ -154,7 +158,6 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         if (hasRecipe()) {
             ForgingRecipe currentRecipe = recipe.get();
             maxProgress = currentRecipe.getHammeringRequired();
-
             increaseCraftingProgress();
             setChanged(pLevel, pPos, pState);
 
@@ -178,13 +181,26 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             ForgingRecipe recipe = recipeOptional.get();
             ItemStack result = recipe.getResultItem(getLevel().registryAccess());
 
+            // Determine quality based on performance
+            String quality = determineForgingQuality();
+
+            // Only set the NBT tag if quality is meaningful
+            if (quality != null && !quality.isEmpty()) {
+                CompoundTag tag = result.getOrCreateTag();
+                tag.putString("ForgingQuality", quality);
+                result.setTag(tag);
+            }
+
+            // Extract ingredients
             for (int i = 0; i < this.itemHandler.getSlots() - 1; i++) {
                 this.itemHandler.extractItem(i, 1, false);
             }
-            this.itemHandler.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
-                    this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + 1));
+
+            // Set the result directly into the output slot
+            this.itemHandler.setStackInSlot(OUTPUT_SLOT, result);
         }
     }
+
 
     public boolean hasRecipe() {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
@@ -224,7 +240,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return true;
     }
 
-    private Optional<ForgingRecipe> getCurrentRecipe() {
+    public Optional<ForgingRecipe> getCurrentRecipe() {
         SimpleContainer inventory = new SimpleContainer(9);
         for (int i = 0; i < 9; i++) {
             inventory.setItem(i, itemHandler.getStackInSlot(i));
@@ -232,7 +248,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
         return ForgingRecipe.findBestMatch(level, inventory)
                 .filter(this::matchesRecipeExactly)
-                .filter(this::hasEnoughIngredients);
+                //.filter(this::hasEnoughIngredients)
+                ;
     }
 
     private boolean canInsertItemIntoOutputSlot(Item item) {
@@ -283,6 +300,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         if (hasRecipe()) {
             ForgingRecipe currentRecipe = recipe.get();
             maxProgress = currentRecipe.getHammeringRequired();
+            //ModMessages.sendToServer(new UpdateAnvilProgressC2SPacket(maxProgress));
             hitRemains = maxProgress - progress;
             setChanged(lvl, pos, st);
             if (hasProgressFinished()) {
@@ -307,9 +325,9 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return saveWithoutMetadata();
     }
 
-    public static void applyForgingQuality(ItemStack stack, String quality) {
+    public static void applyForgingQuality(ItemStack stack, ForgingQuality quality) {
         CompoundTag tag = stack.getOrCreateTag();
-        tag.putString("ForgingQuality", quality);
+        tag.putString("ForgingQuality", quality.getDisplayName());
     }
 
     private boolean matchesRecipeExactly(ForgingRecipe recipe) {
@@ -321,9 +339,74 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return recipe.matches(inventory, level);
     }
 
-    public void startForgingMinigame(Player player, ItemStack result) {
+   /* public void startForgingMinigame(Player player, ItemStack result) {
         if (player.level().isClientSide) {
             Minecraft.getInstance().setScreen(new ForgingMinigameScreen(result));
         }
+    }*/
+
+    private String determineForgingQuality() {
+        // Implement your logic here to assess performance
+        // For demonstration, we'll return a random quality
+        String quality = SmithingAnvil.getQuality();
+        switch (quality) {
+            case "poor":
+                return ForgingQuality.POOR.getDisplayName();
+            case "expert":
+                return ForgingQuality.EXPERT.getDisplayName();
+            case "perfect":
+                return ForgingQuality.PERFECT.getDisplayName();
+            default:
+                return ForgingQuality.WELL.getDisplayName();
+        }
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+        this.setChanged();
+
+        // If you're using ContainerData
+        if (this.data != null) {
+            this.data.set(0, progress); // Assuming progress is at index 0
+        }
+    }
+
+    public int getRequiredProgress() {
+        Optional<ForgingRecipe> recipe = getCurrentRecipe();
+        ForgingRecipe currentRecipe = recipe.get();
+        return currentRecipe.getHammeringRequired() - progress;
+    }
+
+
+    public void completeForgingWithQuality(String quality) {
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isPresent()) {
+            ForgingRecipe recipe = recipeOptional.get();
+            ItemStack result = recipe.getResultItem(level.registryAccess()).copy();
+
+            // Apply quality
+            result.getOrCreateTag().putString("ForgingQuality", quality);
+
+            // Clear inputs
+            for (int i = 0; i < 9; i++) {
+                itemHandler.extractItem(i, 1, false);
+            }
+
+            // Set output
+            ItemStack currentOutput = itemHandler.getStackInSlot(OUTPUT_SLOT);
+            if (currentOutput.isEmpty()) {
+                itemHandler.setStackInSlot(OUTPUT_SLOT, result);
+            } else {
+                currentOutput.grow(1);
+            }
+
+            resetForgingState();
+        }
+    }
+
+    private void resetForgingState() {
+        perfectHits = 0;
+        goodHits = 0;
+        missedHits = 0;
     }
 }

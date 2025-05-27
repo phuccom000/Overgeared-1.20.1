@@ -2,20 +2,15 @@ package net.stirdrem.overgeared.item;
 
 import cech12.bucketlib.api.item.UniversalBucketItem;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.item.custom.HeatedItem;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.item.custom.Tongs;
-import cech12.bucketlib.api.BucketLibApi;
-import net.stirdrem.overgeared.util.ModTags;
+import net.stirdrem.overgeared.item.custom.ToolParts;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
@@ -38,6 +33,8 @@ public class ModItems {
     public static final RegistryObject<Item> HEATED_STEEL_INGOT = ITEMS.register("heated_steel_ingot",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> STEEL_TONG = ITEMS.register("steel_tong",
+            () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> IRON_TONGS = ITEMS.register("iron_tongs",
             () -> new Tongs(new Item.Properties().durability(512)));

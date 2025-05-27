@@ -3,11 +3,13 @@
   "category": "misc",
   "key": {
     "#": {
-      "item": "minecraft:iron_ingot"
+      "item": "overgeared:steel_ingot"
     }
   },
   "pattern": [
-    " "
+    "###",
+    "###",
+    "###"
   ],
   "result": {
     "item": "minecraft:bucket"

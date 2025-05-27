@@ -10,7 +10,10 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.networking.packet.UpdateAnvilProgressC2SPacket;
 import net.stirdrem.overgeared.util.TooltipButton;
 
 public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMenu> {
@@ -77,6 +80,7 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
 
         renderProgressArrow(guiGraphics, x, y);
+        //renderResultPreview(guiGraphics, x, y); // Add this line
     }
 
     private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
@@ -102,19 +106,35 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
 
     private void renderHitsRemaining(GuiGraphics guiGraphics) {
         // Draw remaining hits label
-        if (menu.getRemainingHits() == 0) return;
+        int remainingHits = menu.getRemainingHits();
+        if (remainingHits == 0) return;
         else {
-            String hitsText = "Remaining Hits: " + menu.getRemainingHits();
+            String hitsText = "Remaining Hits: " + remainingHits;
             int x = (width - imageWidth) / 2;
             int y = (height - imageHeight) / 2;
             guiGraphics.drawString(font, hitsText, x + 89, y + 17, 4210752, false); // White color
         }
     }
 
-    private void onTechniqueButtonPressed(int techniqueIndex) {
-        // Implement the logic for each technique here
-        // For example:
-        System.out.println("Technique " + (techniqueIndex + 1) + " selected.");
-        // You can add more complex logic based on the techniqueIndex
+    private void renderResultPreview(GuiGraphics guiGraphics, int x, int y) {
+        ItemStack result = menu.getResultItem();
+        if (!result.isEmpty()) {
+            // Set transparency (0.5f = 50% opacity)
+            RenderSystem.enableBlend();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.5F);
+
+            // Position the preview (adjust these coordinates as needed)
+            int itemX = x + 143;
+            int itemY = y + 35;
+
+            // Render the item with transparency
+            guiGraphics.renderItem(result, itemX, itemY);
+            guiGraphics.renderItemDecorations(font, result, itemX, itemY);
+
+            // Reset transparency
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.disableBlend();
+        }
     }
+
 }
