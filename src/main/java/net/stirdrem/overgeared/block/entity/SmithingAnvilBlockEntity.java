@@ -28,6 +28,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.block.custom.SmithingAnvil;
+import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
@@ -173,6 +174,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private void resetProgress() {
         progress = 0;
         maxProgress = 0;
+        AnvilMinigameOverlay.endMinigame();
     }
 
     private void craftItem() {
@@ -196,18 +198,49 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
                 this.itemHandler.extractItem(i, 1, false);
             }
 
-            // Set the result directly into the output slot
-            this.itemHandler.setStackInSlot(OUTPUT_SLOT, result);
+            ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+
+            if (existing.isEmpty()) {
+                // If the output slot is empty, just set the result
+                this.itemHandler.setStackInSlot(OUTPUT_SLOT, result);
+            } else if (ItemStack.isSameItemSameTags(existing, result)) {
+                // If the same item (with same NBT), try to stack them
+                int total = existing.getCount() + result.getCount();
+                int maxSize = Math.min(existing.getMaxStackSize(), this.itemHandler.getSlotLimit(OUTPUT_SLOT));
+
+                if (total <= maxSize) {
+                    existing.grow(result.getCount());
+                    this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
+                } else {
+                    // If not all items fit, grow to max and optionally handle overflow
+                    int remainder = total - maxSize;
+                    existing.setCount(maxSize);
+                    this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
+
+                    // Handle remainder if needed (e.g. drop, store elsewhere, etc.)
+                    ItemStack overflow = result.copy();
+                    overflow.setCount(remainder);
+                    // Example: drop the overflow into the world
+                    Containers.dropItemStack(getLevel(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), overflow);
+                }
+            }
+
         }
     }
 
 
     public boolean hasRecipe() {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        return recipe.isPresent()
-                && canInsertItemIntoOutputSlot(recipe.get().getResultItem(level.registryAccess()).getItem())
-                && canInsertAmountIntoOutputSlot(recipe.get().getResultItem(level.registryAccess()).getCount());
+        if (recipe.isPresent()) {
+            ItemStack resultStack = recipe.get().getResultItem(level.registryAccess());
+
+            return canInsertItemIntoOutputSlot(resultStack)
+                    && canInsertAmountIntoOutputSlot(resultStack.getCount());
+        }
+
+        return false;
     }
+
 
     private boolean hasEnoughIngredients(ForgingRecipe recipe) {
         NonNullList<Ingredient> ingredients = recipe.getIngredients();
@@ -252,9 +285,11 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
                 ;
     }
 
-    private boolean canInsertItemIntoOutputSlot(Item item) {
-        return this.itemHandler.getStackInSlot(OUTPUT_SLOT).isEmpty() || this.itemHandler.getStackInSlot(OUTPUT_SLOT).is(item);
+    private boolean canInsertItemIntoOutputSlot(ItemStack stackToInsert) {
+        ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+        return (existing.isEmpty() || ItemStack.isSameItemSameTags(existing, stackToInsert));
     }
+
 
     private boolean canInsertAmountIntoOutputSlot(int count) {
         return this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.itemHandler.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();

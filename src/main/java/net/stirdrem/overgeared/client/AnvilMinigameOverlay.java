@@ -55,9 +55,9 @@ public class AnvilMinigameOverlay {
     private static final int ARROW_HEIGHT = 20;
 
     // Speed increase constants
-    private static final float BASE_SPEED = 1.0f;
-    private static final float SPEED_INCREASE_PER_HIT = 1.0f;
-    private static final float MAX_SPEED = 10.0f;
+    private static final float BASE_SPEED = 2.0f;
+    private static final float SPEED_INCREASE_PER_HIT = 0.75f;
+    private static final float MAX_SPEED = 5.0f;
 
     public static final IGuiOverlay ANVIL_MG = ((gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         if (!isVisible) return;
@@ -130,20 +130,17 @@ public class AnvilMinigameOverlay {
         arrowPosition = 0;
         arrowSpeed = BASE_SPEED;
         movingRight = true;
-        perfectZoneStart = PERFECT_ZONE_START;
-        perfectZoneEnd = PERFECT_ZONE_END;
-        goodZoneStart = GOOD_ZONE_START;
-        goodZoneEnd = GOOD_ZONE_END;
+        double random = Math.random() * 10;
+        perfectZoneStart = Math.max(0, Math.min(100, (int) (PERFECT_ZONE_START + random)));
+        perfectZoneEnd = Math.max(0, Math.min(100, (int) (PERFECT_ZONE_END + random)));
+        goodZoneStart = Math.max(0, Math.min(100, (int) (GOOD_ZONE_START + random)));
+        goodZoneEnd = Math.max(0, Math.min(100, (int) (GOOD_ZONE_END + random)));
     }
 
     public static void tick() {
         if (!isVisible) return;
         // Pause the minigame if the game itself is paused
         if (Minecraft.getInstance().isPaused()) return;
-        if (temporaryExit) {
-            isVisible = true;
-            return;
-        }
         // Update arrow position
         if (movingRight) {
             arrowPosition += arrowSpeed;
@@ -202,11 +199,11 @@ public class AnvilMinigameOverlay {
         float random = (float) Math.random();
         // Calculate new zone positions with random shift
         float perfectZoneCenter = (perfectZoneStart + perfectZoneEnd) / 2f;
-        perfectZoneCenter += (float) (random - 0.5) * zoneShiftAmount * 2;
+        perfectZoneCenter += (float) (random - 0.5) * zoneShiftAmount * 3;
         //perfectZoneCenter = Math.max(20, Math.min(80, perfectZoneCenter)); // Keep within reasonable bounds
 
         float goodZoneCenter = (goodZoneStart + goodZoneEnd) / 2f;
-        goodZoneCenter += (float) (random - 0.5) * zoneShiftAmount * 2;
+        goodZoneCenter += (float) (random - 0.5) * zoneShiftAmount * 3;
         //goodZoneCenter = Math.max(20, Math.min(80, goodZoneCenter)); // Keep within reasonable bounds
 
         // Apply new zones
@@ -271,5 +268,18 @@ public class AnvilMinigameOverlay {
         if (qualityScore > 0.75f) return "expert";
         if (qualityScore > 0.50f) return "well";
         return "poor";
+    }
+
+    public static void endMinigame() {
+        // Close minigame
+        isVisible = false;
+        minigameStarted = false;
+        resultItem = null;
+        hitsRemaining = 0;
+        perfectHits = 0;
+        goodHits = 0;
+        missedHits = 0;
+        arrowPosition = 0;
+        arrowSpeed = 0;
     }
 }
