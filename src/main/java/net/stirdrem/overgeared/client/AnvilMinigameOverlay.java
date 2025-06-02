@@ -12,6 +12,7 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.FinalizeForgingC2SPacket;
 import net.stirdrem.overgeared.networking.packet.UpdateAnvilProgressC2SPacket;
@@ -26,6 +27,7 @@ public class AnvilMinigameOverlay {
     private static int hitsRemaining = 0;
     private static float arrowPosition = 0;
     private static float arrowSpeed = 1.0f;
+    private static float speedIncreasePerHit = 0.75f;
     private static boolean movingRight = true;
     private static int perfectHits = 0;
     private static int goodHits = 0;
@@ -103,10 +105,22 @@ public class AnvilMinigameOverlay {
                 0xFFFF0000);*/
 
         // Draw stats
-        guiGraphics.drawString(Minecraft.getInstance().font,
-                "Hits Left: " + hitsRemaining + " | Perfect: " + perfectHits + " Good: " + goodHits + " Miss: " + missedHits,
-                x + 10, y - 10,
-                0xFFFFFFFF);
+        Component stats = Component.translatable(
+                "gui.overgeared.forging_stats",
+                hitsRemaining,
+                perfectHits,
+                goodHits,
+                missedHits
+        );
+
+        guiGraphics.drawString(
+                Minecraft.getInstance().font,
+                stats,
+                x + 10,
+                y - 10,
+                0xFFFFFFFF
+        );
+
 
     });
 
@@ -128,7 +142,12 @@ public class AnvilMinigameOverlay {
         goodHits = 0;
         missedHits = 0;
         arrowPosition = 0;
-        arrowSpeed = BASE_SPEED;
+        double as = ServerConfig.DEFAULT_ARROW_SPEED.get();
+        arrowSpeed = (float) as;
+        as = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get();
+        speedIncreasePerHit = (float) as;
+        as = ServerConfig.ZONE_SHRINK_FACTOR.get();
+        zoneShrinkFactor = (float) as;
         movingRight = true;
         double random = Math.random() * 10;
         perfectZoneStart = Math.max(0, Math.min(100, (int) (PERFECT_ZONE_START + random)));
@@ -159,13 +178,8 @@ public class AnvilMinigameOverlay {
 
     public static String handleHit() {
         // Increase speed with every hit
-        arrowSpeed = Math.min(arrowSpeed + SPEED_INCREASE_PER_HIT, MAX_SPEED);
+        arrowSpeed = Math.min(arrowSpeed + speedIncreasePerHit, MAX_SPEED);
 
-
-        int perfectZoneStart1 = perfectZoneStart;
-        int perfectZoneEnd1 = perfectZoneEnd;
-        int goodZoneStart1 = goodZoneStart;
-        int goodZoneEnd1 = goodZoneEnd;
         if (arrowPosition >= perfectZoneStart && arrowPosition <= perfectZoneEnd) {
             perfectHits++;
         } else if (arrowPosition >= goodZoneStart && arrowPosition <= goodZoneEnd) {

@@ -1,0 +1,14 @@
+{
+  "type": "overgeared:add_item",
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:chests/abandoned_mineshaft"
+    },
+    {
+      "chance": 0.35,
+      "condition": "minecraft:random_chance"
+    }
+  ],
+  "item": "overgeared:diamond_upgrade_smithing_template"
+}

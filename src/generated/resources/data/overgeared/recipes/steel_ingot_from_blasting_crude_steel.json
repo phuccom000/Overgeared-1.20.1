@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.7,
+  "group": "steel_ingot",
+  "ingredient": {
+    "item": "overgeared:crude_steel"
+  },
+  "result": "overgeared:steel_ingot"
+}

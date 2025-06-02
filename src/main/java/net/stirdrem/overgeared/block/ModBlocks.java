@@ -32,9 +32,9 @@ public class ModBlocks {
     public static final RegistryObject<Block> STEEL_BLOCK = registerBlock("steel_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> WATER_BARREL = registerBlock("water_barrel",
-            () -> new WaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL).requiresCorrectToolForDrops().strength(2.0F).noOcclusion()));
+            () -> new WaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()));
     public static final RegistryObject<Block> WATER_BARREL_FULL = registerBlock("water_barrel_full",
-            () -> new LayeredWaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL), LayeredCauldronBlock.RAIN, BarrelInteraction.WATER));
+            () -> new LayeredWaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion(), LayeredCauldronBlock.RAIN, BarrelInteraction.WATER));
     /*public static final RegistryObject<Block> WATER_BARREL_FULL = registerBlock("water_barrel_full",
             () -> new WaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL).requiresCorrectToolForDrops().strength(2.0F).noOcclusion()));*/
 

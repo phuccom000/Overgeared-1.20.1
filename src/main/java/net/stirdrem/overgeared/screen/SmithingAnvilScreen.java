@@ -105,16 +105,15 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
     }
 
     private void renderHitsRemaining(GuiGraphics guiGraphics) {
-        // Draw remaining hits label
         int remainingHits = menu.getRemainingHits();
         if (remainingHits == 0) return;
-        else {
-            String hitsText = "Remaining Hits: " + remainingHits;
-            int x = (width - imageWidth) / 2;
-            int y = (height - imageHeight) / 2;
-            guiGraphics.drawString(font, hitsText, x + 89, y + 17, 4210752, false); // White color
-        }
+
+        Component hitsText = Component.translatable("gui.overgeared.remaining_hits", remainingHits);
+        int x = (width - imageWidth) / 2;
+        int y = (height - imageHeight) / 2;
+        guiGraphics.drawString(font, hitsText, x + 89, y + 17, 4210752, false);
     }
+
 
     private void renderResultPreview(GuiGraphics guiGraphics, int x, int y) {
         ItemStack result = menu.getResultItem();

@@ -4,13 +4,11 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.resources.ResourceLocation;
@@ -36,6 +34,8 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private final Map<Character, Ingredient> key = new LinkedHashMap<>();
     private final Advancement.Builder advancement = Advancement.Builder.recipeAdvancement();
 
+    @Nullable
+    private Boolean hasQuality; // Can be null, true, or false
     @Nullable
     private String group;
     private boolean showNotification = true;
@@ -94,6 +94,11 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
+    public ShapedForgingRecipeBuilder setQuality(@Nullable boolean hasQuality) {
+        this.hasQuality = hasQuality;
+        return this;
+    }
+
     public ShapedForgingRecipeBuilder showNotification(boolean pShowNotification) {
         this.showNotification = pShowNotification;
         return this;
@@ -126,11 +131,13 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 this.hammering,
                 new ItemStack(this.result, this.count),
                 pRecipeId,
+                this.group == null ? "" : this.group,
                 this.rows,
                 this.key,
                 this.advancement,
                 pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/"),
-                this.showNotification
+                this.showNotification,
+                this.hasQuality == null ? true : this.hasQuality
         ));
     }
 
@@ -158,22 +165,29 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final Advancement.Builder advancement;
         private final ResourceLocation advancementId;
         private final boolean showNotification;
+        private final String group;
+        private final Boolean hasQuality;
 
 
-        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification) {
+        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, Boolean hasQuality) {
             this.ingredients = ingredients;
             this.hammering = hammering;
             this.result = result;
             this.id = id;
+            this.group = group;
             this.pattern = pattern;
             this.key = key;
             this.advancement = advancement;
             this.advancementId = advancementId;
             this.showNotification = showNotification;
+            this.hasQuality = hasQuality;
         }
 
         @Override
         public void serializeRecipeData(JsonObject json) {
+            if (!this.group.isEmpty()) {
+                json.addProperty("group", this.group);
+            }
             JsonArray patternArray = new JsonArray();
 
             for (String s : this.pattern) {
@@ -185,6 +199,11 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             //json.addProperty("category", this.category);
 
             json.addProperty("hammering", this.hammering);
+            // Add quality flag if not null
+            if (this.hasQuality != null || this.hasQuality) {
+                json.addProperty("has_quality", this.hasQuality);
+            }
+
             for (Map.Entry<Character, Ingredient> entry : this.key.entrySet()) {
                 jsonobject.add(String.valueOf(entry.getKey()), entry.getValue().toJson());
             }

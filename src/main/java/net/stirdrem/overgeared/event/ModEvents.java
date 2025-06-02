@@ -1,5 +1,7 @@
 package net.stirdrem.overgeared.event;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -7,12 +9,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -33,6 +36,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.heat.HeatCapability;
 import net.stirdrem.overgeared.heat.HeatCapabilityProvider;
 import net.stirdrem.overgeared.item.ModItems;
@@ -200,6 +204,119 @@ public class ModEvents {
         if (event.phase == TickEvent.Phase.END) {
             AnvilMinigameOverlay.tick();
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public static void onItemAttributes(ItemAttributeModifierEvent event) {
+        ItemStack stack = event.getItemStack();
+
+        if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
+            String quality = stack.getTag().getString("ForgingQuality");
+            Item item = stack.getItem();
+
+            if (isWeapon(item)) {
+                double damageBonus = getDamageBonusForQuality(quality);
+                double speedBonus = getSpeedBonusForQuality(quality);
+                modifyWeaponAttributes(event, damageBonus, speedBonus);
+            }
+            if (isArmor(item)) {
+                double armorBonus = getArmorBonusForQuality(quality);
+                modifyArmorAttribute(event, armorBonus);
+            }
+        }
+    }
+
+    private static boolean isWeapon(Item item) {
+        return item instanceof SwordItem ||
+                item instanceof DiggerItem ||
+                item instanceof ProjectileWeaponItem;
+    }
+
+    private static boolean isArmor(Item item) {
+        return item instanceof ArmorItem;
+    }
+
+    private static void modifyWeaponAttributes(ItemAttributeModifierEvent event, double damageBonus, double speedBonus) {
+        Multimap<Attribute, AttributeModifier> originalModifiers = LinkedHashMultimap.create();
+        originalModifiers.putAll(event.getOriginalModifiers());
+
+        // Process attack damage modifiers
+        for (AttributeModifier modifier : originalModifiers.get(Attributes.ATTACK_DAMAGE)) {
+            event.removeModifier(Attributes.ATTACK_DAMAGE, modifier);
+            AttributeModifier newModifier = new AttributeModifier(
+                    modifier.getId(),
+                    modifier.getName() + "_forged",
+                    modifier.getAmount() + damageBonus,
+                    modifier.getOperation()
+            );
+            event.addModifier(Attributes.ATTACK_DAMAGE, newModifier);
+        }
+
+        // Process attack speed modifiers
+        for (AttributeModifier modifier : originalModifiers.get(Attributes.ATTACK_SPEED)) {
+            event.removeModifier(Attributes.ATTACK_SPEED, modifier);
+            AttributeModifier newModifier = new AttributeModifier(
+                    modifier.getId(),
+                    modifier.getName() + "_forged",
+                    modifier.getAmount() + speedBonus,
+                    modifier.getOperation()
+            );
+            event.addModifier(Attributes.ATTACK_SPEED, newModifier);
+        }
+    }
+
+    private static void modifyArmorAttribute(ItemAttributeModifierEvent event, double damageBonus) {
+        // Create a copy of the original modifiers to avoid concurrent modification
+        Multimap<Attribute, AttributeModifier> originalModifiers = LinkedHashMultimap.create();
+        originalModifiers.putAll(event.getOriginalModifiers());
+
+        for (AttributeModifier modifier : originalModifiers.get(Attributes.ARMOR)) {
+            // Remove original modifier
+            event.removeModifier(Attributes.ARMOR, modifier);
+
+            // Create new modifier with bonus damage
+            AttributeModifier newModifier = new AttributeModifier(
+                    modifier.getId(),
+                    modifier.getName() + "_forged",
+                    modifier.getAmount() + damageBonus,
+                    modifier.getOperation()
+            );
+
+            // Add the modified version
+            event.addModifier(Attributes.ARMOR, newModifier);
+        }
+
+
+    }
+
+    private static double getDamageBonusForQuality(String quality) {
+        return switch (quality.toLowerCase()) {
+            case "perfect" -> ServerConfig.PERFECT_WEAPON_DAMAGE.get();
+            case "expert" -> ServerConfig.EXPERT_WEAPON_DAMAGE.get();
+            case "well" -> ServerConfig.WELL_WEAPON_DAMAGE.get();
+            case "poor" -> ServerConfig.POOR_WEAPON_DAMAGE.get();
+            default -> 0.0;
+        };
+    }
+
+    private static double getSpeedBonusForQuality(String quality) {
+        return switch (quality.toLowerCase()) {
+            case "perfect" -> ServerConfig.PERFECT_WEAPON_SPEED.get();
+            case "expert" -> ServerConfig.EXPERT_WEAPON_SPEED.get();
+            case "well" -> ServerConfig.WELL_WEAPON_SPEED.get();
+            case "poor" -> ServerConfig.POOR_WEAPON_SPEED.get();
+            default -> 0.0;
+        };
+    }
+
+    private static double getArmorBonusForQuality(String quality) {
+        return switch (quality.toLowerCase()) {
+            case "perfect" -> ServerConfig.PERFECT_ARMOR_BONUS.get();
+            case "expert" -> ServerConfig.EXPERT_ARMOR_BONUS.get();
+            case "well" -> ServerConfig.WELL_ARMOR_BONUS.get();
+            case "poor" -> ServerConfig.POOR_ARMOR_BONUS.get();
+            default -> 0.0;
+        };
     }
 
 }

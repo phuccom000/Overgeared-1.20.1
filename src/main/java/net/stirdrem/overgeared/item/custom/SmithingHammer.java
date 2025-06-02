@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
@@ -52,7 +53,6 @@ public class SmithingHammer extends Item {
                         if (anvilBE.hasRecipe()) {
                             ItemStack result = recipeOpt.get().getResultItem(level.registryAccess());
                             int progress = anvilBE.getRequiredProgress();
-                            AnvilMinigameOverlay.isVisible = true;
                             AnvilMinigameOverlay.startMinigame(result, progress);
                         }
                     }
@@ -64,7 +64,7 @@ public class SmithingHammer extends Item {
     }
 
 
-    @Override
+   /* @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack held = player.getItemInHand(hand);
 
@@ -79,7 +79,7 @@ public class SmithingHammer extends Item {
             return InteractionResultHolder.sidedSuccess(held, level.isClientSide());
         }
         return InteractionResultHolder.pass(held);
-    }
+    }*/
 
     @Override
     public boolean hasCraftingRemainingItem(ItemStack stack) {

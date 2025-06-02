@@ -1,0 +1,19 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "key": {
+    "#": {
+      "item": "overgeared:heated_steel_ingot"
+    }
+  },
+  "pattern": [
+    "# #",
+    "###",
+    "###"
+  ],
+  "result": {
+    "item": "overgeared:steel_chestplate"
+  },
+  "show_notification": true
+}

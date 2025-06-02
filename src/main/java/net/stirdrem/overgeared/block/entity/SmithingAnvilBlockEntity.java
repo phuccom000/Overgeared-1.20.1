@@ -57,11 +57,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private int progress = 0;
     private int maxProgress = 0;
     private int hitRemains;
-    private int hitRemainsMG;
     private long busyUntilGameTime = 0L;
-    private int perfectHits = 0;
-    private int goodHits = 0;
-    private int missedHits = 0;
 
 
     public SmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
@@ -127,7 +123,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.overgeared.smithing_anvil.gui");
+        return Component.translatable("gui.overgeared.smithing_anvil");
     }
 
     @Nullable
@@ -174,6 +170,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private void resetProgress() {
         progress = 0;
         maxProgress = 0;
+        lastRecipe = null;
         AnvilMinigameOverlay.endMinigame();
     }
 
@@ -187,7 +184,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             String quality = determineForgingQuality();
 
             // Only set the NBT tag if quality is meaningful
-            if (quality != null && !quality.isEmpty()) {
+            if (quality != null && !quality.isEmpty() && recipe.hasQuality()) {
                 CompoundTag tag = result.getOrCreateTag();
                 tag.putString("ForgingQuality", quality);
                 result.setTag(tag);
@@ -304,21 +301,6 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         progress++;
     }
 
-    public void increaseCraftingProgressIfValid() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        if (hasRecipe()) {
-            ForgingRecipe currentRecipe = recipe.get();
-            maxProgress = currentRecipe.getHammeringRequired();
-            increaseCraftingProgress();
-
-            if (hasProgressFinished()) {
-                craftItem();
-                resetProgress();
-            }
-        } else {
-            resetProgress();
-        }
-    }
 
     public boolean isBusy(long currentGameTime) {
         return currentGameTime < busyUntilGameTime;
@@ -330,15 +312,45 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
 
+    private ForgingRecipe lastRecipe = null;
+
     public void updateHitsRemaining(Level lvl, BlockPos pos, BlockState st) {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
+        Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
+
+        // Check if recipe has changed by comparing with last known recipe
+        boolean recipeChanged = false;
+
+        if (currentRecipeOpt.isPresent()) {
+            ForgingRecipe currentRecipe = currentRecipeOpt.get();
+
+            if (lastRecipe != null) {
+                // Compare recipes by their IDs or other unique properties
+                recipeChanged = !currentRecipe.getId().equals(lastRecipe.getId());
+            } else if (maxProgress > 0) {
+                // We had progress but no last recipe (shouldn't normally happen)
+                recipeChanged = true;
+            }
+
+            lastRecipe = currentRecipe;
+        } else {
+            // No current recipe but we had one before
+            recipeChanged = (lastRecipe != null || maxProgress > 0);
+            lastRecipe = null;
+        }
+
+        if (recipeChanged) {
+            resetProgress();
+            return;
+        }
+
         if (hasRecipe()) {
-            ForgingRecipe currentRecipe = recipe.get();
-            maxProgress = currentRecipe.getHammeringRequired();
-            //ModMessages.sendToServer(new UpdateAnvilProgressC2SPacket(maxProgress));
+            ForgingRecipe recipe = currentRecipeOpt.get();
+            maxProgress = recipe.getHammeringRequired();
             hitRemains = maxProgress - progress;
             setChanged(lvl, pos, st);
+
             if (hasProgressFinished()) {
+                craftItem();
                 resetProgress();
             }
         } else {
@@ -413,7 +425,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
 
-    public void completeForgingWithQuality(String quality) {
+  /*  public void completeForgingWithQuality(String quality) {
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
         if (recipeOptional.isPresent()) {
             ForgingRecipe recipe = recipeOptional.get();
@@ -437,11 +449,5 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
             resetForgingState();
         }
-    }
-
-    private void resetForgingState() {
-        perfectHits = 0;
-        goodHits = 0;
-        missedHits = 0;
-    }
+    }*/
 }

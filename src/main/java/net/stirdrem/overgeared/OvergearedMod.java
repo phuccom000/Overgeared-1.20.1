@@ -25,6 +25,7 @@ import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
 import net.stirdrem.overgeared.item.ModItems;
 
+import net.stirdrem.overgeared.loot.ModLootModifiers;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
@@ -60,6 +61,8 @@ public class OvergearedMod {
 
         ModRecipeTypes.register(modEventBus);
 
+        ModLootModifiers.register(modEventBus);
+
         MinecraftForge.EVENT_BUS.register(TickScheduler.class);
 
         modEventBus.addListener(this::commonSetup);
@@ -81,12 +84,15 @@ public class OvergearedMod {
             event.accept(ModItems.IRON_TONGS);
             event.accept(ModItems.STEEL_TONGS);
             event.accept(ModItems.SMITHING_HAMMER);
-            event.accept(ModItems.STEEL_SWORD.get());
             event.accept(ModItems.STEEL_PICKAXE.get());
             event.accept(ModItems.STEEL_AXE.get());
             event.accept(ModItems.STEEL_SHOVEL.get());
             event.accept(ModItems.STEEL_HOE.get());
         }
+        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
+            event.accept(ModItems.STEEL_SWORD.get());
+        }
+
     }
 
     private void sendImc(InterModEnqueueEvent evt) {

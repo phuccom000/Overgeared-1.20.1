@@ -1,0 +1,18 @@
+next patch
+
+change steel block texture
+make the multiplier stats for the quality modifier and arrow speed ect be configurable through a config file
+add armor modifier for armor pieces
+smithing anvil gravity
+
+maybe add dependency
+https://www.curseforge.com/minecraft/mc-mods/easy-anvils
+
+next large update
+repair mechanic
+
+Allow weapons to have their durability restored using the grindstone but each use shaves off 10 max durability. Armor on the other hand needs to be heated then hammered on an anvil to restore durability but doing so reduces max durability by 10 as well.
+Repair kits can be used to repair items and even restore their max durability, but can only be applied to items of appropriate tier level or lower. So there’d be a repair kit for iron level, steel level, and etch.
+Additionally, repair kits also have their own durability. So if you wanted to repair a weapon that only lost 15 durability for example, the repair kit only loses 15 durability of itself instead of outright being consumed.
+
+Recipe book integration for the anvil

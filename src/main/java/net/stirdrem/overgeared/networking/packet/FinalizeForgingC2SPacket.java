@@ -29,7 +29,7 @@ public class FinalizeForgingC2SPacket {
             ServerPlayer player = context.getSender();
             if (player != null && player.containerMenu instanceof SmithingAnvilMenu menu) {
                 SmithingAnvilBlockEntity anvil = menu.getBlockEntity();
-                anvil.completeForgingWithQuality(quality);
+                //anvil.completeForgingWithQuality(quality);
 
             }
         });

@@ -1,6 +1,5 @@
 package net.stirdrem.overgeared.recipe;
 
-import ca.weblite.objc.Runtime;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,11 +14,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.config.ServerConfig;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class ForgingRecipe implements Recipe<Container> {
     private final ResourceLocation id;
@@ -27,17 +24,20 @@ public class ForgingRecipe implements Recipe<Container> {
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result;
     private final int hammering;
+    private final boolean hasQuality;
     private final boolean showNotification;
     public final int width;
     public final int height;
 
     public ForgingRecipe(ResourceLocation id, String group, NonNullList<Ingredient> ingredients,
-                         ItemStack result, int hammering, boolean showNotification, int width, int height) {
+                         ItemStack result, int hammering, boolean hasQuality, boolean showNotification, int width, int height) {
         this.id = id;
         this.group = group;
         this.ingredients = ingredients;
         this.result = result;
         this.hammering = hammering;
+
+        this.hasQuality = hasQuality;
         this.showNotification = showNotification;
         this.width = width;
         this.height = height;
@@ -152,8 +152,25 @@ public class ForgingRecipe implements Recipe<Container> {
         return ModRecipeTypes.FORGING.get();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        ForgingRecipe that = (ForgingRecipe) obj;
+        return this.getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
     public int getHammeringRequired() {
         return hammering;
+    }
+
+    public boolean hasQuality() {
+        return hasQuality;
     }
 
     public String getGroup() {
@@ -168,6 +185,7 @@ public class ForgingRecipe implements Recipe<Container> {
         return hammering;
     }
 
+
     public static class Type implements RecipeType<ForgingRecipe> {
         public static final Type INSTANCE = new Type();
         public static final String ID = "forging";
@@ -181,6 +199,7 @@ public class ForgingRecipe implements Recipe<Container> {
         public ForgingRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
             String group = GsonHelper.getAsString(json, "group", "");
             int hammering = GsonHelper.getAsInt(json, "hammering", 1);
+            boolean hasQuality = GsonHelper.getAsBoolean(json, "has_quality", true);
             boolean showNotification = GsonHelper.getAsBoolean(json, "show_notification", true);
 
             Map<Character, Ingredient> keyMap = parseKey(GsonHelper.getAsJsonObject(json, "key"));
@@ -191,7 +210,7 @@ public class ForgingRecipe implements Recipe<Container> {
             NonNullList<Ingredient> ingredients = dissolvePattern(pattern, keyMap, width, height);
 
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
-            return new ForgingRecipe(recipeId, group, ingredients, result, hammering, showNotification, width, height);
+            return new ForgingRecipe(recipeId, group, ingredients, result, hammering, hasQuality, showNotification, width, height);
         }
 
         private static Map<Character, Ingredient> parseKey(JsonObject keyJson) {
@@ -231,6 +250,7 @@ public class ForgingRecipe implements Recipe<Container> {
         public ForgingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             String group = buffer.readUtf();
             int hammering = buffer.readVarInt();
+            boolean hasQuality = buffer.readBoolean();
             boolean showNotification = buffer.readBoolean();
             int width = buffer.readVarInt();
             int height = buffer.readVarInt();
@@ -241,7 +261,7 @@ public class ForgingRecipe implements Recipe<Container> {
             }
 
             ItemStack result = buffer.readItem();
-            return new ForgingRecipe(recipeId, group, ingredients, result, hammering, showNotification, width, height);
+            return new ForgingRecipe(recipeId, group, ingredients, result, hammering, hasQuality, showNotification, width, height);
         }
 
         @Override

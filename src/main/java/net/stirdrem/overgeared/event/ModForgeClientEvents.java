@@ -12,11 +12,11 @@ import org.lwjgl.glfw.GLFW;
 public class ModForgeClientEvents {
 
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public static void onMouseClick(InputEvent.MouseButton.Pre event) {
         if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.getAction() == GLFW.GLFW_PRESS) {
             AnvilMinigameOverlay.pauseMinigame();
         }
-    }
+    }*/
 
 }

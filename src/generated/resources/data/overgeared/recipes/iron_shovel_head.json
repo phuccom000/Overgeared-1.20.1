@@ -1,6 +1,7 @@
 {
   "type": "overgeared:forging",
   "hammering": 3,
+  "has_quality": true,
   "key": {
     "#": {
       "item": "overgeared:heated_iron_ingot"

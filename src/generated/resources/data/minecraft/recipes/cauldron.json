@@ -1,0 +1,19 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": false,
+  "key": {
+    "#": {
+      "item": "overgeared:heated_iron_ingot"
+    }
+  },
+  "pattern": [
+    "# #",
+    "# #",
+    "###"
+  ],
+  "result": {
+    "item": "minecraft:cauldron"
+  },
+  "show_notification": true
+}

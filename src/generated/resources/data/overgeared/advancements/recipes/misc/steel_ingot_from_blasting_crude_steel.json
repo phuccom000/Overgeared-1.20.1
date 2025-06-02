@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_crude_steel": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "overgeared:crude_steel"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "overgeared:steel_ingot_from_blasting_crude_steel"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_crude_steel",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "overgeared:steel_ingot_from_blasting_crude_steel"
+    ]
+  },
+  "sends_telemetry_event": false
+}

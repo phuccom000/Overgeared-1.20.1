@@ -31,39 +31,39 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.TOOL_PARTS)
                 .add(
                         // Sword Blades
-                        ModItems.STONE_SWORD_BLADE.get(),
+                        //ModItems.STONE_SWORD_BLADE.get(),
                         ModItems.IRON_SWORD_BLADE.get(),
                         ModItems.GOLDEN_SWORD_BLADE.get(),
                         ModItems.STEEL_SWORD_BLADE.get(),
-                        ModItems.DIAMOND_SWORD_BLADE.get(),
+                        //ModItems.DIAMOND_SWORD_BLADE.get(),
 
                         // Pickaxe Heads
-                        ModItems.STONE_PICKAXE_HEAD.get(),
+                        //ModItems.STONE_PICKAXE_HEAD.get(),
                         ModItems.IRON_PICKAXE_HEAD.get(),
                         ModItems.GOLDEN_PICKAXE_HEAD.get(),
                         ModItems.STEEL_PICKAXE_HEAD.get(),
-                        ModItems.DIAMOND_PICKAXE_HEAD.get(),
+                        //ModItems.DIAMOND_PICKAXE_HEAD.get(),
 
                         // Axe Heads
-                        ModItems.STONE_AXE_HEAD.get(),
+                        //ModItems.STONE_AXE_HEAD.get(),
                         ModItems.IRON_AXE_HEAD.get(),
                         ModItems.GOLDEN_AXE_HEAD.get(),
                         ModItems.STEEL_AXE_HEAD.get(),
-                        ModItems.DIAMOND_AXE_HEAD.get(),
+                        //ModItems.DIAMOND_AXE_HEAD.get(),
 
                         // Shovel Heads
-                        ModItems.STONE_SHOVEL_HEAD.get(),
+                        //ModItems.STONE_SHOVEL_HEAD.get(),
                         ModItems.IRON_SHOVEL_HEAD.get(),
                         ModItems.GOLDEN_SHOVEL_HEAD.get(),
                         ModItems.STEEL_SHOVEL_HEAD.get(),
-                        ModItems.DIAMOND_SHOVEL_HEAD.get(),
+                        //ModItems.DIAMOND_SHOVEL_HEAD.get(),
 
                         // Hoe Heads
-                        ModItems.STONE_HOE_HEAD.get(),
+                        //ModItems.STONE_HOE_HEAD.get(),
                         ModItems.IRON_HOE_HEAD.get(),
                         ModItems.GOLDEN_HOE_HEAD.get(),
-                        ModItems.STEEL_HOE_HEAD.get(),
-                        ModItems.DIAMOND_HOE_HEAD.get()
+                        ModItems.STEEL_HOE_HEAD.get()
+                        //ModItems.DIAMOND_HOE_HEAD.get()
                 );
 
         this.tag(Tags.Items.TOOLS)
@@ -88,6 +88,52 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                 );
         this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel")))
                 .add(ModItems.STEEL_INGOT.get());
+        this.tag(Tags.Items.TOOLS)
+                .add(
+                        ModItems.STEEL_AXE.get(),
+                        ModItems.STEEL_PICKAXE.get(),
+                        ModItems.STEEL_HOE.get(),
+                        ModItems.STEEL_SHOVEL.get(),
+                        ModItems.STEEL_SWORD.get()
+                );
+        // Add to vanilla Minecraft tags
+        this.tag(ItemTags.HOES)
+                .add(ModItems.STEEL_HOE.get());
+        this.tag(ItemTags.AXES)
+                .add(ModItems.STEEL_AXE.get());
+        this.tag(ItemTags.PICKAXES)
+                .add(ModItems.STEEL_PICKAXE.get());
+        this.tag(ItemTags.SHOVELS)
+                .add(ModItems.STEEL_SHOVEL.get());
+        this.tag(ItemTags.SWORDS)
+                .add(ModItems.STEEL_SWORD.get());
+        // Hoes
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "hoes")))
+                .add(ModItems.STEEL_HOE.get());
+
+        // Axes
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "axes")))
+                .add(ModItems.STEEL_AXE.get());
+
+        // Pickaxes
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "pickaxes")))
+                .add(ModItems.STEEL_PICKAXE.get());
+
+        // Shovels
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "shovels")))
+                .add(ModItems.STEEL_SHOVEL.get());
+
+        // Swords
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "swords")))
+                .add(ModItems.STEEL_SWORD.get());
+
+        this.tag(ItemTags.TRIMMABLE_ARMOR)
+                .add(
+                        ModItems.STEEL_HELMET.get(),
+                        ModItems.STEEL_CHESTPLATE.get(),
+                        ModItems.STEEL_LEGGINGS.get(),
+                        ModItems.STEEL_BOOTS.get()
+                );
     }
 }
 

@@ -19,7 +19,7 @@ public class ModCreativeModeTabs {
                     .title(Component.translatable("creativetab.overgeared_tab"))
                     .displayItems((pParameters, pOutput) -> {
                         // General materials/tools
-                        pOutput.accept(ModItems.STEEL_ALLOY.get());
+                        pOutput.accept(ModItems.CRUDE_STEEL.get());
                         pOutput.accept(ModItems.STEEL_INGOT.get());
                         pOutput.accept(ModItems.HEATED_IRON_INGOT.get());
                         pOutput.accept(ModItems.HEATED_STEEL_INGOT.get());
@@ -27,8 +27,13 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.IRON_TONGS.get());
                         pOutput.accept(ModItems.STEEL_TONGS.get());
                         pOutput.accept(ModItems.SMITHING_HAMMER.get());
+                        pOutput.accept(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get());
                         pOutput.accept(ModItems.WOODEN_BUCKET.get());
 
+                        pOutput.accept(ModItems.STEEL_HELMET.get());
+                        pOutput.accept(ModItems.STEEL_CHESTPLATE.get());
+                        pOutput.accept(ModItems.STEEL_LEGGINGS.get());
+                        pOutput.accept(ModItems.STEEL_BOOTS.get());
 
                         pOutput.accept(ModItems.STEEL_SWORD.get());
                         pOutput.accept(ModItems.STEEL_PICKAXE.get());
@@ -37,11 +42,11 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.STEEL_HOE.get());
 
                         // === STONE ===
-                        pOutput.accept(ModItems.STONE_SWORD_BLADE.get());
+                        /*pOutput.accept(ModItems.STONE_SWORD_BLADE.get());
                         pOutput.accept(ModItems.STONE_PICKAXE_HEAD.get());
                         pOutput.accept(ModItems.STONE_AXE_HEAD.get());
                         pOutput.accept(ModItems.STONE_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.STONE_HOE_HEAD.get());
+                        pOutput.accept(ModItems.STONE_HOE_HEAD.get());*/
 
                         // === IRON ===
                         pOutput.accept(ModItems.IRON_SWORD_BLADE.get());
@@ -65,12 +70,12 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.STEEL_HOE_HEAD.get());
 
                         // === DIAMOND ===
-                        pOutput.accept(ModItems.DIAMOND_SWORD_BLADE.get());
+                       /* pOutput.accept(ModItems.DIAMOND_SWORD_BLADE.get());
                         pOutput.accept(ModItems.DIAMOND_PICKAXE_HEAD.get());
                         pOutput.accept(ModItems.DIAMOND_AXE_HEAD.get());
                         pOutput.accept(ModItems.DIAMOND_SHOVEL_HEAD.get());
                         pOutput.accept(ModItems.DIAMOND_HOE_HEAD.get());
-
+*/
                         pOutput.accept(ModBlocks.SMITHING_ANVIL.get());
                         pOutput.accept(ModBlocks.STEEL_BLOCK.get());
                         pOutput.accept(ModBlocks.WATER_BARREL.get());

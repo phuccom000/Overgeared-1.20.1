@@ -194,6 +194,7 @@ public class SmithingAnvil extends BaseEntityBlock {
             player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
             quality = AnvilMinigameOverlay.handleHit();
             anvil.tick(level, pos, state);
+            held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
 
             return InteractionResult.SUCCESS;
         } //else AnvilMinigameOverlay.endMinigame();

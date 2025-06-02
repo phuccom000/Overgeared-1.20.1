@@ -14,10 +14,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 // SwordItemMixin.java (for melee weapons)
 @Mixin(SwordItem.class)
 public abstract class SwordItemMixin {
-    @Inject(method = "getDamage", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getDamage", at = @At("HEAD"), cancellable = true)
     private void modifyAttackDamage(CallbackInfoReturnable<Float> cir) {
-        ItemStack stack = (ItemStack) (Object) this;
-        float multiplier = QualityHelper.getQualityMultiplier(stack);
-        cir.setReturnValue(cir.getReturnValueF() * multiplier);
+        // Only modify if we're not in attribute calculation context
+        if (!QualityHelper.isCalculatingAttributes()) {
+            ItemStack stack = (ItemStack) (Object) this;
+            float multiplier = QualityHelper.getQualityMultiplier(stack);
+            cir.setReturnValue(((SwordItem) (Object) this).getDamage() * multiplier);
+        }
     }
 }

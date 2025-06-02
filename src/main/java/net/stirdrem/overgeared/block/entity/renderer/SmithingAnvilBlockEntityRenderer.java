@@ -23,6 +23,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<SmithingAnvilBlockEntity> {
     public SmithingAnvilBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -39,16 +42,37 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
             renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, 0f, 120f, 0.5f);
         }
 
-        // Render up to three input items from slots 0 to 8
+        // 1️⃣ First pass: render up to three unique input items
+        Set<Item> renderedItems = new HashSet<>();
         int rendered = 0;
         for (int i = 0; i < 9 && rendered < 3; i++) {
             ItemStack stack = pBlockEntity.getRenderStack(i);
             if (!stack.isEmpty()) {
-                float baseYOffset = 1.025f + (rendered * 0.025f);
-                float yOffset = isBlockItem(stack) ? baseYOffset + 0.02f : baseYOffset;
-                float rotation = 96f + (rendered * 14f);
-                renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, -0.43f, rotation, 0.35f);
-                rendered++;
+                Item item = stack.getItem();
+                if (!renderedItems.contains(item)) {
+                    float baseYOffset = 1.025f + (rendered * 0.025f);
+                    float yOffset = isBlockItem(stack) ? baseYOffset + 0.02f : baseYOffset;
+                    float rotation = 96f + (rendered * 14f);
+                    renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, -0.43f, rotation, 0.35f);
+                    renderedItems.add(item);
+                    rendered++;
+                }
+            }
+        }
+
+        // 2️⃣ Fallback pass: fill remaining slots (up to 3) even with duplicate items
+        if (rendered < 3) {
+            for (int i = 0; i < 9 && rendered < 3; i++) {
+                ItemStack stack = pBlockEntity.getRenderStack(i);
+                if (!stack.isEmpty()) {
+                    Item item = stack.getItem();
+                    // Allow rendering even if already rendered
+                    float baseYOffset = 1.025f + (rendered * 0.025f);
+                    float yOffset = isBlockItem(stack) ? baseYOffset + 0.02f : baseYOffset;
+                    float rotation = 96f + (rendered * 14f);
+                    renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, -0.43f, rotation, 0.35f);
+                    rendered++;
+                }
             }
         }
 
