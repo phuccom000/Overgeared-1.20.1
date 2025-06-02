@@ -2,8 +2,8 @@ next patch
 
 change steel block texture
 make the multiplier stats for the quality modifier and arrow speed ect be configurable through a config file
-add armor modifier for armor pieces
-smithing anvil gravity
+add armor modifier for armor pieces (fixed)
+smithing anvil gravity (cant implement)
 
 maybe add dependency
 https://www.curseforge.com/minecraft/mc-mods/easy-anvils

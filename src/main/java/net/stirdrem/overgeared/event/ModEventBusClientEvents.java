@@ -21,11 +21,13 @@ public class ModEventBusClientEvents {
         event.registerBlockEntityRenderer(ModBlockEntities.SMITHING_ANVIL_BE.get(), SmithingAnvilBlockEntityRenderer::new);
     }
 
-    @SubscribeEvent
-    public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("anvil_mg", AnvilMinigameOverlay.ANVIL_MG);
+    @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+    public static class ClientModBusEvents {
+        @SubscribeEvent
+        public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
+            event.registerBelowAll("anvil_mg", AnvilMinigameOverlay.ANVIL_MG);
+        }
     }
-
 
     // In your client setup (e.g., ModClientEvents.java)
     @SubscribeEvent
