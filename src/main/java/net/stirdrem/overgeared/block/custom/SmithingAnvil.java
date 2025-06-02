@@ -208,7 +208,7 @@ public class SmithingAnvil extends BaseEntityBlock {
         if (level instanceof ServerLevel serverLevel) {
 
             Random random = new Random();
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 6; i++) {
                 double offsetX = 0.5 + (random.nextFloat() - 0.5);
                 double offsetY = 1.0 + random.nextFloat() * 0.5;
                 double offsetZ = 0.5 + (random.nextFloat() - 0.5);
