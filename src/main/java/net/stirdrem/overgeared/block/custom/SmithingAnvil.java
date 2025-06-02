@@ -56,7 +56,7 @@ public class SmithingAnvil extends BaseEntityBlock {
     // Z-axis oriented shape
     private static final VoxelShape Z_AXIS_AABB = Shapes.or(Z1, Z2, Z3, Z4, Z5);
 
-    private static final int HAMMER_SOUND_DURATION_TICKS = 20; // adjust to match your sound
+    private static final int HAMMER_SOUND_DURATION_TICKS = 0; // adjust to match your sound
 
     private static String quality;
 
@@ -191,7 +191,7 @@ public class SmithingAnvil extends BaseEntityBlock {
 
             level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1f);
             held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
-            player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
+            //player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
             quality = AnvilMinigameOverlay.handleHit();
             anvil.tick(level, pos, state);
             held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));

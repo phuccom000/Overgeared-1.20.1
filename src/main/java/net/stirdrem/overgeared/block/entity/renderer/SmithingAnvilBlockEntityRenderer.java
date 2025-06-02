@@ -44,6 +44,7 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
 
         // 1️⃣ First pass: render up to three unique input items
         Set<Item> renderedItems = new HashSet<>();
+        Set<Integer> renderedSlots = new HashSet<>(); // Track which slots we've rendered from
         int rendered = 0;
         for (int i = 0; i < 9 && rendered < 3; i++) {
             ItemStack stack = pBlockEntity.getRenderStack(i);
@@ -55,22 +56,27 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
                     float rotation = 96f + (rendered * 14f);
                     renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, -0.43f, rotation, 0.35f);
                     renderedItems.add(item);
+                    renderedSlots.add(i); // Mark this slot as rendered
                     rendered++;
                 }
             }
         }
 
-        // 2️⃣ Fallback pass: fill remaining slots (up to 3) even with duplicate items
+        // 2️⃣ Fallback pass: fill remaining slots (up to 3) with non-rendered slots
         if (rendered < 3) {
             for (int i = 0; i < 9 && rendered < 3; i++) {
+                // Skip slots that were already rendered in first pass
+                if (renderedSlots.contains(i)) {
+                    continue;
+                }
+
                 ItemStack stack = pBlockEntity.getRenderStack(i);
                 if (!stack.isEmpty()) {
-                    Item item = stack.getItem();
-                    // Allow rendering even if already rendered
                     float baseYOffset = 1.025f + (rendered * 0.025f);
                     float yOffset = isBlockItem(stack) ? baseYOffset + 0.02f : baseYOffset;
                     float rotation = 96f + (rendered * 14f);
                     renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, -0.43f, rotation, 0.35f);
+                    renderedSlots.add(i); // Mark this slot as rendered
                     rendered++;
                 }
             }
