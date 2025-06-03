@@ -34,10 +34,10 @@ public class AnvilMinigameOverlay {
     private static int missedHits = 0;
 
     // Zone definitions (0-100%)
-    private static final int PERFECT_ZONE_START = 40;
-    private static final int PERFECT_ZONE_END = 60;
-    private static final int GOOD_ZONE_START = 30;
-    private static final int GOOD_ZONE_END = 70;
+    private static final int PERFECT_ZONE_START = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+    private static final int PERFECT_ZONE_END = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+    private static final int GOOD_ZONE_START = PERFECT_ZONE_START - 10;
+    private static final int GOOD_ZONE_END = PERFECT_ZONE_END + 10;
     private static final int INITIAL_PERFECT_ZONE_SIZE = 20; // 40-60 (20% wide)
     private static final int INITIAL_GOOD_ZONE_SIZE = 40;    // 30-70 (40% wide)
     private static int perfectZoneStart = PERFECT_ZONE_START;
@@ -214,11 +214,11 @@ public class AnvilMinigameOverlay {
         // Calculate new zone positions with random shift
         float perfectZoneCenter = (perfectZoneStart + perfectZoneEnd) / 2f;
         perfectZoneCenter += (float) (random - 0.5) * zoneShiftAmount * 3;
-        //perfectZoneCenter = Math.max(20, Math.min(80, perfectZoneCenter)); // Keep within reasonable bounds
+        perfectZoneCenter = Math.max(20, Math.min(80, perfectZoneCenter)); // Keep within reasonable bounds
 
         float goodZoneCenter = (goodZoneStart + goodZoneEnd) / 2f;
         goodZoneCenter += (float) (random - 0.5) * zoneShiftAmount * 3;
-        //goodZoneCenter = Math.max(20, Math.min(80, goodZoneCenter)); // Keep within reasonable bounds
+        goodZoneCenter = Math.max(20, Math.min(80, goodZoneCenter)); // Keep within reasonable bounds
 
         // Apply new zones
         perfectZoneStart = (int) (perfectZoneCenter - perfectZoneSize / 2);

@@ -238,6 +238,12 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy(getHasName(ModBlocks.STEEL_BLOCK.get()), has(ModBlocks.STEEL_BLOCK.get()))
                 .save(pWriter);
 
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModBlocks.SMITHING_ANVIL.get())
+                .requires(ModItems.SMITHING_HAMMER.get())
+                .requires(Blocks.ANVIL)
+                .unlockedBy(getHasName(ModItems.SMITHING_HAMMER.get()), has(ModItems.SMITHING_HAMMER.get()))
+                .save(pWriter);
+
         /*ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get(), 2)
                 .pattern("axa")
                 .pattern("aba")

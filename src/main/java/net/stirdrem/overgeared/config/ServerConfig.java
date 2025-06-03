@@ -37,6 +37,7 @@ public class ServerConfig {
     public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
     public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
     public static ForgeConfigSpec.DoubleValue MAX_SPEED;
+    public static ForgeConfigSpec.IntValue ZONE_STARTING_SIZE;
     public static ForgeConfigSpec.DoubleValue ZONE_SHRINK_FACTOR;
 
     static {
@@ -134,6 +135,10 @@ public class ServerConfig {
         MAX_SPEED = builder
                 .comment("Maximum arrow speed for the forging minigame")
                 .defineInRange("maxArrowSpeed", 5, -10.0, 10.0);
+
+        ZONE_STARTING_SIZE = builder
+                .comment("Zone starting size for the forging minigame,  in percentage")
+                .defineInRange("zoneStartingSize", 20, 0, 100);
 
         ZONE_SHRINK_FACTOR = builder
                 .comment("Zone shrink factor for the forging minigame")
