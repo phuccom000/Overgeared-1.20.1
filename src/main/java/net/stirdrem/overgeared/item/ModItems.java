@@ -37,14 +37,14 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> IRON_TONGS = ITEMS.register("iron_tongs",
-            () -> new Tongs(Tiers.IRON, 1, -3f, new Item.Properties().durability(512)));
+            () -> new Tongs(Tiers.IRON, -1, -2f, new Item.Properties().durability(512)));
 
     public static final RegistryObject<Item> STEEL_TONGS = ITEMS.register("steel_tongs",
-            () -> new Tongs(ModToolTiers.STEEL, 1, -6f, new Item.Properties().durability(1024)));
+            () -> new Tongs(ModToolTiers.STEEL, -1, -2f, new Item.Properties().durability(1024)));
 
     public static final RegistryObject<Item> SMITHING_HAMMER = ITEMS.register("smithing_hammer",
             //() -> new SmithingHammer(new Item.Properties().durability(512)));
-            () -> new SmithingHammer(ModToolTiers.STEEL, 1, -5f, new Item.Properties().durability(512)));
+            () -> new SmithingHammer(ModToolTiers.STEEL, -1, -2f, new Item.Properties().durability(512)));
     public static final RegistryObject<Item> WOODEN_BUCKET = ITEMS.register("wooden_bucket",
             () -> new UniversalBucketItem(new UniversalBucketItem.Properties().durability(100)
                     .upperCrackingTemperature(ServerConfig.WOODEN_BUCKET_BREAK_TEMPERATURE)

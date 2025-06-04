@@ -376,8 +376,8 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WOODEN_BUCKET.get())
                 .pattern("# #")
                 .pattern(" # ")
-                .define('#', ItemTags.PLANKS)
-                .unlockedBy("has_planks", has(ItemTags.PLANKS))
+                .define('#', ItemTags.LOGS)
+                .unlockedBy("has_logs", has(ItemTags.LOGS))
                 .save(pWriter);
         
 

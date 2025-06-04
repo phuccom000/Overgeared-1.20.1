@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_planks": {
+    "has_logs": {
       "conditions": {
         "items": [
           {
-            "tag": "minecraft:planks"
+            "tag": "minecraft:logs"
           }
         ]
       },
@@ -20,7 +20,7 @@
   },
   "requirements": [
     [
-      "has_planks",
+      "has_logs",
       "has_the_recipe"
     ]
   ],
