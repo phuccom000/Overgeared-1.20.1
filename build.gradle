@@ -232,11 +232,11 @@ mixin {
     debug.export = true
 }
 
-sourceSets {
+/*sourceSets {
     main {
         ext.refMap = "mixins.overgeared.refmap.json"
     }
-}
+}*/
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 // When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
@@ -296,4 +296,13 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    options.annotationProcessorPath = configurations.annotationProcessor
+    options.compilerArgs += [
+            "-AreobfSide=PROD",
+            "-Amixin.debug.verbose=true",
+            "-Amixin.debug.export=true"
+    ]
+}
+jar {
+    from "mixins.overgeared.refmap.json"
 }
