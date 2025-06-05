@@ -1,46 +1,46 @@
-[04Jun2025 15:35:55.011] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.4.0, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources, --mixin.config, mixins.overgeared.json]
-[04Jun2025 15:35:55.038] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.8 by Oracle Corporation; OS Windows 10 arch amd64 version 10.0
-[04Jun2025 15:35:55.203] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
-[04Jun2025 15:35:55.278] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/Administrator/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23128!/ Service=ModLauncher Env=CLIENT
-[04Jun2025 15:35:55.780] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.4.0\f0c0b352173d0a378cbdcec9cfc4ba65899a721\javafmllanguage-1.20.1-47.4.0.jar is missing mods.toml file
-[04Jun2025 15:35:55.787] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.4.0\e862740d8c84d08dbfedea412bef88fe42e727c5\lowcodelanguage-1.20.1-47.4.0.jar is missing mods.toml file
-[04Jun2025 15:35:55.794] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.4.0\5719b3a297a33f877ed5dde4cb4bd75c859096af\mclanguage-1.20.1-47.4.0.jar is missing mods.toml file
-[04Jun2025 15:35:55.801] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.4.0\235975dafa4309945b59c56b53f31dc5b65a6051\fmlcore-1.20.1-47.4.0.jar is missing mods.toml file
-[04Jun2025 15:35:55.990] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
-[04Jun2025 15:35:58.328] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by mixins.overgeared.json is higher than the maximum level supported by this version of mixin (JAVA_13).
-[04Jun2025 15:35:58.328] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
-[04Jun2025 15:35:58.339] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources]
-[04Jun2025 15:35:58.490] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
-[04Jun2025 15:35:58.492] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
-[04Jun2025 15:35:58.502] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
-[04Jun2025 15:35:58.503] [main/INFO] [mixin/]: Selecting config mixins.overgeared.json
-[04Jun2025 15:35:58.508] [main/WARN] [mixin/]: Reference map 'mixins.overgeared.refmap.json' for mixins.overgeared.json could not be read. If this is a development environment you can ignore this message
-[04Jun2025 15:35:58.510] [main/INFO] [mixin/]: Selecting config mixins.bucketlib.json
-[04Jun2025 15:35:59.158] [main/INFO] [mixin/]: Remapping refMap mixins.bucketlib.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
-[04Jun2025 15:35:59.159] [main/INFO] [mixin/]: Preparing mixins.overgeared.json (1)
-[04Jun2025 15:35:59.251] [main/INFO] [mixin/]: Preparing mixins.bucketlib.json (1)
-[04Jun2025 15:35:59.290] [main/INFO] [mixin/]: Prepared 2 mixins in 0.788 sec (394.0ms avg) (0ms load, 0ms transform, 0ms plugin)
-[04Jun2025 15:35:59.633] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [overgeared]
-[04Jun2025 15:36:01.589] [main/INFO] [mixin/]: Mixing ItemStackMixin from mixins.overgeared.json into net.minecraft.world.item.ItemStack
-[04Jun2025 15:36:05.964] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.0, for MC 1.20.1 with MCP 20230612.114412
-[04Jun2025 15:36:05.965] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.0 Initialized
-[04Jun2025 15:36:06.392] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
-[04Jun2025 15:36:06.404] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 7.801 ms
-[04Jun2025 15:36:06.866] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
-[04Jun2025 15:36:06.866] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
-[04Jun2025 15:36:07.340] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
-[04Jun2025 15:36:07.650] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 310 ms
-[04Jun2025 15:36:07.651] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
-[04Jun2025 15:36:07.685] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 33 ms
-[04Jun2025 15:36:07.685] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: overgeared
-[04Jun2025 15:36:07.845] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: overgeared finished after 159 ms
-[04Jun2025 15:36:07.845] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: overgeared
-[04Jun2025 15:36:08.040] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: overgeared finished after 195 ms
-[04Jun2025 15:36:08.041] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id overgeared
-[04Jun2025 15:36:08.060] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id overgeared finished after 19 ms
-[04Jun2025 15:36:08.060] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id overgeared
-[04Jun2025 15:36:08.088] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id overgeared finished after 27 ms
-[04Jun2025 15:36:08.088] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : overgeared
-[04Jun2025 15:36:08.151] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : overgeared finished after 62 ms
-[04Jun2025 15:36:08.151] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 812 ms
-[04Jun2025 15:36:08.174] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 260, old count: 260, new count: 261, removed stale: 0, written: 2
+[05Jun2025 12:53:26.116] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.4.0, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources, --mixin.config, mixins.overgeared.json]
+[05Jun2025 12:53:26.125] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.8 by Oracle Corporation; OS Windows 10 arch amd64 version 10.0
+[05Jun2025 12:53:26.294] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
+[05Jun2025 12:53:26.372] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/Administrator/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23128!/ Service=ModLauncher Env=CLIENT
+[05Jun2025 12:53:26.862] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.4.0\f0c0b352173d0a378cbdcec9cfc4ba65899a721\javafmllanguage-1.20.1-47.4.0.jar is missing mods.toml file
+[05Jun2025 12:53:26.870] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.4.0\e862740d8c84d08dbfedea412bef88fe42e727c5\lowcodelanguage-1.20.1-47.4.0.jar is missing mods.toml file
+[05Jun2025 12:53:26.878] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.4.0\5719b3a297a33f877ed5dde4cb4bd75c859096af\mclanguage-1.20.1-47.4.0.jar is missing mods.toml file
+[05Jun2025 12:53:26.887] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.4.0\235975dafa4309945b59c56b53f31dc5b65a6051\fmlcore-1.20.1-47.4.0.jar is missing mods.toml file
+[05Jun2025 12:53:27.033] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
+[05Jun2025 12:53:29.155] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by mixins.overgeared.json is higher than the maximum level supported by this version of mixin (JAVA_13).
+[05Jun2025 12:53:29.155] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[05Jun2025 12:53:29.166] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources]
+[05Jun2025 12:53:29.311] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
+[05Jun2025 12:53:29.314] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
+[05Jun2025 12:53:29.348] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
+[05Jun2025 12:53:29.349] [main/INFO] [mixin/]: Selecting config mixins.overgeared.json
+[05Jun2025 12:53:29.355] [main/WARN] [mixin/]: Reference map 'mixins.overgeared.refmap.json' for mixins.overgeared.json could not be read. If this is a development environment you can ignore this message
+[05Jun2025 12:53:29.358] [main/INFO] [mixin/]: Selecting config mixins.bucketlib.json
+[05Jun2025 12:53:29.761] [main/INFO] [mixin/]: Remapping refMap mixins.bucketlib.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
+[05Jun2025 12:53:29.761] [main/INFO] [mixin/]: Preparing mixins.overgeared.json (1)
+[05Jun2025 12:53:29.850] [main/INFO] [mixin/]: Preparing mixins.bucketlib.json (1)
+[05Jun2025 12:53:29.887] [main/INFO] [mixin/]: Prepared 2 mixins in 0.537 sec (268.5ms avg) (0ms load, 0ms transform, 0ms plugin)
+[05Jun2025 12:53:30.191] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [overgeared]
+[05Jun2025 12:53:32.001] [main/INFO] [mixin/]: Mixing ItemStackMixin from mixins.overgeared.json into net.minecraft.world.item.ItemStack
+[05Jun2025 12:53:36.174] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.0, for MC 1.20.1 with MCP 20230612.114412
+[05Jun2025 12:53:36.175] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.0 Initialized
+[05Jun2025 12:53:36.610] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
+[05Jun2025 12:53:36.617] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 4.458 ms
+[05Jun2025 12:53:37.130] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
+[05Jun2025 12:53:37.131] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
+[05Jun2025 12:53:37.459] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[05Jun2025 12:53:37.561] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 100 ms
+[05Jun2025 12:53:37.561] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
+[05Jun2025 12:53:37.647] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 85 ms
+[05Jun2025 12:53:37.647] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: overgeared
+[05Jun2025 12:53:37.840] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: overgeared finished after 191 ms
+[05Jun2025 12:53:37.840] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: overgeared
+[05Jun2025 12:53:37.891] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: overgeared finished after 50 ms
+[05Jun2025 12:53:37.891] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id overgeared
+[05Jun2025 12:53:37.914] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id overgeared finished after 22 ms
+[05Jun2025 12:53:37.914] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id overgeared
+[05Jun2025 12:53:37.919] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id overgeared finished after 4 ms
+[05Jun2025 12:53:37.920] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : overgeared
+[05Jun2025 12:53:37.935] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : overgeared finished after 15 ms
+[05Jun2025 12:53:37.936] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 477 ms
+[05Jun2025 12:53:37.955] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 260, old count: 260, new count: 261, removed stale: 0, written: 0

@@ -29,6 +29,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.block.custom.SmithingAnvil;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
@@ -160,18 +161,20 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
             if (hasProgressFinished()) {
                 craftItem();
-                resetProgress();
+                resetProgress(pPos);
             }
         } else {
-            resetProgress();
+            resetProgress(pPos);
         }
     }
 
-    private void resetProgress() {
+    private void resetProgress(BlockPos pos) {
         progress = 0;
         maxProgress = 0;
         lastRecipe = null;
-        AnvilMinigameOverlay.endMinigame();
+        System.out.println("Minigame reset progress");
+        //AnvilMinigameOverlay.endMinigame();
+        SmithingHammer.releaseAnvil(pos);
     }
 
     private void craftItem() {
@@ -339,7 +342,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         }
 
         if (recipeChanged) {
-            resetProgress();
+            //resetProgress();
+            hitRemains = 0;
             return;
         }
 
@@ -347,14 +351,16 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             ForgingRecipe recipe = currentRecipeOpt.get();
             maxProgress = recipe.getHammeringRequired();
             hitRemains = maxProgress - progress;
-            setChanged(lvl, pos, st);
+            //setChanged(lvl, pos, st);
 
             if (hasProgressFinished()) {
-                craftItem();
-                resetProgress();
+                //craftItem();
+                // resetProgress();
+                hitRemains = 0;
             }
         } else {
-            resetProgress();
+            hitRemains = 0;
+            //resetProgress();
         }
     }
 

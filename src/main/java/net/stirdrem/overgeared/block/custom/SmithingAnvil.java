@@ -31,6 +31,8 @@ import net.minecraftforge.network.NetworkHooks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.item.custom.SmithingHammer;
+import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.TickScheduler;
 import org.jetbrains.annotations.Nullable;
@@ -181,15 +183,18 @@ public class SmithingAnvil extends BaseEntityBlock {
         ItemStack held = player.getItemInHand(hand);
         boolean isHammer = held.is(ModTags.Items.SMITHING_HAMMERS);  // Tag-based check
 
-        if (isHammer && anvil.hasRecipe() && AnvilMinigameOverlay.isVisible) {
+        if (isHammer && anvil.hasRecipe() && AnvilMinigameOverlay.getVisible()) {
             // Hammer logic (particles, sound, cooldown)
             //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
-            for (int i = 0; i < 3; i++) {
+/*            for (int i = 0; i < 3; i++) {
                 int delay = 7 * i;
                 TickScheduler.schedule(delay, () -> spawnAnvilParticles(level, pos));
-            }
-
-            level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1f);
+            }*/
+            spawnAnvilParticles(level, pos);
+            //level.playSound(null, pos, SoundEvents.ANVIL_, SoundSource.BLOCKS, 1f, 1f);
+            if (anvil.getHitsRemaining() == 1)
+                level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
+            else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
             held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
             //player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
             quality = AnvilMinigameOverlay.handleHit();
@@ -255,7 +260,6 @@ public class SmithingAnvil extends BaseEntityBlock {
             return createTickerHelper(pBlockEntityType, ModBlockEntities.SMITHING_ANVIL_BE.get(),
                     (pLevel1, pPos, pState1, pBlockEntity) ->
                             pBlockEntity.updateHitsRemaining(pLevel, pPos, pState1));
-
         }
         return null;
     }

@@ -1,0 +1,14 @@
+{
+  "anvil_hit": {
+    "subtitle": "sounds.overgeared.anvil_hit",
+    "sounds": [
+      "overgeared:anvil_hit"
+    ]
+  },
+  "forging_complete": {
+    "subtitle": "sounds.overgeared.forging_complete",
+    "sounds": [
+      "overgeared:forging_complete"
+    ]
+  }
+}

@@ -31,6 +31,7 @@ import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
 import net.stirdrem.overgeared.screen.SmithingAnvilScreen;
+import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.TickScheduler;
 import org.slf4j.Logger;
 
@@ -62,6 +63,8 @@ public class OvergearedMod {
         ModRecipeTypes.register(modEventBus);
 
         ModLootModifiers.register(modEventBus);
+
+        ModSounds.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(TickScheduler.class);
 

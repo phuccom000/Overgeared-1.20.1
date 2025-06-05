@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -13,6 +14,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.FinalizeForgingC2SPacket;
 import net.stirdrem.overgeared.networking.packet.UpdateAnvilProgressC2SPacket;
@@ -22,7 +24,7 @@ public class AnvilMinigameOverlay {
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/smithing_anvil_minigame.png");
 
     // Minigame state
-    public static boolean isVisible = false;
+    private static boolean isVisible = false;
     private static ItemStack resultItem;
     private static int hitsRemaining = 0;
     private static float arrowPosition = 0;
@@ -47,8 +49,8 @@ public class AnvilMinigameOverlay {
     private static float zoneShrinkFactor = 0.80f; // Zones shrink to 95% of their size each hit
     private static float zoneShiftAmount = 15.0f; // Zones shift by 2% each hit
 
+    private static BlockPos anvilPos;
 
-    public static boolean temporaryExit = true;
     public static boolean minigameStarted = false;
 
     // UI dimensions
@@ -124,17 +126,24 @@ public class AnvilMinigameOverlay {
 
     });
 
-    public static void startMinigame(ItemStack result, int requiredHits) {
+    public static void startMinigame(ItemStack result, int requiredHits, BlockPos pos) {
         if (minigameStarted) {
-            pauseMinigame();
+            isVisible = !isVisible;
+            //pauseMinigame();
             return;
         }
+        /*System.out.println("Anvil Minigame Overlay is " + (isVisible ? "ENABLED" : "DISABLED"));
+        if (isVisible) {
+            isVisible = false;
+            //pauseMinigame();
+            return;
+        }*/
         if (result == null) {
             OvergearedMod.LOGGER.error("Attempted to start minigame with null result!");
             return;
         }
+        anvilPos = pos;
         minigameStarted = true;
-        temporaryExit = false;
         isVisible = true;
         resultItem = result.copy();
         hitsRemaining = requiredHits;
@@ -245,12 +254,13 @@ public class AnvilMinigameOverlay {
         // Close minigame
         isVisible = false;
         minigameStarted = false;
+        System.out.println("Anvil Minigame Overlay is " + (isVisible ? "ENABLED" : "DISABLED") + "at finishForging");
+        SmithingHammer.releaseAnvil(anvilPos);
         return quality;
     }
 
     public static void pauseMinigame() {
         if (minigameStarted) {
-            temporaryExit = !temporaryExit;
             isVisible = !isVisible;
         }
     }
@@ -295,5 +305,15 @@ public class AnvilMinigameOverlay {
         missedHits = 0;
         arrowPosition = 0;
         arrowSpeed = 0;
+        System.out.println("Anvil Minigame Overlay is " + (isVisible ? "ENABLED" : "DISABLED") + " at endMinigame");
+
+    }
+
+    public static boolean getVisible() {
+        return isVisible;
+    }
+
+    public static boolean isForging() {
+        return minigameStarted;
     }
 }

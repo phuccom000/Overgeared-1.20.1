@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -29,15 +30,17 @@ import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SmithingHammer extends DiggerItem {
 
+    private static final Map<BlockPos, UUID> activeAnvils = new ConcurrentHashMap<>();
 
     public SmithingHammer(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Item.Properties pProperties) {
         super(pAttackDamageModifier, pAttackSpeedModifier, pTier, ModTags.Blocks.SMITHING, pProperties);
     }
+
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
@@ -50,15 +53,26 @@ public class SmithingHammer extends DiggerItem {
 
         if (player.isCrouching() && held.is(ModItems.SMITHING_HAMMER.get())) {
             if (state.is(ModBlocks.SMITHING_ANVIL.get())) {
+                // Server-side check
+                if (!level.isClientSide()) {
+                    // When starting the minigame:
+                    if (!activeAnvils.containsKey(pos)) {
+                        activeAnvils.put(pos, player.getUUID());
+                    } else {
+                        player.sendSystemMessage(Component.literal("Anvil in use by another player!"));
+                        return InteractionResult.FAIL;
+                    }
+                }
+
                 if (level.isClientSide()) {
-                    // Client-side only
+                    // Client-side minigame logic (unchanged)
                     BlockEntity be = level.getBlockEntity(pos);
                     if (be instanceof SmithingAnvilBlockEntity anvilBE) {
                         Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
                         if (anvilBE.hasRecipe()) {
                             ItemStack result = recipeOpt.get().getResultItem(level.registryAccess());
                             int progress = anvilBE.getRequiredProgress();
-                            AnvilMinigameOverlay.startMinigame(result, progress);
+                            AnvilMinigameOverlay.startMinigame(result, progress, pos);
                         }
                     }
                 }
@@ -129,4 +143,45 @@ public class SmithingHammer extends DiggerItem {
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
 
+    public static void releaseAnvil(BlockPos pos) {
+        activeAnvils.remove(pos);
+    }
+
+    public static void cleanupStaleAnvils(Level level) {
+        if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
+            return; // Only run on server side with ServerLevel access
+        }
+
+        // Create a copy to avoid ConcurrentModificationException
+        Set<BlockPos> positionsToCheck = new HashSet<>(activeAnvils.keySet());
+
+        for (BlockPos pos : positionsToCheck) {
+            // Check if chunk is loaded before accessing block state
+            if (serverLevel.isLoaded(pos)) {
+                BlockState state = serverLevel.getBlockState(pos);
+                UUID user = activeAnvils.get(pos);
+
+                // Remove if:
+                // 1. Block is no longer an anvil
+                // 2. Or player is no longer online (optional)
+                if (!state.is(ModBlocks.SMITHING_ANVIL.get()) ||
+                        (user != null && serverLevel.getPlayerByUUID(user) == null)) {
+                    activeAnvils.remove(pos);
+                }
+            } else {
+                // If chunk isn't loaded, we can't check - leave it for now
+                // Optionally could remove if you want to aggressively clean
+            }
+        }
+    }
+
+    // New method to release all anvils for a specific player
+    public static void releaseAnvilsForPlayer(UUID playerId) {
+        activeAnvils.entrySet().removeIf(entry -> {
+            if (entry.getValue().equals(playerId)) {
+                return true; // Remove this entry
+            }
+            return false;
+        });
+    }
 }

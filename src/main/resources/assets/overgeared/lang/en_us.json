@@ -66,5 +66,7 @@
   "tooltip.overgeared.tongs.tooltip": "Prevent players from burning themselves when handling hot metals.",
   "tooltip.overgeared.well": "Well Forged",
   "upgrade.overgeared.diamond_upgrade": "Diamond Upgrade",
-  "gui.overgeared.forging_stats": "Hits Left: %s | Perfect: %s Good: %s Miss: %s"
+  "gui.overgeared.forging_stats": "Hits Left: %s | Perfect: %s Good: %s Miss: %s",
+  "sounds.overgeared.anvil_hit": "Smithing Anvil was hit",
+  "sounds.overgeared.forging_complete": "Forging completed"
 }

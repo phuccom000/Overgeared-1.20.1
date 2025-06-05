@@ -29,7 +29,7 @@ public class ModMessages {
 
         INSTANCE = net;
 
-        net.messageBuilder(UpdateAnvilProgressC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+        /*net.messageBuilder(UpdateAnvilProgressC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(UpdateAnvilProgressC2SPacket::new)
                 .encoder(UpdateAnvilProgressC2SPacket::toBytes)
                 .consumerMainThread(UpdateAnvilProgressC2SPacket::handle)
@@ -39,7 +39,7 @@ public class ModMessages {
                 .decoder(FinalizeForgingC2SPacket::new)
                 .encoder(FinalizeForgingC2SPacket::toBytes)
                 .consumerMainThread(FinalizeForgingC2SPacket::handle)
-                .add();
+                .add();*/
     }
 
     public static <MSG> void sendToServer(MSG message) {

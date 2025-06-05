@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -30,17 +31,21 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.heat.HeatCapability;
 import net.stirdrem.overgeared.heat.HeatCapabilityProvider;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.custom.HeatableItem;
+import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.util.ModTags;
 
 import java.util.List;
@@ -117,8 +122,19 @@ public class ModEvents {
 
     }
 
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END && event.side == LogicalSide.SERVER) {
+            // Run cleanup every minute (1200 ticks)
+            if (event.getServer().getTickCount() % 1200 == 0) {
+                SmithingHammer.cleanupStaleAnvils(event.getServer().overworld());
+            }
+        }
+    }
+
     private static int TICK = 0;
     private static final int perTick = 30;
+
 
     @SubscribeEvent//(priority = EventPriority.HIGH)
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -319,4 +335,18 @@ public class ModEvents {
         };
     }
 
+    @SubscribeEvent
+    public static void onPlayerDisconnect(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            // Free all anvils this player was using
+            SmithingHammer.releaseAnvilsForPlayer(player.getUUID());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+        if (event.getState().getBlock() == ModBlocks.SMITHING_ANVIL.get()) {
+            SmithingHammer.releaseAnvil(event.getPos());
+        }
+    }
 }
