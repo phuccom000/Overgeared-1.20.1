@@ -250,7 +250,7 @@ public class ForgingRecipe implements Recipe<Container> {
         public ForgingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             String group = buffer.readUtf();
             int hammering = buffer.readVarInt();
-            boolean hasQuality = buffer.readBoolean();
+            boolean hasQuality = buffer.readBoolean();  // Changed order to match writing
             boolean showNotification = buffer.readBoolean();
             int width = buffer.readVarInt();
             int height = buffer.readVarInt();
@@ -268,6 +268,7 @@ public class ForgingRecipe implements Recipe<Container> {
         public void toNetwork(FriendlyByteBuf buffer, ForgingRecipe recipe) {
             buffer.writeUtf(recipe.group);
             buffer.writeVarInt(recipe.hammering);
+            buffer.writeBoolean(recipe.hasQuality);
             buffer.writeBoolean(recipe.showNotification);
             buffer.writeVarInt(recipe.width);
             buffer.writeVarInt(recipe.height);

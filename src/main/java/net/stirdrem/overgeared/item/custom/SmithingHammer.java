@@ -5,27 +5,27 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
-import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
-import net.stirdrem.overgeared.config.ServerConfig;
+
+import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.item.ModItems;
+import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
+import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.networking.packet.FinalizeForgingC2SPacket;
+import net.stirdrem.overgeared.networking.packet.StartMinigameC2SPacket;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
@@ -33,12 +33,29 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
+
 public class SmithingHammer extends DiggerItem {
 
     private static final Map<BlockPos, UUID> activeAnvils = new ConcurrentHashMap<>();
 
     public SmithingHammer(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Item.Properties pProperties) {
         super(pAttackDamageModifier, pAttackSpeedModifier, pTier, ModTags.Blocks.SMITHING, pProperties);
+    }
+
+
+    public static ServerPlayer getUsingPlayer(BlockPos pos) {
+        return ServerLifecycleHooks.getCurrentServer()
+                .getPlayerList()
+                .getPlayers()
+                .stream()
+                .filter(player -> player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
+                        .map(minigame -> pos.equals(minigame.getAnvilPos()))
+                        .orElse(false))
+                .findFirst()
+                .orElse(null);
     }
 
 
@@ -58,24 +75,45 @@ public class SmithingHammer extends DiggerItem {
                     // When starting the minigame:
                     if (!activeAnvils.containsKey(pos)) {
                         activeAnvils.put(pos, player.getUUID());
+                    } else if (activeAnvils.get(pos).equals(player.getUUID())) {
+                        if (level.isClientSide()) {
+                            if (FMLEnvironment.dist.isClient()) {
+                                // Client-side minigame logic (unchanged)
+                                BlockEntity be = level.getBlockEntity(pos);
+                                if (be instanceof SmithingAnvilBlockEntity anvilBE) {
+                                    Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
+                                    if (anvilBE.hasRecipe()) {
+                                        ItemStack result = recipeOpt.get().getResultItem(level.registryAccess());
+                                        int progress = anvilBE.getRequiredProgress();
+                                        //AnvilMinigame.start(result, progress, pos);
+                                    }
+                                }
+                            }
+                        }
                     } else {
                         player.sendSystemMessage(Component.literal("Anvil in use by another player!"));
                         return InteractionResult.FAIL;
                     }
                 }
-
                 if (level.isClientSide()) {
-                    // Client-side minigame logic (unchanged)
-                    BlockEntity be = level.getBlockEntity(pos);
-                    if (be instanceof SmithingAnvilBlockEntity anvilBE) {
-                        Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
-                        if (anvilBE.hasRecipe()) {
-                            ItemStack result = recipeOpt.get().getResultItem(level.registryAccess());
-                            int progress = anvilBE.getRequiredProgress();
-                            AnvilMinigameOverlay.startMinigame(result, progress, pos);
+                    if (FMLEnvironment.dist.isClient()) {
+                        // Client-side minigame logic (unchanged)
+                        BlockEntity be = level.getBlockEntity(pos);
+                        if (be instanceof SmithingAnvilBlockEntity anvilBE) {
+                            Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
+                            if (anvilBE.hasRecipe()) {
+                                ItemStack result = recipeOpt.get().getResultItem(level.registryAccess());
+                                int progress = anvilBE.getRequiredProgress();
+                                //AnvilMinigame.start(result, progress, pos);
+                                ModMessages.sendToServer(new StartMinigameC2SPacket(result, progress, pos));
+                                //ModMessages.sendToServer(new FinalizeForgingC2SPacket("shift right clicked"));
+
+
+                            }
                         }
                     }
                 }
+
                 return InteractionResult.sidedSuccess(level.isClientSide());
             }
         }
@@ -83,7 +121,8 @@ public class SmithingHammer extends DiggerItem {
     }
 
     @Override
-    public boolean mineBlock(ItemStack pStack, Level pLevel, BlockState pState, BlockPos pPos, LivingEntity pEntityLiving) {
+    public boolean mineBlock(ItemStack pStack, Level pLevel, BlockState pState, BlockPos pPos, LivingEntity
+            pEntityLiving) {
         if (pState.getDestroySpeed(pLevel, pPos) != 0.0F) {
             pStack.hurtAndBreak(2, pEntityLiving, (p_43276_) -> {
                 p_43276_.broadcastBreakEvent(EquipmentSlot.MAINHAND);
@@ -126,7 +165,8 @@ public class SmithingHammer extends DiggerItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+    public void appendHoverText(ItemStack pStack, @Nullable Level
+            pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         // Check if shift is being held down
         if (Screen.hasShiftDown()) {
             // Advanced tooltip (only shown when holding shift)

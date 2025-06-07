@@ -42,6 +42,7 @@ public class OvergearedMod {
     public static final String MOD_ID = "overgeared";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
+    //public static final AnvilMinigameHandler SERVER_HANDLER = new AnvilMinigameHandler();
 
     public OvergearedMod(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();

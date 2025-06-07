@@ -6,7 +6,6 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -30,11 +29,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
-import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
-import net.stirdrem.overgeared.item.custom.SmithingHammer;
+import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
+import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.networking.packet.FinalizeForgingC2SPacket;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
-import net.stirdrem.overgeared.util.TickScheduler;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Random;
 import org.joml.Vector3f;
@@ -60,7 +60,7 @@ public class SmithingAnvil extends BaseEntityBlock {
 
     private static final int HAMMER_SOUND_DURATION_TICKS = 0; // adjust to match your sound
 
-    private static String quality;
+    private static String quality = null;
 
     public SmithingAnvil(Properties properties) {
         super(properties);
@@ -69,6 +69,33 @@ public class SmithingAnvil extends BaseEntityBlock {
     public static String getQuality() {
         return quality;
     }
+
+    private boolean isVisible = false;
+    private boolean minigameStarted = false;
+    private ItemStack resultItem;
+    private int hitsRemaining = 0;
+    private float arrowPosition = 0;
+    private float arrowSpeed = 1.0f;
+    double temp2 = ServerConfig.MAX_SPEED.get();
+    private final float maxArrowSpeed = (float) temp2;
+    private float speedIncreasePerHit = 0.75f;
+    private boolean movingRight = true;
+    private int perfectHits = 0;
+    private int goodHits = 0;
+    private int missedHits = 0;
+    private final int PERFECT_ZONE_START = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+    private final int PERFECT_ZONE_END = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+    private final int GOOD_ZONE_START = PERFECT_ZONE_START - 10;
+    private final int GOOD_ZONE_END = PERFECT_ZONE_END + 10;
+    private int perfectZoneStart = PERFECT_ZONE_START;
+    private int perfectZoneEnd = PERFECT_ZONE_END;
+    private int goodZoneStart = GOOD_ZONE_START;
+    private int goodZoneEnd = GOOD_ZONE_END;
+    double temp3 = ServerConfig.ZONE_SHRINK_FACTOR.get();
+    private final float zoneShrinkFactor = (float) temp3;
+    private float zoneShiftAmount = 15.0f;
+    private BlockPos anvilPos;
+    private boolean isUnpaused = false;
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
@@ -183,7 +210,17 @@ public class SmithingAnvil extends BaseEntityBlock {
         ItemStack held = player.getItemInHand(hand);
         boolean isHammer = held.is(ModTags.Items.SMITHING_HAMMERS);  // Tag-based check
 
-        if (isHammer && anvil.hasRecipe() && AnvilMinigameOverlay.getVisible()) {
+       /* OvergearedMod.LOGGER.info("== SmithingAnvil Debug ==");
+        OvergearedMod.LOGGER.info("isHammer: " + isHammer);
+        OvergearedMod.LOGGER.info("hasRecipe: " + anvil.hasRecipe());
+        OvergearedMod.LOGGER.info("AnvilMinigame.isVisible (CLIENT-ONLY!): " + AnvilMinigame.isVisible());
+        OvergearedMod.LOGGER.info("AnvilMinigame.isUnpaused: " + AnvilMinigame.isUnpaused());
+        OvergearedMod.LOGGER.info("== END DEBUG ==");*/
+        player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+            isVisible = minigame.getVisible();
+        });
+        //if (isHammer && anvil.hasRecipe() && AnvilMinigame.isVisible()) {
+        if (isHammer && anvil.hasRecipe() && isVisible) {
             // Hammer logic (particles, sound, cooldown)
             //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
 /*            for (int i = 0; i < 3; i++) {
@@ -197,7 +234,14 @@ public class SmithingAnvil extends BaseEntityBlock {
             else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
             held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
             //player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
-            quality = AnvilMinigameOverlay.handleHit();
+            //if (player instanceof ServerPlayer serverPlayer) {
+            //ModMessages.sendToServer(new FinalizeForgingC2SPacket("test"));
+            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                quality = minigame.handleHit((ServerPlayer) player);
+
+            });
+            // quality = AnvilMinigame.handleHit(serverPlayer);
+            //}
             anvil.tick(level, pos, state);
             held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
 
@@ -205,6 +249,7 @@ public class SmithingAnvil extends BaseEntityBlock {
         } //else AnvilMinigameOverlay.endMinigame();
         // Open GUI if not hammering
         NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
+
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
 

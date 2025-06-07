@@ -5,7 +5,6 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
 import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)

@@ -12,7 +12,6 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.networking.packet.UpdateAnvilProgressC2SPacket;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 

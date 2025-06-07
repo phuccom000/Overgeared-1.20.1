@@ -1,8 +1,8 @@
+/*
 package net.stirdrem.overgeared.event;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -25,19 +25,20 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
-import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
+import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.util.ModTags;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
-public class ModEvents {
+public class ModEventsOld {
 
 
-    /*@SubscribeEvent
+    */
+/*@SubscribeEvent
     public static void onLevelTick(TickEvent.LevelTickEvent event) {
         if (event.phase != TickEvent.Phase.END || event.level.isClientSide()) return;
 
@@ -94,7 +95,8 @@ public class ModEvents {
                 }
             }
         }
-    }*/
+    }*//*
+
 
     @SubscribeEvent
     public static void onLevelTick(TickEvent.LevelTickEvent event) {
@@ -201,7 +203,8 @@ public class ModEvents {
                 });
             }
 
-           /* for (ItemStack stack : player.getInventory().items) {
+           */
+/* for (ItemStack stack : player.getInventory().items) {
                 if (!stack.isEmpty() && stack.is(ModTags.Items.HEATABLE_METALS)
                         && stack.hasTag() && stack.getTag().contains("heat")) {
                     // Decrease durability over time
@@ -214,10 +217,12 @@ public class ModEvents {
                     //player.sendSystemMessage(Component.literal("Item: " + stack.getItem().getDescription().getString() +
                     //", Durability: " + currentDurability + "/" + stack.getMaxDamage()));
                 }
-            }*/
+            }*//*
 
 
-            /*for (ItemStack stack : player.getInventory().items) {
+
+ */
+/*for (ItemStack stack : player.getInventory().items) {
                 if (!stack.isEmpty() && stack.is(ModTags.Items.HEATED_METALS)) {
                     if (stack.getDamageValue() == stack.getMaxDamage() - 1) {
                         Item cooledItem = getCooledIngot(stack.getItem());
@@ -239,7 +244,8 @@ public class ModEvents {
                     }
                     break;
                 }
-            }*/
+            }*//*
+
         }
     }
 
@@ -434,3 +440,4 @@ public class ModEvents {
         }
     }
 }
+*/

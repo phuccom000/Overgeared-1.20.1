@@ -9,9 +9,9 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.renderer.SmithingAnvilBlockEntityRenderer;
-import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent; // Updated event class
 import net.stirdrem.overgeared.client.WaterBarrelBlockColor;
+import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModEventBusClientEvents {
@@ -25,7 +25,7 @@ public class ModEventBusClientEvents {
     public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
         event.registerBelowAll("anvil_mg", AnvilMinigameOverlay.ANVIL_MG);
     }
-    
+
 
     // In your client setup (e.g., ModClientEvents.java)
     @SubscribeEvent

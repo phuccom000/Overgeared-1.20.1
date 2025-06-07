@@ -15,7 +15,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
@@ -28,8 +27,9 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.block.custom.SmithingAnvil;
-import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
+import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
@@ -173,59 +173,58 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         maxProgress = 0;
         lastRecipe = null;
         System.out.println("Minigame reset progress");
-        //AnvilMinigameOverlay.endMinigame();
+        //AnvilMinigame.end();
         SmithingHammer.releaseAnvil(pos);
     }
 
     private void craftItem() {
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
-        if (recipeOptional.isPresent()) {
-            ForgingRecipe recipe = recipeOptional.get();
-            ItemStack result = recipe.getResultItem(getLevel().registryAccess());
+        ForgingRecipe recipe = recipeOptional.get();
+        ItemStack result = recipe.getResultItem(null);
 
-            // Determine quality based on performance
-            String quality = determineForgingQuality();
-
-            // Only set the NBT tag if quality is meaningful
-            if (quality != null && !quality.isEmpty() && recipe.hasQuality()) {
-                CompoundTag tag = result.getOrCreateTag();
-                tag.putString("ForgingQuality", quality);
-                result.setTag(tag);
-            }
-
-            // Extract ingredients
-            for (int i = 0; i < this.itemHandler.getSlots() - 1; i++) {
-                this.itemHandler.extractItem(i, 1, false);
-            }
-
-            ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
-
-            if (existing.isEmpty()) {
-                // If the output slot is empty, just set the result
-                this.itemHandler.setStackInSlot(OUTPUT_SLOT, result);
-            } else if (ItemStack.isSameItemSameTags(existing, result)) {
-                // If the same item (with same NBT), try to stack them
-                int total = existing.getCount() + result.getCount();
-                int maxSize = Math.min(existing.getMaxStackSize(), this.itemHandler.getSlotLimit(OUTPUT_SLOT));
-
-                if (total <= maxSize) {
-                    existing.grow(result.getCount());
-                    this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
-                } else {
-                    // If not all items fit, grow to max and optionally handle overflow
-                    int remainder = total - maxSize;
-                    existing.setCount(maxSize);
-                    this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
-
-                    // Handle remainder if needed (e.g. drop, store elsewhere, etc.)
-                    ItemStack overflow = result.copy();
-                    overflow.setCount(remainder);
-                    // Example: drop the overflow into the world
-                    Containers.dropItemStack(getLevel(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), overflow);
-                }
-            }
-
+        // Determine quality based on performance
+        String quality = determineForgingQuality();
+        //String quality = null;
+        // Only set the NBT tag if quality is meaningful
+        if (quality != null && !quality.isEmpty() && recipe.hasQuality() && !quality.equals("none")) {
+            CompoundTag tag = result.getOrCreateTag();
+            tag.putString("ForgingQuality", quality);
+            result.setTag(tag);
         }
+        int test = this.itemHandler.getSlots();
+        // Extract ingredients
+        for (int i = 0; i < this.itemHandler.getSlots() - 1; i++) {
+            this.itemHandler.extractItem(i, 1, false);
+        }
+
+
+        ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+
+        if (existing.isEmpty()) {
+            // If the output slot is empty, just set the result
+            this.itemHandler.setStackInSlot(OUTPUT_SLOT, result);
+        } else if (ItemStack.isSameItemSameTags(existing, result)) {
+            // If the same item (with same NBT), try to stack them
+            int total = existing.getCount() + result.getCount();
+            int maxSize = Math.min(existing.getMaxStackSize(), this.itemHandler.getSlotLimit(OUTPUT_SLOT));
+
+            if (total <= maxSize) {
+                existing.grow(result.getCount());
+                this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
+            } else {
+                // If not all items fit, grow to max and optionally handle overflow
+                int remainder = total - maxSize;
+                existing.setCount(maxSize);
+                this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
+
+                // Handle remainder if needed (e.g. drop, store elsewhere, etc.)
+                ItemStack overflow = result.copy();
+                overflow.setCount(remainder);
+                // Example: drop the overflow into the world
+                Containers.dropItemStack(getLevel(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), overflow);
+            }
+        }
+
     }
 
 
@@ -402,16 +401,13 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         // Implement your logic here to assess performance
         // For demonstration, we'll return a random quality
         String quality = SmithingAnvil.getQuality();
-        switch (quality) {
-            case "poor":
-                return ForgingQuality.POOR.getDisplayName();
-            case "expert":
-                return ForgingQuality.EXPERT.getDisplayName();
-            case "perfect":
-                return ForgingQuality.PERFECT.getDisplayName();
-            default:
-                return ForgingQuality.WELL.getDisplayName();
-        }
+        return switch (quality) {
+            case "poor" -> ForgingQuality.POOR.getDisplayName();
+            case "expert" -> ForgingQuality.EXPERT.getDisplayName();
+            case "perfect" -> ForgingQuality.PERFECT.getDisplayName();
+            case "well" -> ForgingQuality.WELL.getDisplayName();
+            default -> "none";
+        };
     }
 
     public void setProgress(int progress) {
