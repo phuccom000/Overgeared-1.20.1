@@ -1,3 +1,4 @@
+/*
 package net.stirdrem.overgeared.networking.packet;
 
 import net.minecraft.core.BlockPos;
@@ -142,8 +143,8 @@ public class MinigameSyncS2CPacket {
         return true;
     }
 }
+*/
 
-/*
 package net.stirdrem.overgeared.networking.packet;
 
 import net.minecraft.core.BlockPos;
@@ -189,4 +190,4 @@ public class MinigameSyncS2CPacket {
         });
         return true;
     }
-}*/
+}

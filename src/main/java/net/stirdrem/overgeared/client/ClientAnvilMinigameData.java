@@ -1,232 +1,242 @@
 package net.stirdrem.overgeared.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.config.ServerConfig;
 
-public class ClientAnvilMinigameData {
-    private static boolean isVisible = false;
-    private static boolean minigameStarted = false;
-    private static ItemStack resultItem;
-    private static int hitsRemaining = 0;
-    private static float arrowPosition = 0;
-    private static double temp1 = ServerConfig.DEFAULT_ARROW_SPEED.get();
-    private static float arrowSpeed = (float) temp1;
-    private static double temp2 = ServerConfig.MAX_SPEED.get();
-    private static final float maxArrowSpeed = (float) temp2;
-    private static double temp3 = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get();
-    private static float speedIncreasePerHit = (float) temp3;
-    private static boolean movingRight = true;
-    private static int perfectHits = 0;
-    private static int goodHits = 0;
-    private static int missedHits = 0;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-    private static final int INITIAL_PERFECT_ZONE_SIZE = 20; // 40-60 (20% wide)
-    private static final int INITIAL_GOOD_ZONE_SIZE = 40;    // 30-70 (40% wide)
-    private static final int PERFECT_ZONE_START = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-    private static final int PERFECT_ZONE_END = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-    private static final int GOOD_ZONE_START = PERFECT_ZONE_START - 10;
-    private static final int GOOD_ZONE_END = PERFECT_ZONE_END + 10;
-    private static int perfectZoneStart = PERFECT_ZONE_START;
-    private static int perfectZoneEnd = PERFECT_ZONE_END;
-    private static int goodZoneStart = GOOD_ZONE_START;
-    private static int goodZoneEnd = GOOD_ZONE_END;
-    private static float zoneShrinkFactor = 0.80f; // Zones shrink to 80% of their size each hit
-    private static float zoneShiftAmount = 15.0f; // Zones shift by 15% each hit
+public class ClientAnvilMinigameData {
+    private static final Map<UUID, PlayerMinigameData> playerData = new HashMap<>();
+
+    public static class PlayerMinigameData {
+        public boolean isVisible = false;
+        public boolean minigameStarted = false;
+        public ItemStack resultItem = null;
+        public int hitsRemaining = 0;
+        public float arrowPosition = 0;
+        public float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        public final float maxArrowSpeed = ServerConfig.MAX_SPEED.get().floatValue();
+        public float speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
+        public boolean movingRight = true;
+        public int perfectHits = 0;
+        public int goodHits = 0;
+        public int missedHits = 0;
+        public int perfectZoneStart = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        public int perfectZoneEnd = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        public int goodZoneStart = perfectZoneStart - 10;
+        public int goodZoneEnd = perfectZoneEnd + 10;
+        public float zoneShrinkFactor = 0.80f;
+        public float zoneShiftAmount = 15.0f;
+    }
+
+    private static PlayerMinigameData getData() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null) {
+            return playerData.computeIfAbsent(mc.player.getUUID(), k -> new PlayerMinigameData());
+        }
+        return new PlayerMinigameData(); // Fallback
+    }
 
     // Visibility
     public static void setIsVisible(boolean visible) {
-        isVisible = visible;
+        getData().isVisible = visible;
     }
 
     public static boolean getIsVisible() {
-        return isVisible;
+        return getData().isVisible;
     }
 
     // Result item
     public static void setResultItem(ItemStack item) {
-        resultItem = item;
+        getData().resultItem = item;
     }
 
     public static ItemStack getResultItem() {
-        return resultItem;
+        return getData().resultItem;
     }
 
     // Hits remaining
     public static void setHitsRemaining(int hits) {
-        hitsRemaining = hits;
+        getData().hitsRemaining = hits;
     }
 
     public static int getHitsRemaining() {
-        return hitsRemaining;
+        return getData().hitsRemaining;
     }
 
     // Arrow position
     public static void setArrowPosition(float position) {
-        arrowPosition = position;
+        getData().arrowPosition = position;
     }
 
     public static float getArrowPosition() {
-        return arrowPosition;
+        return getData().arrowPosition;
     }
 
     // Arrow speed
     public static void setArrowSpeed(float speed) {
-        arrowSpeed = speed;
+        getData().arrowSpeed = speed;
     }
 
     public static float getArrowSpeed() {
-        return arrowSpeed;
+        return getData().arrowSpeed;
     }
 
-    // Max arrow speed (no setter since it's final)
+    // Max arrow speed
     public static float getMaxArrowSpeed() {
-        return maxArrowSpeed;
+        return getData().maxArrowSpeed;
     }
 
     // Speed increase per hit
     public static void setSpeedIncreasePerHit(float increase) {
-        speedIncreasePerHit = increase;
+        getData().speedIncreasePerHit = increase;
     }
 
     public static float getSpeedIncreasePerHit() {
-        return speedIncreasePerHit;
+        return getData().speedIncreasePerHit;
     }
 
     // Arrow direction
     public static void setMovingRight(boolean right) {
-        movingRight = right;
+        getData().movingRight = right;
     }
 
     public static boolean isMovingRight() {
-        return movingRight;
+        return getData().movingRight;
     }
 
     // Perfect hits
     public static void setPerfectHits(int hits) {
-        perfectHits = hits;
+        getData().perfectHits = hits;
     }
 
     public static int getPerfectHits() {
-        return perfectHits;
+        return getData().perfectHits;
     }
 
     // Good hits
     public static void setGoodHits(int hits) {
-        goodHits = hits;
+        getData().goodHits = hits;
     }
 
     public static int getGoodHits() {
-        return goodHits;
+        return getData().goodHits;
     }
 
     // Missed hits
     public static void setMissedHits(int hits) {
-        missedHits = hits;
+        getData().missedHits = hits;
     }
 
     public static int getMissedHits() {
-        return missedHits;
+        return getData().missedHits;
     }
 
     // Perfect zone
     public static void setPerfectZoneStart(int start) {
-        perfectZoneStart = start;
+        getData().perfectZoneStart = start;
     }
 
     public static int getPerfectZoneStart() {
-        return perfectZoneStart;
+        return getData().perfectZoneStart;
     }
 
     public static void setPerfectZoneEnd(int end) {
-        perfectZoneEnd = end;
+        getData().perfectZoneEnd = end;
     }
 
     public static int getPerfectZoneEnd() {
-        return perfectZoneEnd;
+        return getData().perfectZoneEnd;
     }
 
     // Good zone
     public static void setGoodZoneStart(int start) {
-        goodZoneStart = start;
+        getData().goodZoneStart = start;
     }
 
     public static int getGoodZoneStart() {
-        return goodZoneStart;
+        return getData().goodZoneStart;
     }
 
     public static void setGoodZoneEnd(int end) {
-        goodZoneEnd = end;
+        getData().goodZoneEnd = end;
     }
 
     public static int getGoodZoneEnd() {
-        return goodZoneEnd;
+        return getData().goodZoneEnd;
     }
 
     // Zone shrink factor
     public static void setZoneShrinkFactor(float factor) {
-        zoneShrinkFactor = factor;
+        getData().zoneShrinkFactor = factor;
     }
 
     public static float getZoneShrinkFactor() {
-        return zoneShrinkFactor;
+        return getData().zoneShrinkFactor;
     }
 
     // Zone shift amount
     public static void setZoneShiftAmount(float amount) {
-        zoneShiftAmount = amount;
+        getData().zoneShiftAmount = amount;
     }
 
     public static float getZoneShiftAmount() {
-        return zoneShiftAmount;
+        return getData().zoneShiftAmount;
     }
 
     public static void loadFromNBT(CompoundTag nbt) {
+        PlayerMinigameData data = getData();
+
         // Basic game state
-        setIsVisible(nbt.getBoolean("isVisible"));
-        setMinigameStarted(nbt.getBoolean("minigameStarted"));
+        data.isVisible = nbt.getBoolean("isVisible");
+        data.minigameStarted = nbt.getBoolean("minigameStarted");
 
         // Item data
         if (nbt.contains("resultItem")) {
-            setResultItem(ItemStack.of(nbt.getCompound("resultItem")));
+            data.resultItem = ItemStack.of(nbt.getCompound("resultItem"));
         }
 
         // Game progress
-        setHitsRemaining(nbt.getInt("hitsRemaining"));
-        setPerfectHits(nbt.getInt("perfectHits"));
-        setGoodHits(nbt.getInt("goodHits"));
-        setMissedHits(nbt.getInt("missedHits"));
+        data.hitsRemaining = nbt.getInt("hitsRemaining");
+        data.perfectHits = nbt.getInt("perfectHits");
+        data.goodHits = nbt.getInt("goodHits");
+        data.missedHits = nbt.getInt("missedHits");
 
         // Arrow mechanics
-        setArrowPosition(nbt.getFloat("arrowPosition"));
-        setArrowSpeed(nbt.getFloat("arrowSpeed"));
-        setSpeedIncreasePerHit(nbt.getFloat("speedIncreasePerHit"));
-        setMovingRight(nbt.getBoolean("movingRight"));
+        data.arrowPosition = nbt.getFloat("arrowPosition");
+        data.arrowSpeed = nbt.getFloat("arrowSpeed");
+        data.speedIncreasePerHit = nbt.getFloat("speedIncreasePerHit");
+        data.movingRight = nbt.getBoolean("movingRight");
 
         // Zone data
-        setPerfectZoneStart(nbt.getInt("perfectZoneStart"));
-        setPerfectZoneEnd(nbt.getInt("perfectZoneEnd"));
-        setGoodZoneStart(nbt.getInt("goodZoneStart"));
-        setGoodZoneEnd(nbt.getInt("goodZoneEnd"));
+        data.perfectZoneStart = nbt.getInt("perfectZoneStart");
+        data.perfectZoneEnd = nbt.getInt("perfectZoneEnd");
+        data.goodZoneStart = nbt.getInt("goodZoneStart");
+        data.goodZoneEnd = nbt.getInt("goodZoneEnd");
 
         // Zone behavior modifiers
-        setZoneShrinkFactor(nbt.getFloat("zoneShrinkFactor"));
-        setZoneShiftAmount(nbt.getFloat("zoneShiftAmount"));
+        data.zoneShrinkFactor = nbt.getFloat("zoneShrinkFactor");
+        data.zoneShiftAmount = nbt.getFloat("zoneShiftAmount");
 
         // Additional validation
-        if (arrowSpeed > maxArrowSpeed) {
-            arrowSpeed = maxArrowSpeed;
+        if (data.arrowSpeed > data.maxArrowSpeed) {
+            data.arrowSpeed = data.maxArrowSpeed;
         }
 
         // Clamp values to valid ranges
-        arrowPosition = Math.max(0, Math.min(100, arrowPosition));
-        perfectZoneStart = Math.max(0, Math.min(100, perfectZoneStart));
-        perfectZoneEnd = Math.max(0, Math.min(100, perfectZoneEnd));
-        goodZoneStart = Math.max(0, Math.min(100, goodZoneStart));
-        goodZoneEnd = Math.max(0, Math.min(100, goodZoneEnd));
+        data.arrowPosition = Math.max(0, Math.min(100, data.arrowPosition));
+        data.perfectZoneStart = Math.max(0, Math.min(100, data.perfectZoneStart));
+        data.perfectZoneEnd = Math.max(0, Math.min(100, data.perfectZoneEnd));
+        data.goodZoneStart = Math.max(0, Math.min(100, data.goodZoneStart));
+        data.goodZoneEnd = Math.max(0, Math.min(100, data.goodZoneEnd));
     }
 
-    private static void setMinigameStarted(boolean mstarted) {
-        minigameStarted = mstarted;
+    public static void clearData(UUID playerId) {
+        playerData.remove(playerId);
     }
 }

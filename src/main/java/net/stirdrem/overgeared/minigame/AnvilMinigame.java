@@ -4,17 +4,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import net.stirdrem.overgeared.HitResult;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
-import net.stirdrem.overgeared.networking.packet.ToggleMinigamePauseC2SPacket;
+import net.stirdrem.overgeared.networking.packet.MinigameHitResultC2SPacket;
 
 public class AnvilMinigame {
     // Instance fields instead of static
-    private boolean isVisible = ClientAnvilMinigameData.getIsVisible();
+    private static boolean isVisible = ClientAnvilMinigameData.getIsVisible();
     private boolean minigameStarted = false;
     private ItemStack resultItem = ClientAnvilMinigameData.getResultItem();
     private int hitsRemaining = ClientAnvilMinigameData.getHitsRemaining();
@@ -38,6 +39,9 @@ public class AnvilMinigame {
     private float zoneShiftAmount = 15.0f;
     private BlockPos anvilPos;
     private boolean isUnpaused = false;
+    private HitResult result;
+    private String quality;
+
 
     // Save to NBT
     public void saveNBTData(CompoundTag nbt) {
@@ -100,11 +104,11 @@ public class AnvilMinigame {
         }
     }
 
-    public void start(ItemStack result, int requiredHits, BlockPos pos) {
+    public void start(ItemStack result, int requiredHits, BlockPos pos, ServerPlayer player) {
         if (minigameStarted) {
             isVisible = !isVisible;
             OvergearedMod.LOGGER.info("isVisible: " + isVisible);
-            sendUpdatePacket();
+            sendUpdatePacket(player);
             return;
         }
 
@@ -131,7 +135,7 @@ public class AnvilMinigame {
         goodZoneStart = Math.max(0, Math.min(100, (int) (GOOD_ZONE_START + random)));
         goodZoneEnd = Math.max(0, Math.min(100, (int) (GOOD_ZONE_END + random)));
 
-        sendUpdatePacket();
+        sendUpdatePacket(player);
         OvergearedMod.LOGGER.info("Minigame started");
     }
 
@@ -153,6 +157,17 @@ public class AnvilMinigame {
         }
     }
 
+    public void clientHandleHit() {
+        arrowSpeed = Math.min(arrowSpeed + ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue(),
+                ServerConfig.MAX_SPEED.get().floatValue());
+
+        // Client-side visual updates
+        shrinkAndShiftZones();
+
+        // Send hit result to server for validation
+        sendHitResultToServer();
+    }
+
     public String handleHit(ServerPlayer player) {
         arrowSpeed = Math.min(arrowSpeed + speedIncreasePerHit, maxArrowSpeed);
 
@@ -163,15 +178,40 @@ public class AnvilMinigame {
         } else {
             missedHits++;
         }
-
+        /*if (arrowPosition >= perfectZoneStart && arrowPosition <= perfectZoneEnd) {
+            result = HitResult.PERFECT;
+        } else if (arrowPosition >= goodZoneStart && arrowPosition <= goodZoneEnd) {
+            result = HitResult.GOOD;
+        } else {
+            result = HitResult.MISSED;
+            }*/
         shrinkAndShiftZones();
         hitsRemaining--;
-        sendUpdatePacket();
+        //sendUpdatePacket();
+        // sendHitResultToServer();
 
         if (hitsRemaining <= 0) {
             return finishForging(player);
         }
+        //syncRemainingHits(player);
         return null;
+    }
+
+    public void serverHandleHit(ServerPlayer player, HitResult result) {
+        switch (result) {
+            case PERFECT -> perfectHits++;
+            case GOOD -> goodHits++;
+            case MISSED -> missedHits++;
+        }
+
+        hitsRemaining--;
+
+        if (hitsRemaining <= 0) {
+            quality = finishForging(player);
+            // Handle the forged item quality
+        }
+        // Optionally sync remaining hits back to client
+        syncRemainingHits(player);
     }
 
     private void shrinkAndShiftZones() {
@@ -205,12 +245,12 @@ public class AnvilMinigame {
         goodZoneEnd = Math.min(100, goodZoneEnd);
     }
 
-    private String finishForging(ServerPlayer player) {
+    public String finishForging(ServerPlayer player) {
         isVisible = false;
         minigameStarted = false;
         SmithingHammer.releaseAnvil(anvilPos);
         float qualityScore = calculateQualityScore();
-        sendUpdatePacket();
+        sendUpdatePacket(player);
         return determineQuality(qualityScore);
     }
 
@@ -227,7 +267,7 @@ public class AnvilMinigame {
         return "poor";
     }
 
-    public void end() {
+    /*public void end() {
         isVisible = false;
         minigameStarted = false;
         resultItem = null;
@@ -237,43 +277,80 @@ public class AnvilMinigame {
         missedHits = 0;
         arrowPosition = 0;
         arrowSpeed = 0;
-        sendUpdatePacket();
+        sendUpdatePacket(player);
+    }*/
+
+    private void sendHitResultToServer() {
+        if (anvilPos == null) return;
+
+        // Determine hit quality client-side
+        HitResult result;
+        if (arrowPosition >= perfectZoneStart && arrowPosition <= perfectZoneEnd) {
+            result = HitResult.PERFECT;
+        } else if (arrowPosition >= goodZoneStart && arrowPosition <= goodZoneEnd) {
+            result = HitResult.GOOD;
+        } else {
+            result = HitResult.MISSED;
+        }
+
+        // Send to server
+        ModMessages.sendToServer(new MinigameHitResultC2SPacket(
+                anvilPos,
+                result
+        ));
     }
 
-    public void sendUpdatePacket() {
-        ServerPlayer player = anvilPos != null ? SmithingHammer.getUsingPlayer(anvilPos) : null;
-        if (player != null) {
-            ModMessages.sendToPlayer(new MinigameSyncS2CPacket(
-                    isVisible,
-                    minigameStarted,
-                    ClientAnvilMinigameData.getResultItem(),
-                    ClientAnvilMinigameData.getHitsRemaining(),
-                    ClientAnvilMinigameData.getArrowPosition(),
-                    ClientAnvilMinigameData.getArrowSpeed(),
-                    maxArrowSpeed,
-                    ClientAnvilMinigameData.getSpeedIncreasePerHit(),
-                    ClientAnvilMinigameData.isMovingRight(),
-                    ClientAnvilMinigameData.getPerfectHits(),
-                    ClientAnvilMinigameData.getGoodHits(),
-                    ClientAnvilMinigameData.getMissedHits(),
-                    ClientAnvilMinigameData.getPerfectZoneStart(),
-                    ClientAnvilMinigameData.getPerfectZoneEnd(),
-                    ClientAnvilMinigameData.getGoodZoneStart(),
-                    ClientAnvilMinigameData.getGoodZoneEnd(),
-                    zoneShrinkFactor,
-                    zoneShiftAmount,
-                    anvilPos
-            ), player);
-        }
+    // Server-side hit validation
+
+
+    private void syncRemainingHits(ServerPlayer player) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("hitsRemaining", hitsRemaining);
+        ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
     }
-    /*public void sendUpdatePacket() {
+
+
+    /* public void sendUpdatePacket() {
+         ServerPlayer player = anvilPos != null ? SmithingHammer.getUsingPlayer(anvilPos) : null;
+         if (player != null) {
+             ModMessages.sendToPlayer(new MinigameSyncS2CPacket(
+                     isVisible,
+                     minigameStarted,
+                     ClientAnvilMinigameData.getResultItem(),
+                     ClientAnvilMinigameData.getHitsRemaining(),
+                     ClientAnvilMinigameData.getArrowPosition(),
+                     ClientAnvilMinigameData.getArrowSpeed(),
+                     maxArrowSpeed,
+                     ClientAnvilMinigameData.getSpeedIncreasePerHit(),
+                     ClientAnvilMinigameData.isMovingRight(),
+                     ClientAnvilMinigameData.getPerfectHits(),
+                     ClientAnvilMinigameData.getGoodHits(),
+                     ClientAnvilMinigameData.getMissedHits(),
+                     ClientAnvilMinigameData.getPerfectZoneStart(),
+                     ClientAnvilMinigameData.getPerfectZoneEnd(),
+                     ClientAnvilMinigameData.getGoodZoneStart(),
+                     ClientAnvilMinigameData.getGoodZoneEnd(),
+                     zoneShrinkFactor,
+                     zoneShiftAmount,
+                     anvilPos
+             ), player);
+         }
+     }*/
+   /* private void sendUpdatePacket() {
         ServerPlayer player = anvilPos != null ? SmithingHammer.getUsingPlayer(anvilPos) : null;
         if (player != null) {
             CompoundTag nbt = new CompoundTag();
-            this.saveNBTData(nbt); // Use your existing NBT serialization
+            this.saveNBTData(nbt);
+            nbt.putUUID("playerId", player.getUUID()); // Include player ID
             ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
         }
     }*/
+    public void sendUpdatePacket(ServerPlayer player) {
+        CompoundTag nbt = new CompoundTag();
+        this.saveNBTData(nbt);
+        nbt.putUUID("playerId", player.getUUID()); // Include player ID
+        ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
+    }
 
     // Getters and Setters
     public boolean isVisible() {
@@ -398,5 +475,40 @@ public class AnvilMinigame {
 
     public BlockPos getAnvilPos() {
         return anvilPos;
+    }
+
+    public void clientTick() {
+        if (!isVisible || !minigameStarted) return;
+
+        if (movingRight) {
+            arrowPosition += arrowSpeed;
+            if (arrowPosition >= 100) {
+                arrowPosition = 100;
+                movingRight = false;
+            }
+        } else {
+            arrowPosition -= arrowSpeed;
+            if (arrowPosition <= 0) {
+                arrowPosition = 0;
+                movingRight = true;
+            }
+        }
+    }
+
+
+    public String getQuality() {
+        if (hitsRemaining <= 0) {
+            return quality;
+        }
+        //syncRemainingHits(player);
+        return null;
+    }
+
+    public BlockPos getAnvilPosition() {
+        return anvilPos;
+    }
+
+    public boolean hasAnvilPosition() {
+        return anvilPos != null;
     }
 }

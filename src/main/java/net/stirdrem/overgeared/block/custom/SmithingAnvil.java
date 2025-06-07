@@ -237,8 +237,9 @@ public class SmithingAnvil extends BaseEntityBlock {
             //if (player instanceof ServerPlayer serverPlayer) {
             //ModMessages.sendToServer(new FinalizeForgingC2SPacket("test"));
             player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                //minigame.clientHandleHit();
+                //quality = minigame.getQuality();
                 quality = minigame.handleHit((ServerPlayer) player);
-
             });
             // quality = AnvilMinigame.handleHit(serverPlayer);
             //}

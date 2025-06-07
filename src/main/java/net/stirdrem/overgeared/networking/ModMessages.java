@@ -10,7 +10,7 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.networking.packet.FinalizeForgingC2SPacket;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.networking.packet.StartMinigameC2SPacket;
-import net.stirdrem.overgeared.networking.packet.ToggleMinigamePauseC2SPacket;
+import net.stirdrem.overgeared.networking.packet.MinigameHitResultC2SPacket;
 
 public class ModMessages {
     private static SimpleChannel INSTANCE;
@@ -31,10 +31,10 @@ public class ModMessages {
 
         INSTANCE = net;
 
-        net.messageBuilder(ToggleMinigamePauseC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(ToggleMinigamePauseC2SPacket::decode)
-                .encoder(ToggleMinigamePauseC2SPacket::encode)
-                .consumerMainThread(ToggleMinigamePauseC2SPacket::handle)
+        net.messageBuilder(MinigameHitResultC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(MinigameHitResultC2SPacket::decode)
+                .encoder(MinigameHitResultC2SPacket::encode)
+                .consumerMainThread(MinigameHitResultC2SPacket::handle)
                 .add();
 
         net.messageBuilder(StartMinigameC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
@@ -61,6 +61,11 @@ public class ModMessages {
                 .consumerMainThread(MinigameSyncS2CPacket::handle)
                 .add();
 
+        net.messageBuilder(MinigameHitResultC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(MinigameHitResultC2SPacket::encode)
+                .decoder(MinigameHitResultC2SPacket::decode)
+                .consumerMainThread(MinigameHitResultC2SPacket::handle)
+                .add();
 
     }
 

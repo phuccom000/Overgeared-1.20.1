@@ -2,6 +2,8 @@ package net.stirdrem.overgeared.event;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,6 +27,7 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
+import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
@@ -35,269 +38,129 @@ import net.stirdrem.overgeared.util.ModTags;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
 public class ModEvents {
-
-
-    /*@SubscribeEvent
-    public static void onLevelTick(TickEvent.LevelTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || event.level.isClientSide()) return;
-
-        Level level = event.level;
-
-        // Define the area to search for ItemEntities
-        AABB searchArea = new AABB(
-                level.getWorldBorder().getMinX(), level.getMinBuildHeight(), level.getWorldBorder().getMinZ(),
-                level.getWorldBorder().getMaxX(), level.getMaxBuildHeight(), level.getWorldBorder().getMaxZ()
-        );
-
-        List<ItemEntity> itemEntities = level.getEntitiesOfClass(ItemEntity.class, searchArea);
-
-        for (ItemEntity itemEntity : itemEntities) {
-            BlockPos pos = itemEntity.blockPosition();
-            BlockState state = level.getBlockState(pos);
-            ItemStack itemStack = itemEntity.getItem();
-
-            if (!itemStack.is(ModTags.Items.HEATED_METALS)) return;
-
-            // Check if the item is in water or in a water cauldron
-            boolean inWater = itemEntity.isInWater();
-            boolean inWaterCauldron = state.is(Blocks.WATER_CAULDRON) && state.getValue(LayeredCauldronBlock.LEVEL) > 0;
-
-            if (!inWater && !inWaterCauldron) continue;
-
-            Item cooledItem = getCooledIngot(itemStack.getItem());
-            if (cooledItem == null) continue;
-
-            // Create cooled item stack
-            ItemStack cooledStack = new ItemStack(cooledItem);
-
-            // Handle item stack reduction
-            itemStack.shrink(1);
-            if (itemStack.isEmpty()) {
-                itemEntity.discard();
-            }
-
-            // Spawn new item with proper motion
-            Block.popResource(level, pos, cooledStack); // spawn cooled ingot
-
-            // Play sound
-            level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, 1.0F);
-
-            // If in water cauldron, reduce water level by 1
-            if (inWaterCauldron) {
-                int currentLevel = state.getValue(LayeredCauldronBlock.LEVEL);
-                if (currentLevel == 1) {
-                    // Replace Water Cauldron with normal (empty) Cauldron
-                    level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
-                } else {
-                    // Decrease water level by 1
-                    level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, currentLevel - 1));
-                }
-            }
-        }
-    }*/
-
-    @SubscribeEvent
-    public static void onLevelTick(TickEvent.LevelTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || event.level.isClientSide()) return;
-
-        Level level = event.level;
-
-    }
+    private static final int ANVIL_CLEANUP_INTERVAL = 1200; // 1 minute (60 seconds * 20 ticks)
+    private static final int HEATED_ITEM_CHECK_INTERVAL = 20; // 1 second
+    private static final float BURN_DAMAGE = 1.0f;
+    private static final float ZONE_SHIFT_AMOUNT = 15.0f;
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END && event.side == LogicalSide.SERVER) {
-            // Run cleanup every minute (1200 ticks)
-            if (event.getServer().getTickCount() % 1200 == 0) {
+            // Run cleanup at regular intervals
+            if (event.getServer().getTickCount() % ANVIL_CLEANUP_INTERVAL == 0) {
                 SmithingHammer.cleanupStaleAnvils(event.getServer().overworld());
             }
         }
     }
 
-    private static int TICK = 0;
-    private static final int perTick = 30;
-
-
-    @SubscribeEvent//(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             Player player = event.player;
             Level level = player.level();
-            TICK = TICK + 1;
-            //player.sendSystemMessage(Component.literal(String.valueOf(TICK)));
-            boolean hasHeatedIngot = false;
-            // Check inventory
-            if (level.isClientSide()) return; // Ensure this runs only on the server side
 
-            for (ItemStack stack : player.getInventory().items) {
-                if (!stack.isEmpty() && stack.is(ModTags.Items.HEATED_METALS)) {
-                    hasHeatedIngot = true;
-                    break;
-                }
-            }
+            if (level.isClientSide()) return;
 
-            // Check offhand
-            ItemStack offhandStack = player.getOffhandItem();
-            if (!offhandStack.isEmpty() && offhandStack.is(ModTags.Items.HEATED_METALS)) {
-                hasHeatedIngot = true;
-            }
-
-            // Apply effect if player has heated ingot
-            if (hasHeatedIngot) {
-                boolean hasTongs = false;
-                ItemStack offhand = player.getOffhandItem();
-                if (!offhand.isEmpty() && offhand.is(ModTags.Items.TONGS)) {
-                    hasTongs = true;
-                    if (level.getGameTime() % 40 == 0)
-                        offhandStack.hurtAndBreak(1, event.player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-                }
-                if (!hasTongs)            //player.sendSystemMessage(Component.literal("Player does not have tongs!"));
-                    player.hurt(player.damageSources().hotFloor(), 1.0F); // Apply burn damage
-            }
-
-            if (event.side == LogicalSide.SERVER) {
-                event.player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                    if (minigame.isVisible()) {
-                        float arrowPosition = minigame.getArrowPosition();
-                        float arrowSpeed = minigame.getArrowSpeed();
-                        if (minigame.getMovingRight()) {
-                            minigame.setArrowPosition(arrowPosition + arrowSpeed);
-                            ;
-                            if (arrowPosition >= 100) {
-                                minigame.setArrowPosition(100);
-                                minigame.setMovingRight(false);
-                            }
-                        } else {
-                            minigame.setArrowPosition(arrowPosition - arrowSpeed);
-                            ;
-                            if (arrowPosition <= 0) {
-                                minigame.setArrowPosition(0);
-                                minigame.setMovingRight(true);
-                            }
-                        }
-                        //event.player.sendSystemMessage(Component.literal("minigamemoving"));
-                        ModMessages.sendToPlayer(new MinigameSyncS2CPacket(
-                                minigame.isVisible(),
-                                minigame.isForging(),
-                                minigame.getResultItem(),
-                                minigame.getHitsRemaining(),
-                                minigame.getArrowPosition(),
-                                minigame.getArrowSpeed(),
-                                ServerConfig.MAX_SPEED.get().floatValue(),
-                                ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue(),
-                                minigame.getMovingRight(),
-                                minigame.getPerfectHits(),
-                                minigame.getGoodHits(),
-                                minigame.getMissedHits(),
-                                minigame.getPerfectZoneStart(),
-                                minigame.getPerfectZoneEnd(),
-                                minigame.getGoodZoneStart(),
-                                minigame.getGoodZoneEnd(),
-                                ServerConfig.ZONE_SHRINK_FACTOR.get().floatValue(),
-                                15.0f, // zoneShiftAmount
-                                minigame.getAnvilPos()
-                        ), (ServerPlayer) event.player);
-                    }
-                });
-            }
-
-           /* for (ItemStack stack : player.getInventory().items) {
-                if (!stack.isEmpty() && stack.is(ModTags.Items.HEATABLE_METALS)
-                        && stack.hasTag() && stack.getTag().contains("heat")) {
-                    // Decrease durability over time
-                    //if (level.getGameTime() % 20 == 0) { // Every second
-                    stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-                    //}
-
-                    // Send debug message to the player
-                    //int currentDurability = stack.getMaxDamage() - stack.getDamageValue();
-                    //player.sendSystemMessage(Component.literal("Item: " + stack.getItem().getDescription().getString() +
-                    //", Durability: " + currentDurability + "/" + stack.getMaxDamage()));
-                }
-            }*/
-
-
-            /*for (ItemStack stack : player.getInventory().items) {
-                if (!stack.isEmpty() && stack.is(ModTags.Items.HEATED_METALS)) {
-                    if (stack.getDamageValue() == stack.getMaxDamage() - 1) {
-                        Item cooledItem = getCooledIngot(stack.getItem());
-                        if (cooledItem != null) {
-                            ItemStack cooledIngot = new ItemStack(cooledItem);
-                            stack.shrink(1);
-                            if (stack.isEmpty()) {
-                                player.setItemInHand(player.getUsedItemHand(), cooledIngot);
-                                level.playSound(null, player.getOnPos(), SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, 1.0F);
-                            } else {
-                                if (!player.getInventory().add(cooledIngot)) {
-                                    player.drop(cooledIngot, false);
-                                }
-                            }
-                        }
-                    } else {
-                        if (level.getGameTime() % 20 == 0)
-                            stack.hurtAndBreak(1, event.player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-                    }
-                    break;
-                }
-            }*/
+            handleHeatedItems(player, level);
+            handleAnvilMinigameSync(event, player);
         }
     }
 
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            //AnvilMinigame.tick();
+    private static void handleHeatedItems(Player player, Level level) {
+        boolean hasHeatedIngot = player.getInventory().items.stream()
+                .anyMatch(stack -> !stack.isEmpty() && stack.is(ModTags.Items.HEATED_METALS))
+                || (!player.getOffhandItem().isEmpty() && player.getOffhandItem().is(ModTags.Items.HEATED_METALS));
+
+        if (hasHeatedIngot) {
+            boolean hasTongs = !player.getOffhandItem().isEmpty() &&
+                    player.getOffhandItem().is(ModTags.Items.TONGS);
+
+            if (hasTongs && level.getGameTime() % HEATED_ITEM_CHECK_INTERVAL == 0) {
+                player.getOffhandItem().hurtAndBreak(1, player,
+                        p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            } else if (!hasTongs) {
+                player.hurt(player.damageSources().hotFloor(), BURN_DAMAGE);
+            }
+        }
+    }
+
+    private static void handleAnvilMinigameSync(TickEvent.PlayerTickEvent event, Player player) {
+        if (event.side == LogicalSide.SERVER) {
+            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                if (minigame.isVisible()) {
+                    updateArrowPosition(minigame);
+                    syncMinigameData(minigame, (ServerPlayer) player);
+                }
+            });
+        }
+    }
+
+    private static void updateArrowPosition(AnvilMinigame minigame) {
+        float arrowPosition = minigame.getArrowPosition();
+        float arrowSpeed = minigame.getArrowSpeed();
+        boolean movingRight = minigame.getMovingRight();
+
+        if (movingRight) {
+            minigame.setArrowPosition(Math.min(100, arrowPosition + arrowSpeed));
+            if (arrowPosition >= 100) {
+                minigame.setMovingRight(false);
+            }
+        } else {
+            minigame.setArrowPosition(Math.max(0, arrowPosition - arrowSpeed));
+            if (arrowPosition <= 0) {
+                minigame.setMovingRight(true);
+            }
+        }
+    }
+
+    private static void syncMinigameData(AnvilMinigame minigame, ServerPlayer player) {
+        try {
+            // Create a CompoundTag to hold all minigame data
+            CompoundTag minigameData = new CompoundTag();
+            minigame.saveNBTData(minigameData); // Use your existing NBT serialization
+
+            // Add server config values that the client needs
+            minigameData.putFloat("maxArrowSpeed", ServerConfig.MAX_SPEED.get().floatValue());
+            minigameData.putFloat("speedIncreasePerHit", ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue());
+            minigameData.putFloat("zoneShrinkFactor", ServerConfig.ZONE_SHRINK_FACTOR.get().floatValue());
+
+            // Send the packet
+            ModMessages.sendToPlayer(new MinigameSyncS2CPacket(minigameData), player);
+
+            // Optional debug logging
+            OvergearedMod.LOGGER.debug("Sent minigame sync packet to player {}", player.getName().getString());
+        } catch (Exception e) {
+            OvergearedMod.LOGGER.error("Failed to sync minigame data to player {}", player.getName().getString(), e);
         }
     }
 
     @SubscribeEvent
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof Player) {
-            if (!event.getObject().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).isPresent()) {
-                event.addCapability(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "properties"), new AnvilMinigameProvider());
-            }
+        if (event.getObject() instanceof Player &&
+                !event.getObject().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).isPresent()) {
+            event.addCapability(
+                    ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "properties"),
+                    new AnvilMinigameProvider()
+            );
         }
     }
 
     @SubscribeEvent
     public static void onPlayerCloned(PlayerEvent.Clone event) {
         if (event.isWasDeath()) {
-            event.getOriginal().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(oldStore -> {
-                event.getOriginal().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(newStore -> {
-                    newStore.copyFrom(oldStore);
-                });
-            });
+            event.getOriginal().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
+                    .ifPresent(oldStore -> {
+                        event.getEntity().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
+                                .ifPresent(newStore -> newStore.copyFrom(oldStore));
+                    });
         }
     }
 
     @SubscribeEvent
     public static void onPlayerJoinWorld(EntityJoinLevelEvent event) {
-        if (!event.getLevel().isClientSide()) {
-            if (event.getEntity() instanceof ServerPlayer player) {
-                player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                    ModMessages.sendToPlayer(new MinigameSyncS2CPacket(
-                            minigame.isVisible(),
-                            minigame.isForging(),
-                            minigame.getResultItem(),
-                            minigame.getHitsRemaining(),
-                            minigame.getArrowPosition(),
-                            minigame.getArrowSpeed(),
-                            ServerConfig.MAX_SPEED.get().floatValue(),
-                            ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue(),
-                            minigame.getMovingRight(),
-                            minigame.getPerfectHits(),
-                            minigame.getGoodHits(),
-                            minigame.getMissedHits(),
-                            minigame.getPerfectZoneStart(),
-                            minigame.getPerfectZoneEnd(),
-                            minigame.getGoodZoneStart(),
-                            minigame.getGoodZoneEnd(),
-                            ServerConfig.ZONE_SHRINK_FACTOR.get().floatValue(),
-                            15.0f, // zoneShiftAmount
-                            minigame.getAnvilPos()
-                    ), player);
-                });
-            }
+        if (!event.getLevel().isClientSide() && event.getEntity() instanceof ServerPlayer player) {
+            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
+                    .ifPresent(minigame -> syncMinigameData(minigame, player));
         }
     }
 
@@ -315,15 +178,42 @@ public class ModEvents {
             Item item = stack.getItem();
 
             if (isWeapon(item)) {
-                double damageBonus = getDamageBonusForQuality(quality);
-                double speedBonus = getSpeedBonusForQuality(quality);
-                modifyWeaponAttributes(event, damageBonus, speedBonus);
-            }
-            if (isArmor(item)) {
-                double armorBonus = getArmorBonusForQuality(quality);
-                modifyArmorAttribute(event, armorBonus);
+                applyWeaponAttributes(event, quality);
+            } else if (isArmor(item)) {
+                applyArmorAttributes(event, quality);
             }
         }
+    }
+
+    private static void applyWeaponAttributes(ItemAttributeModifierEvent event, String quality) {
+        double damageBonus = getDamageBonusForQuality(quality);
+        double speedBonus = getSpeedBonusForQuality(quality);
+        modifyAttribute(event, Attributes.ATTACK_DAMAGE, damageBonus);
+        modifyAttribute(event, Attributes.ATTACK_SPEED, speedBonus);
+    }
+
+    private static void applyArmorAttributes(ItemAttributeModifierEvent event, String quality) {
+        double armorBonus = getArmorBonusForQuality(quality);
+        modifyAttribute(event, Attributes.ARMOR, armorBonus);
+    }
+
+    private static void modifyAttribute(ItemAttributeModifierEvent event, Attribute attribute, double bonus) {
+        Multimap<Attribute, AttributeModifier> originalModifiers = LinkedHashMultimap.create();
+        originalModifiers.putAll(event.getOriginalModifiers());
+
+        originalModifiers.get(attribute).forEach(modifier -> {
+            event.removeModifier(attribute, modifier);
+            event.addModifier(attribute, createModifiedAttribute(modifier, bonus));
+        });
+    }
+
+    private static AttributeModifier createModifiedAttribute(AttributeModifier original, double bonus) {
+        return new AttributeModifier(
+                original.getId(),
+                original.getName() + "_forged",
+                original.getAmount() + bonus,
+                original.getOperation()
+        );
     }
 
     private static boolean isWeapon(Item item) {
@@ -334,59 +224,6 @@ public class ModEvents {
 
     private static boolean isArmor(Item item) {
         return item instanceof ArmorItem;
-    }
-
-    private static void modifyWeaponAttributes(ItemAttributeModifierEvent event, double damageBonus, double speedBonus) {
-        Multimap<Attribute, AttributeModifier> originalModifiers = LinkedHashMultimap.create();
-        originalModifiers.putAll(event.getOriginalModifiers());
-
-        // Process attack damage modifiers
-        for (AttributeModifier modifier : originalModifiers.get(Attributes.ATTACK_DAMAGE)) {
-            event.removeModifier(Attributes.ATTACK_DAMAGE, modifier);
-            AttributeModifier newModifier = new AttributeModifier(
-                    modifier.getId(),
-                    modifier.getName() + "_forged",
-                    modifier.getAmount() + damageBonus,
-                    modifier.getOperation()
-            );
-            event.addModifier(Attributes.ATTACK_DAMAGE, newModifier);
-        }
-
-        // Process attack speed modifiers
-        for (AttributeModifier modifier : originalModifiers.get(Attributes.ATTACK_SPEED)) {
-            event.removeModifier(Attributes.ATTACK_SPEED, modifier);
-            AttributeModifier newModifier = new AttributeModifier(
-                    modifier.getId(),
-                    modifier.getName() + "_forged",
-                    modifier.getAmount() + speedBonus,
-                    modifier.getOperation()
-            );
-            event.addModifier(Attributes.ATTACK_SPEED, newModifier);
-        }
-    }
-
-    private static void modifyArmorAttribute(ItemAttributeModifierEvent event, double damageBonus) {
-        // Create a copy of the original modifiers to avoid concurrent modification
-        Multimap<Attribute, AttributeModifier> originalModifiers = LinkedHashMultimap.create();
-        originalModifiers.putAll(event.getOriginalModifiers());
-
-        for (AttributeModifier modifier : originalModifiers.get(Attributes.ARMOR)) {
-            // Remove original modifier
-            event.removeModifier(Attributes.ARMOR, modifier);
-
-            // Create new modifier with bonus damage
-            AttributeModifier newModifier = new AttributeModifier(
-                    modifier.getId(),
-                    modifier.getName() + "_forged",
-                    modifier.getAmount() + damageBonus,
-                    modifier.getOperation()
-            );
-
-            // Add the modified version
-            event.addModifier(Attributes.ARMOR, newModifier);
-        }
-
-
     }
 
     private static double getDamageBonusForQuality(String quality) {
@@ -422,10 +259,16 @@ public class ModEvents {
     @SubscribeEvent
     public static void onPlayerDisconnect(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            // Free all anvils this player was using
-            SmithingHammer.releaseAnvilsForPlayer(player.getUUID());
+            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                if (minigame.hasAnvilPosition()) {
+                    BlockPos anvilPos = minigame.getAnvilPosition();
+                    SmithingHammer.releaseAnvil(anvilPos);
+                }
+            });
+            ClientAnvilMinigameData.clearData(player.getUUID());
         }
     }
+
 
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {

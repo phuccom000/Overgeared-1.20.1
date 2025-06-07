@@ -426,6 +426,13 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return currentRecipe.getHammeringRequired() - progress;
     }
 
+    public ItemStack getResultItem() {
+        Optional<ForgingRecipe> recipe = getCurrentRecipe();
+        if (recipe.isPresent())
+            return recipe.get().getResultItem(level.registryAccess());
+        return null;
+    }
+
 
   /*  public void completeForgingWithQuality(String quality) {
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
