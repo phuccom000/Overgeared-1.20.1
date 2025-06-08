@@ -265,7 +265,7 @@ public class ModEvents {
                     SmithingHammer.releaseAnvil(anvilPos);
                 }
             });
-            ClientAnvilMinigameData.clearData(player.getUUID());
+            //ClientAnvilMinigameData.clearData(player.getUUID());
         }
     }
 

@@ -31,13 +31,13 @@ import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
-import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.networking.packet.FinalizeForgingC2SPacket;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Random;
 import org.joml.Vector3f;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SmithingAnvil extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -70,7 +70,6 @@ public class SmithingAnvil extends BaseEntityBlock {
         return quality;
     }
 
-    private boolean isVisible = false;
     private boolean minigameStarted = false;
     private ItemStack resultItem;
     private int hitsRemaining = 0;
@@ -209,46 +208,45 @@ public class SmithingAnvil extends BaseEntityBlock {
 
         ItemStack held = player.getItemInHand(hand);
         boolean isHammer = held.is(ModTags.Items.SMITHING_HAMMERS);  // Tag-based check
-
        /* OvergearedMod.LOGGER.info("== SmithingAnvil Debug ==");
         OvergearedMod.LOGGER.info("isHammer: " + isHammer);
         OvergearedMod.LOGGER.info("hasRecipe: " + anvil.hasRecipe());
         OvergearedMod.LOGGER.info("AnvilMinigame.isVisible (CLIENT-ONLY!): " + AnvilMinigame.isVisible());
         OvergearedMod.LOGGER.info("AnvilMinigame.isUnpaused: " + AnvilMinigame.isUnpaused());
         OvergearedMod.LOGGER.info("== END DEBUG ==");*/
+        AtomicBoolean isHit = new AtomicBoolean(false);
+
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-            isVisible = minigame.getVisible();
-        });
-        //if (isHammer && anvil.hasRecipe() && AnvilMinigame.isVisible()) {
-        if (isHammer && anvil.hasRecipe() && isVisible) {
-            // Hammer logic (particles, sound, cooldown)
-            //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
+            //if (isHammer && anvil.hasRecipe() && AnvilMinigame.isVisible()) {
+            if (isHammer && anvil.hasRecipe() && minigame.getVisible()) {
+                // Hammer logic (particles, sound, cooldown)
+                //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
 /*            for (int i = 0; i < 3; i++) {
                 int delay = 7 * i;
                 TickScheduler.schedule(delay, () -> spawnAnvilParticles(level, pos));
             }*/
-            spawnAnvilParticles(level, pos);
-            //level.playSound(null, pos, SoundEvents.ANVIL_, SoundSource.BLOCKS, 1f, 1f);
-            if (anvil.getHitsRemaining() == 1)
-                level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
-            else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
-            held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
-            //player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
-            //if (player instanceof ServerPlayer serverPlayer) {
-            //ModMessages.sendToServer(new FinalizeForgingC2SPacket("test"));
-            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                spawnAnvilParticles(level, pos);
+                //level.playSound(null, pos, SoundEvents.ANVIL_, SoundSource.BLOCKS, 1f, 1f);
+                if (anvil.getHitsRemaining() == 1)
+                    level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
+                else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
+                held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+                //player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
+                //if (player instanceof ServerPlayer serverPlayer) {
+                //ModMessages.sendToServer(new FinalizeForgingC2SPacket("test"));
+                //player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                 //minigame.clientHandleHit();
                 //quality = minigame.getQuality();
                 quality = minigame.handleHit((ServerPlayer) player);
-            });
-            // quality = AnvilMinigame.handleHit(serverPlayer);
-            //}
-            anvil.tick(level, pos, state);
-            held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
-
-            return InteractionResult.SUCCESS;
-        } //else AnvilMinigameOverlay.endMinigame();
-        // Open GUI if not hammering
+                // quality = AnvilMinigame.handleHit(serverPlayer);
+                //}
+                anvil.tick(level, pos, state);
+                held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+                isHit.set(true);
+            } //else AnvilMinigameOverlay.endMinigame();
+            // Open GUI if not hammering
+        });
+        if (isHit.get()) return InteractionResult.SUCCESS;
         NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
 
         return InteractionResult.sidedSuccess(level.isClientSide());

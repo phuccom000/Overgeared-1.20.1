@@ -15,14 +15,14 @@ import net.stirdrem.overgeared.networking.packet.MinigameHitResultC2SPacket;
 
 public class AnvilMinigame {
     // Instance fields instead of static
-    private static boolean isVisible = ClientAnvilMinigameData.getIsVisible();
+    private boolean isVisible = ClientAnvilMinigameData.getIsVisible();
     private boolean minigameStarted = false;
     private ItemStack resultItem = ClientAnvilMinigameData.getResultItem();
     private int hitsRemaining = ClientAnvilMinigameData.getHitsRemaining();
     private float arrowPosition = ClientAnvilMinigameData.getArrowPosition();
-    private float arrowSpeed = ClientAnvilMinigameData.getArrowSpeed();
+    private float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
     private final float maxArrowSpeed = ServerConfig.MAX_SPEED.get().floatValue();
-    private float speedIncreasePerHit = ClientAnvilMinigameData.getSpeedIncreasePerHit();
+    private float speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
     private boolean movingRight = ClientAnvilMinigameData.isMovingRight();
     private int perfectHits = ClientAnvilMinigameData.getPerfectHits();
     private int goodHits = ClientAnvilMinigameData.getGoodHits();
@@ -349,7 +349,15 @@ public class AnvilMinigame {
         CompoundTag nbt = new CompoundTag();
         this.saveNBTData(nbt);
         nbt.putUUID("playerId", player.getUUID()); // Include player ID
-        ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
+        player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(capability -> {
+            ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
+        });
+    }
+
+    private void setAnvilPos(BlockPos anvilPos) {
+    }
+
+    private void setResultItem(ItemStack copy) {
     }
 
     // Getters and Setters

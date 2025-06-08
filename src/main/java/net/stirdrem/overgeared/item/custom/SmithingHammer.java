@@ -49,6 +49,30 @@ public class SmithingHammer extends DiggerItem {
             return InteractionResult.PASS;
         }
 
+        // Server-side handling
+
+        UUID playerId = player.getUUID();
+        UUID currentUser = occupiedAnvils.get(pos);
+        if (currentUser != null) {
+            if (!currentUser.equals(playerId)) {
+                player.sendSystemMessage(Component.literal("This anvil is already in use!").withStyle(ChatFormatting.RED));
+                return InteractionResult.FAIL;
+            }
+        }
+        // If player is already using this anvil, check minigame visibility
+        if (level instanceof ServerLevel serverLevel) {
+            ServerPlayer serverPlayer = serverLevel.getServer().getPlayerList().getPlayer(playerId);
+            if (serverPlayer != null) {
+                serverPlayer.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                    if (!minigame.isVisible()) {
+                        // Release anvil if minigame is not visible
+                        releaseAnvil(pos);
+                    }
+                });
+            }
+        }
+
+
         if (level.isClientSide()) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof SmithingAnvilBlockEntity anvilBE && anvilBE.hasRecipe()) {
@@ -59,20 +83,6 @@ public class SmithingHammer extends DiggerItem {
                 ));
             }
             return InteractionResult.SUCCESS;
-        }
-
-        // Server-side handling
-        UUID currentUser = occupiedAnvils.get(pos);
-        UUID playerId = player.getUUID();
-
-        if (currentUser != null) {
-            if (currentUser.equals(playerId)) {
-                // Same player trying to use same anvil - allow reopening UI
-                return InteractionResult.SUCCESS;
-            } else {
-                player.sendSystemMessage(Component.literal("This anvil is already in use!").withStyle(ChatFormatting.RED));
-                return InteractionResult.FAIL;
-            }
         }
 
         // Claim the anvil for this player
