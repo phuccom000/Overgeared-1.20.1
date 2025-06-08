@@ -76,10 +76,15 @@ public class SmithingHammer extends DiggerItem {
         if (level.isClientSide()) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof SmithingAnvilBlockEntity anvilBE && anvilBE.hasRecipe()) {
-                int progress = anvilBE.getRequiredProgress();
+                int progress = anvilBE.getProgress();
                 ModMessages.sendToServer(new StartMinigameC2SPacket(
                         anvilBE.getResultItem(),
-                        anvilBE.getUpdateTag(),
+                        anvilBE.getRequiredProgress(),
+                        anvilBE.getPerfectHits(),
+                        anvilBE.getGoodHits(),
+                        anvilBE.getMissedHits(),
+                        anvilBE.getArrowPosition(),
+                        anvilBE.getArrowSpeed(),
                         pos
                 ));
             }

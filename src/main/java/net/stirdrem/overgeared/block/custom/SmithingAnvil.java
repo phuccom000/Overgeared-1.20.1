@@ -34,7 +34,6 @@ import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
-import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
@@ -77,6 +76,19 @@ public class SmithingAnvil extends BaseEntityBlock {
         return quality;
     }
 
+    public static int getPerfectHits() {
+        return perfectHits;
+    }
+
+    public static int getGoodHits() {
+        return goodHits;
+    }
+
+    public static int getMissedHits() {
+        return missedHits;
+    }
+
+
     private boolean minigameStarted = false;
     private ItemStack resultItem;
     private int hitsRemaining = 0;
@@ -86,9 +98,9 @@ public class SmithingAnvil extends BaseEntityBlock {
     private final float maxArrowSpeed = (float) temp2;
     private float speedIncreasePerHit = 0.75f;
     private boolean movingRight = true;
-    private int perfectHits = 0;
-    private int goodHits = 0;
-    private int missedHits = 0;
+    private static int perfectHits = 0;
+    private static int goodHits = 0;
+    private static int missedHits = 0;
     private final int PERFECT_ZONE_START = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
     private final int PERFECT_ZONE_END = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
     private final int GOOD_ZONE_START = PERFECT_ZONE_START - 10;
@@ -245,9 +257,12 @@ public class SmithingAnvil extends BaseEntityBlock {
                 //minigame.clientHandleHit();
                 //quality = minigame.getQuality();
                 quality = minigame.handleHit((ServerPlayer) player);
+                perfectHits = minigame.getPerfectHits();
+                goodHits = minigame.getGoodHits();
+                missedHits = minigame.getMissedHits();
                 // quality = AnvilMinigame.handleHit(serverPlayer);
                 //}
-                anvil.tick(level, pos, state);
+                anvil.increaseForgingProgress(level, pos, state);
                 held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
                 isHit.set(true);
             } //else AnvilMinigameOverlay.endMinigame();

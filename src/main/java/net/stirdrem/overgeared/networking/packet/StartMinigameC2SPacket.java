@@ -17,10 +17,15 @@ import java.util.function.Supplier;
 public class StartMinigameC2SPacket {
     private final CompoundTag minigameData;
 
-    public StartMinigameC2SPacket(ItemStack result, int hitsRemaining, BlockPos pos) {
+    public StartMinigameC2SPacket(ItemStack result, int hitsRemaining, int pHits, int gHits, int mHits, float arrowPos, float arrowSpe, BlockPos pos) {
         this.minigameData = new CompoundTag();
         minigameData.put("result", result.save(new CompoundTag()));
         minigameData.putInt("hitsRemaining", hitsRemaining);
+        minigameData.putInt("perfectHits", pHits);
+        minigameData.putInt("goodHits", gHits);
+        minigameData.putInt("missedHits", mHits);
+        minigameData.putFloat("arrowPosition", arrowPos);
+        minigameData.putFloat("arrowSpeed", arrowSpe);
         minigameData.putInt("posX", pos.getX());
         minigameData.putInt("posY", pos.getY());
         minigameData.putInt("posZ", pos.getZ());
@@ -51,6 +56,11 @@ public class StartMinigameC2SPacket {
 
             ItemStack result = ItemStack.of(minigameData.getCompound("result"));
             int hitsRequired = minigameData.getInt("hitsRemaining");
+            int perfectHits = minigameData.getInt("perfectHits");
+            int goodHits = minigameData.getInt("goodHits");
+            int missedHits = minigameData.getInt("missedHits");
+            float arrowPos = minigameData.getFloat("arrowPosition");
+            float arrowSpe = minigameData.getInt("arrowSpeed");
             BlockPos pos = new BlockPos(
                     minigameData.getInt("posX"),
                     minigameData.getInt("posY"),
@@ -59,8 +69,8 @@ public class StartMinigameC2SPacket {
 
             player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                 ClientAnvilMinigameData.loadFromNBT(minigameData);
-                //minigame.start(result, hitsRequired, pos, player);
-                minigame.start(result, minigameData, pos, player);
+                minigame.start(result, hitsRequired, perfectHits, goodHits, missedHits, arrowPos, arrowSpe, pos, player);
+                //minigame.start(result, minigameData, pos, player);
                 // Create sync packet data
                 CompoundTag syncData = new CompoundTag();
                 minigame.saveNBTData(syncData);

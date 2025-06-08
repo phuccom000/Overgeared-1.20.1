@@ -17,6 +17,8 @@ public class ClientAnvilMinigameData {
     public static boolean minigameStarted = false;
     public static ItemStack resultItem = null;
     public static int hitsRemaining = 0;
+    public static int progress = 0;
+    public static int maxprogress = 0;
     public static float arrowPosition = 0;
     public static float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
     public static final float maxArrowSpeed = ServerConfig.MAX_SPEED.get().floatValue();
@@ -266,5 +268,13 @@ public class ClientAnvilMinigameData {
         // Reset zone behavior modifiers
         zoneShrinkFactor = 0.80f;
         zoneShiftAmount = 15.0f;
+    }
+
+    public static int getProgress() {
+        return progress;
+    }
+
+    public static int getMaxProgress() {
+        return maxprogress;
     }
 }

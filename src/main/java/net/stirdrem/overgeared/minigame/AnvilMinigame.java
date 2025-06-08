@@ -19,6 +19,8 @@ public class AnvilMinigame {
     private boolean minigameStarted = false;
     private ItemStack resultItem = ClientAnvilMinigameData.getResultItem();
     private int hitsRemaining = ClientAnvilMinigameData.getHitsRemaining();
+    private int progress = ClientAnvilMinigameData.getProgress();
+    private int maxprogress = ClientAnvilMinigameData.getMaxProgress();
     private float arrowPosition = ClientAnvilMinigameData.getArrowPosition();
     private float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
     private final float maxArrowSpeed = ServerConfig.MAX_SPEED.get().floatValue();
@@ -115,6 +117,7 @@ public class AnvilMinigame {
         perfectHits = 0;
         goodHits = 0;
         missedHits = 0;
+        ClientAnvilMinigameData.setHitsRemaining(0);
         perfectZoneStart = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
         perfectZoneEnd = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
         goodZoneStart = perfectZoneStart - 10;
@@ -124,12 +127,12 @@ public class AnvilMinigame {
         quality = null;
     }
 
-    public void start(ItemStack result, int requiredHits, BlockPos pos, ServerPlayer player) {
+    public void start(ItemStack result, int requiredHits, int phits, int ghits, int mhits, float arrowPos, float arrowSpe, BlockPos pos, ServerPlayer player) {
         // If trying to start a new minigame while another is paused
         if (minigameStarted && !pos.equals(anvilPos)) {
             // First cancel the existing minigame
             cancelMinigame();
-
+            //syncRemainingHits(player);
             // Then start fresh
             minigameStarted = false;
         }
@@ -141,7 +144,13 @@ public class AnvilMinigame {
             resultItem = result.copy();
             hitsRemaining = requiredHits;
             anvilPos = pos;
+            perfectHits = phits;
+            goodHits = ghits;
+            missedHits = mhits;
+            arrowPosition = arrowPos;
+            arrowSpeed = arrowSpe;
             sendUpdatePacket(player);
+            syncRemainingHits(player);
             return;
         }
 
@@ -175,9 +184,10 @@ public class AnvilMinigame {
         //pause function
         if (minigameStarted && !pos.equals(anvilPos)) {
             cancelMinigame();
+            //syncRemainingHits(player);
             minigameStarted = false;
         }
-        if (minigameStarted) {
+        /*if (minigameStarted) {
             isVisible = !isVisible;
             isUnpaused = isVisible;
             resultItem = result.copy();
@@ -191,8 +201,14 @@ public class AnvilMinigame {
             OvergearedMod.LOGGER.info("isVisible: " + isVisible);
             sendUpdatePacket(player);
             return;
+        }*/
+        if (minigameStarted) {
+            isVisible = !isVisible;
+            isUnpaused = isVisible;
+            sendUpdatePacket(player);
+            //syncRemainingHits(player);
+            return;
         }
-
         if (result == null) return;
 
         anvilPos = pos;
@@ -276,12 +292,11 @@ public class AnvilMinigame {
         hitsRemaining--;
         sendUpdatePacket(player);
 
-
+        syncRemainingHits(player);
         if (hitsRemaining <= 0) {
             //return quality;
             return finishForging(player);
         }
-        //syncRemainingHits(player);
         return null;
     }
 
@@ -399,6 +414,18 @@ public class AnvilMinigame {
     private void syncRemainingHits(ServerPlayer player) {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("hitsRemaining", hitsRemaining);
+        nbt.putInt("perfectHits", perfectHits);
+        nbt.putInt("goodHits", goodHits);
+        nbt.putInt("missedHits", missedHits);
+        ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
+    }
+
+    private void getRemainingHits(ServerPlayer player) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("hitsRemaining", hitsRemaining);
+        nbt.putInt("perfectHits", perfectHits);
+        nbt.putInt("goodHits", goodHits);
+        nbt.putInt("missedHits", missedHits);
         ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
     }
 
