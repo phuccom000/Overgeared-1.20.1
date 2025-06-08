@@ -236,4 +236,35 @@ public class ClientAnvilMinigameData {
     /*public static void clearData(UUID playerId) {
         playerData.remove(playerId);
     }*/
+
+    public static void resetData() {
+        // Reset visibility and state
+        isVisible = false;
+        minigameStarted = false;
+
+        // Clear item reference
+        resultItem = null;
+
+        // Reset progress tracking
+        hitsRemaining = 0;
+        perfectHits = 0;
+        goodHits = 0;
+        missedHits = 0;
+
+        // Reset arrow mechanics
+        arrowPosition = 0;
+        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
+        movingRight = true;
+
+        // Reset zones to default positions
+        perfectZoneStart = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        perfectZoneEnd = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        goodZoneStart = perfectZoneStart - 10;
+        goodZoneEnd = perfectZoneEnd + 10;
+
+        // Reset zone behavior modifiers
+        zoneShrinkFactor = 0.80f;
+        zoneShiftAmount = 15.0f;
+    }
 }

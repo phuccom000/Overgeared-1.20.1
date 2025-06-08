@@ -12,6 +12,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
@@ -69,6 +70,9 @@ public class ModForgeClientEvents {
                 minigame.setMovingRight(true);
             }
         }
+        ClientAnvilMinigameData.setArrowPosition(minigame.getArrowPosition());
+        ClientAnvilMinigameData.setArrowSpeed(minigame.getArrowSpeed());
+        ClientAnvilMinigameData.setMovingRight(minigame.getMovingRight());
     }
 
     private static void syncMinigameData(AnvilMinigame minigame, ServerPlayer player) {

@@ -104,9 +104,90 @@ public class AnvilMinigame {
         }
     }
 
+    public void resetNBTData() {
+        isVisible = false;
+        minigameStarted = false;
+        resultItem = null;
+        hitsRemaining = 0;
+        arrowPosition = 0;
+        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        movingRight = true;
+        perfectHits = 0;
+        goodHits = 0;
+        missedHits = 0;
+        perfectZoneStart = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        perfectZoneEnd = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        goodZoneStart = perfectZoneStart - 10;
+        goodZoneEnd = perfectZoneEnd + 10;
+        isUnpaused = false;
+        anvilPos = null;
+        quality = null;
+    }
+
     public void start(ItemStack result, int requiredHits, BlockPos pos, ServerPlayer player) {
+        // If trying to start a new minigame while another is paused
+        if (minigameStarted && !pos.equals(anvilPos)) {
+            // First cancel the existing minigame
+            cancelMinigame();
+
+            // Then start fresh
+            minigameStarted = false;
+        }
+
+        if (minigameStarted) {
+            // Toggle visibility if same anvil
+            isVisible = !isVisible;
+            isUnpaused = isVisible;
+            resultItem = result.copy();
+            hitsRemaining = requiredHits;
+            anvilPos = pos;
+            sendUpdatePacket(player);
+            return;
+        }
+
+        if (result == null) return;
+
+        anvilPos = pos;
+        minigameStarted = true;
+        isVisible = true;
+        isUnpaused = true;
+        resultItem = result.copy();
+        hitsRemaining = requiredHits;
+        perfectHits = 0;
+        goodHits = 0;
+        missedHits = 0;
+        arrowPosition = 0;
+        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
+        movingRight = true;
+
+        double random = Math.random() * 10;
+        perfectZoneStart = Math.max(0, Math.min(100, (int) (PERFECT_ZONE_START + random)));
+        perfectZoneEnd = Math.max(0, Math.min(100, (int) (PERFECT_ZONE_END + random)));
+        goodZoneStart = Math.max(0, Math.min(100, (int) (GOOD_ZONE_START + random)));
+        goodZoneEnd = Math.max(0, Math.min(100, (int) (GOOD_ZONE_END + random)));
+
+        sendUpdatePacket(player);
+        OvergearedMod.LOGGER.info("Minigame started");
+    }
+
+    public void start(ItemStack result, CompoundTag nbt, BlockPos pos, ServerPlayer player) {
+        //pause function
+        if (minigameStarted && !pos.equals(anvilPos)) {
+            cancelMinigame();
+            minigameStarted = false;
+        }
         if (minigameStarted) {
             isVisible = !isVisible;
+            isUnpaused = isVisible;
+            resultItem = result.copy();
+            hitsRemaining = nbt.getInt("smithing_anvil.hitsRemaining");
+            perfectHits = nbt.getInt("smithing_anvil.perfectHits");
+            goodHits = nbt.getInt("smithing_anvil.goodHits");
+            missedHits = nbt.getInt("smithing_anvil.missedHits");
+            arrowPosition = nbt.getFloat("smithing_anvil.arrowPosition");
+            arrowSpeed = nbt.getFloat("smithing_anvil.arrowSpeed");
+            anvilPos = pos;
             OvergearedMod.LOGGER.info("isVisible: " + isVisible);
             sendUpdatePacket(player);
             return;
@@ -118,15 +199,13 @@ public class AnvilMinigame {
         minigameStarted = true;
         isVisible = true;
         resultItem = result.copy();
-        hitsRemaining = requiredHits;
+        hitsRemaining = nbt.getInt("hitsRemaining");
         perfectHits = 0;
         goodHits = 0;
         missedHits = 0;
         arrowPosition = 0;
-        double temp = ServerConfig.DEFAULT_ARROW_SPEED.get();
-        arrowSpeed = (float) temp;
-        temp = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get();
-        speedIncreasePerHit = (float) temp;
+        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
         movingRight = true;
 
         double random = Math.random() * 10;
@@ -140,7 +219,7 @@ public class AnvilMinigame {
     }
 
     public void tick() {
-        if (!isVisible) return;
+        if (!isVisible || isPaused()) return; // Don't update if paused
 
         if (movingRight) {
             arrowPosition += arrowSpeed;
@@ -170,14 +249,22 @@ public class AnvilMinigame {
 
     public String handleHit(ServerPlayer player) {
         arrowSpeed = Math.min(arrowSpeed + speedIncreasePerHit, maxArrowSpeed);
+        //sendHitResultToServer();
+        /*ClientAnvilMinigameData.setPerfectHits(perfectHits);
+        ClientAnvilMinigameData.setGoodHits(goodHits);
+        ClientAnvilMinigameData.setMissedHits(missedHits);*/
 
         if (arrowPosition >= perfectZoneStart && arrowPosition <= perfectZoneEnd) {
             perfectHits++;
+            ClientAnvilMinigameData.setPerfectHits(perfectHits);
         } else if (arrowPosition >= goodZoneStart && arrowPosition <= goodZoneEnd) {
             goodHits++;
+            ClientAnvilMinigameData.setGoodHits(goodHits);
         } else {
             missedHits++;
+            ClientAnvilMinigameData.setMissedHits(missedHits);
         }
+
         /*if (arrowPosition >= perfectZoneStart && arrowPosition <= perfectZoneEnd) {
             result = HitResult.PERFECT;
         } else if (arrowPosition >= goodZoneStart && arrowPosition <= goodZoneEnd) {
@@ -187,10 +274,11 @@ public class AnvilMinigame {
             }*/
         shrinkAndShiftZones();
         hitsRemaining--;
-        //sendUpdatePacket();
-        // sendHitResultToServer();
+        sendUpdatePacket(player);
+
 
         if (hitsRemaining <= 0) {
+            //return quality;
             return finishForging(player);
         }
         //syncRemainingHits(player);
@@ -246,12 +334,17 @@ public class AnvilMinigame {
     }
 
     public String finishForging(ServerPlayer player) {
-        isVisible = false;
-        minigameStarted = false;
+        String quality = determineQuality(calculateQualityScore());
+        resetNBTData(); // Clear all state
         SmithingHammer.releaseAnvil(anvilPos);
-        float qualityScore = calculateQualityScore();
         sendUpdatePacket(player);
-        return determineQuality(qualityScore);
+        return quality;
+    }
+
+    // When cancelling the minigame
+    public void cancelMinigame() {
+        resetNBTData();
+        SmithingHammer.releaseAnvil(anvilPos);
     }
 
     private float calculateQualityScore() {
@@ -353,6 +446,7 @@ public class AnvilMinigame {
             ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
         });
     }
+
 
     private void setAnvilPos(BlockPos anvilPos) {
     }
@@ -518,5 +612,39 @@ public class AnvilMinigame {
 
     public boolean hasAnvilPosition() {
         return anvilPos != null;
+    }
+
+    // Add this to your existing methods
+    public void togglePause(ServerPlayer player) {
+        if (!minigameStarted) return;
+
+        isUnpaused = !isUnpaused;
+
+        if (isUnpaused) {
+            // When unpausing, make sure the game is visible
+            isVisible = true;
+        }
+
+        sendUpdatePacket(player);
+        OvergearedMod.LOGGER.info("Minigame " + (isUnpaused ? "unpaused" : "paused"));
+    }
+
+    public boolean isPaused() {
+        return minigameStarted && !isUnpaused;
+    }
+
+    public void pause(ServerPlayer player) {
+        if (!minigameStarted) return;
+
+        isUnpaused = false;
+        sendUpdatePacket(player);
+    }
+
+    public void unpause(ServerPlayer player) {
+        if (!minigameStarted) return;
+
+        isUnpaused = true;
+        isVisible = true;
+        sendUpdatePacket(player);
     }
 }

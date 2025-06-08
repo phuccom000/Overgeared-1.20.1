@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -27,6 +28,8 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.block.custom.SmithingAnvil;
+import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
@@ -38,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
+
     private final ItemStackHandler itemHandler = new ItemStackHandler(11) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -55,9 +59,14 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     protected final ContainerData data;
-    private int progress = 0;
-    private int maxProgress = 0;
-    private int hitRemains;
+    private static int progress = 0;
+    private static int maxProgress = 0;
+    private static int hitRemains;
+    private static int perfectHits = ClientAnvilMinigameData.getPerfectHits();
+    private static int goodHits = ClientAnvilMinigameData.getGoodHits();
+    private static int missedHits = ClientAnvilMinigameData.getMissedHits();
+    private static float arrowPosition = ClientAnvilMinigameData.getArrowPosition();
+    private static float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
     private long busyUntilGameTime = 0L;
 
 
@@ -139,7 +148,20 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         pTag.put("inventory", itemHandler.serializeNBT());
-        pTag.putInt("smithing_anvil.progress", progress);
+        pTag.putInt("progress", progress);
+        pTag.putInt("maxProgress", maxProgress);
+        pTag.putInt("hitsRemaining", hitRemains);
+        pTag.putInt("perfectHits", perfectHits);
+        pTag.putInt("goodHits", goodHits);
+        pTag.putInt("missedHits", missedHits);
+        pTag.putFloat("arrowPosition", arrowPosition);
+        pTag.putFloat("missedHits", arrowSpeed);
+        pTag.putLong("busyUntil", busyUntilGameTime);
+
+        // Save recipe ID if we have a last recipe
+        if (lastRecipe != null) {
+            pTag.putString("lastRecipe", lastRecipe.getId().toString());
+        }
 
         super.saveAdditional(pTag);
     }
@@ -148,8 +170,31 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     public void load(CompoundTag pTag) {
         super.load(pTag);
         itemHandler.deserializeNBT(pTag.getCompound("inventory"));
-        progress = pTag.getInt("smithing_anvil.progress");
+        progress = pTag.getInt("progress");
+        maxProgress = pTag.getInt("maxProgress");
+        hitRemains = pTag.getInt("hitsRemaining");
+        perfectHits = pTag.getInt("perfectHits");
+        goodHits = pTag.getInt("goodHits");
+        missedHits = pTag.getInt("missedHits");
+        arrowPosition = pTag.getFloat("arrowPosition");
+        arrowSpeed = pTag.getFloat("arrowSpeed");
+        busyUntilGameTime = pTag.getLong("busyUntil");
+
+        // Load last recipe if present
+        if (pTag.contains("lastRecipe")) {
+            ResourceLocation recipeId = ResourceLocation.tryParse(pTag.getString("lastRecipe"));
+            if (level != null) {
+                level.getRecipeManager().byKey(recipeId).ifPresent(recipe -> {
+                    if (recipe instanceof ForgingRecipe) {
+                        lastRecipe = (ForgingRecipe) recipe;
+                    }
+                });
+            }
+        }
     }
+
+    // Helper method to save minimal data for sync
+
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
@@ -157,6 +202,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             ForgingRecipe currentRecipe = recipe.get();
             maxProgress = currentRecipe.getHammeringRequired();
             increaseCraftingProgress();
+            hitRemains = maxProgress - progress;
+            ClientAnvilMinigameData.setHitsRemaining(hitRemains);
             setChanged(pLevel, pPos, pState);
 
             if (hasProgressFinished()) {
@@ -317,49 +364,38 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private ForgingRecipe lastRecipe = null;
 
     public void updateHitsRemaining(Level lvl, BlockPos pos, BlockState st) {
+
         Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
 
-        // Check if recipe has changed by comparing with last known recipe
-        boolean recipeChanged = false;
+/*
+        // If no recipe but we have progress, reset
+        if (currentRecipeOpt.isEmpty() && maxProgress > 0) {
+            progress = 0;
+            maxProgress = 0;
+            lastRecipe = null;
+            return;
+        }
+*/
 
+        // If we have a recipe
         if (currentRecipeOpt.isPresent()) {
             ForgingRecipe currentRecipe = currentRecipeOpt.get();
 
-            if (lastRecipe != null) {
-                // Compare recipes by their IDs or other unique properties
-                recipeChanged = !currentRecipe.getId().equals(lastRecipe.getId());
-            } else if (maxProgress > 0) {
-                // We had progress but no last recipe (shouldn't normally happen)
-                recipeChanged = true;
+            // Check if recipe changed
+            if (lastRecipe != null && !currentRecipe.getId().equals(lastRecipe.getId())) {
+                progress = 0;
+                maxProgress = 0;
+                lastRecipe = currentRecipe;
+                return;
             }
 
             lastRecipe = currentRecipe;
-        } else {
-            // No current recipe but we had one before
-            recipeChanged = (lastRecipe != null || maxProgress > 0);
-            lastRecipe = null;
-        }
-
-        if (recipeChanged) {
-            //resetProgress();
-            hitRemains = 0;
-            return;
-        }
-
-        if (hasRecipe()) {
-            ForgingRecipe recipe = currentRecipeOpt.get();
-            maxProgress = recipe.getHammeringRequired();
+            maxProgress = currentRecipe.getHammeringRequired();
             hitRemains = maxProgress - progress;
-            //setChanged(lvl, pos, st);
 
             if (hasProgressFinished()) {
-                //craftItem();
-                // resetProgress();
                 hitRemains = 0;
             }
-        } else {
-            hitRemains = 0;
-            //resetProgress();
         }
     }
 
@@ -374,7 +410,9 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
     @Override
     public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+        CompoundTag tag = new CompoundTag();
+        saveAdditional(tag);
+        return tag;
     }
 
     public static void applyForgingQuality(ItemStack stack, ForgingQuality quality) {
@@ -423,6 +461,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     public int getRequiredProgress() {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
         ForgingRecipe currentRecipe = recipe.get();
+        int required = currentRecipe.getHammeringRequired() - progress;
         return currentRecipe.getHammeringRequired() - progress;
     }
 
@@ -459,4 +498,6 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             resetForgingState();
         }
     }*/
+
+
 }

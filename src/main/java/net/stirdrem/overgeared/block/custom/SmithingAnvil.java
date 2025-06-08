@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -13,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -30,7 +33,11 @@ import net.minecraftforge.network.NetworkHooks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.item.custom.SmithingHammer;
+import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
+import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
@@ -306,5 +313,36 @@ public class SmithingAnvil extends BaseEntityBlock {
                             pBlockEntity.updateHitsRemaining(pLevel, pPos, pState1));
         }
         return null;
+    }
+
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+        resetMinigameData(level, pos);
+        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+    }
+
+    @Override
+    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
+        resetMinigameData(level, pos);
+        super.onBlockExploded(state, level, pos, explosion);
+    }
+
+    private void resetMinigameData(Level level, BlockPos pos) {
+        if (!level.isClientSide()) {
+            ServerPlayer usingPlayer = SmithingHammer.getUsingPlayer(pos);
+            if (usingPlayer != null) {
+                // Reset server-side data
+                usingPlayer.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                    minigame.resetNBTData();
+
+                    // Notify client to reset
+                    CompoundTag resetTag = new CompoundTag();
+                    resetTag.putBoolean("isVisible", false);
+                    ModMessages.sendToPlayer(new MinigameSyncS2CPacket(resetTag), usingPlayer);
+                });
+            }
+            // Release the anvil
+            SmithingHammer.releaseAnvil(pos);
+        }
     }
 }

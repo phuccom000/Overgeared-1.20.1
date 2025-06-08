@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
@@ -16,10 +17,19 @@ import java.util.function.Supplier;
 public class StartMinigameC2SPacket {
     private final CompoundTag minigameData;
 
-    public StartMinigameC2SPacket(ItemStack result, int hitsRequired, BlockPos pos) {
+    public StartMinigameC2SPacket(ItemStack result, int hitsRemaining, BlockPos pos) {
         this.minigameData = new CompoundTag();
         minigameData.put("result", result.save(new CompoundTag()));
-        minigameData.putInt("hitsRequired", hitsRequired);
+        minigameData.putInt("hitsRemaining", hitsRemaining);
+        minigameData.putInt("posX", pos.getX());
+        minigameData.putInt("posY", pos.getY());
+        minigameData.putInt("posZ", pos.getZ());
+    }
+
+    public StartMinigameC2SPacket(ItemStack result, CompoundTag nbt, BlockPos pos) {
+        this.minigameData = nbt;
+        minigameData.putInt("hitsRemaining", nbt.getInt("hitsRemaining"));
+        minigameData.put("result", result.save(new CompoundTag()));
         minigameData.putInt("posX", pos.getX());
         minigameData.putInt("posY", pos.getY());
         minigameData.putInt("posZ", pos.getZ());
@@ -40,7 +50,7 @@ public class StartMinigameC2SPacket {
             if (player == null) return;
 
             ItemStack result = ItemStack.of(minigameData.getCompound("result"));
-            int hitsRequired = minigameData.getInt("hitsRequired");
+            int hitsRequired = minigameData.getInt("hitsRemaining");
             BlockPos pos = new BlockPos(
                     minigameData.getInt("posX"),
                     minigameData.getInt("posY"),
@@ -48,8 +58,9 @@ public class StartMinigameC2SPacket {
             );
 
             player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                minigame.start(result, hitsRequired, pos, player);
-
+                ClientAnvilMinigameData.loadFromNBT(minigameData);
+                //minigame.start(result, hitsRequired, pos, player);
+                minigame.start(result, minigameData, pos, player);
                 // Create sync packet data
                 CompoundTag syncData = new CompoundTag();
                 minigame.saveNBTData(syncData);
