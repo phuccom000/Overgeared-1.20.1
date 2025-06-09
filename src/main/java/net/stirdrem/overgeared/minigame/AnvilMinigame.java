@@ -519,4 +519,27 @@ public class AnvilMinigame {
     public boolean hasAnvilPosition() {
         return anvilPos != null;
     }
+
+    public void reset(ServerPlayer player) {
+        isVisible = false;
+        minigameStarted = false;
+        resultItem = null;
+        hitsRemaining = 0;
+        arrowPosition = 0;
+        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        movingRight = true;
+        perfectHits = 0;
+        goodHits = 0;
+        missedHits = 0;
+        perfectZoneStart = PERFECT_ZONE_START;
+        perfectZoneEnd = PERFECT_ZONE_END;
+        goodZoneStart = GOOD_ZONE_START;
+        goodZoneEnd = GOOD_ZONE_END;
+        isUnpaused = false;
+        anvilPos = null;
+        result = null;
+        quality = null;
+        sendUpdatePacket(player);
+    }
+
 }

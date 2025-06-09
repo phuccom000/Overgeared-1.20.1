@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -20,6 +21,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -35,6 +37,7 @@ import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 
 public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
@@ -432,6 +435,20 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             return recipe.get().getResultItem(level.registryAccess());
         return null;
     }
+
+    public void resetMinigame() {
+        Level level = this.getLevel();
+        if (level == null) return;
+
+        // Reset minigame for nearby players (for multiplayer safety)
+        List<Player> players = level.getEntitiesOfClass(Player.class, new AABB(worldPosition).inflate(5));
+        for (Player player : players) {
+            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                minigame.reset((ServerPlayer) player); // Implement this in your capability
+            });
+        }
+    }
+
 
 
   /*  public void completeForgingWithQuality(String quality) {
