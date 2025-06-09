@@ -1,16 +1,11 @@
 package net.stirdrem.overgeared.minigame;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.stirdrem.overgeared.HitResult;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
@@ -18,14 +13,14 @@ import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.networking.packet.MinigameHitResultC2SPacket;
 
-import java.util.UUID;
-
 public class AnvilMinigame {
     // Instance fields instead of static
     private boolean isVisible = ClientAnvilMinigameData.getIsVisible();
     private boolean minigameStarted = false;
     private ItemStack resultItem = ClientAnvilMinigameData.getResultItem();
     private int hitsRemaining = ClientAnvilMinigameData.getHitsRemaining();
+    private int progress = ClientAnvilMinigameData.getProgress();
+    private int maxprogress = ClientAnvilMinigameData.getMaxProgress();
     private float arrowPosition = ClientAnvilMinigameData.getArrowPosition();
     private float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
     private final float maxArrowSpeed = ServerConfig.MAX_SPEED.get().floatValue();
@@ -48,12 +43,10 @@ public class AnvilMinigame {
     private boolean isUnpaused = false;
     private HitResult result;
     private String quality;
-    private UUID ownerUUID = null;
 
 
     // Save to NBT
     public void saveNBTData(CompoundTag nbt) {
-        nbt.putUUID("ownerUUID", ownerUUID);
         nbt.putBoolean("isVisible", isVisible);
         nbt.putBoolean("minigameStarted", minigameStarted);
         nbt.putInt("hitsRemaining", hitsRemaining);
@@ -85,7 +78,6 @@ public class AnvilMinigame {
 
     // Load from NBT
     public void loadNBTData(CompoundTag nbt) {
-        ownerUUID = nbt.getUUID("ownerUUID");
         isVisible = nbt.getBoolean("isVisible");
         minigameStarted = nbt.getBoolean("minigameStarted");
         hitsRemaining = nbt.getInt("hitsRemaining");
@@ -114,47 +106,122 @@ public class AnvilMinigame {
         }
     }
 
-    public void start(ItemStack result, int requiredHits, BlockPos pos, ServerPlayer player) {
+    public void resetNBTData() {
+        isVisible = false;
+        minigameStarted = false;
+        resultItem = null;
+        hitsRemaining = 0;
+        arrowPosition = 0;
+        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        movingRight = true;
+        perfectHits = 0;
+        goodHits = 0;
+        missedHits = 0;
+        ClientAnvilMinigameData.setHitsRemaining(0);
+        perfectZoneStart = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        perfectZoneEnd = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        goodZoneStart = perfectZoneStart - 10;
+        goodZoneEnd = perfectZoneEnd + 10;
+        isUnpaused = false;
+        anvilPos = null;
+        quality = null;
+    }
+
+    public void start(ItemStack result, int requiredHits, int phits, int ghits, int mhits, float arrowPos, float arrowSpe, BlockPos pos, ServerPlayer player) {
+        // If trying to start a new minigame while another is paused
+        if (minigameStarted && !pos.equals(anvilPos)) {
+            // First cancel the existing minigame
+            cancelMinigame();
+            //syncRemainingHits(player);
+            // Then start fresh
+            minigameStarted = false;
+        }
+
         if (minigameStarted) {
-            if (anvilPos != null && !anvilPos.equals(pos)) {
-                player.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use", anvilPos.getX(), anvilPos.getY(), anvilPos.getZ()).withStyle(ChatFormatting.RED));
-                return;
-            }
-            if (ownerUUID != null && !ownerUUID.equals(player.getUUID())) {
-                player.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED));
-                return;
-            }
-            /*BlockEntity blockEntity = player.serverLevel().getBlockEntity(pos);
-            if (blockEntity instanceof SmithingAnvilBlockEntity) {
-                if (((SmithingAnvilBlockEntity) blockEntity).isOwned() && !((SmithingAnvilBlockEntity) blockEntity).isOwnedBy(player)) {
-                    player.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED));
-                    return;
-                }
-            }*/
-            // Toggle visibility on same anvil
+            // Toggle visibility if same anvil
             isVisible = !isVisible;
+            isUnpaused = isVisible;
+            resultItem = result.copy();
+            hitsRemaining = requiredHits;
+            anvilPos = pos;
+            perfectHits = phits;
+            goodHits = ghits;
+            missedHits = mhits;
+            arrowPosition = arrowPos;
+            arrowSpeed = arrowSpe;
             sendUpdatePacket(player);
+            syncRemainingHits(player);
             return;
         }
 
-        // Starting fresh:
-
         if (result == null) return;
 
-        ownerUUID = player.getUUID();
         anvilPos = pos;
         minigameStarted = true;
         isVisible = true;
+        isUnpaused = true;
         resultItem = result.copy();
         hitsRemaining = requiredHits;
         perfectHits = 0;
         goodHits = 0;
         missedHits = 0;
         arrowPosition = 0;
-        double temp = ServerConfig.DEFAULT_ARROW_SPEED.get();
-        arrowSpeed = (float) temp;
-        temp = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get();
-        speedIncreasePerHit = (float) temp;
+        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
+        movingRight = true;
+
+        double random = Math.random() * 10;
+        perfectZoneStart = Math.max(0, Math.min(100, (int) (PERFECT_ZONE_START + random)));
+        perfectZoneEnd = Math.max(0, Math.min(100, (int) (PERFECT_ZONE_END + random)));
+        goodZoneStart = Math.max(0, Math.min(100, (int) (GOOD_ZONE_START + random)));
+        goodZoneEnd = Math.max(0, Math.min(100, (int) (GOOD_ZONE_END + random)));
+
+        sendUpdatePacket(player);
+        OvergearedMod.LOGGER.info("Minigame started");
+    }
+
+    public void start(ItemStack result, CompoundTag nbt, BlockPos pos, ServerPlayer player) {
+        //pause function
+        if (minigameStarted && !pos.equals(anvilPos)) {
+            cancelMinigame();
+            //syncRemainingHits(player);
+            minigameStarted = false;
+        }
+        /*if (minigameStarted) {
+            isVisible = !isVisible;
+            isUnpaused = isVisible;
+            resultItem = result.copy();
+            hitsRemaining = nbt.getInt("smithing_anvil.hitsRemaining");
+            perfectHits = nbt.getInt("smithing_anvil.perfectHits");
+            goodHits = nbt.getInt("smithing_anvil.goodHits");
+            missedHits = nbt.getInt("smithing_anvil.missedHits");
+            arrowPosition = nbt.getFloat("smithing_anvil.arrowPosition");
+            arrowSpeed = nbt.getFloat("smithing_anvil.arrowSpeed");
+            anvilPos = pos;
+            OvergearedMod.LOGGER.info("isVisible: " + isVisible);
+            sendUpdatePacket(player);
+            return;
+        }*/
+        if (minigameStarted) {
+            isVisible = !isVisible;
+            isUnpaused = isVisible;
+            sendUpdatePacket(player);
+            //syncRemainingHits(player);
+            return;
+        }
+        if (result == null) return;
+
+        anvilPos = pos;
+        minigameStarted = true;
+        isVisible = true;
+        resultItem = result.copy();
+        hitsRemaining = nbt.getInt("hitsRemaining");
+        perfectHits = 0;
+        goodHits = 0;
+        missedHits = 0;
+        arrowPosition = 0;
+        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
         movingRight = true;
 
         double random = Math.random() * 10;
@@ -168,7 +235,7 @@ public class AnvilMinigame {
     }
 
     public void tick() {
-        if (!isVisible) return;
+        if (!isVisible || isPaused()) return; // Don't update if paused
 
         if (movingRight) {
             arrowPosition += arrowSpeed;
@@ -198,14 +265,22 @@ public class AnvilMinigame {
 
     public String handleHit(ServerPlayer player) {
         arrowSpeed = Math.min(arrowSpeed + speedIncreasePerHit, maxArrowSpeed);
+        //sendHitResultToServer();
+        /*ClientAnvilMinigameData.setPerfectHits(perfectHits);
+        ClientAnvilMinigameData.setGoodHits(goodHits);
+        ClientAnvilMinigameData.setMissedHits(missedHits);*/
 
         if (arrowPosition >= perfectZoneStart && arrowPosition <= perfectZoneEnd) {
             perfectHits++;
+            ClientAnvilMinigameData.setPerfectHits(perfectHits);
         } else if (arrowPosition >= goodZoneStart && arrowPosition <= goodZoneEnd) {
             goodHits++;
+            ClientAnvilMinigameData.setGoodHits(goodHits);
         } else {
             missedHits++;
+            ClientAnvilMinigameData.setMissedHits(missedHits);
         }
+
         /*if (arrowPosition >= perfectZoneStart && arrowPosition <= perfectZoneEnd) {
             result = HitResult.PERFECT;
         } else if (arrowPosition >= goodZoneStart && arrowPosition <= goodZoneEnd) {
@@ -215,13 +290,13 @@ public class AnvilMinigame {
             }*/
         shrinkAndShiftZones();
         hitsRemaining--;
-        //sendUpdatePacket();
-        // sendHitResultToServer();
+        sendUpdatePacket(player);
 
+        syncRemainingHits(player);
         if (hitsRemaining <= 0) {
+            //return quality;
             return finishForging(player);
         }
-        //syncRemainingHits(player);
         return null;
     }
 
@@ -274,13 +349,17 @@ public class AnvilMinigame {
     }
 
     public String finishForging(ServerPlayer player) {
-        isVisible = false;
-        minigameStarted = false;
-        //SmithingHammer.releaseAnvil(anvilPos);
-        float qualityScore = calculateQualityScore();
+        String quality = determineQuality(calculateQualityScore());
+        resetNBTData(); // Clear all state
+        SmithingHammer.releaseAnvil(anvilPos);
         sendUpdatePacket(player);
-        reset(player);
-        return determineQuality(qualityScore);
+        return quality;
+    }
+
+    // When cancelling the minigame
+    public void cancelMinigame() {
+        resetNBTData();
+        SmithingHammer.releaseAnvil(anvilPos);
     }
 
     private float calculateQualityScore() {
@@ -335,6 +414,18 @@ public class AnvilMinigame {
     private void syncRemainingHits(ServerPlayer player) {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("hitsRemaining", hitsRemaining);
+        nbt.putInt("perfectHits", perfectHits);
+        nbt.putInt("goodHits", goodHits);
+        nbt.putInt("missedHits", missedHits);
+        ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
+    }
+
+    private void getRemainingHits(ServerPlayer player) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("hitsRemaining", hitsRemaining);
+        nbt.putInt("perfectHits", perfectHits);
+        nbt.putInt("goodHits", goodHits);
+        nbt.putInt("missedHits", missedHits);
         ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
     }
 
@@ -382,6 +473,7 @@ public class AnvilMinigame {
             ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
         });
     }
+
 
     private void setAnvilPos(BlockPos anvilPos) {
     }
@@ -549,47 +641,37 @@ public class AnvilMinigame {
         return anvilPos != null;
     }
 
-    public void reset(ServerPlayer player) {
-        isVisible = false;
-        minigameStarted = false;
-        resultItem = null;
-        hitsRemaining = 0;
-        arrowPosition = 0;
-        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
-        movingRight = true;
-        perfectHits = 0;
-        goodHits = 0;
-        missedHits = 0;
-        perfectZoneStart = PERFECT_ZONE_START;
-        perfectZoneEnd = PERFECT_ZONE_END;
-        goodZoneStart = GOOD_ZONE_START;
-        goodZoneEnd = GOOD_ZONE_END;
+    // Add this to your existing methods
+    public void togglePause(ServerPlayer player) {
+        if (!minigameStarted) return;
+
+        isUnpaused = !isUnpaused;
+
+        if (isUnpaused) {
+            // When unpausing, make sure the game is visible
+            isVisible = true;
+        }
+
+        sendUpdatePacket(player);
+        OvergearedMod.LOGGER.info("Minigame " + (isUnpaused ? "unpaused" : "paused"));
+    }
+
+    public boolean isPaused() {
+        return minigameStarted && !isUnpaused;
+    }
+
+    public void pause(ServerPlayer player) {
+        if (!minigameStarted) return;
+
         isUnpaused = false;
-        anvilPos = null;
-        result = null;
-        quality = null;
-        ownerUUID = null;
         sendUpdatePacket(player);
     }
 
-    public void resetNBTData() {
-        isVisible = false;
-        minigameStarted = false;
-        resultItem = null;
-        hitsRemaining = 0;
-        arrowPosition = 0;
-        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
-        movingRight = true;
-        perfectHits = 0;
-        goodHits = 0;
-        missedHits = 0;
-        ClientAnvilMinigameData.setHitsRemaining(0);
-        perfectZoneStart = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-        perfectZoneEnd = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-        goodZoneStart = perfectZoneStart - 10;
-        goodZoneEnd = perfectZoneEnd + 10;
-        isUnpaused = false;
-        anvilPos = null;
-        quality = null;
+    public void unpause(ServerPlayer player) {
+        if (!minigameStarted) return;
+
+        isUnpaused = true;
+        isVisible = true;
+        sendUpdatePacket(player);
     }
 }

@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class ClientAnvilMinigameData {
     //private static final Map<UUID, PlayerMinigameData> playerData = new HashMap<>();
-    public static UUID ownerUUID = null;
+
     public static boolean isVisible = false;
     public static boolean minigameStarted = false;
     public static ItemStack resultItem = null;
@@ -193,7 +193,6 @@ public class ClientAnvilMinigameData {
     public static void loadFromNBT(CompoundTag nbt) {
         // Basic game state
         isVisible = nbt.getBoolean("isVisible");
-        ownerUUID = nbt.getUUID("ownerUUID");
         minigameStarted = nbt.getBoolean("minigameStarted");
 
         // Item data

@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,12 +18,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
-import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
-import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.StartMinigameC2SPacket;
-import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
 
 import javax.annotation.Nullable;
@@ -43,10 +39,7 @@ public class SmithingHammer extends DiggerItem {
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         Player player = context.getPlayer();
-        InteractionHand hand = context.getHand();
         BlockPos pos = context.getClickedPos();
-        BlockState state = level.getBlockState(pos);
-        ItemStack held = player.getItemInHand(hand);
 
         if (player == null || !player.isCrouching()) {
             return InteractionResult.PASS;
@@ -57,7 +50,7 @@ public class SmithingHammer extends DiggerItem {
         }
 
         // Server-side handling
-/*
+
         UUID playerId = player.getUUID();
         UUID currentUser = occupiedAnvils.get(pos);
         if (currentUser != null) {
@@ -100,30 +93,7 @@ public class SmithingHammer extends DiggerItem {
 
         // Claim the anvil for this player
         occupyAnvil(pos, playerId);
-        return InteractionResult.SUCCESS;*/
-
-        if (player.isCrouching() && held.is(ModItems.SMITHING_HAMMER.get())) {
-            if (state.is(ModBlocks.SMITHING_ANVIL.get())) {
-                if (level.isClientSide()) {
-                    // Client-side only
-                    BlockEntity be = level.getBlockEntity(pos);
-                    if (be instanceof SmithingAnvilBlockEntity anvilBE) {
-                        Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
-                        if (anvilBE.hasRecipe()) {
-                            ItemStack result = recipeOpt.get().getResultItem(level.registryAccess());
-                            int progress = anvilBE.getRequiredProgress();
-                            ModMessages.sendToServer(new StartMinigameC2SPacket(
-                                    result,
-                                    progress,
-                                    pos
-                            ));
-                        }
-                    }
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide());
-            }
-        }
-        return InteractionResult.PASS;
+        return InteractionResult.SUCCESS;
     }
 
     // Server-side anvil management

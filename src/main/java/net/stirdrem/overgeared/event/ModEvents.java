@@ -262,8 +262,7 @@ public class ModEvents {
             player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                 if (minigame.hasAnvilPosition()) {
                     BlockPos anvilPos = minigame.getAnvilPosition();
-                    //SmithingHammer.releaseAnvil(anvilPos);
-                    minigame.reset((ServerPlayer) player); // Implement this in your capability
+                    SmithingHammer.releaseAnvil(anvilPos);
                 }
             });
             //ClientAnvilMinigameData.clearData(player.getUUID());
@@ -271,10 +270,10 @@ public class ModEvents {
     }
 
 
-   /* @SubscribeEvent
+    @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         if (event.getState().getBlock() == ModBlocks.SMITHING_ANVIL.get()) {
             SmithingHammer.releaseAnvil(event.getPos());
         }
-    }*/
+    }
 }
