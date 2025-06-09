@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -32,7 +33,10 @@ import net.minecraftforge.network.NetworkHooks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
+import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
@@ -68,8 +72,10 @@ public class SmithingAnvil extends BaseEntityBlock {
         super(properties);
     }
 
+    // In your SmithingAnvil class, ensure getQuality() never returns null:
     public static String getQuality() {
-        return quality;
+        // Return current quality or default if null
+        return quality != null ? quality : "well";
     }
 
     private boolean minigameStarted = false;
@@ -135,9 +141,9 @@ public class SmithingAnvil extends BaseEntityBlock {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof SmithingAnvilBlockEntity) {
                 ((SmithingAnvilBlockEntity) blockEntity).drops();
+                resetMinigameData(pLevel, pPos);
             }
         }
-
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 
@@ -311,17 +317,33 @@ public class SmithingAnvil extends BaseEntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        if (pState.getBlock() != pNewState.getBlock()) {
-            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof SmithingAnvilBlockEntity anvil) {
-                anvil.drops();
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+        resetMinigameData(level, pos);
+        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+    }
 
-                // Reset any associated minigame when the block is removed
-                anvil.resetMinigame();
+    @Override
+    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
+        resetMinigameData(level, pos);
+        super.onBlockExploded(state, level, pos, explosion);
+    }
+
+    private void resetMinigameData(Level level, BlockPos pos) {
+        if (!level.isClientSide()) {
+            ServerPlayer usingPlayer = SmithingHammer.getUsingPlayer(pos);
+            if (usingPlayer != null) {
+                // Reset server-side data
+                usingPlayer.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                    minigame.resetNBTData();
+                    minigame.reset((ServerPlayer) usingPlayer); // Implement this in your capability
+
+                    // Notify client to reset
+                    CompoundTag resetTag = new CompoundTag();
+                    resetTag.putBoolean("isVisible", false);
+                    ModMessages.sendToPlayer(new MinigameSyncS2CPacket(resetTag), usingPlayer);
+                });
             }
         }
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 
 }

@@ -68,5 +68,7 @@
   "upgrade.overgeared.diamond_upgrade": "Diamond Upgrade",
   "gui.overgeared.forging_stats": "Hits Left: %s | Perfect: %s Good: %s Miss: %s",
   "sounds.overgeared.anvil_hit": "Smithing Anvil was hit",
-  "sounds.overgeared.forging_complete": "Forging completed"
+  "sounds.overgeared.forging_complete": "Forging completed",
+  "message.overgeared.another_anvil_in_use": "You're already using another anvil at %s, %s, %s!",
+  "message.overgeared.anvil_in_use_by_another": "This anvil is in use by another player!"
 }

@@ -8,7 +8,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -16,29 +15,28 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.ForgingQuality;
+import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.custom.SmithingAnvil;
-import net.stirdrem.overgeared.minigame.AnvilMinigame;
-import net.stirdrem.overgeared.item.custom.SmithingHammer;
-import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
+import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
     private final ItemStackHandler itemHandler = new ItemStackHandler(11) {
@@ -62,6 +60,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private int maxProgress = 0;
     private int hitRemains;
     private long busyUntilGameTime = 0L;
+    private UUID ownerUUID = null;
+    private long sessionStartTime = 0L; // optional, for timeout logic
 
 
     public SmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
@@ -140,18 +140,23 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        pTag.put("inventory", itemHandler.serializeNBT());
-        pTag.putInt("smithing_anvil.progress", progress);
-
-        super.saveAdditional(pTag);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        if (ownerUUID != null) {
+            tag.putUUID("ownerUUID", ownerUUID);
+            tag.putLong("sessionStartTime", sessionStartTime);
+        }
     }
 
     @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
-        itemHandler.deserializeNBT(pTag.getCompound("inventory"));
-        progress = pTag.getInt("smithing_anvil.progress");
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        if (tag.hasUUID("ownerUUID")) {
+            ownerUUID = tag.getUUID("ownerUUID");
+            sessionStartTime = tag.getLong("sessionStartTime");
+        } else {
+            ownerUUID = null;
+        }
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
@@ -164,42 +169,41 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
             if (hasProgressFinished()) {
                 craftItem();
-                resetProgress(pPos);
+                resetProgress();
             }
         } else {
-            resetProgress(pPos);
+            resetProgress();
         }
     }
 
-    private void resetProgress(BlockPos pos) {
+    private void resetProgress() {
         progress = 0;
         maxProgress = 0;
         lastRecipe = null;
-        System.out.println("Minigame reset progress");
-        //AnvilMinigame.end();
-        SmithingHammer.releaseAnvil(pos);
+        //AnvilMinigameOverlay.endMinigame();
     }
 
     private void craftItem() {
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
-        ForgingRecipe recipe = recipeOptional.get();
-        ItemStack result = recipe.getResultItem(null);
+        if (recipeOptional.isEmpty()) return;
 
-        // Determine quality based on performance
-        String quality = determineForgingQuality();
-        //String quality = null;
-        // Only set the NBT tag if quality is meaningful
-        if (quality != null && !quality.isEmpty() && recipe.hasQuality() && !quality.equals("none")) {
-            CompoundTag tag = result.getOrCreateTag();
-            tag.putString("ForgingQuality", quality);
-            result.setTag(tag);
+        ForgingRecipe recipe = recipeOptional.get();
+        ItemStack result = recipe.getResultItem(getLevel().registryAccess());
+
+        // Only set quality if recipe supports it
+        if (recipe.hasQuality()) {
+            String quality = determineForgingQuality();
+            if (quality != null) { // Additional safety check
+                CompoundTag tag = result.getOrCreateTag();
+                tag.putString("ForgingQuality", quality);
+                result.setTag(tag);
+            }
         }
-        int test = this.itemHandler.getSlots();
+
         // Extract ingredients
         for (int i = 0; i < this.itemHandler.getSlots() - 1; i++) {
             this.itemHandler.extractItem(i, 1, false);
         }
-
 
         ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
 
@@ -227,7 +231,6 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
                 Containers.dropItemStack(getLevel(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), overflow);
             }
         }
-
     }
 
 
@@ -320,49 +323,53 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private ForgingRecipe lastRecipe = null;
 
     public void updateHitsRemaining(Level lvl, BlockPos pos, BlockState st) {
-        Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
-
-        // Check if recipe has changed by comparing with last known recipe
-        boolean recipeChanged = false;
-
-        if (currentRecipeOpt.isPresent()) {
-            ForgingRecipe currentRecipe = currentRecipeOpt.get();
-
-            if (lastRecipe != null) {
-                // Compare recipes by their IDs or other unique properties
-                recipeChanged = !currentRecipe.getId().equals(lastRecipe.getId());
-            } else if (maxProgress > 0) {
-                // We had progress but no last recipe (shouldn't normally happen)
-                recipeChanged = true;
+        try {
+            Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
+            // Check if recipe has changed by comparing with last known recipe
+            boolean recipeChanged = false;
+            if (currentRecipeOpt.isEmpty()) {
+                resetProgress();
+                return;
             }
 
-            lastRecipe = currentRecipe;
-        } else {
-            // No current recipe but we had one before
-            recipeChanged = (lastRecipe != null || maxProgress > 0);
-            lastRecipe = null;
-        }
 
-        if (recipeChanged) {
-            //resetProgress();
-            hitRemains = 0;
-            return;
-        }
+            if (currentRecipeOpt.isPresent()) {
+                ForgingRecipe currentRecipe = currentRecipeOpt.get();
 
-        if (hasRecipe()) {
-            ForgingRecipe recipe = currentRecipeOpt.get();
-            maxProgress = recipe.getHammeringRequired();
-            hitRemains = maxProgress - progress;
-            //setChanged(lvl, pos, st);
+                if (lastRecipe != null) {
+                    // Compare recipes by their IDs or other unique properties
+                    recipeChanged = !currentRecipe.getId().equals(lastRecipe.getId());
+                } else if (maxProgress > 0) {
+                    // We had progress but no last recipe (shouldn't normally happen)
+                    recipeChanged = true;
+                }
 
-            if (hasProgressFinished()) {
-                //craftItem();
-                // resetProgress();
-                hitRemains = 0;
+                lastRecipe = currentRecipe;
+            } else {
+
             }
-        } else {
-            hitRemains = 0;
-            //resetProgress();
+
+            if (recipeChanged) {
+                resetProgress();
+                return;
+            }
+
+            if (hasRecipe()) {
+                ForgingRecipe recipe = currentRecipeOpt.get();
+                maxProgress = recipe.getHammeringRequired();
+                hitRemains = maxProgress - progress;
+                setChanged(lvl, pos, st);
+
+                if (hasProgressFinished()) {
+                    craftItem();
+                    resetProgress();
+                }
+            } else {
+                resetProgress();
+            }
+        } catch (Exception e) {
+            OvergearedMod.LOGGER.error("Error updating anvil hits remaining", e);
+            resetProgress();
         }
     }
 
@@ -401,17 +408,21 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }*/
 
     private String determineForgingQuality() {
-        // Implement your logic here to assess performance
-        // For demonstration, we'll return a random quality
+        // Get quality from anvil or use default if null
         String quality = SmithingAnvil.getQuality();
-        return switch (quality) {
+        if (quality == null) {
+            return ForgingQuality.WELL.getDisplayName(); // Default quality
+        }
+
+        // Use switch expression for better null safety
+        return switch (quality.toLowerCase()) {
             case "poor" -> ForgingQuality.POOR.getDisplayName();
             case "expert" -> ForgingQuality.EXPERT.getDisplayName();
             case "perfect" -> ForgingQuality.PERFECT.getDisplayName();
-            case "well" -> ForgingQuality.WELL.getDisplayName();
-            default -> "none";
+            default -> ForgingQuality.WELL.getDisplayName(); // Fallback
         };
     }
+
 
     public void setProgress(int progress) {
         this.progress = progress;
@@ -428,27 +439,6 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         ForgingRecipe currentRecipe = recipe.get();
         return currentRecipe.getHammeringRequired() - progress;
     }
-
-    public ItemStack getResultItem() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        if (recipe.isPresent())
-            return recipe.get().getResultItem(level.registryAccess());
-        return null;
-    }
-
-    public void resetMinigame() {
-        Level level = this.getLevel();
-        if (level == null) return;
-
-        // Reset minigame for nearby players (for multiplayer safety)
-        List<Player> players = level.getEntitiesOfClass(Player.class, new AABB(worldPosition).inflate(5));
-        for (Player player : players) {
-            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                minigame.reset((ServerPlayer) player); // Implement this in your capability
-            });
-        }
-    }
-
 
 
   /*  public void completeForgingWithQuality(String quality) {
@@ -476,4 +466,25 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             resetForgingState();
         }
     }*/
+
+    public void setOwner(UUID uuid) {
+        ownerUUID = uuid;
+        sessionStartTime = level.getGameTime();
+        setChanged();
+    }
+
+    public void clearOwner() {
+        ownerUUID = null;
+        sessionStartTime = 0L;
+        setChanged();
+    }
+
+    public boolean isOwnedBy(Player player) {
+        return ownerUUID != null && ownerUUID.equals(player.getUUID());
+    }
+
+    public boolean isOwned() {
+        return ownerUUID != null;
+    }
+
 }
