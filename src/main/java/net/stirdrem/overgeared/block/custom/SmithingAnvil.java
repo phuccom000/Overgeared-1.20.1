@@ -72,22 +72,11 @@ public class SmithingAnvil extends BaseEntityBlock {
         super(properties);
     }
 
+    // In your SmithingAnvil class, ensure getQuality() never returns null:
     public static String getQuality() {
-        return quality;
+        // Return current quality or default if null
+        return quality != null ? quality : "well";
     }
-
-    public static int getPerfectHits() {
-        return perfectHits;
-    }
-
-    public static int getGoodHits() {
-        return goodHits;
-    }
-
-    public static int getMissedHits() {
-        return missedHits;
-    }
-
 
     private boolean minigameStarted = false;
     private ItemStack resultItem;
@@ -98,9 +87,9 @@ public class SmithingAnvil extends BaseEntityBlock {
     private final float maxArrowSpeed = (float) temp2;
     private float speedIncreasePerHit = 0.75f;
     private boolean movingRight = true;
-    private static int perfectHits = 0;
-    private static int goodHits = 0;
-    private static int missedHits = 0;
+    private int perfectHits = 0;
+    private int goodHits = 0;
+    private int missedHits = 0;
     private final int PERFECT_ZONE_START = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
     private final int PERFECT_ZONE_END = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
     private final int GOOD_ZONE_START = PERFECT_ZONE_START - 10;
@@ -152,9 +141,9 @@ public class SmithingAnvil extends BaseEntityBlock {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof SmithingAnvilBlockEntity) {
                 ((SmithingAnvilBlockEntity) blockEntity).drops();
+                resetMinigameData(pLevel, pPos);
             }
         }
-
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 
@@ -257,12 +246,9 @@ public class SmithingAnvil extends BaseEntityBlock {
                 //minigame.clientHandleHit();
                 //quality = minigame.getQuality();
                 quality = minigame.handleHit((ServerPlayer) player);
-                perfectHits = minigame.getPerfectHits();
-                goodHits = minigame.getGoodHits();
-                missedHits = minigame.getMissedHits();
                 // quality = AnvilMinigame.handleHit(serverPlayer);
                 //}
-                anvil.increaseForgingProgress(level, pos, state);
+                anvil.tick(level, pos, state);
                 held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
                 isHit.set(true);
             } //else AnvilMinigameOverlay.endMinigame();
@@ -349,6 +335,7 @@ public class SmithingAnvil extends BaseEntityBlock {
                 // Reset server-side data
                 usingPlayer.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                     minigame.resetNBTData();
+                    minigame.reset((ServerPlayer) usingPlayer); // Implement this in your capability
 
                     // Notify client to reset
                     CompoundTag resetTag = new CompoundTag();
@@ -356,8 +343,7 @@ public class SmithingAnvil extends BaseEntityBlock {
                     ModMessages.sendToPlayer(new MinigameSyncS2CPacket(resetTag), usingPlayer);
                 });
             }
-            // Release the anvil
-            SmithingHammer.releaseAnvil(pos);
         }
     }
+
 }
