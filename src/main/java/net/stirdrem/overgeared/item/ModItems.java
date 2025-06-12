@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared.item;
 
-import cech12.bucketlib.api.item.UniversalBucketItem;
+//import cech12.bucketlib.api.item.UniversalBucketItem;
+
 import net.minecraft.world.item.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -33,6 +34,12 @@ public class ModItems {
     public static final RegistryObject<Item> HEATED_STEEL_INGOT = ITEMS.register("heated_steel_ingot",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> IRON_PLATE = ITEMS.register("iron_plate",
+            () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> STEEL_PLATE = ITEMS.register("steel_plate",
+            () -> new Item(new Item.Properties()));
+
     public static final RegistryObject<Item> STEEL_TONG = ITEMS.register("steel_tong",
             () -> new Item(new Item.Properties()));
 
@@ -45,7 +52,7 @@ public class ModItems {
     public static final RegistryObject<Item> SMITHING_HAMMER = ITEMS.register("smithing_hammer",
             //() -> new SmithingHammer(new Item.Properties().durability(512)));
             () -> new SmithingHammer(ModToolTiers.STEEL, -1, -2f, new Item.Properties().durability(512)));
-    public static final RegistryObject<Item> WOODEN_BUCKET = ITEMS.register("wooden_bucket",
+    /*public static final RegistryObject<Item> WOODEN_BUCKET = ITEMS.register("wooden_bucket",
             () -> new UniversalBucketItem(new UniversalBucketItem.Properties().durability(100)
                     .upperCrackingTemperature(ServerConfig.WOODEN_BUCKET_BREAK_TEMPERATURE)
                     //.crackingFluids(ModTags.Fluids.WOODEN_CRACKING)
@@ -53,7 +60,7 @@ public class ModItems {
                     .entityObtaining(ServerConfig.FISH_OBTAINING_ENABLED)
                     //.dyeable(14975336)
                     .durability(ServerConfig.WOODEN_BUCKET_DURABILITY)
-            ));
+            ));*/
 
     public static final RegistryObject<Item> DIAMOND_UPGRADE_SMITHING_TEMPLATE = ITEMS.register("diamond_upgrade_smithing_template",
             DiamondUpgradeTemplateItem::createDiamondUpgradeTemplate);

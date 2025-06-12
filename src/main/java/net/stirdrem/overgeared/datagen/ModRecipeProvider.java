@@ -261,6 +261,20 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
                 .save(pWriter, OvergearedMod.MOD_ID + ":" + getItemName(ModBlocks.STEEL_BLOCK.get()) + "_from_forging_" + getItemName(ModItems.STEEL_INGOT.get()));*/
 
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_PLATE.get(), 3)
+                .setQuality(false)
+                .pattern("#")
+                .define('#', Items.IRON_INGOT)
+                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_PLATE.get(), 4)
+                .setQuality(false)
+                .pattern("#")
+                .define('#', ModItems.STEEL_INGOT.get())
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT.get()), has(ModItems.STEEL_INGOT.get()))
+                .save(pWriter);
+
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_PICKAXE_HEAD.get(), 3)
                 .pattern("###")
                 .define('#', ModItems.HEATED_IRON_INGOT.get())
@@ -365,62 +379,30 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
                 .save(pWriter);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.WATER_BARREL.get())
+        /*ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.WATER_BARREL.get())
                 .pattern("# #")
                 .pattern("#x#")
                 .define('#', ItemTags.PLANKS)
                 .define('x', ItemTags.WOODEN_SLABS)
                 .unlockedBy("has_planks", has(ItemTags.PLANKS))
-                .save(pWriter);
+                .save(pWriter);*/
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WOODEN_BUCKET.get())
+       /* ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WOODEN_BUCKET.get())
                 .pattern("# #")
                 .pattern(" # ")
                 .define('#', ItemTags.LOGS)
                 .unlockedBy("has_logs", has(ItemTags.LOGS))
-                .save(pWriter);
-        
-
-        /*ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.IRON_HELMET)
-                .pattern("###")
-                .pattern("###")
-                .pattern("###")
-                .define('#', ModItems.STEEL_INGOT.get())
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
-                .save(pWriter);
-
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.IRON_CHESTPLATE)
-                .pattern("###")
-                .pattern("###")
-                .pattern("###")
-                .define('#', ModItems.STEEL_INGOT.get())
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
-                .save(pWriter);
-
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.IRON_LEGGINGS)
-                .pattern("###")
-                .pattern("###")
-                .pattern("###")
-                .define('#', ModItems.STEEL_INGOT.get())
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
-                .save(pWriter);
-
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.IRON_BOOTS)
-                .pattern("###")
-                .pattern("###")
-                .pattern("###")
-                .define('#', ModItems.STEEL_INGOT.get())
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
                 .save(pWriter);*/
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SMITHING_HAMMER.get())
+
+       /* ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.SMITHING_HAMMER.get())
                 .pattern(" x ")
                 .pattern(" #x")
                 .pattern("#  ")
                 .define('#', Items.STICK)
                 .define('x', ModItems.STEEL_INGOT.get())
                 .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
-                .save(pWriter);
+                .save(pWriter);*/
 
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.IRON_TONGS.get())
                 .pattern(" x ")
@@ -459,7 +441,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .setQuality(false)
                 .pattern("# #")
                 .pattern(" # ")
-                .define('#', ModItems.HEATED_IRON_INGOT.get())
+                .define('#', Items.IRON_INGOT)
+                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, Items.SHEARS, 3)
+                .setQuality(false)
+                .pattern(" #")
+                .pattern("# ")
+                .define('#', Items.IRON_INGOT)
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
                 .save(pWriter);
 
@@ -468,68 +458,68 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("# #")
                 .pattern("# #")
                 .pattern("###")
-                .define('#', ModItems.HEATED_IRON_INGOT.get())
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .define('#', ModItems.HEATED_STEEL_INGOT.get())
+                .unlockedBy(getHasName(ModItems.HEATED_STEEL_INGOT.get()), has(ModItems.HEATED_STEEL_INGOT.get()))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.IRON_HELMET, 3)
                 .pattern("###")
                 .pattern("# #")
-                .define('#', ModItems.HEATED_IRON_INGOT.get())
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .define('#', ModItems.IRON_PLATE.get())
+                .unlockedBy(getHasName(ModItems.IRON_PLATE.get()), has(ModItems.IRON_PLATE.get()))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.IRON_CHESTPLATE, 5)
                 .pattern("# #")
                 .pattern("###")
                 .pattern("###")
-                .define('#', ModItems.HEATED_IRON_INGOT.get())
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .define('#', ModItems.IRON_PLATE.get())
+                .unlockedBy(getHasName(ModItems.IRON_PLATE.get()), has(ModItems.IRON_PLATE.get()))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.IRON_LEGGINGS, 4)
                 .pattern("###")
                 .pattern("# #")
                 .pattern("# #")
-                .define('#', ModItems.HEATED_IRON_INGOT.get())
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .define('#', ModItems.IRON_PLATE.get())
+                .unlockedBy(getHasName(ModItems.IRON_PLATE.get()), has(ModItems.IRON_PLATE.get()))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.IRON_BOOTS, 3)
                 .pattern("# #")
                 .pattern("# #")
-                .define('#', ModItems.HEATED_IRON_INGOT.get())
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .define('#', ModItems.IRON_PLATE.get())
+                .unlockedBy(getHasName(ModItems.IRON_PLATE.get()), has(ModItems.IRON_PLATE.get()))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.STEEL_HELMET.get(), 3)
                 .pattern("###")
                 .pattern("# #")
-                .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .define('#', ModItems.STEEL_PLATE.get())
+                .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.STEEL_CHESTPLATE.get(), 5)
                 .pattern("# #")
                 .pattern("###")
                 .pattern("###")
-                .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .define('#', ModItems.STEEL_PLATE.get())
+                .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.STEEL_LEGGINGS.get(), 4)
                 .pattern("###")
                 .pattern("# #")
                 .pattern("# #")
-                .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .define('#', ModItems.STEEL_PLATE.get())
+                .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.STEEL_BOOTS.get(), 3)
                 .pattern("# #")
                 .pattern("# #")
-                .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .define('#', ModItems.STEEL_PLATE.get())
+                .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
                 .save(pWriter);
 
 

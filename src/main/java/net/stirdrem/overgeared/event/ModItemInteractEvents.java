@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
-import net.stirdrem.overgeared.block.custom.LayeredWaterBarrel;
+//import net.stirdrem.overgeared.block.custom.LayeredWaterBarrel;
 import net.stirdrem.overgeared.util.ModTags;
 
 
@@ -45,11 +45,11 @@ public class ModItemInteractEvents {
             event.setCanceled(true);
         }
         // Handle water barrel interaction
-        else if (state.is(ModBlocks.WATER_BARREL_FULL.get())) {
+       /* else if (state.is(ModBlocks.WATER_BARREL_FULL.get())) {
             handleWaterBarrelInteraction(level, pos, player, heldStack, state);
             event.setCancellationResult(InteractionResult.SUCCESS);
             event.setCanceled(true);
-        }
+        }*/
     }
 
     private static void handleCauldronInteraction(Level level, BlockPos pos, Player player,
@@ -71,7 +71,7 @@ public class ModItemInteractEvents {
         }
     }
 
-    private static void handleWaterBarrelInteraction(Level level, BlockPos pos, Player player,
+    /*private static void handleWaterBarrelInteraction(Level level, BlockPos pos, Player player,
                                                      ItemStack heldStack, BlockState state) {
         IntegerProperty levelProperty = LayeredWaterBarrel.LEVEL;
         int waterLevel = state.getValue(levelProperty);
@@ -88,7 +88,7 @@ public class ModItemInteractEvents {
             // Cool the ingot
             coolIngot(player, heldStack);
         }
-    }
+    }*/
 
     private static void coolIngot(Player player, ItemStack heldStack) {
         Item cooledItem = getCooledIngot(heldStack.getItem());

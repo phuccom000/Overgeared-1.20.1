@@ -4,10 +4,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -15,28 +17,33 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.custom.SmithingAnvil;
-import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.item.custom.SmithingHammer;
+import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
+import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
     private final ItemStackHandler itemHandler = new ItemStackHandler(11) {
@@ -61,6 +68,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private int hitRemains;
     private long busyUntilGameTime = 0L;
     private UUID ownerUUID = null;
+    private Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
+
     private long sessionStartTime = 0L; // optional, for timeout logic
 
 
@@ -87,7 +96,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
             @Override
             public int getCount() {
-                return 2;
+                return 3;
             }
         };
     }
@@ -99,7 +108,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return lazyItemHandler.cast();
+            return LazyOptional.of(() -> itemHandler).cast();
         }
 
         return super.getCapability(cap, side);
@@ -142,24 +151,62 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
+        tag.putInt("hitRemains", hitRemains);
+        tag.put("inventory", itemHandler.serializeNBT());
+
         if (ownerUUID != null) {
             tag.putUUID("ownerUUID", ownerUUID);
             tag.putLong("sessionStartTime", sessionStartTime);
         }
+
+        // Save occupiedAnvils
+        ListTag occupiedList = new ListTag();
+        for (Map.Entry<BlockPos, UUID> entry : occupiedAnvils.entrySet()) {
+            CompoundTag entryTag = new CompoundTag();
+            BlockPos pos = entry.getKey();
+            entryTag.putInt("x", pos.getX());
+            entryTag.putInt("y", pos.getY());
+            entryTag.putInt("z", pos.getZ());
+            entryTag.putUUID("uuid", entry.getValue());
+            occupiedList.add(entryTag);
+        }
+        tag.put("occupiedAnvils", occupiedList);
     }
+
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
+        if (tag.contains("inventory")) {
+            itemHandler.deserializeNBT(tag.getCompound("inventory"));
+        }
+        if (tag.contains("hitRemains")) {
+            hitRemains = tag.getInt("hitRemains");
+        }
         if (tag.hasUUID("ownerUUID")) {
             ownerUUID = tag.getUUID("ownerUUID");
             sessionStartTime = tag.getLong("sessionStartTime");
         } else {
             ownerUUID = null;
         }
+
+        // Load occupiedAnvils
+        occupiedAnvils.clear();
+        if (tag.contains("occupiedAnvils", CompoundTag.TAG_LIST)) {
+            ListTag occupiedList = tag.getList("occupiedAnvils", CompoundTag.TAG_COMPOUND);
+            for (int i = 0; i < occupiedList.size(); i++) {
+                CompoundTag entryTag = occupiedList.getCompound(i);
+                int x = entryTag.getInt("x");
+                int y = entryTag.getInt("y");
+                int z = entryTag.getInt("z");
+                UUID uuid = entryTag.getUUID("uuid");
+                occupiedAnvils.put(new BlockPos(x, y, z), uuid);
+            }
+        }
     }
 
-    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+
+    public void increaseForgingProgress(Level pLevel, BlockPos pPos, BlockState pState) {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
         if (hasRecipe()) {
             ForgingRecipe currentRecipe = recipe.get();
@@ -180,6 +227,17 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         progress = 0;
         maxProgress = 0;
         lastRecipe = null;
+        //ClientAnvilMinigameData.setHitsRemaining(0);
+        ServerPlayer user = SmithingHammer.getUsingPlayer(getBlockPos());
+        if (user != null) {
+            user.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                //minigame.resetNBTData();
+                minigame.reset(user);
+                //minigame.setIsVisible(false, user);
+                SmithingHammer.releaseAnvil(user, getBlockPos());
+                //ModMessages.sendToPlayer(new MinigameSyncS2CPacket(new CompoundTag().putBoolean("isVisible", false)), user);
+            });
+        }
         //AnvilMinigameOverlay.endMinigame();
     }
 
@@ -193,7 +251,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         // Only set quality if recipe supports it
         if (recipe.hasQuality()) {
             String quality = determineForgingQuality();
-            if (quality != null) { // Additional safety check
+            if (!Objects.equals(quality, "no_quality")) { // Additional safety check
                 CompoundTag tag = result.getOrCreateTag();
                 tag.putString("ForgingQuality", quality);
                 result.setTag(tag);
@@ -301,7 +359,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
 
-    private boolean hasProgressFinished() {
+    public boolean hasProgressFinished() {
         return progress >= maxProgress;
     }
 
@@ -322,7 +380,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
     private ForgingRecipe lastRecipe = null;
 
-    public void updateHitsRemaining(Level lvl, BlockPos pos, BlockState st) {
+    public void tick(Level lvl, BlockPos pos, BlockState st) {
         try {
             Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
             // Check if recipe has changed by comparing with last known recipe
@@ -333,21 +391,17 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             }
 
 
-            if (currentRecipeOpt.isPresent()) {
-                ForgingRecipe currentRecipe = currentRecipeOpt.get();
+            ForgingRecipe currentRecipe = currentRecipeOpt.get();
 
-                if (lastRecipe != null) {
-                    // Compare recipes by their IDs or other unique properties
-                    recipeChanged = !currentRecipe.getId().equals(lastRecipe.getId());
-                } else if (maxProgress > 0) {
-                    // We had progress but no last recipe (shouldn't normally happen)
-                    recipeChanged = true;
-                }
-
-                lastRecipe = currentRecipe;
-            } else {
-
+            if (lastRecipe != null) {
+                // Compare recipes by their IDs or other unique properties
+                recipeChanged = !currentRecipe.getId().equals(lastRecipe.getId());
+            } else if (maxProgress > 0) {
+                // We had progress but no last recipe (shouldn't normally happen)
+                recipeChanged = true;
             }
+
+            lastRecipe = currentRecipe;
 
             if (recipeChanged) {
                 resetProgress();
@@ -364,9 +418,10 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
                     craftItem();
                     resetProgress();
                 }
-            } else {
-                resetProgress();
             }
+            /*else {
+                resetProgress();
+            }*/
         } catch (Exception e) {
             OvergearedMod.LOGGER.error("Error updating anvil hits remaining", e);
             resetProgress();
@@ -384,7 +439,9 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
     @Override
     public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+        CompoundTag tag = super.getUpdateTag();
+        tag.put("inventory", itemHandler.serializeNBT());
+        return tag;
     }
 
     public static void applyForgingQuality(ItemStack stack, ForgingQuality quality) {
@@ -411,7 +468,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         // Get quality from anvil or use default if null
         String quality = SmithingAnvil.getQuality();
         if (quality == null) {
-            return ForgingQuality.WELL.getDisplayName(); // Default quality
+            return "no_quality"; // Default quality
         }
 
         // Use switch expression for better null safety
@@ -419,7 +476,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             case "poor" -> ForgingQuality.POOR.getDisplayName();
             case "expert" -> ForgingQuality.EXPERT.getDisplayName();
             case "perfect" -> ForgingQuality.PERFECT.getDisplayName();
-            default -> ForgingQuality.WELL.getDisplayName(); // Fallback
+            case "well" -> ForgingQuality.WELL.getDisplayName();
+            default -> "no_quality";// Fallback
         };
     }
 
@@ -440,6 +498,22 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return currentRecipe.getHammeringRequired() - progress;
     }
 
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        // Ensure any players are reset
+        ServerPlayer user = SmithingHammer.getUsingPlayer(getBlockPos());
+        if (user != null) {
+            user.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                //minigame.resetNBTData();
+                minigame.reset(user);
+                //minigame.setIsVisible(false, user);
+                progress = 0;
+                SmithingHammer.releaseAnvil(user, getBlockPos());
+                //ModMessages.sendToPlayer(new MinigameSyncS2CPacket(new CompoundTag().putBoolean("isVisible", false)), user);
+            });
+        }
+    }
 
   /*  public void completeForgingWithQuality(String quality) {
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
@@ -487,4 +561,39 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return ownerUUID != null;
     }
 
+    public UUID getOccupiedAnvil(BlockPos pos) {
+        return occupiedAnvils.get(pos);
+    }
+
+    public void putOccupiedAnvil(BlockPos pos, UUID me) {
+        occupiedAnvils.put(pos, me);
+    }
+
+    public boolean hasQuality() {
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isEmpty()) return false;
+
+        ForgingRecipe recipe = recipeOptional.get();
+
+        // Only set quality if recipe supports it
+        return recipe.hasQuality();
+    }
+
+    public IItemHandlerModifiable getItemHandler() {
+        return itemHandler;
+    }
+
+    public BlockPos getPos(ServerPlayer serverPlayer) {
+        UUID playerUUID = serverPlayer.getUUID();
+        for (Map.Entry<BlockPos, UUID> entry : occupiedAnvils.entrySet()) {
+            if (entry.getValue().equals(playerUUID)) {
+                return entry.getKey();
+            }
+        }
+        return null; // Not found
+    }
+
+    public UUID getOwnerUUID() {
+        return ownerUUID;
+    }
 }

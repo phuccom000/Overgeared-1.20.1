@@ -36,8 +36,8 @@ public class AnvilMinigame {
     private int missedHits = ClientAnvilMinigameData.getMissedHits();
     private final int PERFECT_ZONE_START = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
     private final int PERFECT_ZONE_END = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-    private final int GOOD_ZONE_START = PERFECT_ZONE_START - 10;
-    private final int GOOD_ZONE_END = PERFECT_ZONE_END + 10;
+    private final int GOOD_ZONE_START = PERFECT_ZONE_START - 20;
+    private final int GOOD_ZONE_END = PERFECT_ZONE_END + 20;
     private int perfectZoneStart = ClientAnvilMinigameData.getPerfectZoneStart();
     private int perfectZoneEnd = ClientAnvilMinigameData.getPerfectZoneEnd();
     private int goodZoneStart = ClientAnvilMinigameData.getGoodZoneStart();
@@ -53,7 +53,9 @@ public class AnvilMinigame {
 
     // Save to NBT
     public void saveNBTData(CompoundTag nbt) {
-        nbt.putUUID("ownerUUID", ownerUUID);
+        if (ownerUUID != null) {
+            nbt.putUUID("ownerUUID", ownerUUID);
+        }
         nbt.putBoolean("isVisible", isVisible);
         nbt.putBoolean("minigameStarted", minigameStarted);
         nbt.putInt("hitsRemaining", hitsRemaining);
@@ -85,7 +87,11 @@ public class AnvilMinigame {
 
     // Load from NBT
     public void loadNBTData(CompoundTag nbt) {
-        ownerUUID = nbt.getUUID("ownerUUID");
+        if (nbt.hasUUID("ownerUUID")) {
+            ownerUUID = nbt.getUUID("ownerUUID");
+        } else {
+            ownerUUID = null;
+        }
         isVisible = nbt.getBoolean("isVisible");
         minigameStarted = nbt.getBoolean("minigameStarted");
         hitsRemaining = nbt.getInt("hitsRemaining");
@@ -100,7 +106,6 @@ public class AnvilMinigame {
         goodZoneStart = nbt.getInt("goodZoneStart");
         goodZoneEnd = nbt.getInt("goodZoneEnd");
         isUnpaused = nbt.getBoolean("isUnpaused");
-
         if (nbt.contains("anvilX")) {
             anvilPos = new BlockPos(
                     nbt.getInt("anvilX"),
@@ -115,13 +120,17 @@ public class AnvilMinigame {
     }
 
     public void start(ItemStack result, int requiredHits, BlockPos pos, ServerPlayer player) {
+        if (player == null) return;
+        ownerUUID = ClientAnvilMinigameData.getOccupiedAnvil(pos);
         if (minigameStarted) {
             if (anvilPos != null && !anvilPos.equals(pos)) {
-                player.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use", anvilPos.getX(), anvilPos.getY(), anvilPos.getZ()).withStyle(ChatFormatting.RED));
+                player.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED), true);
                 return;
             }
             if (ownerUUID != null && !ownerUUID.equals(player.getUUID())) {
-                player.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED));
+                player.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED), true);
+                isVisible = false;
+                sendUpdatePacket(player);
                 return;
             }
             /*BlockEntity blockEntity = player.serverLevel().getBlockEntity(pos);
@@ -249,23 +258,17 @@ public class AnvilMinigame {
         perfectZoneSize *= zoneShrinkFactor;
         goodZoneSize *= zoneShrinkFactor;
 
-        perfectZoneSize = Math.max(perfectZoneSize, 5);
-        goodZoneSize = Math.max(goodZoneSize, perfectZoneSize * 2);
+        perfectZoneSize = Math.max(perfectZoneSize, ServerConfig.MIN_PERFECT_ZONE.get());
+        goodZoneSize = Math.max(goodZoneSize, perfectZoneSize * 3);
 
-        float random = (float) Math.random();
-        float perfectZoneCenter = (perfectZoneStart + perfectZoneEnd) / 2f;
-        perfectZoneCenter += (random - 0.5f) * zoneShiftAmount * 3;
-        perfectZoneCenter = Math.max(20, Math.min(80, perfectZoneCenter));
+        //float random = getWeightedRandomCenter((float) Math.random());
+        float zoneCenter = getWeightedRandomCenter((perfectZoneStart + perfectZoneEnd) / 2f);
 
-        float goodZoneCenter = (goodZoneStart + goodZoneEnd) / 2f;
-        goodZoneCenter += (random - 0.5f) * zoneShiftAmount * 3;
-        goodZoneCenter = Math.max(20, Math.min(80, goodZoneCenter));
+        perfectZoneStart = (int) (zoneCenter - perfectZoneSize / 2);
+        perfectZoneEnd = (int) (zoneCenter + perfectZoneSize / 2);
 
-        perfectZoneStart = (int) (perfectZoneCenter - perfectZoneSize / 2);
-        perfectZoneEnd = (int) (perfectZoneCenter + perfectZoneSize / 2);
-
-        goodZoneStart = (int) (goodZoneCenter - goodZoneSize / 2);
-        goodZoneEnd = (int) (goodZoneCenter + goodZoneSize / 2);
+        goodZoneStart = (int) (zoneCenter - goodZoneSize / 2);
+        goodZoneEnd = (int) (zoneCenter + goodZoneSize / 2);
 
         perfectZoneStart = Math.max(0, perfectZoneStart);
         perfectZoneEnd = Math.min(100, perfectZoneEnd);
@@ -273,10 +276,29 @@ public class AnvilMinigame {
         goodZoneEnd = Math.min(100, goodZoneEnd);
     }
 
+    private float getWeightedRandomCenter(float currentCenter) {
+        // 70% chance for small shift, 20% medium, 10% large
+        float rand = (float) Math.random();
+        float shiftMagnitude;
+
+        if (rand < 0.7) {
+            shiftMagnitude = 0.5f; // Small shift
+        } else if (rand < 0.9) {
+            shiftMagnitude = 1.5f; // Medium shift
+        } else {
+            shiftMagnitude = 3.0f; // Large shift
+        }
+
+        // Apply shift in random direction
+        float direction = Math.signum((float) Math.random() - 0.5f);
+        return Math.max(20, Math.min(80,
+                currentCenter + direction * zoneShiftAmount * shiftMagnitude));
+    }
+
     public String finishForging(ServerPlayer player) {
         isVisible = false;
         minigameStarted = false;
-        //SmithingHammer.releaseAnvil(anvilPos);
+        SmithingHammer.releaseAnvil(player, anvilPos);
         float qualityScore = calculateQualityScore();
         sendUpdatePacket(player);
         reset(player);
@@ -375,9 +397,13 @@ public class AnvilMinigame {
         }
     }*/
     public void sendUpdatePacket(ServerPlayer player) {
+        if (player == null) return;
+
         CompoundTag nbt = new CompoundTag();
         this.saveNBTData(nbt);
-        nbt.putUUID("playerId", player.getUUID()); // Include player ID
+        if (ownerUUID != null) {
+            nbt.putUUID("ownerUUID", ownerUUID);
+        } else nbt.putUUID("ownerUUID", player.getUUID());
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(capability -> {
             ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
         });
@@ -446,8 +472,9 @@ public class AnvilMinigame {
         isUnpaused = unpaused;
     }
 
-    public void setIsVisible(boolean visible) {
+    public void setIsVisible(boolean visible, ServerPlayer player) {
         isVisible = visible;
+        sendUpdatePacket(player);
     }
 
     public void setHitsRemaining(int hits) {
@@ -541,10 +568,6 @@ public class AnvilMinigame {
         return null;
     }
 
-    public BlockPos getAnvilPosition() {
-        return anvilPos;
-    }
-
     public boolean hasAnvilPosition() {
         return anvilPos != null;
     }
@@ -592,4 +615,10 @@ public class AnvilMinigame {
         anvilPos = null;
         quality = null;
     }
+
+    public UUID getOwnerUUID() {
+        return ownerUUID;
+    }
+
+
 }

@@ -1,11 +1,14 @@
 package net.stirdrem.overgeared.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.config.ServerConfig;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -31,7 +34,8 @@ public class ClientAnvilMinigameData {
     public static int goodZoneEnd = perfectZoneEnd + 10;
     public static float zoneShrinkFactor = 0.80f;
     public static float zoneShiftAmount = 15.0f;
-    
+    public static Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
+
 
     /*private static PlayerMinigameData ClientAnvilMinigameData {
         Minecraft mc = Minecraft.getInstance();
@@ -189,50 +193,79 @@ public class ClientAnvilMinigameData {
     }
 
     public static void loadFromNBT(CompoundTag nbt) {
-        // Basic game state
-        isVisible = nbt.getBoolean("isVisible");
-        ownerUUID = nbt.getUUID("ownerUUID");
-        minigameStarted = nbt.getBoolean("minigameStarted");
+        isVisible = nbt.contains("isVisible") && nbt.getBoolean("isVisible");
 
-        // Item data
+        if (nbt.hasUUID("ownerUUID")) {
+            ownerUUID = nbt.getUUID("ownerUUID");
+        } else {
+            ownerUUID = null;
+        }
+
+        minigameStarted = nbt.contains("minigameStarted") && nbt.getBoolean("minigameStarted");
+
         if (nbt.contains("resultItem")) {
             resultItem = ItemStack.of(nbt.getCompound("resultItem"));
+        } else {
+            resultItem = ItemStack.EMPTY;
         }
 
-        // Game progress
-        hitsRemaining = nbt.getInt("hitsRemaining");
-        perfectHits = nbt.getInt("perfectHits");
-        goodHits = nbt.getInt("goodHits");
-        missedHits = nbt.getInt("missedHits");
+        hitsRemaining = nbt.contains("hitsRemaining") ? nbt.getInt("hitsRemaining") : 0;
+        perfectHits = nbt.contains("perfectHits") ? nbt.getInt("perfectHits") : 0;
+        goodHits = nbt.contains("goodHits") ? nbt.getInt("goodHits") : 0;
+        missedHits = nbt.contains("missedHits") ? nbt.getInt("missedHits") : 0;
 
-        // Arrow mechanics
-        arrowPosition = nbt.getFloat("arrowPosition");
-        arrowSpeed = nbt.getFloat("arrowSpeed");
-        speedIncreasePerHit = nbt.getFloat("speedIncreasePerHit");
-        movingRight = nbt.getBoolean("movingRight");
+        arrowPosition = nbt.contains("arrowPosition") ? nbt.getFloat("arrowPosition") : 0f;
+        arrowSpeed = nbt.contains("arrowSpeed") ? nbt.getFloat("arrowSpeed") : ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        speedIncreasePerHit = nbt.contains("speedIncreasePerHit")
+                ? nbt.getFloat("speedIncreasePerHit")
+                : ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
 
-        // Zone data
-        perfectZoneStart = nbt.getInt("perfectZoneStart");
-        perfectZoneEnd = nbt.getInt("perfectZoneEnd");
-        goodZoneStart = nbt.getInt("goodZoneStart");
-        goodZoneEnd = nbt.getInt("goodZoneEnd");
+        movingRight = !nbt.contains("movingRight") || nbt.getBoolean("movingRight");
 
-        // Zone behavior modifiers
-        zoneShrinkFactor = nbt.getFloat("zoneShrinkFactor");
-        zoneShiftAmount = nbt.getFloat("zoneShiftAmount");
+        perfectZoneStart = nbt.contains("perfectZoneStart") ? nbt.getInt("perfectZoneStart") : (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        perfectZoneEnd = nbt.contains("perfectZoneEnd") ? nbt.getInt("perfectZoneEnd") : (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        goodZoneStart = nbt.contains("goodZoneStart") ? nbt.getInt("goodZoneStart") : Mth.clamp(perfectZoneStart - 20, 0, 100);
+        goodZoneEnd = nbt.contains("goodZoneEnd") ? nbt.getInt("goodZoneEnd") : Mth.clamp(perfectZoneEnd + 20, goodZoneStart, 100);
 
-        // Additional validation
-        if (arrowSpeed > maxArrowSpeed) {
-            arrowSpeed = maxArrowSpeed;
+        if (nbt.contains("zoneShrinkFactor")) {
+            zoneShrinkFactor = nbt.getFloat("zoneShrinkFactor");
+        }
+        if (nbt.contains("zoneShiftAmount")) {
+            zoneShiftAmount = nbt.getFloat("zoneShiftAmount");
         }
 
-        // Clamp values to valid ranges
-        arrowPosition = Math.max(0, Math.min(100, arrowPosition));
-        perfectZoneStart = Math.max(0, Math.min(100, perfectZoneStart));
-        perfectZoneEnd = Math.max(0, Math.min(100, perfectZoneEnd));
-        goodZoneStart = Math.max(0, Math.min(100, goodZoneStart));
-        goodZoneEnd = Math.max(0, Math.min(100, goodZoneEnd));
+        // Clamp values
+        arrowSpeed = Math.min(arrowSpeed, maxArrowSpeed);
+        arrowPosition = Mth.clamp(arrowPosition, 0f, 100f);
+        perfectZoneStart = Mth.clamp(perfectZoneStart, 0, 100);
+        perfectZoneEnd = Mth.clamp(perfectZoneEnd, perfectZoneStart, 100);
+        goodZoneStart = Mth.clamp(goodZoneStart, 0, 100);
+        goodZoneEnd = Mth.clamp(goodZoneEnd, goodZoneStart, 100);
     }
+
+    public static UUID getOccupiedAnvil(BlockPos pos) {
+        return occupiedAnvils.get(pos);
+    }
+
+    public static void putOccupiedAnvil(BlockPos pos, UUID me) {
+        occupiedAnvils.put(pos, me);
+    }
+
+    private static BlockPos pendingMinigamePos = null;
+
+    public static void setPendingMinigame(BlockPos pos) {
+        pendingMinigamePos = pos;
+    }
+
+    public static BlockPos getPendingMinigamePos() {
+        return pendingMinigamePos;
+    }
+
+    public static void clearPendingMinigame() {
+        pendingMinigamePos = null;
+    }
+
+
 
     /*public static void clearData(UUID playerId) {
         playerData.remove(playerId);

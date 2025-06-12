@@ -1,10 +1,12 @@
 {
   "criteria": {
-    "has_steel_ingot": {
+    "has_steel_plate": {
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/steel"
+            "items": [
+              "overgeared:steel_plate"
+            ]
           }
         ]
       },
@@ -13,7 +15,7 @@
   },
   "requirements": [
     [
-      "has_steel_ingot"
+      "has_steel_plate"
     ]
   ],
   "sends_telemetry_event": false

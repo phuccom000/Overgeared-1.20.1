@@ -2,6 +2,7 @@ package net.stirdrem.overgeared.config;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
+import io.netty.util.Attribute;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.nio.file.Path;
@@ -9,8 +10,9 @@ import java.nio.file.Path;
 public class ServerConfig {
 
     public static final int DEFAULT_WOODEN_BUCKET_BREAK_TEMPERATURE = 1000;
+    public static final ForgeConfigSpec.IntValue MAX_ANVIL_DISTANCE;
 
-    public static ForgeConfigSpec SERVER_CONFIG;
+    public static final ForgeConfigSpec SERVER_CONFIG;
 
     public static final ForgeConfigSpec.IntValue WOODEN_BUCKET_BREAK_TEMPERATURE;
     public static final ForgeConfigSpec.BooleanValue MILKING_ENABLED;
@@ -18,27 +20,29 @@ public class ServerConfig {
     public static final ForgeConfigSpec.IntValue WOODEN_BUCKET_DURABILITY;
 
     // Weapon bonuses
-    public static ForgeConfigSpec.DoubleValue PERFECT_WEAPON_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue EXPERT_WEAPON_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue WELL_WEAPON_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue POOR_WEAPON_DAMAGE;
+    public static final ForgeConfigSpec.DoubleValue PERFECT_WEAPON_DAMAGE;
+    public static final ForgeConfigSpec.DoubleValue EXPERT_WEAPON_DAMAGE;
+    public static final ForgeConfigSpec.DoubleValue WELL_WEAPON_DAMAGE;
+    public static final ForgeConfigSpec.DoubleValue POOR_WEAPON_DAMAGE;
 
-    public static ForgeConfigSpec.DoubleValue PERFECT_WEAPON_SPEED;
-    public static ForgeConfigSpec.DoubleValue EXPERT_WEAPON_SPEED;
-    public static ForgeConfigSpec.DoubleValue WELL_WEAPON_SPEED;
-    public static ForgeConfigSpec.DoubleValue POOR_WEAPON_SPEED;
+    public static final ForgeConfigSpec.DoubleValue PERFECT_WEAPON_SPEED;
+    public static final ForgeConfigSpec.DoubleValue EXPERT_WEAPON_SPEED;
+    public static final ForgeConfigSpec.DoubleValue WELL_WEAPON_SPEED;
+    public static final ForgeConfigSpec.DoubleValue POOR_WEAPON_SPEED;
 
     // Armor bonuses
-    public static ForgeConfigSpec.DoubleValue PERFECT_ARMOR_BONUS;
-    public static ForgeConfigSpec.DoubleValue EXPERT_ARMOR_BONUS;
-    public static ForgeConfigSpec.DoubleValue WELL_ARMOR_BONUS;
-    public static ForgeConfigSpec.DoubleValue POOR_ARMOR_BONUS;
+    public static final ForgeConfigSpec.DoubleValue PERFECT_ARMOR_BONUS;
+    public static final ForgeConfigSpec.DoubleValue EXPERT_ARMOR_BONUS;
+    public static final ForgeConfigSpec.DoubleValue WELL_ARMOR_BONUS;
+    public static final ForgeConfigSpec.DoubleValue POOR_ARMOR_BONUS;
 
-    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue MAX_SPEED;
-    public static ForgeConfigSpec.IntValue ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue ZONE_SHRINK_FACTOR;
+    public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
+    public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
+    public static final ForgeConfigSpec.DoubleValue MAX_SPEED;
+    public static final ForgeConfigSpec.IntValue ZONE_STARTING_SIZE;
+    public static final ForgeConfigSpec.IntValue MIN_PERFECT_ZONE;
+    public static final ForgeConfigSpec.DoubleValue ZONE_SHRINK_FACTOR;
+    public static final ForgeConfigSpec.IntValue MINIGAME_TIMEOUT_TICKS;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -130,7 +134,7 @@ public class ServerConfig {
 
         DEFAULT_ARROW_SPEED_INCREASE = builder
                 .comment("Default arrow speed increase for the forging minigame")
-                .defineInRange("arrowSpeedIncrease", 0.5, -5.0, 5.0);
+                .defineInRange("arrowSpeedIncrease", 0.8, -5.0, 5.0);
 
         MAX_SPEED = builder
                 .comment("Maximum arrow speed for the forging minigame")
@@ -141,15 +145,27 @@ public class ServerConfig {
                 .defineInRange("zoneStartingSize", 20, 0, 100);
 
         ZONE_SHRINK_FACTOR = builder
-                .comment("Zone shrink factor for the forging minigame")
-                .defineInRange("zoneShrinkFactor", 0.8, 0, 1);
+                .comment("Zone shrink factor for the forging minigame, default value here means that it shrinks to 70% of its original size")
+                .defineInRange("zoneShrinkFactor", 0.7, 0, 1);
+
+        MAX_ANVIL_DISTANCE = builder
+                .comment("Maximum distance you can go from your Smithing Anvil before minigame reset")
+                .defineInRange("maxAnvilDistance", 100, 0, 1000);
+
+        MIN_PERFECT_ZONE = builder
+                .comment("Smallest perfect zone it can become")
+                .defineInRange("minPerfectZone", 3, 0, 100);
+
+        MINIGAME_TIMEOUT_TICKS = builder
+                .comment("Minigame resets after a certain amount of ticks")
+                .defineInRange("minigameTimeout", 6000, 0, 36000);
 
         builder.pop();
 
         SERVER_CONFIG = builder.build();
     }
 
-    public static void loadConfig(ForgeConfigSpec spec, Path path) {
+    public static final void loadConfig(ForgeConfigSpec spec, Path path) {
         final CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave().writingMode(WritingMode.REPLACE).build();
         configData.load();
         spec.setConfig(configData);

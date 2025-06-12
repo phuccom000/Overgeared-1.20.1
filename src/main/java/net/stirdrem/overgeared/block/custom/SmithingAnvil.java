@@ -1,10 +1,11 @@
 package net.stirdrem.overgeared.block.custom;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -35,8 +36,6 @@ import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
-import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
@@ -75,7 +74,7 @@ public class SmithingAnvil extends BaseEntityBlock {
     // In your SmithingAnvil class, ensure getQuality() never returns null:
     public static String getQuality() {
         // Return current quality or default if null
-        return quality != null ? quality : "well";
+        return quality != null ? quality : "no_quality";
     }
 
     private boolean minigameStarted = false;
@@ -222,36 +221,46 @@ public class SmithingAnvil extends BaseEntityBlock {
         OvergearedMod.LOGGER.info("AnvilMinigame.isVisible (CLIENT-ONLY!): " + AnvilMinigame.isVisible());
         OvergearedMod.LOGGER.info("AnvilMinigame.isUnpaused: " + AnvilMinigame.isUnpaused());
         OvergearedMod.LOGGER.info("== END DEBUG ==");*/
+
         AtomicBoolean isHit = new AtomicBoolean(false);
 
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-            //if (isHammer && anvil.hasRecipe() && AnvilMinigame.isVisible()) {
-            if (isHammer && anvil.hasRecipe() && minigame.getVisible()) {
-                // Hammer logic (particles, sound, cooldown)
-                //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
+            boolean test = anvil.hasQuality();
+            boolean recipe = anvil.hasRecipe();
+            boolean poshas = pos.equals(minigame.getAnvilPos());
+            if (isHammer && anvil.hasRecipe()) {
+                if (minigame.getVisible() && pos.equals(minigame.getAnvilPos()) || !anvil.hasQuality()) {
+                    // Hammer logic (particles, sound, cooldown)
+                    //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
 /*            for (int i = 0; i < 3; i++) {
                 int delay = 7 * i;
                 TickScheduler.schedule(delay, () -> spawnAnvilParticles(level, pos));
             }*/
-                spawnAnvilParticles(level, pos);
-                //level.playSound(null, pos, SoundEvents.ANVIL_, SoundSource.BLOCKS, 1f, 1f);
-                if (anvil.getHitsRemaining() == 1)
-                    level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
-                else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
-                held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
-                //player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
-                //if (player instanceof ServerPlayer serverPlayer) {
-                //ModMessages.sendToServer(new FinalizeForgingC2SPacket("test"));
-                //player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                //minigame.clientHandleHit();
-                //quality = minigame.getQuality();
-                quality = minigame.handleHit((ServerPlayer) player);
-                // quality = AnvilMinigame.handleHit(serverPlayer);
-                //}
-                anvil.tick(level, pos, state);
-                held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+                    spawnAnvilParticles(level, pos);
+                    //level.playSound(null, pos, SoundEvents.ANVIL_, SoundSource.BLOCKS, 1f, 1f);
+                    if (anvil.getHitsRemaining() == 1)
+                        level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
+                    else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
+                    held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+                    //player.getCooldowns().addCooldown(held.getItem(), HAMMER_SOUND_DURATION_TICKS);
+                    //if (player instanceof ServerPlayer serverPlayer) {
+                    //ModMessages.sendToServer(new FinalizeForgingC2SPacket("test"));
+                    //player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+                    //minigame.clientHandleHit();
+                    //quality = minigame.getQuality();
+                    if (anvil.hasQuality()) quality = minigame.handleHit((ServerPlayer) player);
+                    // quality = AnvilMinigame.handleHit(serverPlayer);
+                    //}
+                    anvil.increaseForgingProgress(level, pos, state);
+                    held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+                    isHit.set(true);
+                } //else AnvilMinigameOverlay.endMinigame();
+            }
+            if (minigame.isForging() && !pos.equals(minigame.getAnvilPos()) && player instanceof ServerPlayer serverPlayer) {
                 isHit.set(true);
-            } //else AnvilMinigameOverlay.endMinigame();
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED), true);
+            }
+
             // Open GUI if not hammering
         });
         if (isHit.get()) return InteractionResult.SUCCESS;
@@ -304,14 +313,14 @@ public class SmithingAnvil extends BaseEntityBlock {
         return createTickerHelper(pBlockEntityType, ModBlockEntities.SMITHING_TABLE_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
     }
-*/
+    */
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
         if (!pLevel.isClientSide && pBlockEntityType == ModBlockEntities.SMITHING_ANVIL_BE.get()) {
             return createTickerHelper(pBlockEntityType, ModBlockEntities.SMITHING_ANVIL_BE.get(),
                     (pLevel1, pPos, pState1, pBlockEntity) ->
-                            pBlockEntity.updateHitsRemaining(pLevel, pPos, pState1));
+                            pBlockEntity.tick(pLevel, pPos, pState1));
         }
         return null;
     }
@@ -334,13 +343,14 @@ public class SmithingAnvil extends BaseEntityBlock {
             if (usingPlayer != null) {
                 // Reset server-side data
                 usingPlayer.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                    minigame.resetNBTData();
-                    minigame.reset((ServerPlayer) usingPlayer); // Implement this in your capability
+                    //minigame.resetNBTData();
+                    minigame.reset(usingPlayer); // Implement this in your capability
+                    //minigame.setIsVisible(false, usingPlayer);
 
-                    // Notify client to reset
+                    /*// Notify client to reset
                     CompoundTag resetTag = new CompoundTag();
                     resetTag.putBoolean("isVisible", false);
-                    ModMessages.sendToPlayer(new MinigameSyncS2CPacket(resetTag), usingPlayer);
+                    ModMessages.sendToPlayer(new MinigameSyncS2CPacket(resetTag), usingPlayer);*/
                 });
             }
         }

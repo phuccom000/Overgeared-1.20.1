@@ -43,11 +43,11 @@ public class ModForgeClientEvents {
     }
 
     private static void handleAnvilMinigameSync(TickEvent.PlayerTickEvent event, Player player) {
-        if (event.side == LogicalSide.SERVER) {
+        if (event.side == LogicalSide.CLIENT) {
             player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                 if (minigame.isVisible()) {
                     updateArrowPosition(minigame);
-                    syncMinigameData(minigame, (ServerPlayer) player);
+                    //syncMinigameData(minigame, (ServerPlayer) player);
                 }
             });
         }
@@ -86,7 +86,7 @@ public class ModForgeClientEvents {
             ModMessages.sendToPlayer(new MinigameSyncS2CPacket(minigameData), player);
 
             // Optional debug logging
-            OvergearedMod.LOGGER.debug("Sent minigame sync packet to player {}", player.getName().getString());
+            //OvergearedMod.LOGGER.debug("Sent minigame sync packet to player {}", player.getName().getString());
         } catch (Exception e) {
             OvergearedMod.LOGGER.error("Failed to sync minigame data to player {}", player.getName().getString(), e);
         }

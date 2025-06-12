@@ -19,8 +19,8 @@ public class ModBlockStateProvider extends BlockStateProvider {
         blockWithItem(ModBlocks.STEEL_BLOCK);
         horizontalBlock(ModBlocks.SMITHING_ANVIL.get(),
                 new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
-        simpleBlock(ModBlocks.WATER_BARREL.get(),
-                new ModelFile.UncheckedModelFile(modLoc("block/water_barrel")));
+        /*simpleBlock(ModBlocks.WATER_BARREL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/water_barrel")));*/
     }
 
     private void blockWithItem(RegistryObject<Block> blockRegistryObject) {

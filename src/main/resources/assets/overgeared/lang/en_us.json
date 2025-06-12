@@ -7,6 +7,8 @@
   "gui.overgeared.remaining_hits": "Hits Left: %s",
   "gui.overgeared.smithing_anvil": "Forging",
   "item.overgeared.crude_steel": "Crude Steel",
+  "item.overgeared.iron_plate": "Iron Plate",
+  "item.overgeared.steel_plate": "Steel Plate",
   "item.overgeared.diamond_axe_head": "Diamond Axe Head",
   "item.overgeared.diamond_hoe_head": "Diamond Hoe Head",
   "item.overgeared.diamond_pickaxe_head": "Diamond Pickaxe Head",
@@ -69,6 +71,7 @@
   "gui.overgeared.forging_stats": "Hits Left: %s | Perfect: %s Good: %s Miss: %s",
   "sounds.overgeared.anvil_hit": "Smithing Anvil was hit",
   "sounds.overgeared.forging_complete": "Forging completed",
-  "message.overgeared.another_anvil_in_use": "You're already using another anvil at %s, %s, %s!",
-  "message.overgeared.anvil_in_use_by_another": "This anvil is in use by another player!"
+  "message.overgeared.another_anvil_in_use": "You're already using another anvil!",
+  "message.overgeared.anvil_in_use_by_another": "This anvil is in use by another player!",
+  "message.overgeared.item_has_no_quality": "This recipe does not have quality modifier"
 }

@@ -23,12 +23,14 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.STEEL_INGOT.get());
                         pOutput.accept(ModItems.HEATED_IRON_INGOT.get());
                         pOutput.accept(ModItems.HEATED_STEEL_INGOT.get());
+                        pOutput.accept(ModItems.IRON_PLATE.get());
+                        pOutput.accept(ModItems.STEEL_PLATE.get());
                         pOutput.accept(ModItems.STEEL_TONG.get());
                         pOutput.accept(ModItems.IRON_TONGS.get());
                         pOutput.accept(ModItems.STEEL_TONGS.get());
                         pOutput.accept(ModItems.SMITHING_HAMMER.get());
                         pOutput.accept(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get());
-                        pOutput.accept(ModItems.WOODEN_BUCKET.get());
+                        //pOutput.accept(ModItems.WOODEN_BUCKET.get());
 
                         pOutput.accept(ModItems.STEEL_HELMET.get());
                         pOutput.accept(ModItems.STEEL_CHESTPLATE.get());
@@ -78,7 +80,7 @@ public class ModCreativeModeTabs {
 */
                         pOutput.accept(ModBlocks.SMITHING_ANVIL.get());
                         pOutput.accept(ModBlocks.STEEL_BLOCK.get());
-                        pOutput.accept(ModBlocks.WATER_BARREL.get());
+                        //pOutput.accept(ModBlocks.WATER_BARREL.get());
                         //pOutput.accept(ModBlocks.WATER_BARREL_FULL.get());
 
                         //pOutput.accept(Items.DIAMOND); //.get() only for custom items

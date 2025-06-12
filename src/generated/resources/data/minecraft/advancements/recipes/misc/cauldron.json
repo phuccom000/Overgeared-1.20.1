@@ -1,11 +1,11 @@
 {
   "criteria": {
-    "has_iron_ingot": {
+    "has_heated_steel_ingot": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:iron_ingot"
+              "overgeared:heated_steel_ingot"
             ]
           }
         ]
@@ -15,7 +15,7 @@
   },
   "requirements": [
     [
-      "has_iron_ingot"
+      "has_heated_steel_ingot"
     ]
   ],
   "sends_telemetry_event": false

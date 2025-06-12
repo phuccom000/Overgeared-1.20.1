@@ -47,7 +47,7 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
 
     @Override
     public Component getTitle() {
-        return Component.translatable("block.overgeared.smithing_anvil.gui");
+        return Component.translatable("gui.overgeared.smithing_anvil");
     }
 
     @Override

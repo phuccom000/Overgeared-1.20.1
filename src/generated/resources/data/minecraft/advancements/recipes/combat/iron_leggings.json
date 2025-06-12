@@ -1,11 +1,11 @@
 {
   "criteria": {
-    "has_iron_ingot": {
+    "has_iron_plate": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:iron_ingot"
+              "overgeared:iron_plate"
             ]
           }
         ]
@@ -15,7 +15,7 @@
   },
   "requirements": [
     [
-      "has_iron_ingot"
+      "has_iron_plate"
     ]
   ],
   "sends_telemetry_event": false

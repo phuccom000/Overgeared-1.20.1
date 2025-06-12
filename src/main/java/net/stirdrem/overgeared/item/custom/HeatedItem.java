@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.block.ModBlocks;
-import net.stirdrem.overgeared.block.custom.LayeredWaterBarrel;
+//import net.stirdrem.overgeared.block.custom.LayeredWaterBarrel;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,7 +71,7 @@ public class HeatedItem extends Item {
                     return InteractionResult.SUCCESS;
                 }
             }
-        } else if (state.is(ModBlocks.WATER_BARREL_FULL.get())) {
+        } /*else if (state.is(ModBlocks.WATER_BARREL_FULL.get())) {
             IntegerProperty levelProperty = LayeredWaterBarrel.LEVEL;
             int waterLevel = state.getValue(levelProperty);
 
@@ -105,7 +105,7 @@ public class HeatedItem extends Item {
                     return InteractionResult.SUCCESS;
                 }
             }
-        }
+        }*/
         return InteractionResult.PASS;
     }
 

@@ -186,6 +186,11 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    maven {
+        url "https://maven.theillusivec4.top/"
+    }
+    maven { url "https://maven.terraformersmc.com/releases/" }
+
 }
 
 dependencies {
@@ -197,8 +202,8 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    compileOnly fg.deobf("com.github.cech12:BucketLib:${bucketlib_version}:api")
-    runtimeOnly fg.deobf("com.github.cech12:BucketLib:${bucketlib_version}")
+    //compileOnly fg.deobf("com.github.cech12:BucketLib:${bucketlib_version}:api")
+    //runtimeOnly fg.deobf("com.github.cech12:BucketLib:${bucketlib_version}")
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
@@ -207,8 +212,12 @@ dependencies {
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
     runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
-    //implementation(fg.deobf("curse.maven:polymorph-388800:5736385"))
-    //runtimeOnly(fg.deobf("dev.latvian.mods:kubejs-forge:2001.6.4-build.95"))
+    /*compileOnly(fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1:api"))
+    runtimeOnly(fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1"))
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.3.5+1.20.1")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.3.5+1.20.1:api")
+    implementation(fg.deobf("curse.maven:polymorph-388800:6450982"))
+    runtimeOnly(fg.deobf("dev.latvian.mods:kubejs-forge:2001.6.4-build.95"))*/
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"

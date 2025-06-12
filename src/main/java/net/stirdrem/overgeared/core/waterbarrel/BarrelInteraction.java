@@ -1,3 +1,4 @@
+/*
 package net.stirdrem.overgeared.core.waterbarrel;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -300,4 +301,4 @@ public interface BarrelInteraction {
 
         return InteractionResult.sidedSuccess(pLevel.isClientSide);
     }
-}
+}*/

@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared;
 
-import cech12.bucketlib.api.BucketLibApi;
+//import cech12.bucketlib.api.BucketLibApi;
+
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
+//import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
 import net.stirdrem.overgeared.item.ModItems;
 
@@ -101,7 +102,7 @@ public class OvergearedMod {
 
     private void sendImc(InterModEnqueueEvent evt) {
         //register your bucket at the BucketLib mod to activate all features for your bucket
-        BucketLibApi.registerBucket(ModItems.WOODEN_BUCKET.getId());
+        //BucketLibApi.registerBucket(ModItems.WOODEN_BUCKET.getId());
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -117,7 +118,7 @@ public class OvergearedMod {
         public static void onClientSetup(FMLClientSetupEvent event) {
             MenuScreens.register(ModMenuTypes.SMITHING_ANVIL_MENU.get(), SmithingAnvilScreen::new);
             //MenuScreens.register(ModMenuTypes.SMITHING_ANVIL_MG_MENU.get(), SmithingAnvilMinigameScreen::new);
-            BarrelInteraction.bootStrap();
+            //BarrelInteraction.bootStrap();
 
 
         }

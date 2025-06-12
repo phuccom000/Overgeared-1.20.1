@@ -58,7 +58,7 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
                     return false; // Prevent inserting any item
                 }
             });*/
-
+            //output slot
             this.addSlot(new SlotItemHandler(iItemHandler, 10, 124, 35) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {

@@ -1,0 +1,17 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 3,
+  "has_quality": false,
+  "key": {
+    "#": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "#"
+  ],
+  "result": {
+    "item": "overgeared:iron_plate"
+  },
+  "show_notification": true
+}

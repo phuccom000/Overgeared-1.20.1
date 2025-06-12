@@ -28,13 +28,13 @@ public class ModEventBusClientEvents {
 
 
     // In your client setup (e.g., ModClientEvents.java)
-    @SubscribeEvent
+    /*@SubscribeEvent
     public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
         event.register(
                 new WaterBarrelBlockColor(),
                 ModBlocks.WATER_BARREL_FULL.get()  // Your block here
         );
-    }
+    }*/
 
 
 }

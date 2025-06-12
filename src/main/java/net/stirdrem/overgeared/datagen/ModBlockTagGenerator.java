@@ -28,11 +28,11 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 .add(ModBlocks.STEEL_BLOCK.get(),
                         ModBlocks.SMITHING_ANVIL.get()
                 );
-        this.tag(BlockTags.MINEABLE_WITH_AXE)
+       /* this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(ModBlocks.WATER_BARREL.get(),
                         ModBlocks.WATER_BARREL_FULL.get()
                 );
-
+*/
         this.tag(BlockTags.NEEDS_IRON_TOOL)
                 .add(ModBlocks.STEEL_BLOCK.get()
                 );

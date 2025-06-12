@@ -46,6 +46,8 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.STEEL_INGOT);
         simpleItem(ModItems.HEATED_IRON_INGOT);
         simpleItem(ModItems.HEATED_STEEL_INGOT);
+        simpleItem(ModItems.IRON_PLATE);
+        simpleItem(ModItems.STEEL_PLATE);
         simpleItem(ModItems.STEEL_TONG);
         simpleItem(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE);
         trimmedArmorItem(ModItems.STEEL_HELMET);

@@ -14,10 +14,13 @@
 	expertWeaponSpeed = 0.25
 
 ["Minigame Config"]
+	#Smallest perfect zone it can become
+	#Range: 0 ~ 100
+	minPerfectZone = 3
 	#Default arrow speed for the forging minigame
 	#Range: -5.0 ~ 5.0
 	arrowSpeed = 2.0
-	#Zone shrink factor for the forging minigame
+	#Zone shrink factor for the forging minigame, default value here means that it shrinks to 70% of its original size
 	#Range: 0.0 ~ 1.0
 	zoneShrinkFactor = 0.8
 	#Default arrow speed increase for the forging minigame
@@ -29,6 +32,12 @@
 	#Maximum arrow speed for the forging minigame
 	#Range: -10.0 ~ 10.0
 	maxArrowSpeed = 5.0
+	#Maximum distance you can go from your Smithing Anvil before minigame reset
+	#Range: 0 ~ 1000
+	maxAnvilDistance = 100
+	#Minigame resets after a certain amount of ticks
+	#Range: 0 ~ 36000
+	minigameTimeout = 6000
 
 ["Balance Options"]
 	#Whether or not obtaining fish with a Wooden Bucket should be enabled.

@@ -7,10 +7,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.networking.packet.FinalizeForgingC2SPacket;
-import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
-import net.stirdrem.overgeared.networking.packet.StartMinigameC2SPacket;
-import net.stirdrem.overgeared.networking.packet.MinigameHitResultC2SPacket;
+import net.stirdrem.overgeared.networking.packet.*;
 
 public class ModMessages {
     private static SimpleChannel INSTANCE;
@@ -66,6 +63,12 @@ public class ModMessages {
                 .decoder(MinigameHitResultC2SPacket::decode)
                 .consumerMainThread(MinigameHitResultC2SPacket::handle)
                 .add();
+
+        /*net.messageBuilder(AnvilOccupationSyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(AnvilOccupationSyncS2CPacket::new)
+                .encoder(AnvilOccupationSyncS2CPacket::toBytes)
+                .consumerMainThread(AnvilOccupationSyncS2CPacket::handle)
+                .add();*/
 
     }
 

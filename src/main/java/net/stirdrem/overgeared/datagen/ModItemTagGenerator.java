@@ -88,6 +88,16 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                 );
         this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel")))
                 .add(ModItems.STEEL_INGOT.get());
+
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "armors/helmets")))
+                .add(ModItems.STEEL_HELMET.get());
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "armors/chestplates")))
+                .add(ModItems.STEEL_CHESTPLATE.get());
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "armors/leggings")))
+                .add(ModItems.STEEL_LEGGINGS.get());
+        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "armors/boots")))
+                .add(ModItems.STEEL_BOOTS.get());
+
         this.tag(Tags.Items.TOOLS)
                 .add(
                         ModItems.STEEL_AXE.get(),

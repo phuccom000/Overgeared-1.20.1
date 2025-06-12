@@ -4,8 +4,9 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -14,20 +15,19 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.ModBlocks;
-import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
+import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
@@ -36,14 +36,20 @@ import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.util.ModTags;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
 public class ModEvents {
     private static final int ANVIL_CLEANUP_INTERVAL = 1200; // 1 minute (60 seconds * 20 ticks)
     private static final int HEATED_ITEM_CHECK_INTERVAL = 20; // 1 second
     private static final float BURN_DAMAGE = 1.0f;
     private static final float ZONE_SHIFT_AMOUNT = 15.0f;
+    private static final Map<UUID, Integer> playerTimeoutCounters = new HashMap<>();
 
-    @SubscribeEvent
+   /* @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END && event.side == LogicalSide.SERVER) {
             // Run cleanup at regular intervals
@@ -51,19 +57,41 @@ public class ModEvents {
                 SmithingHammer.cleanupStaleAnvils(event.getServer().overworld());
             }
         }
-    }
+    }*/
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            Player player = event.player;
-            Level level = player.level();
+        if (event.phase != TickEvent.Phase.END) return;
+        if (event.side == LogicalSide.CLIENT) return; // STOP here on client
 
-            if (level.isClientSide()) return;
+        ServerPlayer player = (ServerPlayer) event.player; // Safe cast
 
-            handleHeatedItems(player, level);
-            handleAnvilMinigameSync(event, player);
-        }
+        // Refresh timeout counter if player is actively in minigame
+        player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+            if (minigame.isVisible()) {
+                playerTimeoutCounters.put(player.getUUID(), ServerConfig.MINIGAME_TIMEOUT_TICKS.get());
+            }
+        });
+
+
+        Level level = player.level();
+
+        handleHeatedItems(player, level);
+        handleAnvilMinigameSync(event, player);
+
+        player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+            if (minigame.isVisible() && minigame.hasAnvilPosition()) {
+                BlockPos anvilPos = minigame.getAnvilPos();
+                BlockEntity be = level.getBlockEntity(anvilPos);
+                if ((be instanceof SmithingAnvilBlockEntity anvil)) {
+                    double distSq = player.blockPosition().distSqr(anvilPos);
+                    int maxDist = ServerConfig.MAX_ANVIL_DISTANCE.get(); // e.g. 7
+                    if (distSq > maxDist * maxDist) {
+                        resetMinigameForPlayer(player);
+                    }
+                }
+            }
+        });
     }
 
     private static void handleHeatedItems(Player player, Level level) {
@@ -128,7 +156,7 @@ public class ModEvents {
             ModMessages.sendToPlayer(new MinigameSyncS2CPacket(minigameData), player);
 
             // Optional debug logging
-            OvergearedMod.LOGGER.debug("Sent minigame sync packet to player {}", player.getName().getString());
+            // OvergearedMod.LOGGER.debug("Sent minigame sync packet to player {}", player.getName().getString());
         } catch (Exception e) {
             OvergearedMod.LOGGER.error("Failed to sync minigame data to player {}", player.getName().getString(), e);
         }
@@ -153,14 +181,6 @@ public class ModEvents {
                         event.getEntity().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
                                 .ifPresent(newStore -> newStore.copyFrom(oldStore));
                     });
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerJoinWorld(EntityJoinLevelEvent event) {
-        if (!event.getLevel().isClientSide() && event.getEntity() instanceof ServerPlayer player) {
-            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
-                    .ifPresent(minigame -> syncMinigameData(minigame, player));
         }
     }
 
@@ -257,18 +277,57 @@ public class ModEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerDisconnect(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                if (minigame.hasAnvilPosition()) {
-                    BlockPos anvilPos = minigame.getAnvilPosition();
-                    //SmithingHammer.releaseAnvil(anvilPos);
-                    minigame.reset((ServerPlayer) player); // Implement this in your capability
-                }
-            });
-            //ClientAnvilMinigameData.clearData(player.getUUID());
+    public static void onPlayerJoinWorld(EntityJoinLevelEvent event) {
+        if (!event.getLevel().isClientSide() && event.getEntity() instanceof ServerPlayer player) {
+            // Reset minigame state when joining any world
+            resetMinigameForPlayer(player);
+
+            // Start timeout counter if needed
+            startTimeoutCounter(player);
         }
     }
+
+    @SubscribeEvent
+    public static void onPlayerDisconnect(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            resetMinigameForPlayer(player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            resetMinigameForPlayer(player);
+            startTimeoutCounter(player);
+        }
+    }
+
+    private static void resetMinigameForPlayer(ServerPlayer player) {
+        player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+            if (minigame.hasAnvilPosition()) {
+                BlockPos anvilPos = minigame.getAnvilPos();
+                BlockEntity be = player.level().getBlockEntity(anvilPos);
+                if (be instanceof SmithingAnvilBlockEntity anvil) {
+                    anvil.setProgress(0);
+                    anvil.setChanged();
+                }
+                SmithingHammer.releaseAnvil(player, anvilPos);
+            }
+            minigame.reset(player);
+            minigame.setIsVisible(false, player);
+
+            // Clear timeout counter
+            playerTimeoutCounters.remove(player.getUUID());
+        });
+    }
+
+    private static void startTimeoutCounter(ServerPlayer player) {
+        if (player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
+                .map(AnvilMinigame::isVisible).orElse(false)) {
+            playerTimeoutCounters.put(player.getUUID(), ServerConfig.MINIGAME_TIMEOUT_TICKS.get());
+        }
+    }
+
 
 
    /* @SubscribeEvent
