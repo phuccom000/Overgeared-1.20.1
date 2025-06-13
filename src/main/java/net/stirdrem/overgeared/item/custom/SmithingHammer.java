@@ -83,6 +83,16 @@ public class SmithingHammer extends DiggerItem {
                 ModMessages.sendToPlayer(new MinigameSyncS2CPacket(syncData), other);
             }
         }
+        if (playerUUID.equals(currentOwner)) {
+            if (anvilBE.hasRecipe()) {
+                Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
+                recipeOpt.ifPresent(recipe -> {
+                    ItemStack result = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());
+                    int progress = anvilBE.getRequiredProgress();
+                    ModMessages.sendToServer(new StartMinigameC2SPacket(result, progress, pos));
+                });
+            }
+        }
         return InteractionResult.SUCCESS;
     }
 
@@ -119,17 +129,20 @@ public class SmithingHammer extends DiggerItem {
 
     // Add this to your packet handler for MinigameSyncS2CPacket
     public static void handleAnvilOwnershipSync(CompoundTag syncData) {
-        UUID owner = syncData.getUUID("anvilOwner");
-        if (owner.getMostSignificantBits() == 0 && owner.getLeastSignificantBits() == 0) {
-            owner = null;
+        UUID owner = null;
+        if (syncData.contains("anvilOwner")) {
+            owner = syncData.getUUID("anvilOwner");
+            if (owner.getMostSignificantBits() == 0 && owner.getLeastSignificantBits() == 0) {
+                owner = null;
+            }
         }
         BlockPos pos = BlockPos.of(syncData.getLong("anvilPos"));
         ClientAnvilMinigameData.putOccupiedAnvil(pos, owner);
 
         // ✅ Only start minigame if this client is the new owner and it was waiting
         if (Minecraft.getInstance().player != null
-                && owner.equals(Minecraft.getInstance().player.getUUID())
-                && ClientAnvilMinigameData.getPendingMinigamePos().equals(pos)) {
+                && Minecraft.getInstance().player.getUUID().equals(owner)
+                && pos.equals(ClientAnvilMinigameData.getPendingMinigamePos())) {
 
             BlockEntity be = Minecraft.getInstance().level.getBlockEntity(pos);
             if (be instanceof SmithingAnvilBlockEntity anvilBE && anvilBE.hasRecipe()) {
@@ -156,9 +169,9 @@ public class SmithingHammer extends DiggerItem {
         ClientAnvilMinigameData.putOccupiedAnvil(pos, null);
 
         // 3. Reset player’s minigame capability
-        player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+       /* player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
             minigame.reset(player);
-        });
+        });*/
 
         // 4. Sync null ownership to all clients
         CompoundTag syncData = new CompoundTag();
