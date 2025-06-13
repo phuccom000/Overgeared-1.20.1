@@ -37,7 +37,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addRecipeClickArea(SmithingAnvilScreen.class, 8, 30, 20, 30,
+        registration.addRecipeClickArea(SmithingAnvilScreen.class, 90, 35, 22, 15,
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE);
     }
 }
