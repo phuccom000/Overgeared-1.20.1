@@ -64,6 +64,16 @@ public class SmithingHammer extends DiggerItem {
 
     private InteractionResult handleServerSideInteraction(SmithingAnvilBlockEntity anvilBE, BlockPos pos, ServerPlayer player, UUID playerUUID) {
         // Server always uses the block entity as source of truth
+        if (!anvilBE.hasRecipe()) {
+            player.sendSystemMessage(Component.translatable("message.overgeared.no_recipe").withStyle(ChatFormatting.RED), true);
+            return InteractionResult.FAIL;
+        }
+
+        if (!anvilBE.hasQuality()) {
+            player.sendSystemMessage(Component.translatable("message.overgeared.item_has_no_quality").withStyle(ChatFormatting.RED), true);
+            return InteractionResult.FAIL;
+        }
+
         UUID currentOwner = anvilBE.getOwnerUUID();
 
         // Check if anvil is already owned by someone else
@@ -82,33 +92,28 @@ public class SmithingHammer extends DiggerItem {
             for (ServerPlayer other : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
                 ModMessages.sendToPlayer(new MinigameSyncS2CPacket(syncData), other);
             }
+            return InteractionResult.SUCCESS;
         }
-        if (playerUUID.equals(currentOwner)) {
-            if (anvilBE.hasRecipe()) {
-                Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
-                recipeOpt.ifPresent(recipe -> {
-                    ItemStack result = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());
-                    int progress = anvilBE.getRequiredProgress();
-                    ModMessages.sendToServer(new StartMinigameC2SPacket(result, progress, pos));
-                });
-            }
-        }
+
+
         return InteractionResult.SUCCESS;
     }
 
     private InteractionResult handleClientSideInteraction(SmithingAnvilBlockEntity anvilBE, BlockPos pos, Player player, ItemStack heldItem) {
         if (!anvilBE.hasRecipe()) {
+            //player.sendSystemMessage(Component.translatable("message.overgeared.no_recipe").withStyle(ChatFormatting.RED));
             return InteractionResult.FAIL;
         }
 
         if (!anvilBE.hasQuality()) {
-            player.displayClientMessage(Component.translatable("message.overgeared.item_has_no_quality").withStyle(ChatFormatting.RED), true);
+            //player.sendSystemMessage(Component.translatable("message.overgeared.item_has_no_quality").withStyle(ChatFormatting.RED));
             return InteractionResult.FAIL;
         }
 
         // Client should trust the server's sync data in ClientAnvilMinigameData
         UUID currentOwner = ClientAnvilMinigameData.getOccupiedAnvil(pos);
         if (currentOwner != null && !currentOwner.equals(player.getUUID())) {
+            //player.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED));
             return InteractionResult.FAIL;
         }
 
@@ -122,8 +127,21 @@ public class SmithingHammer extends DiggerItem {
         });*/
 
         // Set "pending minigame" data if allowed to request
-        ClientAnvilMinigameData.setPendingMinigame(pos);
 
+        if (player.getUUID().equals(currentOwner)
+                && ClientAnvilMinigameData.getPendingMinigamePos() == null) {
+            if (anvilBE.hasRecipe()) {
+                Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
+                recipeOpt.ifPresent(recipe -> {
+                    ItemStack result = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());
+                    int progress = anvilBE.getRequiredProgress();
+                    ModMessages.sendToServer(new StartMinigameC2SPacket(result, progress, pos));
+                });
+            }
+            return InteractionResult.SUCCESS;
+        }
+
+        ClientAnvilMinigameData.setPendingMinigame(pos);
         return InteractionResult.SUCCESS;
     }
 

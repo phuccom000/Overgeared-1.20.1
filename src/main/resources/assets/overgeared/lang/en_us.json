@@ -73,5 +73,6 @@
   "sounds.overgeared.forging_complete": "Forging completed",
   "message.overgeared.another_anvil_in_use": "You're already using another anvil!",
   "message.overgeared.anvil_in_use_by_another": "This anvil is in use by another player!",
-  "message.overgeared.item_has_no_quality": "This recipe does not have quality modifier"
+  "message.overgeared.item_has_no_quality": "This recipe does not have quality modifier",
+  "message.overgeared.no_recipe": "There is no valid recipe!"
 }

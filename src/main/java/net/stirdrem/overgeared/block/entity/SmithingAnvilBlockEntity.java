@@ -231,8 +231,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         ServerPlayer user = SmithingHammer.getUsingPlayer(getBlockPos());
         if (user != null) {
             user.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                //minigame.resetNBTData();
-                minigame.reset(user);
+                minigame.resetNBTData();
+                //minigame.reset(user);
                 //minigame.setIsVisible(false, user);
                 SmithingHammer.releaseAnvil(user, getBlockPos());
                 //ModMessages.sendToPlayer(new MinigameSyncS2CPacket(new CompoundTag().putBoolean("isVisible", false)), user);

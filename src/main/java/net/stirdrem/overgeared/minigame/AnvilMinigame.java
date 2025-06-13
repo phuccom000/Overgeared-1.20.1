@@ -403,7 +403,7 @@ public class AnvilMinigame {
         this.saveNBTData(nbt);
         if (ownerUUID != null) {
             nbt.putUUID("ownerUUID", ownerUUID);
-        } else nbt.putUUID("ownerUUID", player.getUUID());
+        }
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(capability -> {
             ModMessages.sendToPlayer(new MinigameSyncS2CPacket(nbt), player);
         });
