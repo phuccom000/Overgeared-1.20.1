@@ -2,15 +2,21 @@ package net.stirdrem.overgeared;
 
 //import cech12.bucketlib.api.BucketLibApi;
 
+import com.eruannie_9.booklinggear.register.DeferredRegisters;
+import com.eruannie_9.booklinggear.register.RegistrationHelper;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.client.event.RegisterRecipeBookCategoriesEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -21,8 +27,12 @@ import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
+import net.stirdrem.overgeared.block.entity.renderer.SmithingAnvilBlockEntityRenderer;
+import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.client.RecipeBookExtensionClientHelper;
 import net.stirdrem.overgeared.config.ServerConfig;
 //import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
+import net.stirdrem.overgeared.event.ModAttributes;
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
 import net.stirdrem.overgeared.item.ModItems;
 
@@ -44,11 +54,17 @@ public class OvergearedMod {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     //public static final AnvilMinigameHandler SERVER_HANDLER = new AnvilMinigameHandler();
+    public static final DeferredRegisters REGISTERS = new DeferredRegisters(MOD_ID);
+
+    public static final RegistrationHelper REGISTRATION_HELPER;
+    public static boolean polymorph;
 
     public OvergearedMod(FMLJavaModLoadingContext context) {
+        //ServerConfig.registerConfig();
+
         IEventBus modEventBus = context.getModEventBus();
 
-        ServerConfig.loadConfig(ServerConfig.SERVER_CONFIG, FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath()).resolve(MOD_ID + "-server.toml"));
+        ServerConfig.loadConfig(ServerConfig.SERVER_CONFIG, FMLPaths.GAMEDIR.get().resolve(FMLPaths.CONFIGDIR.get()).resolve(MOD_ID + "-common.toml"));
 
         ModCreativeModeTabs.register(modEventBus);
 
@@ -68,12 +84,18 @@ public class OvergearedMod {
 
         ModSounds.register(modEventBus);
 
+        ModAttributes.register(modEventBus);
+
+        REGISTERS.register(modEventBus);
+
         MinecraftForge.EVENT_BUS.register(TickScheduler.class);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::sendImc);
         MinecraftForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::addCreative);
+
+        polymorph = ModList.get().isLoaded("polymorph");
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         //context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -119,8 +141,26 @@ public class OvergearedMod {
             MenuScreens.register(ModMenuTypes.SMITHING_ANVIL_MENU.get(), SmithingAnvilScreen::new);
             //MenuScreens.register(ModMenuTypes.SMITHING_ANVIL_MG_MENU.get(), SmithingAnvilMinigameScreen::new);
             //BarrelInteraction.bootStrap();
-
-
         }
+
+        @SubscribeEvent
+        public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(ModBlockEntities.SMITHING_ANVIL_BE.get(), SmithingAnvilBlockEntityRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
+            event.registerBelowAll("anvil_mg", AnvilMinigameOverlay.ANVIL_MG);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterRecipeBookCategories(RegisterRecipeBookCategoriesEvent event) {
+            //ModRecipeBookTypes.registerRecipeBookCategories(event);
+            RecipeBookExtensionClientHelper.init(event);
+        }
+    }
+
+    static {
+        REGISTRATION_HELPER = new RegistrationHelper(REGISTERS);
     }
 }

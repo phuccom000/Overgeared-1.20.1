@@ -1,5 +1,6 @@
 {
   "type": "overgeared:forging",
+  "category": "misc",
   "hammering": 3,
   "has_quality": false,
   "key": {

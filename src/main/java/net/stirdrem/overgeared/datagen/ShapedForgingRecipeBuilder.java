@@ -10,14 +10,14 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.core.NonNullList;
+import net.stirdrem.overgeared.ForgingBookCategory;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
+import net.stirdrem.overgeared.util.ModTags;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 
 public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category;
+    private final ForgingBookCategory bookCategory;
     private final Item result;
     private final int count;
     private final int hammering;
@@ -41,19 +42,43 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private boolean showNotification = true;
 
 
-    public ShapedForgingRecipeBuilder(RecipeCategory category, ItemLike result, int count, int hammering) {
+    public ShapedForgingRecipeBuilder(RecipeCategory category, ForgingBookCategory bookCategory, ItemLike result, int count, int hammering) {
         this.category = category;
+        this.bookCategory = bookCategory;
         this.result = result.asItem();
         this.count = count;
         this.hammering = hammering;
     }
 
+    private static boolean isTools(Item item) {
+        return item instanceof SwordItem ||
+                item instanceof DiggerItem ||
+                item instanceof ProjectileWeaponItem;
+    }
+
+    public static boolean isToolPart(ItemStack stack) {
+        return !stack.isEmpty() && stack.is(ModTags.Items.TOOL_PARTS);
+    }
+
+    public static boolean isToolPart(Item item) {
+        return item.builtInRegistryHolder().is(ModTags.Items.TOOL_PARTS);
+    }
+
+    private static ForgingBookCategory determineWeaponRecipeCategory(ItemLike pResult) {
+        if (isTools(pResult.asItem()) || isToolPart(pResult.asItem())) {
+            return ForgingBookCategory.TOOLS;
+        } else {
+            return pResult.asItem() instanceof ArmorItem ? ForgingBookCategory.ARMORS : ForgingBookCategory.MISC;
+        }
+    }
+
+
     public static ShapedForgingRecipeBuilder shaped(RecipeCategory category, ItemLike result, int hammering) {
-        return new ShapedForgingRecipeBuilder(category, result, 1, hammering);
+        return new ShapedForgingRecipeBuilder(category, determineWeaponRecipeCategory(result), result, 1, hammering);
     }
 
     public static ShapedForgingRecipeBuilder shaped(RecipeCategory category, ItemLike result, int count, int hammering) {
-        return new ShapedForgingRecipeBuilder(category, result, count, hammering);
+        return new ShapedForgingRecipeBuilder(category, determineWeaponRecipeCategory(result), result, count, hammering);
     }
 
     public ShapedForgingRecipeBuilder define(Character pSymbol, TagKey<Item> pTag) {
@@ -132,12 +157,13 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 new ItemStack(this.result, this.count),
                 pRecipeId,
                 this.group == null ? "" : this.group,
+                this.bookCategory,
                 this.rows,
                 this.key,
                 this.advancement,
                 pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/"),
                 this.showNotification,
-                this.hasQuality == null ? true : this.hasQuality
+                this.hasQuality == null || this.hasQuality
         ));
     }
 
@@ -166,13 +192,15 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final ResourceLocation advancementId;
         private final boolean showNotification;
         private final String group;
+        private final ForgingBookCategory category;
         private final Boolean hasQuality;
 
 
-        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, Boolean hasQuality) {
+        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, Boolean hasQuality) {
             this.ingredients = ingredients;
             this.hammering = hammering;
             this.result = result;
+            this.category = category;
             this.id = id;
             this.group = group;
             this.pattern = pattern;
@@ -189,6 +217,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 json.addProperty("group", this.group);
             }
             JsonArray patternArray = new JsonArray();
+            json.addProperty("category", this.category.getSerializedName());
 
             for (String s : this.pattern) {
                 patternArray.add(s);
@@ -196,7 +225,6 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
 
             json.add("pattern", patternArray);
             JsonObject jsonobject = new JsonObject();
-            //json.addProperty("category", this.category);
 
             json.addProperty("hammering", this.hammering);
             // Add quality flag if not null

@@ -1,10 +1,15 @@
 package net.stirdrem.overgeared.screen;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -12,15 +17,22 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.recipe.ModRecipeBookTypes;
+import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
-public class SmithingAnvilMenu extends AbstractContainerMenu {
+public class SmithingAnvilMenu extends RecipeBookMenu<Container> {
+    private final Container container = new SimpleContainer();
     public final SmithingAnvilBlockEntity blockEntity;
     private final Level level;
     private final ContainerData data;
+    private final ResultContainer resultContainer = new ResultContainer();
+    private Slot resultSlot;
+    private final Player player;
 
     public SmithingAnvilMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
         this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(11));
@@ -33,7 +45,7 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
         blockEntity = (SmithingAnvilBlockEntity) entity;
         this.level = inv.player.level();
         this.data = data;
-
+        this.player = inv.player;
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
 
@@ -59,12 +71,68 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
                 }
             });*/
             //output slot
-            this.addSlot(new SlotItemHandler(iItemHandler, 10, 124, 35) {
+            this.resultSlot = new SlotItemHandler(iItemHandler, 10, 124, 35) {
+                private int removeCount;
+
                 @Override
                 public boolean mayPlace(ItemStack stack) {
-                    return false; // Prevent inserting any item
+                    return false;
                 }
-            });
+
+                @Override
+                public void onTake(Player player, ItemStack stack) {
+                    this.checkTakeAchievements(stack);
+                    Container craftingContainer = SmithingAnvilMenu.this.container;
+                    NonNullList<ItemStack> remainders = player.level()
+                            .getRecipeManager().getRemainingItemsFor(ModRecipeTypes.FORGING.get(), SmithingAnvilMenu.this.container, player.level());
+                    for (int i = 0; i < remainders.size(); ++i) {
+                        ItemStack toRemove = craftingContainer.getItem(i);
+                        ItemStack toReplace = remainders.get(i);
+                        if (!toRemove.isEmpty()) {
+                            craftingContainer.removeItem(i, 1);
+                            toRemove = craftingContainer.getItem(i);
+                        }
+
+                        if (!toReplace.isEmpty()) {
+                            if (toRemove.isEmpty())
+                                craftingContainer.setItem(i, toRemove);
+                            else if (ItemStack.isSameItemSameTags(toRemove, toReplace)) {
+                                toReplace.grow(toRemove.getCount());
+                                craftingContainer.setItem(i, toReplace);
+                            } else if (!player.getInventory().add(toReplace))
+                                player.drop(toReplace, false);
+                        }
+                    }
+                }
+
+                @Override
+                public ItemStack remove(int amount) {
+                    if (this.hasItem())
+                        this.removeCount += Math.min(amount, this.getItem().getCount());
+                    return super.remove(amount);
+                }
+
+                @Override
+                public void onQuickCraft(ItemStack output, int amount) {
+                    this.removeCount += amount;
+                    this.checkTakeAchievements(output);
+                }
+
+                @Override
+                protected void onSwapCraft(int amount) {
+                    this.removeCount = amount;
+                }
+
+                @Override
+                protected void checkTakeAchievements(ItemStack stack) {
+                    if (this.removeCount > 0)
+                        stack.onCraftedBy(SmithingAnvilMenu.this.player.level(), SmithingAnvilMenu.this.player, this.removeCount);
+                    if (this.container instanceof RecipeHolder recipeHolder)
+                        recipeHolder.awardUsedRecipes(SmithingAnvilMenu.this.player, List.of());
+                    this.removeCount = 0;
+                }
+            };
+            this.addSlot(this.resultSlot); //slot 0
         });
 
         addDataSlots(data);
@@ -178,4 +246,51 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
         }
         return ItemStack.EMPTY;
     }
+
+    @Override
+    public void fillCraftSlotsStackedContents(StackedContents contents) {
+
+    }
+
+    @Override
+    public void clearCraftingContent() {
+
+    }
+
+
+    @Override
+    public boolean recipeMatches(Recipe<? super Container> pRecipe) {
+        return false;
+    }
+
+    @Override
+    public int getResultSlotIndex() {
+        return 11;
+    }
+
+    @Override
+    public int getGridWidth() {
+        return 3;
+    }
+
+    @Override
+    public int getGridHeight() {
+        return 3;
+    }
+
+    @Override
+    public int getSize() {
+        return 9;
+    }
+
+    @Override
+    public RecipeBookType getRecipeBookType() {
+        return ModRecipeBookTypes.FORGING;
+    }
+
+    @Override
+    public boolean shouldMoveToInventory(int pSlotIndex) {
+        return false;
+    }
+
 }

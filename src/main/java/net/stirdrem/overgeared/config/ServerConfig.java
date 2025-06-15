@@ -4,6 +4,8 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import io.netty.util.Attribute;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
 
 import java.nio.file.Path;
 
@@ -13,11 +15,6 @@ public class ServerConfig {
     public static final ForgeConfigSpec.IntValue MAX_ANVIL_DISTANCE;
 
     public static final ForgeConfigSpec SERVER_CONFIG;
-
-    public static final ForgeConfigSpec.IntValue WOODEN_BUCKET_BREAK_TEMPERATURE;
-    public static final ForgeConfigSpec.BooleanValue MILKING_ENABLED;
-    public static final ForgeConfigSpec.BooleanValue FISH_OBTAINING_ENABLED;
-    public static final ForgeConfigSpec.IntValue WOODEN_BUCKET_DURABILITY;
 
     // Weapon bonuses
     public static final ForgeConfigSpec.DoubleValue PERFECT_WEAPON_DAMAGE;
@@ -43,27 +40,16 @@ public class ServerConfig {
     public static final ForgeConfigSpec.IntValue MIN_PERFECT_ZONE;
     public static final ForgeConfigSpec.DoubleValue ZONE_SHRINK_FACTOR;
     public static final ForgeConfigSpec.IntValue MINIGAME_TIMEOUT_TICKS;
+    public static final ForgeConfigSpec.DoubleValue BASE_DURABILITY_MULTIPLIER;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
         builder.push("Balance Options");
 
-        WOODEN_BUCKET_BREAK_TEMPERATURE = builder
-                .comment("Minimum temperature of fluid at which the Wooden Bucket breaks when emptied. (-1 means that bucket never breaks caused by high fluid temperature)")
-                .defineInRange("woodenBucketBreakTemperature", DEFAULT_WOODEN_BUCKET_BREAK_TEMPERATURE, 0, 10000);
-
-        MILKING_ENABLED = builder
-                .comment("Whether or not milking entities with a Wooden Bucket should be enabled.")
-                .define("milkingEnabled", true);
-
-        FISH_OBTAINING_ENABLED = builder
-                .comment("Whether or not obtaining fish with a Wooden Bucket should be enabled.")
-                .define("fishObtainingEnabled", true);
-
-        WOODEN_BUCKET_DURABILITY = builder
-                .comment("Defines the maximum durability of a Wooden Bucket. (0 deactivates the durability)")
-                .defineInRange("durability", 0, 0, 10000);
+        BASE_DURABILITY_MULTIPLIER = builder
+                .comment("Defines the base durability multiplier of all items that has durability.")
+                .defineInRange("durability", 1f, 0, 10000);
 
         builder.pop();
 

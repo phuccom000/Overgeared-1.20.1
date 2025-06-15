@@ -246,4 +246,14 @@ public class SmithingHammer extends DiggerItem {
         }
         return super.use(level, player, hand);
     }
+
+    @Override
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+        return itemStack.copy();
+    }
 }

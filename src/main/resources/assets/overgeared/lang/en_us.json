@@ -74,5 +74,10 @@
   "message.overgeared.another_anvil_in_use": "You're already using another anvil!",
   "message.overgeared.anvil_in_use_by_another": "This anvil is in use by another player!",
   "message.overgeared.item_has_no_quality": "This recipe does not have quality modifier",
-  "message.overgeared.no_recipe": "There is no valid recipe!"
+  "message.overgeared.no_recipe": "There is no valid recipe!",
+  "recipeBook.toggleRecipes.forging": "Show forgeable items",
+  "recipeBook.category.forging_search": "Search",
+  "recipeBook.category.forging_main": "Forging Recipes",
+  "gui.recipebook.toggleRecipes.forgeable": "Show forgeable"
 }
+

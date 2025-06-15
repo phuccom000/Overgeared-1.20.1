@@ -1,30 +1,24 @@
 package net.stirdrem.overgeared.event;
 
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.client.event.RegisterRecipeBookCategoriesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.renderer.SmithingAnvilBlockEntityRenderer;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent; // Updated event class
-import net.stirdrem.overgeared.client.WaterBarrelBlockColor;
+import net.stirdrem.overgeared.client.RecipeBookExtensionClientHelper;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.recipe.ModRecipeBookTypes;
+import net.stirdrem.overgeared.screen.ModMenuTypes;
+import net.stirdrem.overgeared.screen.SmithingAnvilScreen;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModEventBusClientEvents {
-
-    @SubscribeEvent
-    public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(ModBlockEntities.SMITHING_ANVIL_BE.get(), SmithingAnvilBlockEntityRenderer::new);
-    }
-
-    @SubscribeEvent
-    public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerBelowAll("anvil_mg", AnvilMinigameOverlay.ANVIL_MG);
-    }
 
 
     // In your client setup (e.g., ModClientEvents.java)

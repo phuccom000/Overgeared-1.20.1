@@ -190,7 +190,9 @@ repositories {
         url "https://maven.theillusivec4.top/"
     }
     maven { url "https://maven.terraformersmc.com/releases/" }
-
+    flatDir {
+        dir 'libs'
+    }
 }
 
 dependencies {
@@ -209,16 +211,22 @@ dependencies {
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
     // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
     runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
-    compileOnly(fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1:api"))
-    runtimeOnly(fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1"))
+
+/*    compileOnly(fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1:api"))
+    runtimeOnly(fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1"))*/
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.3.5+1.20.1")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.3.5+1.20.1:api")
     implementation(fg.deobf("curse.maven:polymorph-388800:6450982"))
-    implementation(fg.deobf("curse.maven:lit-it-up-916334:6415378"))
-    runtimeOnly(fg.deobf("dev.latvian.mods:kubejs-forge:2001.6.4-build.95"))
+    implementation fg.deobf("curse.maven:lit-it-up-916334:6415378")
+    implementation(fg.deobf("curse.maven:bookling-gear-1122766:6628791"))
+    implementation(fg.deobf("curse.maven:durability-tooltip-511040:4741017"))
+    implementation(fg.deobf("curse.maven:supermartijn642s-config-lib-438332:4715408"))
+    implementation fg.deobf("xaero:ItemNBTViewer-Forge-1.20:1.0.2")
+    //runtimeOnly(fg.deobf("dev.latvian.mods:kubejs-forge:2001.6.4-build.95"))
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"

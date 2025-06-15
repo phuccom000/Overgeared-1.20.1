@@ -1,9 +1,15 @@
 package net.stirdrem.overgeared.recipe;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,6 +23,7 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class ForgingRecipe implements Recipe<Container> {
     private final ResourceLocation id;
@@ -165,6 +172,7 @@ public class ForgingRecipe implements Recipe<Container> {
         return Objects.hash(getId());
     }
 
+
     public int getHammeringRequired() {
         return hammering;
     }
@@ -292,5 +300,40 @@ public class ForgingRecipe implements Recipe<Container> {
         return width * height;
     }
 
+    /*public record Ingredients(String group, List<String> pattern, Map<String, Ingredient> recipe, ItemStack result) {
+        private static final Function<String, DataResult<String>> VERIFY_LENGTH_1 =
+                s -> s.length() == 1 ? DataResult.success(s) : DataResult.error(() -> "Key must be a single character!");
+
+        private static final Function<String, DataResult<String>> VERIFY_LENGTH_2 =
+                s -> s.length() == 2 ? DataResult.success(s) : DataResult.error(() -> "Key row length must be of 2!");
+
+        private static final Function<List<String>, DataResult<List<String>>> VERIFY_SIZE = l -> {
+            if (l.size() <= 4 && l.size() >= 1) {
+                List<String> temp = new ArrayList<>(l);
+                Collections.reverse(temp); //reverse so the first row is at the bottom in the json.
+                return DataResult.success(ImmutableList.copyOf(temp));
+            }
+            return DataResult.error(() -> "Pattern must have between 1 and 4 rows of keys");
+        };
+
+        public static final Codec<Ingredient> INGREDIENT_CODEC = Codec.PASSTHROUGH.comapFlatMap(obj -> {
+            JsonElement json = obj.convert(JsonOps.INSTANCE).getValue();
+            try {
+                return DataResult.success(Ingredient.fromJson(json));
+            } catch (Exception e) {
+                return DataResult.error(() -> "Failed to parse ingredient: " + e.getMessage());
+            }
+        }, ingredient -> new Dynamic<>(JsonOps.INSTANCE, ingredient.toJson()));
+
+        public static final Codec<Ingredients> CODEC = RecordCodecBuilder.create(inst ->
+                inst.group(
+                        Codec.STRING.fieldOf("group").forGetter(Ingredients::group),
+                        Codec.STRING.flatXmap(VERIFY_LENGTH_2, VERIFY_LENGTH_2).listOf().flatXmap(VERIFY_SIZE, VERIFY_SIZE).fieldOf("pattern").forGetter(Ingredients::pattern),
+                        Codec.unboundedMap(Codec.STRING.flatXmap(VERIFY_LENGTH_1, VERIFY_LENGTH_1), INGREDIENT_CODEC).fieldOf("key").forGetter(Ingredients::recipe),
+                        ItemStack.CODEC.fieldOf("result").forGetter(Ingredients::result)
+                ).apply(inst, Ingredients::new)
+        );
+    }
+*/
 
 }

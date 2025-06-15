@@ -5,7 +5,8 @@
   "package": "net.stirdrem.overgeared.mixin",
   "refmap": "mixins.overgeared.refmap.json",
   "mixins": [
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "SparklingFlintMixin"
   ],
   "client": [],
   "injectors": {

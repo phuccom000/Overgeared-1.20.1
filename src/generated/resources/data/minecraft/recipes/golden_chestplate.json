@@ -1,5 +1,6 @@
 {
   "type": "overgeared:forging",
+  "category": "armors",
   "hammering": 5,
   "has_quality": true,
   "key": {

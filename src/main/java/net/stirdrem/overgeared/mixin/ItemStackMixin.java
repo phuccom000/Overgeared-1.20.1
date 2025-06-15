@@ -7,6 +7,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.state.BlockState;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.util.QualityHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -54,7 +55,7 @@ public abstract class ItemStackMixin {
     }
 
 
-    @Inject(method = "getMaxDamage", at = @At("HEAD"), cancellable = true)
+    /*@Inject(method = "getMaxDamage", at = @At("HEAD"), cancellable = true)
     private void modifyDurability(CallbackInfoReturnable<Integer> cir) {
         ItemStack stack = (ItemStack) (Object) this;
         if (stack.getItem().canBeDepleted()) { // Only for damageable items
@@ -62,7 +63,7 @@ public abstract class ItemStackMixin {
             int baseDurability = stack.getItem().getMaxDamage();
             cir.setReturnValue((int) (baseDurability * multiplier));
         }
-    }
+    }*/
 
     @Inject(
             method = "getDestroySpeed",
@@ -81,7 +82,7 @@ public abstract class ItemStackMixin {
 
     @Inject(
             method = "getMaxDamage()I",
-            at = @At("HEAD"),
+            at = @At("RETURN"),
             cancellable = true
     )
     private void modifyDurabilityBasedOnQuality(CallbackInfoReturnable<Integer> cir) {
@@ -92,12 +93,24 @@ public abstract class ItemStackMixin {
             return;
         }
 
+        // Get the original max damage (respects overridden methods)
+        int originalDurability = cir.getReturnValue();
+
+        // Skip if durability is already customized (like the flint case)
+        if (originalDurability != stack.getItem().getMaxDamage()) {
+            return;
+        }
+
+        float baseMultiplier = ServerConfig.BASE_DURABILITY_MULTIPLIER.get().floatValue();
+        int newBaseDurability = (int) (originalDurability * baseMultiplier);
+
         // Apply quality multiplier if the tag exists
         if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
             float multiplier = QualityHelper.getQualityMultiplier(stack);
-            int baseDurability = stack.getItem().getMaxDamage();
-            int modifiedDurability = (int) (baseDurability * multiplier);
+            int modifiedDurability = (int) (newBaseDurability * multiplier);
             cir.setReturnValue(modifiedDurability);
+        } else {
+            cir.setReturnValue(newBaseDurability);
         }
     }
 
