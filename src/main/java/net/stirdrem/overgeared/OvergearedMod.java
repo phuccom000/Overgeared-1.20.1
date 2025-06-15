@@ -2,8 +2,6 @@ package net.stirdrem.overgeared;
 
 //import cech12.bucketlib.api.BucketLibApi;
 
-import com.eruannie_9.booklinggear.register.DeferredRegisters;
-import com.eruannie_9.booklinggear.register.RegistrationHelper;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -54,9 +52,7 @@ public class OvergearedMod {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     //public static final AnvilMinigameHandler SERVER_HANDLER = new AnvilMinigameHandler();
-    public static final DeferredRegisters REGISTERS = new DeferredRegisters(MOD_ID);
 
-    public static final RegistrationHelper REGISTRATION_HELPER;
     public static boolean polymorph;
 
     public OvergearedMod(FMLJavaModLoadingContext context) {
@@ -85,8 +81,6 @@ public class OvergearedMod {
         ModSounds.register(modEventBus);
 
         ModAttributes.register(modEventBus);
-
-        REGISTERS.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(TickScheduler.class);
 
@@ -158,9 +152,5 @@ public class OvergearedMod {
             //ModRecipeBookTypes.registerRecipeBookCategories(event);
             RecipeBookExtensionClientHelper.init(event);
         }
-    }
-
-    static {
-        REGISTRATION_HELPER = new RegistrationHelper(REGISTERS);
     }
 }
