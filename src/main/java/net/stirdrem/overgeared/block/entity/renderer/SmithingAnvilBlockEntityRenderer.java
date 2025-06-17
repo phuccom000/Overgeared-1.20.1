@@ -41,7 +41,8 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
             float yOffset = isBlockItem(output) ? 1.05f : 1.025f;
             renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, 0f, 120f, 0.5f);
         }
-
+        float zOffset = -0.43f;
+        if (output.isEmpty()) zOffset = 0f;
         // 1️⃣ First pass: render up to three unique input items
         Set<Item> renderedItems = new HashSet<>();
         Set<Integer> renderedSlots = new HashSet<>(); // Track which slots we've rendered from
@@ -54,7 +55,7 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
                     float baseYOffset = 1.025f + (rendered * 0.025f);
                     float yOffset = isBlockItem(stack) ? baseYOffset + 0.02f : baseYOffset;
                     float rotation = 96f + (rendered * 14f);
-                    renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, -0.43f, rotation, 0.35f);
+                    renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, zOffset, rotation, 0.35f);
                     renderedItems.add(item);
                     renderedSlots.add(i); // Mark this slot as rendered
                     rendered++;
@@ -75,7 +76,7 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
                     float baseYOffset = 1.025f + (rendered * 0.025f);
                     float yOffset = isBlockItem(stack) ? baseYOffset + 0.02f : baseYOffset;
                     float rotation = 96f + (rendered * 14f);
-                    renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, -0.43f, rotation, 0.35f);
+                    renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, zOffset, rotation, 0.35f);
                     renderedSlots.add(i); // Mark this slot as rendered
                     rendered++;
                 }
