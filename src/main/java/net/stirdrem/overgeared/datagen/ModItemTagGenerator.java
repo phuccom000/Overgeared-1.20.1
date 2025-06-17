@@ -31,35 +31,35 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.TOOL_PARTS)
                 .add(
                         // Sword Blades
-                        //ModItems.STONE_SWORD_BLADE.get(),
+                        ModItems.STONE_SWORD_BLADE.get(),
                         ModItems.IRON_SWORD_BLADE.get(),
                         ModItems.GOLDEN_SWORD_BLADE.get(),
                         ModItems.STEEL_SWORD_BLADE.get(),
                         //ModItems.DIAMOND_SWORD_BLADE.get(),
 
                         // Pickaxe Heads
-                        //ModItems.STONE_PICKAXE_HEAD.get(),
+                        ModItems.STONE_PICKAXE_HEAD.get(),
                         ModItems.IRON_PICKAXE_HEAD.get(),
                         ModItems.GOLDEN_PICKAXE_HEAD.get(),
                         ModItems.STEEL_PICKAXE_HEAD.get(),
                         //ModItems.DIAMOND_PICKAXE_HEAD.get(),
 
                         // Axe Heads
-                        //ModItems.STONE_AXE_HEAD.get(),
+                        ModItems.STONE_AXE_HEAD.get(),
                         ModItems.IRON_AXE_HEAD.get(),
                         ModItems.GOLDEN_AXE_HEAD.get(),
                         ModItems.STEEL_AXE_HEAD.get(),
                         //ModItems.DIAMOND_AXE_HEAD.get(),
 
                         // Shovel Heads
-                        //ModItems.STONE_SHOVEL_HEAD.get(),
+                        ModItems.STONE_SHOVEL_HEAD.get(),
                         ModItems.IRON_SHOVEL_HEAD.get(),
                         ModItems.GOLDEN_SHOVEL_HEAD.get(),
                         ModItems.STEEL_SHOVEL_HEAD.get(),
                         //ModItems.DIAMOND_SHOVEL_HEAD.get(),
 
                         // Hoe Heads
-                        //ModItems.STONE_HOE_HEAD.get(),
+                        ModItems.STONE_HOE_HEAD.get(),
                         ModItems.IRON_HOE_HEAD.get(),
                         ModItems.GOLDEN_HOE_HEAD.get(),
                         ModItems.STEEL_HOE_HEAD.get()
@@ -144,6 +144,14 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.STEEL_LEGGINGS.get(),
                         ModItems.STEEL_BOOTS.get()
                 );
+        /*this.tag(ModTags.Items.GRINDABLE)
+                .add(
+                        ModItems.ROCK.get()
+                );
+        this.tag(ModTags.Items.GRINDED)
+                .add(
+                        ModItems.STEEL_SWORD_BLADE.get()
+                );*/
     }
 }
 

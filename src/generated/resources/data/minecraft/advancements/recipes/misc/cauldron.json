@@ -1,11 +1,11 @@
 {
   "criteria": {
-    "has_heated_steel_ingot": {
+    "has_steel_plate": {
       "conditions": {
         "items": [
           {
             "items": [
-              "overgeared:heated_steel_ingot"
+              "overgeared:steel_plate"
             ]
           }
         ]
@@ -15,7 +15,7 @@
   },
   "requirements": [
     [
-      "has_heated_steel_ingot"
+      "has_steel_plate"
     ]
   ],
   "sends_telemetry_event": false

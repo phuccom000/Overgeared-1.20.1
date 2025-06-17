@@ -27,7 +27,6 @@ import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.renderer.SmithingAnvilBlockEntityRenderer;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
-import net.stirdrem.overgeared.client.RecipeBookExtensionClientHelper;
 import net.stirdrem.overgeared.config.ServerConfig;
 //import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
 import net.stirdrem.overgeared.event.ModAttributes;
@@ -39,6 +38,7 @@ import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
+import net.stirdrem.overgeared.screen.RockKnappingScreen;
 import net.stirdrem.overgeared.screen.SmithingAnvilScreen;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.TickScheduler;
@@ -133,7 +133,7 @@ public class OvergearedMod {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             MenuScreens.register(ModMenuTypes.SMITHING_ANVIL_MENU.get(), SmithingAnvilScreen::new);
-            //MenuScreens.register(ModMenuTypes.SMITHING_ANVIL_MG_MENU.get(), SmithingAnvilMinigameScreen::new);
+            MenuScreens.register(ModMenuTypes.ROCK_KNAPPING_MENU.get(), RockKnappingScreen::new);
             //BarrelInteraction.bootStrap();
         }
 
@@ -145,12 +145,6 @@ public class OvergearedMod {
         @SubscribeEvent
         public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
             event.registerBelowAll("anvil_mg", AnvilMinigameOverlay.ANVIL_MG);
-        }
-
-        @SubscribeEvent
-        public static void onRegisterRecipeBookCategories(RegisterRecipeBookCategoriesEvent event) {
-            //ModRecipeBookTypes.registerRecipeBookCategories(event);
-            RecipeBookExtensionClientHelper.init(event);
         }
     }
 }

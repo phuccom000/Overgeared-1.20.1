@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared.recipe;
 
 
+import com.google.gson.JsonArray;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -14,6 +15,8 @@ public class ModRecipes {
 
     public static final RegistryObject<RecipeSerializer<ForgingRecipe>> FORGING_SERIALIZER =
             SERIALIZERS.register("forging", () -> ForgingRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<RockKnappingRecipe>> ROCK_KNAPPING_SERIALIZER =
+            SERIALIZERS.register("rock_knapping", () -> RockKnappingRecipe.Serializer.INSTANCE);
     public static final RegistryObject<RecipeSerializer<ForgingQualityShapelessRecipe>> CRAFTING_SHAPELESS =
             SERIALIZERS.register("crafting_shapeless", () -> ForgingQualityShapelessRecipe.Serializer.INSTANCE);
 

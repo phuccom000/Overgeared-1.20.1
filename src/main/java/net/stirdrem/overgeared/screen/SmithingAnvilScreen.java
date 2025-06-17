@@ -22,11 +22,11 @@ import net.stirdrem.overgeared.networking.ModMessages;
 
 import net.stirdrem.overgeared.util.TooltipButton;
 
-public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMenu> implements RecipeUpdateListener {
+public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMenu> {
     private static final ResourceLocation TEXTURE =
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/smithing_anvil.png");
     private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.tryParse("textures/gui/recipe_button.png");
-    private final RecipeBookComponent recipeBookComponent = new RecipeBookComponent();
+    //private final RecipeBookComponent recipeBookComponent = new RecipeBookComponent();
     private boolean widthTooNarrow;
 
     public SmithingAnvilScreen(SmithingAnvilMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
@@ -37,9 +37,9 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
     protected void init() {
         super.init();
         this.titleLabelX = 29;
-        /*this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
-        this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-        this.addRenderableWidget(new ImageButton(this.leftPos + 5, this.height / 2 - 49, 20, 18, 0, 0, 19, RECIPE_BUTTON_LOCATION, (button) ->
+        //this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
+        //this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
+        /*this.addRenderableWidget(new ImageButton(this.leftPos + 5, this.height / 2 - 49, 20, 18, 0, 0, 19, RECIPE_BUTTON_LOCATION, (button) ->
         {
             this.recipeBookComponent.toggleVisibility();
             this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
@@ -73,7 +73,7 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         renderBackground(guiGraphics);
-        if (this.recipeBookComponent.isVisible() && this.widthTooNarrow) {
+        /*if (this.recipeBookComponent.isVisible() && this.widthTooNarrow) {
             this.renderBg(guiGraphics, delta, mouseX, mouseY);
             renderHitsRemaining(guiGraphics);
             this.recipeBookComponent.render(guiGraphics, mouseX, mouseY, delta);
@@ -82,16 +82,16 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
             super.render(guiGraphics, mouseX, mouseY, delta);
             renderHitsRemaining(guiGraphics);
             this.recipeBookComponent.renderGhostRecipe(guiGraphics, this.leftPos, this.topPos, true, delta);
-        }
-
+        }*/
+        super.render(guiGraphics, mouseX, mouseY, delta);
+        renderHitsRemaining(guiGraphics);
         for (var widget : this.renderables) {
             if (widget instanceof TooltipButton button && button.isHovered()) {
                 guiGraphics.renderTooltip(this.font, button.getTooltipComponent(), mouseX, mouseY);
             }
         }
+        renderGhostResult(guiGraphics, this.leftPos, this.topPos, mouseX, mouseY); // Add ghost result rendering
         renderTooltip(guiGraphics, mouseX, mouseY);
-
-
     }
 
     private void renderHitsRemaining(GuiGraphics guiGraphics) {
@@ -104,13 +104,43 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
         guiGraphics.drawString(font, hitsText, x + 89, y + 17, 4210752, false);
     }
 
+    private void renderGhostResult(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
+        ItemStack ghostResult = menu.getGhostResult();
+        if (!ghostResult.isEmpty()) {
+            int itemX = x + 124;
+            int itemY = y + 35;
+
+            guiGraphics.pose().pushPose();
+
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.5F); // 50% transparency
+
+            guiGraphics.renderFakeItem(ghostResult, itemX, itemY);
+            guiGraphics.renderItemDecorations(this.font, ghostResult, itemX, itemY);
+
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F); // Reset alpha
+            RenderSystem.disableBlend();
+
+            guiGraphics.pose().popPose();
+
+            // Tooltip when hovering over ghost item
+            if (mouseX >= itemX - 1 && mouseX < itemX + 17 && mouseY >= itemY - 1 && mouseY < itemY + 17) {
+                guiGraphics.renderTooltip(this.font, ghostResult, mouseX, mouseY);
+            }
+        }
+    }
+
+
     /*@Override
     protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
         pGuiGraphics.drawString(font, this.title, this.titleLabelX, this.titleLabelY, 4210752);
     }*/
 
-    protected boolean isHovering(int x, int y, int width, int height, double mouseX, double mouseY) {
-        return (!this.widthTooNarrow || !this.recipeBookComponent.isVisible()) && super.isHovering(x, y, width, height, mouseX, mouseY);
+   /* protected boolean isHovering(int x, int y, int width, int height, double mouseX, double mouseY) {
+        return (!this.widthTooNarrow ||
+                !this.recipeBookComponent.isVisible()) &&
+                super.isHovering(x, y, width, height, mouseX, mouseY);
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int buttonId) {
@@ -139,5 +169,5 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
     @Override
     public RecipeBookComponent getRecipeBookComponent() {
         return this.recipeBookComponent;
-    }
+    }*/
 }

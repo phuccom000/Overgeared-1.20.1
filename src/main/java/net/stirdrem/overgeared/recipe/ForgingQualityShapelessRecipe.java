@@ -22,14 +22,39 @@ public class ForgingQualityShapelessRecipe extends ShapelessRecipe {
         ItemStack result = super.assemble(container, registryAccess);
         CompoundTag resultTag = result.getOrCreateTag();
 
-        // Copy ForgingQuality from any ingredient that has it
+        // Find first ingredient with quality data
+        String foundQuality = null;
+        boolean isPolished = false;
+
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack ingredient = container.getItem(i);
-            if (ingredient.hasTag() && ingredient.getTag().contains("ForgingQuality")) {
-                resultTag.putString("ForgingQuality", ingredient.getTag().getString("ForgingQuality"));
-                result.setTag(resultTag);
-                break; // Copy from first matching ingredient
+            if (ingredient.hasTag()) {
+                CompoundTag tag = ingredient.getTag();
+                if (tag.contains("ForgingQuality")) {
+                    foundQuality = tag.getString("ForgingQuality");
+                }
+                if (tag.contains("Polished") && tag.getBoolean("Polished")) {
+                    isPolished = true;
+                }
             }
+        }
+
+        // Apply quality modification rules
+        if (foundQuality != null) {
+            String resultQuality = foundQuality;
+
+            if (!isPolished) {
+                // Downgrade quality if not polished
+                resultQuality = switch (foundQuality) {
+                    case "perfect" -> "expert";
+                    case "expert" -> "well";
+                    case "well" -> "poor";
+                    default -> foundQuality; // "poor" stays as "poor"
+                };
+            }
+
+            resultTag.putString("ForgingQuality", resultQuality);
+            result.setTag(resultTag);
         }
 
         return result;

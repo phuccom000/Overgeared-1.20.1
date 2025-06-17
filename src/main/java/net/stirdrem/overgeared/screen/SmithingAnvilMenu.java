@@ -17,15 +17,16 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.recipe.ModRecipeBookTypes;
+import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
-public class SmithingAnvilMenu extends RecipeBookMenu<Container> {
+public class SmithingAnvilMenu extends AbstractContainerMenu {
     private final Container container = new SimpleContainer();
     public final SmithingAnvilBlockEntity blockEntity;
     private final Level level;
@@ -247,7 +248,20 @@ public class SmithingAnvilMenu extends RecipeBookMenu<Container> {
         return ItemStack.EMPTY;
     }
 
-    @Override
+    public ItemStack getGhostResult() {
+        // Return the expected result based on current inputs
+        // This could be from a recipe match or your custom logic
+        Optional<ForgingRecipe> recipeOptional = blockEntity.getCurrentRecipe();
+        if (recipeOptional.isPresent()) {
+            ForgingRecipe recipe = recipeOptional.get();
+            if (blockEntity.hasRecipe()) {
+                return recipe.getResultItem(level.registryAccess()).copy();
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    /*@Override
     public void fillCraftSlotsStackedContents(StackedContents contents) {
 
     }
@@ -291,6 +305,6 @@ public class SmithingAnvilMenu extends RecipeBookMenu<Container> {
     @Override
     public boolean shouldMoveToInventory(int pSlotIndex) {
         return false;
-    }
+    }*/
 
 }

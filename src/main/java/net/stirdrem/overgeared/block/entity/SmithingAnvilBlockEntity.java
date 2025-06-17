@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
@@ -254,6 +255,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             if (!Objects.equals(quality, "no_quality")) { // Additional safety check
                 CompoundTag tag = result.getOrCreateTag();
                 tag.putString("ForgingQuality", quality);
+                if (!(result.getItem() instanceof ArmorItem))
+                    tag.putBoolean("Polished", false);
                 result.setTag(tag);
             }
         }

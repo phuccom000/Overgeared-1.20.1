@@ -14,6 +14,7 @@ import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgeared.block.ModBlocks;
+import net.stirdrem.overgeared.item.ModItems;
 
 import java.util.Set;
 
@@ -26,6 +27,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
     protected void generate() {
         this.dropSelf(ModBlocks.STEEL_BLOCK.get());
         this.dropSelf(ModBlocks.SMITHING_ANVIL.get());
+        //this.dropOther(ModBlocks.ROCK.get(), ModItems.ROCK.get());
       /*  this.dropSelf(ModBlocks.WATER_BARREL.get());
         this.dropOther(ModBlocks.WATER_BARREL_FULL.get(), ModBlocks.WATER_BARREL.get());*/
 

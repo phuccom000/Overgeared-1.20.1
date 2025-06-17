@@ -41,6 +41,10 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue ZONE_SHRINK_FACTOR;
     public static final ForgeConfigSpec.IntValue MINIGAME_TIMEOUT_TICKS;
     public static final ForgeConfigSpec.DoubleValue BASE_DURABILITY_MULTIPLIER;
+    public static final ForgeConfigSpec.DoubleValue ROCK_DROPPING_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue FLINT_BREAKING_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue DURABILITY_REDUCE_PER_GRIND;
+    public static final ForgeConfigSpec.DoubleValue DAMAGE_RESTORE_PER_GRIND;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -112,6 +116,29 @@ public class ServerConfig {
 
         builder.pop();
 
+        builder.push("Knapping Config");
+
+        ROCK_DROPPING_CHANCE = builder
+                .comment("How likely it is for rock to drop from flint carving stone")
+                .defineInRange("rockDroppingChance", 0.1, 0, 1);
+        FLINT_BREAKING_CHANCE = builder
+                .comment("How likely it is for flint to break when carving stone")
+                .defineInRange("flintBreakingChance", 0.1, 0, 1);
+
+        builder.pop();
+
+        builder.push("Grinding Config");
+
+        DURABILITY_REDUCE_PER_GRIND = builder
+                .comment("How much the item durability reduce per grindstone use")
+                .defineInRange("durabilityReduce", 0.05, 0, 1);
+        DAMAGE_RESTORE_PER_GRIND = builder
+                .comment("How much the item's durability restore per grindstone use. " +
+                        "Should be larger than durability reduce per grind to avoid durability going to the negative")
+                .defineInRange("damageRestore", 0.1, 0, 1);
+        builder.pop();
+
+
         builder.push("Minigame Config");
 
         DEFAULT_ARROW_SPEED = builder
@@ -127,7 +154,7 @@ public class ServerConfig {
                 .defineInRange("maxArrowSpeed", 5, -10.0, 10.0);
 
         ZONE_STARTING_SIZE = builder
-                .comment("Zone starting size for the forging minigame,  in percentage")
+                .comment("Zone starting size for the forging minigame,  in chance")
                 .defineInRange("zoneStartingSize", 20, 0, 100);
 
         ZONE_SHRINK_FACTOR = builder

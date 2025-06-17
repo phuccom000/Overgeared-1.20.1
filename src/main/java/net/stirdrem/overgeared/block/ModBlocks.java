@@ -2,10 +2,7 @@ package net.stirdrem.overgeared.block;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CauldronBlock;
-import net.minecraft.world.level.block.LayeredCauldronBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
@@ -31,6 +28,8 @@ public class ModBlocks {
             () -> new SmithingAnvil(BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
     public static final RegistryObject<Block> STEEL_BLOCK = registerBlock("steel_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+    /*public static final RegistryObject<Block> ROCK = registerBlock("rock",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH).sound(SoundType.STONE)));*/
 
     /* public static final RegistryObject<Block> WATER_BARREL = registerBlock("water_barrel",
              () -> new WaterBarrel(BlockBehaviour.Properties.copy(Blocks.BARREL).noOcclusion()));

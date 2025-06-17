@@ -1,0 +1,10 @@
+{
+  "type": "overgeared:rock_knapping",
+  "pattern": [
+    "xx"
+  ],
+  "result": {
+    "item": "overgeared:stone_hoe_head"
+  },
+  "show_notification": true
+}

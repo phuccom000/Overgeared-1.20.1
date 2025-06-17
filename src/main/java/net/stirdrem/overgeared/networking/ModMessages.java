@@ -64,6 +64,11 @@ public class ModMessages {
                 .consumerMainThread(MinigameHitResultC2SPacket::handle)
                 .add();
 
+        net.messageBuilder(KnappingChipC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(KnappingChipC2SPacket::encode)
+                .decoder(KnappingChipC2SPacket::decode)
+                .consumerMainThread(KnappingChipC2SPacket::handle)
+                .add();
         /*net.messageBuilder(AnvilOccupationSyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(AnvilOccupationSyncS2CPacket::new)
                 .encoder(AnvilOccupationSyncS2CPacket::toBytes)

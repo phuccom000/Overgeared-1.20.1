@@ -27,7 +27,10 @@ public abstract class ItemStackMixin {
     )
     private void insertQualityTooltip(Player player, TooltipFlag context, CallbackInfoReturnable<List<Component>> cir) {
         ItemStack stack = (ItemStack) (Object) this;
+        List<Component> tooltip = cir.getReturnValue() != null ? new ArrayList<>(cir.getReturnValue()) : new ArrayList<>();
+        boolean modified = false;
 
+        // Handle quality tooltip
         if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
             String quality = stack.getTag().getString("ForgingQuality");
             Component qualityComponent = switch (quality) {
@@ -39,18 +42,27 @@ public abstract class ItemStackMixin {
             };
 
             if (qualityComponent != null) {
-                List<Component> tooltip = cir.getReturnValue();
-                if (tooltip == null) {
-                    tooltip = new ArrayList<>();
-                } else {
-                    tooltip = new ArrayList<>(tooltip);
-                }
-
-                // Insert the quality tooltip after the item's name (which is typically at index 0)
                 int insertPos = Math.min(1, tooltip.size());
                 tooltip.add(insertPos, qualityComponent);
-                cir.setReturnValue(tooltip);
+                modified = true;
             }
+        }
+
+        // Handle polished/unpolished tooltip
+        if (stack.hasTag() && stack.getTag().contains("Polished")) {
+            boolean isPolished = stack.getTag().getBoolean("Polished");
+            Component polishComponent = isPolished
+                    ? Component.translatable("tooltip.overgeared.polished").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC)
+                    : Component.translatable("tooltip.overgeared.unpolished").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+
+            // Insert after quality tooltip or at position 1 if no quality
+            int insertPos = modified ? 2 : Math.min(1, tooltip.size());
+            tooltip.add(insertPos, polishComponent);
+            modified = true;
+        }
+
+        if (modified) {
+            cir.setReturnValue(tooltip);
         }
     }
 
@@ -104,14 +116,23 @@ public abstract class ItemStackMixin {
         float baseMultiplier = ServerConfig.BASE_DURABILITY_MULTIPLIER.get().floatValue();
         int newBaseDurability = (int) (originalDurability * baseMultiplier);
 
-        // Apply quality multiplier if the tag exists
+        // Apply quality multiplier if present
         if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
             float multiplier = QualityHelper.getQualityMultiplier(stack);
-            int modifiedDurability = (int) (newBaseDurability * multiplier);
-            cir.setReturnValue(modifiedDurability);
-        } else {
-            cir.setReturnValue(newBaseDurability);
+            newBaseDurability = (int) (newBaseDurability * multiplier);
         }
+
+        // Reduce max durability by 5% for each 'ReducedMaxDurability'
+        if (stack.hasTag() && stack.getTag().contains("ReducedMaxDurability")) {
+            int reductions = stack.getTag().getInt("ReducedMaxDurability");
+            float durabilityPenaltyMultiplier = 1.0f - (reductions * ServerConfig.DURABILITY_REDUCE_PER_GRIND.get().floatValue());
+            durabilityPenaltyMultiplier = Math.max(0.1f, durabilityPenaltyMultiplier); // Prevent zero or negative durability
+            newBaseDurability = (int) (originalDurability * baseMultiplier *
+                    (stack.getTag().contains("ForgingQuality") ? QualityHelper.getQualityMultiplier(stack) : 1)
+                    * durabilityPenaltyMultiplier);
+        }
+
+        cir.setReturnValue(newBaseDurability);
     }
 
     /*@Redirect(method = "getTooltipLines", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;getAttackDamage()F"))

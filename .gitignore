@@ -7617,3 +7617,4 @@ forge*changelog.txt
 /src/generated/resources/.cache/
 /run-data/logs/
 /1.20.1
+/run-data

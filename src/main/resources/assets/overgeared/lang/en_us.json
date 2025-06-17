@@ -6,6 +6,7 @@
   "creativetab.overgeared_tab": "Overgeared",
   "gui.overgeared.remaining_hits": "Hits Left: %s",
   "gui.overgeared.smithing_anvil": "Forging",
+  "item.overgeared.knappable_rock": "Rock",
   "item.overgeared.crude_steel": "Crude Steel",
   "item.overgeared.iron_plate": "Iron Plate",
   "item.overgeared.steel_plate": "Steel Plate",
@@ -78,6 +79,11 @@
   "recipeBook.toggleRecipes.forging": "Show forgeable items",
   "recipeBook.category.forging_search": "Search",
   "recipeBook.category.forging_main": "Forging Recipes",
-  "gui.recipebook.toggleRecipes.forgeable": "Show forgeable"
+  "gui.recipebook.toggleRecipes.forgeable": "Show forgeable",
+  "gui.overgeared.rock_knapping": "Knapping",
+  "tooltip.overgeared.knappable_rock.tooltip": "Hold a rock in each hand and right click to start knapping.",
+  "tooltip.overgeared.flint_flavor": "Right click on stone to carve out a piece of rock. Has a chance to break.",
+  "tooltip.overgeared.polished": "Polished",
+  "tooltip.overgeared.unpolished": "Unpolished"
 }
 

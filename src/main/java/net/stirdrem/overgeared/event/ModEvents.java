@@ -2,12 +2,17 @@ package net.stirdrem.overgeared.event;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -21,7 +26,9 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -54,7 +61,8 @@ public class ModEvents {
         if (event.phase == TickEvent.Phase.END && event.side == LogicalSide.SERVER) {
             // Run cleanup at regular intervals
             if (event.getServer().getTickCount() % ANVIL_CLEANUP_INTERVAL == 0) {
-                SmithingHammer.cleanupStaleAnvils(event.getServer().overworld());
+                resetMinigameForPlayer(event.get);
+                startTimeoutCounter(player);
             }
         }
     }*/
@@ -302,6 +310,19 @@ public class ModEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        MinecraftServer server = event.getServer();
+
+        // Iterate over all players and reset their minigame
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            resetMinigameForPlayer(player);
+        }
+
+        // Optional: Log for debugging
+        OvergearedMod.LOGGER.info("Reset all minigames on server stop.");
+    }
+    
     private static void resetMinigameForPlayer(ServerPlayer player) {
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
             if (minigame.hasAnvilPosition()) {
@@ -328,6 +349,14 @@ public class ModEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onTooltip(ItemTooltipEvent event) {
+        // You can check other vanilla items similarly
+        if (event.getItemStack().is(Items.FLINT)) {
+            event.getToolTip().add(Component.translatable("tooltip.overgeared.flint_flavor")
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        }
+    }
 
 
    /* @SubscribeEvent

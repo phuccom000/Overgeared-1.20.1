@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.compat;
 
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -16,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.items.SlotItemHandler;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
@@ -38,6 +40,7 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
     public ForgingRecipeCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(TEXTURE, 29, 16, 116, 54);
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.SMITHING_ANVIL.get()));
+
     }
 
     @Override

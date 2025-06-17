@@ -43,6 +43,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         simpleItem(ModItems.CRUDE_STEEL);
+        simpleItem(ModItems.ROCK);
         simpleItem(ModItems.STEEL_INGOT);
         simpleItem(ModItems.HEATED_IRON_INGOT);
         simpleItem(ModItems.HEATED_STEEL_INGOT);
@@ -64,35 +65,35 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleHandheld(ModItems.STEEL_HOE);
 
         // Sword Blades
-        //simpleItem(ModItems.STONE_SWORD_BLADE);
+        simpleItem(ModItems.STONE_SWORD_BLADE);
         simpleItem(ModItems.IRON_SWORD_BLADE);
         simpleItem(ModItems.GOLDEN_SWORD_BLADE);
         simpleItem(ModItems.STEEL_SWORD_BLADE);
         //simpleItem(ModItems.DIAMOND_SWORD_BLADE);
 
         // Pickaxe Heads
-        //simpleItem(ModItems.STONE_PICKAXE_HEAD);
+        simpleItem(ModItems.STONE_PICKAXE_HEAD);
         simpleItem(ModItems.IRON_PICKAXE_HEAD);
         simpleItem(ModItems.GOLDEN_PICKAXE_HEAD);
         simpleItem(ModItems.STEEL_PICKAXE_HEAD);
         //simpleItem(ModItems.DIAMOND_PICKAXE_HEAD);
 
         // Axe Heads
-        //simpleItem(ModItems.STONE_AXE_HEAD);
+        simpleItem(ModItems.STONE_AXE_HEAD);
         simpleItem(ModItems.IRON_AXE_HEAD);
         simpleItem(ModItems.GOLDEN_AXE_HEAD);
         simpleItem(ModItems.STEEL_AXE_HEAD);
         //simpleItem(ModItems.DIAMOND_AXE_HEAD);
 
         // Shovel Heads
-        //simpleItem(ModItems.STONE_SHOVEL_HEAD);
+        simpleItem(ModItems.STONE_SHOVEL_HEAD);
         simpleItem(ModItems.IRON_SHOVEL_HEAD);
         simpleItem(ModItems.GOLDEN_SHOVEL_HEAD);
         simpleItem(ModItems.STEEL_SHOVEL_HEAD);
         //simpleItem(ModItems.DIAMOND_SHOVEL_HEAD);
 
         // Hoe Heads
-        //simpleItem(ModItems.STONE_HOE_HEAD);
+        simpleItem(ModItems.STONE_HOE_HEAD);
         simpleItem(ModItems.IRON_HOE_HEAD);
         simpleItem(ModItems.GOLDEN_HOE_HEAD);
         simpleItem(ModItems.STEEL_HOE_HEAD);

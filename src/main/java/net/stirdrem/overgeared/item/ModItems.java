@@ -10,6 +10,7 @@ import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.DiamondUpgradeTemplateItem;
+import net.stirdrem.overgeared.item.custom.KnappableRockItem;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.item.custom.Tongs;
 
@@ -24,6 +25,9 @@ public class ModItems {
 
     public static final RegistryObject<Item> CRUDE_STEEL = ITEMS.register("crude_steel",
             () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> ROCK = ITEMS.register("knappable_rock",
+            () -> new KnappableRockItem(new Item.Properties()));
 
     public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register("steel_ingot",
             () -> new Item(new Item.Properties()));
@@ -66,10 +70,8 @@ public class ModItems {
             DiamondUpgradeTemplateItem::createDiamondUpgradeTemplate);
 
     // Add these inside your ModItems class
-/*
     public static final RegistryObject<Item> STONE_SWORD_BLADE = ITEMS.register("stone_sword_blade",
             () -> new Item(new Item.Properties()));
-*/
     public static final RegistryObject<Item> IRON_SWORD_BLADE = ITEMS.register("iron_sword_blade",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLDEN_SWORD_BLADE = ITEMS.register("golden_sword_blade",
@@ -81,10 +83,8 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 */
 
-    /*
-        public static final RegistryObject<Item> STONE_PICKAXE_HEAD = ITEMS.register("stone_pickaxe_head",
-                () -> new Item(new Item.Properties()));
-    */
+    public static final RegistryObject<Item> STONE_PICKAXE_HEAD = ITEMS.register("stone_pickaxe_head",
+            () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_PICKAXE_HEAD = ITEMS.register("iron_pickaxe_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLDEN_PICKAXE_HEAD = ITEMS.register("golden_pickaxe_head",
@@ -96,10 +96,9 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 */
 
-    /*
-        public static final RegistryObject<Item> STONE_AXE_HEAD = ITEMS.register("stone_axe_head",
-                () -> new Item(new Item.Properties()));
-    */
+
+    public static final RegistryObject<Item> STONE_AXE_HEAD = ITEMS.register("stone_axe_head",
+            () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_AXE_HEAD = ITEMS.register("iron_axe_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLDEN_AXE_HEAD = ITEMS.register("golden_axe_head",
@@ -109,10 +108,9 @@ public class ModItems {
 /*    public static final RegistryObject<Item> DIAMOND_AXE_HEAD = ITEMS.register("diamond_axe_head",
             () -> new Item(new Item.Properties()));*/
 
-    /*
-        public static final RegistryObject<Item> STONE_SHOVEL_HEAD = ITEMS.register("stone_shovel_head",
-                () -> new Item(new Item.Properties()));
-    */
+
+    public static final RegistryObject<Item> STONE_SHOVEL_HEAD = ITEMS.register("stone_shovel_head",
+            () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_SHOVEL_HEAD = ITEMS.register("iron_shovel_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLDEN_SHOVEL_HEAD = ITEMS.register("golden_shovel_head",
@@ -122,8 +120,8 @@ public class ModItems {
 /*    public static final RegistryObject<Item> DIAMOND_SHOVEL_HEAD = ITEMS.register("diamond_shovel_head",
             () -> new Item(new Item.Properties()));*/
 
-    /*    public static final RegistryObject<Item> STONE_HOE_HEAD = ITEMS.register("stone_hoe_head",
-                () -> new Item(new Item.Properties()));*/
+    public static final RegistryObject<Item> STONE_HOE_HEAD = ITEMS.register("stone_hoe_head",
+            () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_HOE_HEAD = ITEMS.register("iron_hoe_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLDEN_HOE_HEAD = ITEMS.register("golden_hoe_head",
