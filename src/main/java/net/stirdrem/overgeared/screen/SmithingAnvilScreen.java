@@ -18,6 +18,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.client.ForgingRecipeBookComponent;
 import net.stirdrem.overgeared.networking.ModMessages;
 
 import net.stirdrem.overgeared.util.TooltipButton;
@@ -26,7 +27,7 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
     private static final ResourceLocation TEXTURE =
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/smithing_anvil.png");
     private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.tryParse("textures/gui/recipe_button.png");
-    private final RecipeBookComponent recipeBookComponent = new RecipeBookComponent();
+    private final ForgingRecipeBookComponent recipeBookComponent = new ForgingRecipeBookComponent();
     private boolean widthTooNarrow;
 
     public SmithingAnvilScreen(SmithingAnvilMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
@@ -37,7 +38,7 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
     protected void init() {
         super.init();
         this.titleLabelX = 29;
-        /*this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
+        this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
         this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
         this.addRenderableWidget(new ImageButton(this.leftPos + 5, this.height / 2 - 49, 20, 18, 0, 0, 19, RECIPE_BUTTON_LOCATION, (button) ->
         {
@@ -45,8 +46,9 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
             this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
             ((ImageButton) button).setPosition(this.leftPos + 5, this.height / 2 - 49);
         }));
+        //this.recipeBookComponent.hide();
         this.addWidget(this.recipeBookComponent);
-        this.setInitialFocus(this.recipeBookComponent);*/
+        this.setInitialFocus(this.recipeBookComponent);
 
     }
 
@@ -140,4 +142,11 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
     public RecipeBookComponent getRecipeBookComponent() {
         return this.recipeBookComponent;
     }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        this.recipeBookComponent.tick();
+    }
+
 }

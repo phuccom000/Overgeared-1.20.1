@@ -78,6 +78,7 @@
   "recipeBook.toggleRecipes.forging": "Show forgeable items",
   "recipeBook.category.forging_search": "Search",
   "recipeBook.category.forging_main": "Forging Recipes",
-  "gui.recipebook.toggleRecipes.forgeable": "Show forgeable"
+  "gui.recipebook.toggleRecipes.forgeable": "Show forgeable",
+  "overgeared.container.recipe_book.forgeable": "Showing Forgeable"
 }
 

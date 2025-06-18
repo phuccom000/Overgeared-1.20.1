@@ -4,6 +4,7 @@ package net.stirdrem.overgeared;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.world.inventory.RecipeBookType;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -52,7 +53,7 @@ public class OvergearedMod {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     //public static final AnvilMinigameHandler SERVER_HANDLER = new AnvilMinigameHandler();
-
+    public static final RecipeBookType RECIPE_TYPE_FORGING = RecipeBookType.create("FORGING");
     public static boolean polymorph;
 
     public OvergearedMod(FMLJavaModLoadingContext context) {

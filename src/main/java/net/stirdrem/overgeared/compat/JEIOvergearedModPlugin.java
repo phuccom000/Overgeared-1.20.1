@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
+import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.screen.SmithingAnvilScreen;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         if (Minecraft.getInstance().level == null) return;
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 
-        List<ForgingRecipe> forgingRecipes = recipeManager.getAllRecipesFor(ForgingRecipe.Type.INSTANCE);
+        List<ForgingRecipe> forgingRecipes = recipeManager.getAllRecipesFor(ModRecipeTypes.FORGING.get());
         registration.addRecipes(ForgingRecipeCategory.FORGING_RECIPE_TYPE, forgingRecipes);
     }
 

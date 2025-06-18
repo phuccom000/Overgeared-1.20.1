@@ -1,15 +1,9 @@
 package net.stirdrem.overgeared.recipe;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,14 +14,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.client.ForgingBookRecipeBookTab;
 
+import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Function;
 
 public class ForgingRecipe implements Recipe<Container> {
     private final ResourceLocation id;
     private final String group;
+    private final ForgingBookRecipeBookTab tab;
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result;
     private final int hammering;
@@ -36,10 +31,11 @@ public class ForgingRecipe implements Recipe<Container> {
     public final int width;
     public final int height;
 
-    public ForgingRecipe(ResourceLocation id, String group, NonNullList<Ingredient> ingredients,
+    public ForgingRecipe(ResourceLocation id, String group, @Nullable ForgingBookRecipeBookTab tab, NonNullList<Ingredient> ingredients,
                          ItemStack result, int hammering, boolean hasQuality, boolean showNotification, int width, int height) {
         this.id = id;
         this.group = group;
+        this.tab = tab;
         this.ingredients = ingredients;
         this.result = result;
         this.hammering = hammering;
@@ -194,6 +190,12 @@ public class ForgingRecipe implements Recipe<Container> {
     }
 
 
+    @Nullable
+    public ForgingBookRecipeBookTab getRecipeBookTab() {
+        return this.tab;
+    }
+
+
     public static class Type implements RecipeType<ForgingRecipe> {
         public static final Type INSTANCE = new Type();
         public static final String ID = "forging";
@@ -212,13 +214,17 @@ public class ForgingRecipe implements Recipe<Container> {
 
             Map<Character, Ingredient> keyMap = parseKey(GsonHelper.getAsJsonObject(json, "key"));
             JsonArray pattern = GsonHelper.getAsJsonArray(json, "pattern");
-
+            final String tabKeyIn = GsonHelper.getAsString(json, "category", null);
+            final ForgingBookRecipeBookTab tabIn = ForgingBookRecipeBookTab.findByName(tabKeyIn);
+            if (tabKeyIn != null && tabIn == null) {
+                OvergearedMod.LOGGER.warn("Optional field 'category' does not match any valid tab. If defined, must be one of the following: " + EnumSet.allOf(ForgingBookRecipeBookTab.class));
+            }
             int width = pattern.get(0).getAsString().length();
             int height = pattern.size();
             NonNullList<Ingredient> ingredients = dissolvePattern(pattern, keyMap, width, height);
 
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
-            return new ForgingRecipe(recipeId, group, ingredients, result, hammering, hasQuality, showNotification, width, height);
+            return new ForgingRecipe(recipeId, group, tabIn, ingredients, result, hammering, hasQuality, showNotification, width, height);
         }
 
         private static Map<Character, Ingredient> parseKey(JsonObject keyJson) {
@@ -257,6 +263,7 @@ public class ForgingRecipe implements Recipe<Container> {
         @Override
         public ForgingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             String group = buffer.readUtf();
+            ForgingBookRecipeBookTab tabIn = ForgingBookRecipeBookTab.findByName(buffer.readUtf());
             int hammering = buffer.readVarInt();
             boolean hasQuality = buffer.readBoolean();  // Changed order to match writing
             boolean showNotification = buffer.readBoolean();
@@ -269,12 +276,13 @@ public class ForgingRecipe implements Recipe<Container> {
             }
 
             ItemStack result = buffer.readItem();
-            return new ForgingRecipe(recipeId, group, ingredients, result, hammering, hasQuality, showNotification, width, height);
+            return new ForgingRecipe(recipeId, group, tabIn, ingredients, result, hammering, hasQuality, showNotification, width, height);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buffer, ForgingRecipe recipe) {
             buffer.writeUtf(recipe.group);
+            buffer.writeUtf(recipe.tab != null ? recipe.tab.toString() : "");
             buffer.writeVarInt(recipe.hammering);
             buffer.writeBoolean(recipe.hasQuality);
             buffer.writeBoolean(recipe.showNotification);

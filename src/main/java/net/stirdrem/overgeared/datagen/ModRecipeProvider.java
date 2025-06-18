@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
+import net.stirdrem.overgeared.client.ForgingBookRecipeBookTab;
 import net.stirdrem.overgeared.item.ModItems;
 
 import java.util.List;
@@ -512,6 +513,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("# #")
                 .pattern("# #")
                 .define('#', ModItems.STEEL_PLATE.get())
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
                 .save(pWriter);
 
