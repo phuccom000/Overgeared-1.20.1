@@ -467,6 +467,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("###")
                 .pattern("# #")
                 .define('#', ModItems.IRON_PLATE.get())
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .unlockedBy(getHasName(ModItems.IRON_PLATE.get()), has(ModItems.IRON_PLATE.get()))
                 .save(pWriter);
 
@@ -474,6 +475,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("# #")
                 .pattern("###")
                 .pattern("###")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', ModItems.IRON_PLATE.get())
                 .unlockedBy(getHasName(ModItems.IRON_PLATE.get()), has(ModItems.IRON_PLATE.get()))
                 .save(pWriter);
@@ -482,6 +484,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("###")
                 .pattern("# #")
                 .pattern("# #")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', ModItems.IRON_PLATE.get())
                 .unlockedBy(getHasName(ModItems.IRON_PLATE.get()), has(ModItems.IRON_PLATE.get()))
                 .save(pWriter);
@@ -489,6 +492,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.IRON_BOOTS, 3)
                 .pattern("# #")
                 .pattern("# #")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', ModItems.IRON_PLATE.get())
                 .unlockedBy(getHasName(ModItems.IRON_PLATE.get()), has(ModItems.IRON_PLATE.get()))
                 .save(pWriter);
@@ -496,6 +500,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.STEEL_HELMET.get(), 3)
                 .pattern("###")
                 .pattern("# #")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', ModItems.STEEL_PLATE.get())
                 .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
                 .save(pWriter);
@@ -504,6 +509,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("# #")
                 .pattern("###")
                 .pattern("###")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', ModItems.STEEL_PLATE.get())
                 .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
                 .save(pWriter);
@@ -512,6 +518,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("###")
                 .pattern("# #")
                 .pattern("# #")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', ModItems.STEEL_PLATE.get())
                 .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
@@ -520,6 +527,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.STEEL_BOOTS.get(), 3)
                 .pattern("# #")
                 .pattern("# #")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', ModItems.STEEL_PLATE.get())
                 .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
                 .save(pWriter);
@@ -528,6 +536,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.GOLDEN_HELMET, 3)
                 .pattern("###")
                 .pattern("# #")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', Items.GOLD_INGOT)
                 .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
                 .save(pWriter);
@@ -536,6 +545,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("# #")
                 .pattern("###")
                 .pattern("###")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', Items.GOLD_INGOT)
                 .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
                 .save(pWriter);
@@ -544,6 +554,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("###")
                 .pattern("# #")
                 .pattern("# #")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', Items.GOLD_INGOT)
                 .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
                 .save(pWriter);
@@ -551,6 +562,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, Items.GOLDEN_BOOTS, 3)
                 .pattern("# #")
                 .pattern("# #")
+                .setRecipeBookTab(ForgingBookRecipeBookTab.ARMORS)
                 .define('#', Items.GOLD_INGOT)
                 .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
                 .save(pWriter);

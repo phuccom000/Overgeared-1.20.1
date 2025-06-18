@@ -147,7 +147,7 @@ public class ForgingRecipe implements Recipe<Container> {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.FORGING_SERIALIZER.get();
+        return ModRecipeSerializers.FORGING_SERIALIZER.get();
     }
 
     @Override
@@ -214,10 +214,10 @@ public class ForgingRecipe implements Recipe<Container> {
 
             Map<Character, Ingredient> keyMap = parseKey(GsonHelper.getAsJsonObject(json, "key"));
             JsonArray pattern = GsonHelper.getAsJsonArray(json, "pattern");
-            final String tabKeyIn = GsonHelper.getAsString(json, "category", null);
+            final String tabKeyIn = GsonHelper.getAsString(json, "recipe_book_tab", ForgingBookRecipeBookTab.MISC.toString());
             final ForgingBookRecipeBookTab tabIn = ForgingBookRecipeBookTab.findByName(tabKeyIn);
             if (tabKeyIn != null && tabIn == null) {
-                OvergearedMod.LOGGER.warn("Optional field 'category' does not match any valid tab. If defined, must be one of the following: " + EnumSet.allOf(ForgingBookRecipeBookTab.class));
+                OvergearedMod.LOGGER.warn("Optional field 'recipe_book_tab' does not match any valid tab. If defined, must be one of the following: " + EnumSet.allOf(ForgingBookRecipeBookTab.class));
             }
             int width = pattern.get(0).getAsString().length();
             int height = pattern.size();

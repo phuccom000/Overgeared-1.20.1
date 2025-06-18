@@ -1,6 +1,5 @@
 {
   "type": "overgeared:forging",
-  "category": "misc",
   "hammering": 3,
   "has_quality": true,
   "key": {
@@ -11,6 +10,7 @@
   "pattern": [
     "#"
   ],
+  "recipe_book_tab": "misc",
   "result": {
     "item": "overgeared:golden_shovel_head"
   },

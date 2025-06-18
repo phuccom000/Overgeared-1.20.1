@@ -16,13 +16,11 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
@@ -38,7 +36,7 @@ import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.loot.ModLootModifiers;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
-import net.stirdrem.overgeared.recipe.ModRecipes;
+import net.stirdrem.overgeared.recipe.ModRecipeSerializers;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
 import net.stirdrem.overgeared.screen.SmithingAnvilScreen;
 import net.stirdrem.overgeared.sound.ModSounds;
@@ -73,7 +71,7 @@ public class OvergearedMod {
 
         ModMenuTypes.register(modEventBus);
 
-        ModRecipes.register(modEventBus);
+        ModRecipeSerializers.register(modEventBus);
 
         ModRecipeTypes.register(modEventBus);
 

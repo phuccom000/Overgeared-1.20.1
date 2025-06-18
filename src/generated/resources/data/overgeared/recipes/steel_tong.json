@@ -1,6 +1,5 @@
 {
   "type": "overgeared:forging",
-  "category": "misc",
   "hammering": 2,
   "has_quality": false,
   "key": {
@@ -13,6 +12,7 @@
     " xx",
     "x  "
   ],
+  "recipe_book_tab": "misc",
   "result": {
     "item": "overgeared:steel_tong"
   },

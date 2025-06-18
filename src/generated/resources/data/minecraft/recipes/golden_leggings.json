@@ -1,6 +1,5 @@
 {
   "type": "overgeared:forging",
-  "category": "armors",
   "hammering": 4,
   "has_quality": true,
   "key": {
@@ -13,6 +12,7 @@
     "# #",
     "# #"
   ],
+  "recipe_book_tab": "armors",
   "result": {
     "item": "minecraft:golden_leggings"
   },

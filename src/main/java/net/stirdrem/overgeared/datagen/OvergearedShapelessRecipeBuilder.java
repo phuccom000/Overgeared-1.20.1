@@ -25,10 +25,7 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.stirdrem.overgeared.recipe.ModRecipeTypes;
-import net.stirdrem.overgeared.recipe.ModRecipes;
-
-import static net.minecraft.data.recipes.RecipeBuilder.ROOT_RECIPE_ADVANCEMENT;
+import net.stirdrem.overgeared.recipe.ModRecipeSerializers;
 
 public class OvergearedShapelessRecipeBuilder extends CraftingRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category;
@@ -156,7 +153,7 @@ public class OvergearedShapelessRecipeBuilder extends CraftingRecipeBuilder impl
         }
 
         public RecipeSerializer<?> getType() {
-            return ModRecipes.CRAFTING_SHAPELESS.get();
+            return ModRecipeSerializers.CRAFTING_SHAPELESS.get();
         }
 
         public ResourceLocation getId() {

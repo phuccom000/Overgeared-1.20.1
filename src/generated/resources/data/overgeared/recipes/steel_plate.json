@@ -1,6 +1,5 @@
 {
   "type": "overgeared:forging",
-  "category": "misc",
   "hammering": 4,
   "has_quality": false,
   "key": {
@@ -11,6 +10,7 @@
   "pattern": [
     "#"
   ],
+  "recipe_book_tab": "misc",
   "result": {
     "item": "overgeared:steel_plate"
   },

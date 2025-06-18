@@ -201,7 +201,6 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final ResourceLocation advancementId;
         private final boolean showNotification;
         private final String group;
-        private final ForgingBookRecipeBookTab category;
         private final Boolean hasQuality;
 
 
@@ -210,7 +209,6 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             this.tab = category;
             this.hammering = hammering;
             this.result = result;
-            this.category = category;
             this.id = id;
             this.group = group;
             this.pattern = pattern;
@@ -228,7 +226,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             }
             JsonArray patternArray = new JsonArray();
             if (tab != null) {
-                json.addProperty("category", tab.toString());
+                json.addProperty("recipe_book_tab", tab.toString());
             }
             for (String s : this.pattern) {
                 patternArray.add(s);

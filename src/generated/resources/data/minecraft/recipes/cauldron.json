@@ -1,6 +1,5 @@
 {
   "type": "overgeared:forging",
-  "category": "misc",
   "hammering": 5,
   "has_quality": false,
   "key": {
@@ -13,6 +12,7 @@
     "# #",
     "###"
   ],
+  "recipe_book_tab": "misc",
   "result": {
     "item": "minecraft:cauldron"
   },

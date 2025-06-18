@@ -268,23 +268,33 @@ public class SmithingAnvilMenu extends RecipeBookMenu<Container> {
 
     @Override
     public void fillCraftSlotsStackedContents(StackedContents contents) {
-        // Provide the current input items for searching recipes
-        for (int i = 0; i < 9; i++) {
-            contents.accountSimpleStack(container.getItem(i));
+        // Fill with items from the crafting grid (slots 1-9 in your case)
+        for (int i = 1; i <= 9; i++) {
+            contents.accountSimpleStack(slots.get(i).getItem());
         }
     }
 
     @Override
     public void clearCraftingContent() {
-        // Clear inputs when resetting
-        container.clearContent();
+        // Clear the crafting grid (slots 1-9)
+        for (int i = 1; i <= 9; i++) {
+            slots.get(i).set(ItemStack.EMPTY);
+        }
     }
 
     @Override
     public boolean recipeMatches(Recipe<? super Container> recipe) {
-        // Only consider your forging recipe type
-        return recipe.getType() == ModRecipeTypes.FORGING.get()
-                && recipe.matches(container, level);
+        if (!(recipe instanceof ForgingRecipe)) return false;
+
+        // Get the crafting grid items
+        NonNullList<ItemStack> items = NonNullList.withSize(9, ItemStack.EMPTY);
+        for (int i = 0; i < 9; i++) {
+            items.set(i, slots.get(i).getItem()); // +1 because slot 0 is output
+        }
+
+        // Create a temporary container with current items
+        SimpleContainer tempInv = new SimpleContainer(items.toArray(new ItemStack[0]));
+        return recipe.matches(tempInv, level);
     }
 
     @Override

@@ -10,7 +10,7 @@ public enum ForgingBookRecipeBookTab {
     public static final StringRepresentable.EnumCodec<net.minecraft.world.item.crafting.CookingBookCategory> CODEC = StringRepresentable.fromEnum(net.minecraft.world.item.crafting.CookingBookCategory::values);
     private final String name;
 
-    private ForgingBookRecipeBookTab(String pName) {
+    ForgingBookRecipeBookTab(String pName) {
         this.name = pName;
     }
 
