@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -15,7 +16,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
@@ -27,14 +27,16 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.ForgingQuality;
-import net.stirdrem.overgeared.block.custom.SmithingAnvil;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.networking.packet.StartMinigameS2CPacket;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
     private final ItemStackHandler itemHandler = new ItemStackHandler(11) {
@@ -50,15 +52,16 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     private static final int INPUT_SLOT = 0;
     private static final int OUTPUT_SLOT = 10;
 
-
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
-
     protected final ContainerData data;
     private int progress = 0;
     private int maxProgress = 0;
     private int hitRemains;
     private long busyUntilGameTime = 0L;
-
+    private String currentQuality = "";
+    @Nullable
+    private UUID forgingPlayerId;
+    private ForgingRecipe lastRecipe = null;
 
     public SmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.SMITHING_ANVIL_BE.get(), pPos, pBlockState);
@@ -88,8 +91,282 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         };
     }
 
-    public ItemStack getRenderStack(int index) {
-        return itemHandler.getStackInSlot(index);
+    // Player tracking methods
+    public boolean isPlayerForging(Player player) {
+        return forgingPlayerId != null && forgingPlayerId.equals(player.getUUID());
+    }
+
+    public void startForging(Player player) {
+        this.forgingPlayerId = player.getUUID();
+        setChanged();
+    }
+
+    public void stopForging() {
+        this.forgingPlayerId = null;
+        setChanged();
+    }
+
+    public boolean isForging() {
+        return forgingPlayerId != null;
+    }
+
+    private boolean isForgingPlayerInRange() {
+        if (level == null || forgingPlayerId == null) return false;
+        Player player = level.getPlayerByUUID(forgingPlayerId);
+        return player != null && player.distanceToSqr(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5) <= 64;
+    }
+
+    public void abortForging() {
+        if (isForging()) {
+            if (level != null) {
+                Player player = level.getPlayerByUUID(forgingPlayerId);
+                if (player != null) {
+                    player.sendSystemMessage(Component.translatable("message.overgeared.forging_aborted"));
+                }
+            }
+            stopForging();
+            resetProgress();
+        }
+    }
+
+    // Minigame methods
+    public void startMinigame(Player player) {
+        if (level.isClientSide || !(player instanceof ServerPlayer serverPlayer)) return;
+
+        Optional<ForgingRecipe> recipe = getCurrentRecipe();
+        if (recipe.isEmpty()) return;
+
+        startForging(player);
+        ItemStack result = recipe.get().getResultItem(level.registryAccess());
+        int requiredHits = recipe.get().getHammeringRequired();
+        ModMessages.sendToPlayer(new StartMinigameS2CPacket(getBlockPos(), forgingPlayerId, result, requiredHits), serverPlayer);
+    }
+
+    public void registerHit(String quality) {
+        this.currentQuality = quality;
+        increaseCraftingProgress();
+        setChanged();
+
+        if (hasProgressFinished()) {
+            craftItem();
+            resetProgress();
+        }
+    }
+
+    // Crafting methods
+    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+        if (pLevel.isClientSide) return;
+
+        if (isForging() && !isForgingPlayerInRange()) {
+            abortForging();
+            return;
+        }
+
+        Optional<ForgingRecipe> recipe = getCurrentRecipe();
+        if (hasRecipe()) {
+            ForgingRecipe currentRecipe = recipe.get();
+            maxProgress = currentRecipe.getHammeringRequired();
+            setChanged(pLevel, pPos, pState);
+
+            if (hasProgressFinished()) {
+                craftItem();
+                resetProgress();
+            }
+        } else {
+            resetProgress();
+        }
+    }
+
+    public void craftItem() {
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isEmpty()) return;
+
+        ForgingRecipe recipe = recipeOptional.get();
+        ItemStack result = recipe.getResultItem(getLevel().registryAccess());
+
+        if (recipe.hasQuality()) {
+            String quality = determineForgingQuality();
+            if (!quality.isEmpty()) {
+                CompoundTag tag = result.getOrCreateTag();
+                tag.putString("ForgingQuality", quality);
+                result.setTag(tag);
+            }
+        }
+
+        for (int i = 0; i < this.itemHandler.getSlots() - 1; i++) {
+            this.itemHandler.extractItem(i, 1, false);
+        }
+
+        ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+        if (existing.isEmpty()) {
+            this.itemHandler.setStackInSlot(OUTPUT_SLOT, result);
+        } else if (ItemStack.isSameItemSameTags(existing, result)) {
+            int total = existing.getCount() + result.getCount();
+            int maxSize = Math.min(existing.getMaxStackSize(), this.itemHandler.getSlotLimit(OUTPUT_SLOT));
+
+            if (total <= maxSize) {
+                existing.grow(result.getCount());
+            } else {
+                existing.setCount(maxSize);
+                ItemStack overflow = result.copy();
+                overflow.setCount(total - maxSize);
+                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), overflow);
+            }
+        }
+    }
+
+    private String determineForgingQuality() {
+        switch (currentQuality.toLowerCase()) {
+            case "perfect":
+                return ForgingQuality.PERFECT.getDisplayName();
+            case "expert":
+                return ForgingQuality.EXPERT.getDisplayName();
+            case "well":
+                return ForgingQuality.WELL.getDisplayName();
+            case "poor":
+                return ForgingQuality.POOR.getDisplayName();
+            default:
+                return ForgingQuality.WELL.getDisplayName();
+        }
+    }
+
+    private void resetProgress() {
+        progress = 0;
+        maxProgress = 0;
+        currentQuality = "";
+        lastRecipe = null;
+        AnvilMinigameOverlay.endMinigame();
+        setChanged();
+    }
+
+    public boolean hasRecipe() {
+        Optional<ForgingRecipe> recipe = getCurrentRecipe();
+        if (recipe.isPresent()) {
+            ItemStack resultStack = recipe.get().getResultItem(level.registryAccess());
+            return canInsertItemIntoOutputSlot(resultStack) && canInsertAmountIntoOutputSlot(resultStack.getCount());
+        }
+        return false;
+    }
+
+    public Optional<ForgingRecipe> getCurrentRecipe() {
+        SimpleContainer inventory = new SimpleContainer(9);
+        for (int i = 0; i < 9; i++) {
+            inventory.setItem(i, itemHandler.getStackInSlot(i));
+        }
+        return ForgingRecipe.findBestMatch(level, inventory)
+                .filter(this::matchesRecipeExactly);
+    }
+
+    private boolean matchesRecipeExactly(ForgingRecipe recipe) {
+        SimpleContainer inventory = new SimpleContainer(9);
+        for (int i = 0; i < 9; i++) {
+            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
+        }
+        return recipe.matches(inventory, level);
+    }
+
+    private boolean canInsertItemIntoOutputSlot(ItemStack stackToInsert) {
+        ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+        return existing.isEmpty() || ItemStack.isSameItemSameTags(existing, stackToInsert);
+    }
+
+    private boolean canInsertAmountIntoOutputSlot(int count) {
+        ItemStack outputStack = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+        return outputStack.getCount() + count <= outputStack.getMaxStackSize();
+    }
+
+    private boolean hasProgressFinished() {
+        return progress >= maxProgress;
+    }
+
+    private void increaseCraftingProgress() {
+        progress++;
+        setChanged();
+    }
+
+    public boolean isBusy(long currentGameTime) {
+        return currentGameTime < busyUntilGameTime;
+    }
+
+    public void setBusyUntil(long time) {
+        this.busyUntilGameTime = time;
+        setChanged();
+    }
+
+    public void updateHitsRemaining(Level lvl, BlockPos pos, BlockState st) {
+        Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
+        boolean recipeChanged = false;
+
+        if (currentRecipeOpt.isPresent()) {
+            ForgingRecipe currentRecipe = currentRecipeOpt.get();
+            if (lastRecipe != null) {
+                recipeChanged = !currentRecipe.getId().equals(lastRecipe.getId());
+            } else if (maxProgress > 0) {
+                recipeChanged = true;
+            }
+            lastRecipe = currentRecipe;
+        } else {
+            recipeChanged = (lastRecipe != null || maxProgress > 0);
+            lastRecipe = null;
+        }
+
+        if (recipeChanged) {
+            resetProgress();
+            return;
+        }
+
+        if (hasRecipe()) {
+            ForgingRecipe recipe = currentRecipeOpt.get();
+            maxProgress = recipe.getHammeringRequired();
+            hitRemains = maxProgress - progress;
+            setChanged();
+
+            if (hasProgressFinished()) {
+                craftItem();
+                resetProgress();
+            }
+        } else {
+            resetProgress();
+        }
+    }
+
+    public int getHitsRemaining() {
+        return hitRemains;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+        setChanged();
+        if (this.data != null) {
+            this.data.set(0, progress);
+        }
+    }
+
+    public int getRequiredProgress() {
+        Optional<ForgingRecipe> recipe = getCurrentRecipe();
+        return recipe.map(forgingRecipe -> forgingRecipe.getHammeringRequired() - progress).orElse(0);
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag pTag) {
+        pTag.put("inventory", itemHandler.serializeNBT());
+        pTag.putInt("smithing_anvil.progress", progress);
+        pTag.putString("current_quality", currentQuality);
+        if (forgingPlayerId != null) {
+            pTag.putUUID("forging_player", forgingPlayerId);
+        }
+        super.saveAdditional(pTag);
+    }
+
+    @Override
+    public void load(CompoundTag pTag) {
+        super.load(pTag);
+        itemHandler.deserializeNBT(pTag.getCompound("inventory"));
+        progress = pTag.getInt("smithing_anvil.progress");
+        currentQuality = pTag.getString("current_quality");
+        if (pTag.hasUUID("forging_player")) {
+            forgingPlayerId = pTag.getUUID("forging_player");
+        }
     }
 
     @Override
@@ -97,7 +374,6 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return lazyItemHandler.cast();
         }
-
         return super.getCapability(cap, side);
     }
 
@@ -131,235 +407,8 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
         if (!pPlayer.isCrouching()) {
             return new SmithingAnvilMenu(pContainerId, pPlayerInventory, this, this.data);
-        } else return null;
-
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        pTag.put("inventory", itemHandler.serializeNBT());
-        pTag.putInt("smithing_anvil.progress", progress);
-
-        super.saveAdditional(pTag);
-    }
-
-    @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
-        itemHandler.deserializeNBT(pTag.getCompound("inventory"));
-        progress = pTag.getInt("smithing_anvil.progress");
-    }
-
-    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        if (hasRecipe()) {
-            ForgingRecipe currentRecipe = recipe.get();
-            maxProgress = currentRecipe.getHammeringRequired();
-            increaseCraftingProgress();
-            setChanged(pLevel, pPos, pState);
-
-            if (hasProgressFinished()) {
-                craftItem();
-                resetProgress();
-            }
-        } else {
-            resetProgress();
         }
-    }
-
-    private void resetProgress() {
-        progress = 0;
-        maxProgress = 0;
-        lastRecipe = null;
-        AnvilMinigameOverlay.endMinigame();
-    }
-
-    private void craftItem() {
-        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
-        if (recipeOptional.isPresent()) {
-            ForgingRecipe recipe = recipeOptional.get();
-            ItemStack result = recipe.getResultItem(getLevel().registryAccess());
-
-            // Determine quality based on performance
-            String quality = determineForgingQuality();
-
-            // Only set the NBT tag if quality is meaningful
-            if (quality != null && !quality.isEmpty() && recipe.hasQuality()) {
-                CompoundTag tag = result.getOrCreateTag();
-                tag.putString("ForgingQuality", quality);
-                result.setTag(tag);
-            }
-
-            // Extract ingredients
-            for (int i = 0; i < this.itemHandler.getSlots() - 1; i++) {
-                this.itemHandler.extractItem(i, 1, false);
-            }
-
-            ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
-
-            if (existing.isEmpty()) {
-                // If the output slot is empty, just set the result
-                this.itemHandler.setStackInSlot(OUTPUT_SLOT, result);
-            } else if (ItemStack.isSameItemSameTags(existing, result)) {
-                // If the same item (with same NBT), try to stack them
-                int total = existing.getCount() + result.getCount();
-                int maxSize = Math.min(existing.getMaxStackSize(), this.itemHandler.getSlotLimit(OUTPUT_SLOT));
-
-                if (total <= maxSize) {
-                    existing.grow(result.getCount());
-                    this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
-                } else {
-                    // If not all items fit, grow to max and optionally handle overflow
-                    int remainder = total - maxSize;
-                    existing.setCount(maxSize);
-                    this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
-
-                    // Handle remainder if needed (e.g. drop, store elsewhere, etc.)
-                    ItemStack overflow = result.copy();
-                    overflow.setCount(remainder);
-                    // Example: drop the overflow into the world
-                    Containers.dropItemStack(getLevel(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), overflow);
-                }
-            }
-
-        }
-    }
-
-
-    public boolean hasRecipe() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        if (recipe.isPresent()) {
-            ItemStack resultStack = recipe.get().getResultItem(level.registryAccess());
-
-            return canInsertItemIntoOutputSlot(resultStack)
-                    && canInsertAmountIntoOutputSlot(resultStack.getCount());
-        }
-
-        return false;
-    }
-
-
-    private boolean hasEnoughIngredients(ForgingRecipe recipe) {
-        NonNullList<Ingredient> ingredients = recipe.getIngredients();
-        SimpleContainer inventory = new SimpleContainer(9);
-        for (int i = 0; i < 9; i++) {
-            inventory.setItem(i, itemHandler.getStackInSlot(i));
-        }
-
-        // Create a copy of the inventory to track consumed items
-        SimpleContainer inventoryCopy = new SimpleContainer(9);
-        for (int i = 0; i < 9; i++) {
-            inventoryCopy.setItem(i, inventory.getItem(i).copy());
-        }
-
-        // Check each ingredient requirement
-        for (Ingredient ingredient : ingredients) {
-            boolean found = false;
-            for (int i = 0; i < 9; i++) {
-                ItemStack stack = inventoryCopy.getItem(i);
-                if (ingredient.test(stack) && stack.getCount() > 0) {
-                    stack.shrink(1);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public Optional<ForgingRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(9);
-        for (int i = 0; i < 9; i++) {
-            inventory.setItem(i, itemHandler.getStackInSlot(i));
-        }
-
-        return ForgingRecipe.findBestMatch(level, inventory)
-                .filter(this::matchesRecipeExactly)
-                //.filter(this::hasEnoughIngredients)
-                ;
-    }
-
-    private boolean canInsertItemIntoOutputSlot(ItemStack stackToInsert) {
-        ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
-        return (existing.isEmpty() || ItemStack.isSameItemSameTags(existing, stackToInsert));
-    }
-
-
-    private boolean canInsertAmountIntoOutputSlot(int count) {
-        return this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.itemHandler.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();
-    }
-
-
-    private boolean hasProgressFinished() {
-        return progress >= maxProgress;
-    }
-
-    private void increaseCraftingProgress() {
-        progress++;
-    }
-
-
-    public boolean isBusy(long currentGameTime) {
-        return currentGameTime < busyUntilGameTime;
-    }
-
-    public void setBusyUntil(long time) {
-        this.busyUntilGameTime = time;
-        setChanged(level, worldPosition, getBlockState());
-    }
-
-
-    private ForgingRecipe lastRecipe = null;
-
-    public void updateHitsRemaining(Level lvl, BlockPos pos, BlockState st) {
-        Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
-
-        // Check if recipe has changed by comparing with last known recipe
-        boolean recipeChanged = false;
-
-        if (currentRecipeOpt.isPresent()) {
-            ForgingRecipe currentRecipe = currentRecipeOpt.get();
-
-            if (lastRecipe != null) {
-                // Compare recipes by their IDs or other unique properties
-                recipeChanged = !currentRecipe.getId().equals(lastRecipe.getId());
-            } else if (maxProgress > 0) {
-                // We had progress but no last recipe (shouldn't normally happen)
-                recipeChanged = true;
-            }
-
-            lastRecipe = currentRecipe;
-        } else {
-            // No current recipe but we had one before
-            recipeChanged = (lastRecipe != null || maxProgress > 0);
-            lastRecipe = null;
-        }
-
-        if (recipeChanged) {
-            resetProgress();
-            return;
-        }
-
-        if (hasRecipe()) {
-            ForgingRecipe recipe = currentRecipeOpt.get();
-            maxProgress = recipe.getHammeringRequired();
-            hitRemains = maxProgress - progress;
-            setChanged(lvl, pos, st);
-
-            if (hasProgressFinished()) {
-                craftItem();
-                resetProgress();
-            }
-        } else {
-            resetProgress();
-        }
-    }
-
-    public int getHitsRemaining() {
-        return hitRemains;
+        return null;
     }
 
     @Override
@@ -372,82 +421,12 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return saveWithoutMetadata();
     }
 
+    public ItemStack getRenderStack(int index) {
+        return itemHandler.getStackInSlot(index);
+    }
+
     public static void applyForgingQuality(ItemStack stack, ForgingQuality quality) {
         CompoundTag tag = stack.getOrCreateTag();
         tag.putString("ForgingQuality", quality.getDisplayName());
     }
-
-    private boolean matchesRecipeExactly(ForgingRecipe recipe) {
-        SimpleContainer inventory = new SimpleContainer(9); // 3x3 grid
-        // Copy items from input slots (0-8) to our 3x3 grid
-        for (int i = 0; i < 9; i++) {
-            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
-        }
-        return recipe.matches(inventory, level);
-    }
-
-   /* public void startForgingMinigame(Player player, ItemStack result) {
-        if (player.level().isClientSide) {
-            Minecraft.getInstance().setScreen(new ForgingMinigameScreen(result));
-        }
-    }*/
-
-    private String determineForgingQuality() {
-        // Implement your logic here to assess performance
-        // For demonstration, we'll return a random quality
-        String quality = SmithingAnvil.getQuality();
-        switch (quality) {
-            case "poor":
-                return ForgingQuality.POOR.getDisplayName();
-            case "expert":
-                return ForgingQuality.EXPERT.getDisplayName();
-            case "perfect":
-                return ForgingQuality.PERFECT.getDisplayName();
-            default:
-                return ForgingQuality.WELL.getDisplayName();
-        }
-    }
-
-    public void setProgress(int progress) {
-        this.progress = progress;
-        this.setChanged();
-
-        // If you're using ContainerData
-        if (this.data != null) {
-            this.data.set(0, progress); // Assuming progress is at index 0
-        }
-    }
-
-    public int getRequiredProgress() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        ForgingRecipe currentRecipe = recipe.get();
-        return currentRecipe.getHammeringRequired() - progress;
-    }
-
-
-  /*  public void completeForgingWithQuality(String quality) {
-        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
-        if (recipeOptional.isPresent()) {
-            ForgingRecipe recipe = recipeOptional.get();
-            ItemStack result = recipe.getResultItem(level.registryAccess()).copy();
-
-            // Apply quality
-            result.getOrCreateTag().putString("ForgingQuality", quality);
-
-            // Clear inputs
-            for (int i = 0; i < 9; i++) {
-                itemHandler.extractItem(i, 1, false);
-            }
-
-            // Set output
-            ItemStack currentOutput = itemHandler.getStackInSlot(OUTPUT_SLOT);
-            if (currentOutput.isEmpty()) {
-                itemHandler.setStackInSlot(OUTPUT_SLOT, result);
-            } else {
-                currentOutput.grow(1);
-            }
-
-            resetForgingState();
-        }
-    }*/
 }

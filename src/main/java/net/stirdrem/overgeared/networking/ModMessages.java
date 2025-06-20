@@ -8,6 +8,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.networking.packet.FinalizeForgingC2SPacket;
+import net.stirdrem.overgeared.networking.packet.StartMinigameS2CPacket;
 import net.stirdrem.overgeared.networking.packet.UpdateAnvilProgressC2SPacket;
 
 public class ModMessages {
@@ -39,6 +40,12 @@ public class ModMessages {
                 .decoder(FinalizeForgingC2SPacket::new)
                 .encoder(FinalizeForgingC2SPacket::toBytes)
                 .consumerMainThread(FinalizeForgingC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(StartMinigameS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(StartMinigameS2CPacket::new)
+                .encoder(StartMinigameS2CPacket::toBytes)
+                .consumerMainThread(StartMinigameS2CPacket::handle)
                 .add();
     }
 

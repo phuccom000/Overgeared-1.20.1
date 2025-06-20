@@ -8,24 +8,24 @@ import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 
 import java.util.function.Supplier;
 
-public class FinalizeForgingC2SPacket {
+public class HitResultC2SPacket {
     private final BlockPos anvilPos;
-    private final String quality;
+    private final String hitQuality;
     private final int perfectHits;
     private final int goodHits;
     private final int missedHits;
 
-    public FinalizeForgingC2SPacket(BlockPos anvilPos, String quality, int perfectHits, int goodHits, int missedHits) {
+    public HitResultC2SPacket(BlockPos anvilPos, String hitQuality, int perfectHits, int goodHits, int missedHits) {
         this.anvilPos = anvilPos;
-        this.quality = quality;
+        this.hitQuality = hitQuality;
         this.perfectHits = perfectHits;
         this.goodHits = goodHits;
         this.missedHits = missedHits;
     }
 
-    public FinalizeForgingC2SPacket(FriendlyByteBuf buf) {
+    public HitResultC2SPacket(FriendlyByteBuf buf) {
         this.anvilPos = buf.readBlockPos();
-        this.quality = buf.readUtf();
+        this.hitQuality = buf.readUtf();
         this.perfectHits = buf.readInt();
         this.goodHits = buf.readInt();
         this.missedHits = buf.readInt();
@@ -33,7 +33,7 @@ public class FinalizeForgingC2SPacket {
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeBlockPos(anvilPos);
-        buf.writeUtf(quality);
+        buf.writeUtf(hitQuality);
         buf.writeInt(perfectHits);
         buf.writeInt(goodHits);
         buf.writeInt(missedHits);
@@ -45,25 +45,19 @@ public class FinalizeForgingC2SPacket {
             ServerPlayer player = context.getSender();
             if (player == null) return;
 
-            // Validate player is still near the anvil
+            // Validate player is near the anvil
             if (player.distanceToSqr(anvilPos.getX() + 0.5, anvilPos.getY() + 0.5, anvilPos.getZ() + 0.5) > 64) {
                 return;
             }
 
             if (player.level().getBlockEntity(anvilPos) instanceof SmithingAnvilBlockEntity anvil) {
-                // Verify the player was the one who started forging
+                // Verify this player is the one currently forging
                 if (!anvil.isPlayerForging(player)) {
                     return;
                 }
 
-                // Complete the forging process
-                anvil.registerHit(quality);
-
-                // If this was the final hit, complete the forging
-                if (anvil.getHitsRemaining() <= 0) {
-                    //anvil.craftItem();
-                    anvil.stopForging();
-                }
+                // Register the hit with the anvil
+                anvil.registerHit(hitQuality);
             }
         });
         return true;

@@ -58,7 +58,7 @@ public class SmithingHammer extends DiggerItem {
                         if (anvilBE.hasRecipe()) {
                             ItemStack result = recipeOpt.get().getResultItem(level.registryAccess());
                             int progress = anvilBE.getRequiredProgress();
-                            AnvilMinigameOverlay.startMinigame(result, progress);
+                            AnvilMinigameOverlay.startMinigame(pos, player.getUUID(), result, progress);
                         }
                     }
                 }
