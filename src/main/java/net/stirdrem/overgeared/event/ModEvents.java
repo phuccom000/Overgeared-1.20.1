@@ -256,6 +256,7 @@ public class ModEvents {
 
     private static double getDamageBonusForQuality(String quality) {
         return switch (quality.toLowerCase()) {
+            case "master" -> ServerConfig.MASTER_WEAPON_DAMAGE.get();
             case "perfect" -> ServerConfig.PERFECT_WEAPON_DAMAGE.get();
             case "expert" -> ServerConfig.EXPERT_WEAPON_DAMAGE.get();
             case "well" -> ServerConfig.WELL_WEAPON_DAMAGE.get();
@@ -266,6 +267,7 @@ public class ModEvents {
 
     private static double getSpeedBonusForQuality(String quality) {
         return switch (quality.toLowerCase()) {
+            case "master" -> ServerConfig.MASTER_WEAPON_SPEED.get();
             case "perfect" -> ServerConfig.PERFECT_WEAPON_SPEED.get();
             case "expert" -> ServerConfig.EXPERT_WEAPON_SPEED.get();
             case "well" -> ServerConfig.WELL_WEAPON_SPEED.get();
@@ -276,6 +278,7 @@ public class ModEvents {
 
     private static double getArmorBonusForQuality(String quality) {
         return switch (quality.toLowerCase()) {
+            case "master" -> ServerConfig.MASTER_ARMOR_BONUS.get();
             case "perfect" -> ServerConfig.PERFECT_ARMOR_BONUS.get();
             case "expert" -> ServerConfig.EXPERT_ARMOR_BONUS.get();
             case "well" -> ServerConfig.WELL_ARMOR_BONUS.get();
@@ -322,7 +325,7 @@ public class ModEvents {
         // Optional: Log for debugging
         OvergearedMod.LOGGER.info("Reset all minigames on server stop.");
     }
-    
+
     private static void resetMinigameForPlayer(ServerPlayer player) {
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
             if (minigame.hasAnvilPosition()) {

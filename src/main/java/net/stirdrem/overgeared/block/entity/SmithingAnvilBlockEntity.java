@@ -256,7 +256,15 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
             if (ServerConfig.ENABLE_MINIGAME.get()) {
                 String quality = determineForgingQuality();
                 if (!Objects.equals(quality, "no_quality")) { // Additional safety check
-                    tag.putString("ForgingQuality", quality);
+                    if (!quality.equals("perfect"))
+                        tag.putString("ForgingQuality", quality);
+                    else {
+                        Random random = new Random();
+                        if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 || random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
+                            quality = "master";
+                        }
+                        tag.putString("ForgingQuality", quality);
+                    }
                     if (!(result.getItem() instanceof ArmorItem))
                         tag.putBoolean("Polished", false);
                 }

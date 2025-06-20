@@ -85,6 +85,7 @@
   "tooltip.overgeared.flint_flavor": "Right click on stone to carve out a piece of rock. Has a chance to break.",
   "tooltip.overgeared.polished": "Polished",
   "tooltip.overgeared.unpolished": "Unpolished",
-  "message.overgeared.no_minigame": "Minigame is disabled!"
+  "message.overgeared.no_minigame": "Minigame is disabled!",
+  "tooltip.overgeared.master": "Masterfully Forged"
 }
 

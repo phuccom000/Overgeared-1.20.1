@@ -17,17 +17,20 @@ public class ServerConfig {
     public static final ForgeConfigSpec SERVER_CONFIG;
 
     // Weapon bonuses
+    public static final ForgeConfigSpec.DoubleValue MASTER_WEAPON_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue PERFECT_WEAPON_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue EXPERT_WEAPON_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue WELL_WEAPON_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue POOR_WEAPON_DAMAGE;
 
+    public static final ForgeConfigSpec.DoubleValue MASTER_WEAPON_SPEED;
     public static final ForgeConfigSpec.DoubleValue PERFECT_WEAPON_SPEED;
     public static final ForgeConfigSpec.DoubleValue EXPERT_WEAPON_SPEED;
     public static final ForgeConfigSpec.DoubleValue WELL_WEAPON_SPEED;
     public static final ForgeConfigSpec.DoubleValue POOR_WEAPON_SPEED;
 
     // Armor bonuses
+    public static final ForgeConfigSpec.DoubleValue MASTER_ARMOR_BONUS;
     public static final ForgeConfigSpec.DoubleValue PERFECT_ARMOR_BONUS;
     public static final ForgeConfigSpec.DoubleValue EXPERT_ARMOR_BONUS;
     public static final ForgeConfigSpec.DoubleValue WELL_ARMOR_BONUS;
@@ -46,6 +49,7 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue DURABILITY_REDUCE_PER_GRIND;
     public static final ForgeConfigSpec.DoubleValue DAMAGE_RESTORE_PER_GRIND;
     public static final ForgeConfigSpec.BooleanValue ENABLE_MINIGAME;
+    public static final ForgeConfigSpec.DoubleValue MASTER_QUALITY_CHANCE;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -63,6 +67,10 @@ public class ServerConfig {
         DEFAULT_ARROW_SPEED_INCREASE = builder
                 .comment("Default arrow speed increase for the forging minigame")
                 .defineInRange("arrowSpeedIncrease", 0.8, -5.0, 5.0);
+
+        MASTER_QUALITY_CHANCE = builder
+                .comment("How likely it is for the player to get Masterfully Forged. Set to 0 to disable it.")
+                .defineInRange("masterQualityChance", 0.05, 0, 1);
 
         MAX_SPEED = builder
                 .comment("Maximum arrow speed for the forging minigame")
@@ -99,6 +107,10 @@ public class ServerConfig {
 
         builder.push("Weapon Damage Bonuses");
 
+        MASTER_WEAPON_DAMAGE = builder
+                .comment("Damage bonus for master quality weapons")
+                .defineInRange("masterWeaponDamage", 3.0, -10.0, 10.0);
+
         PERFECT_WEAPON_DAMAGE = builder
                 .comment("Damage bonus for perfect quality weapons")
                 .defineInRange("perfectWeaponDamage", 2.0, -10.0, 10.0);
@@ -117,6 +129,10 @@ public class ServerConfig {
         builder.pop();
 
         builder.push("Weapon Speed Bonuses");
+
+        MASTER_WEAPON_SPEED = builder
+                .comment("Attack speed bonus for master quality weapons")
+                .defineInRange("masterWeaponSpeed", 1, -2.0, 2.0);
 
         PERFECT_WEAPON_SPEED = builder
                 .comment("Attack speed bonus for perfect quality weapons")
@@ -137,6 +153,10 @@ public class ServerConfig {
         builder.pop();
 
         builder.push("Armor Bonuses");
+
+        MASTER_ARMOR_BONUS = builder
+                .comment("Armor bonus for master quality armor")
+                .defineInRange("masterArmorBonus", 2, -5.0, 5.0);
 
         PERFECT_ARMOR_BONUS = builder
                 .comment("Armor bonus for perfect quality armor")
