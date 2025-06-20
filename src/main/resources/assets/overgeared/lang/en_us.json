@@ -84,6 +84,7 @@
   "tooltip.overgeared.knappable_rock.tooltip": "Hold a rock in each hand and right click to start knapping.",
   "tooltip.overgeared.flint_flavor": "Right click on stone to carve out a piece of rock. Has a chance to break.",
   "tooltip.overgeared.polished": "Polished",
-  "tooltip.overgeared.unpolished": "Unpolished"
+  "tooltip.overgeared.unpolished": "Unpolished",
+  "message.overgeared.no_minigame": "Minigame is disabled!"
 }
 

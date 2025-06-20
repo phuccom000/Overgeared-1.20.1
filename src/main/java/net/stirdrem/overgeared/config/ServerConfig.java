@@ -45,10 +45,50 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue FLINT_BREAKING_CHANCE;
     public static final ForgeConfigSpec.DoubleValue DURABILITY_REDUCE_PER_GRIND;
     public static final ForgeConfigSpec.DoubleValue DAMAGE_RESTORE_PER_GRIND;
+    public static final ForgeConfigSpec.BooleanValue ENABLE_MINIGAME;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        builder.push("Minigame Config");
 
+        DEFAULT_ARROW_SPEED = builder
+                .comment("Default arrow speed for the forging minigame")
+                .defineInRange("arrowSpeed", 2.0, -5.0, 5.0);
+
+        ENABLE_MINIGAME = builder
+                .comment("Toggle for the forging minigame. " +
+                        "You cannot craft with unpolished tool heads and the quality modifier is disabled if set to false.")
+                .define("enableMinigame", true);
+
+        DEFAULT_ARROW_SPEED_INCREASE = builder
+                .comment("Default arrow speed increase for the forging minigame")
+                .defineInRange("arrowSpeedIncrease", 0.8, -5.0, 5.0);
+
+        MAX_SPEED = builder
+                .comment("Maximum arrow speed for the forging minigame")
+                .defineInRange("maxArrowSpeed", 5, -10.0, 10.0);
+
+        ZONE_STARTING_SIZE = builder
+                .comment("Zone starting size for the forging minigame,  in chance")
+                .defineInRange("zoneStartingSize", 20, 0, 100);
+
+        ZONE_SHRINK_FACTOR = builder
+                .comment("Zone shrink factor for the forging minigame, default value here means that it shrinks to 70% of its original size")
+                .defineInRange("zoneShrinkFactor", 0.7, 0, 1);
+
+        MAX_ANVIL_DISTANCE = builder
+                .comment("Maximum distance you can go from your Smithing Anvil before minigame reset")
+                .defineInRange("maxAnvilDistance", 100, 0, 1000);
+
+        MIN_PERFECT_ZONE = builder
+                .comment("Smallest perfect zone it can become")
+                .defineInRange("minPerfectZone", 3, 0, 100);
+
+        MINIGAME_TIMEOUT_TICKS = builder
+                .comment("Minigame resets after a certain amount of ticks")
+                .defineInRange("minigameTimeout", 6000, 0, 36000);
+
+        builder.pop();
         builder.push("Balance Options");
 
         BASE_DURABILITY_MULTIPLIER = builder
@@ -138,42 +178,6 @@ public class ServerConfig {
                 .defineInRange("damageRestore", 0.1, 0, 1);
         builder.pop();
 
-
-        builder.push("Minigame Config");
-
-        DEFAULT_ARROW_SPEED = builder
-                .comment("Default arrow speed for the forging minigame")
-                .defineInRange("arrowSpeed", 2.0, -5.0, 5.0);
-
-        DEFAULT_ARROW_SPEED_INCREASE = builder
-                .comment("Default arrow speed increase for the forging minigame")
-                .defineInRange("arrowSpeedIncrease", 0.8, -5.0, 5.0);
-
-        MAX_SPEED = builder
-                .comment("Maximum arrow speed for the forging minigame")
-                .defineInRange("maxArrowSpeed", 5, -10.0, 10.0);
-
-        ZONE_STARTING_SIZE = builder
-                .comment("Zone starting size for the forging minigame,  in chance")
-                .defineInRange("zoneStartingSize", 20, 0, 100);
-
-        ZONE_SHRINK_FACTOR = builder
-                .comment("Zone shrink factor for the forging minigame, default value here means that it shrinks to 70% of its original size")
-                .defineInRange("zoneShrinkFactor", 0.7, 0, 1);
-
-        MAX_ANVIL_DISTANCE = builder
-                .comment("Maximum distance you can go from your Smithing Anvil before minigame reset")
-                .defineInRange("maxAnvilDistance", 100, 0, 1000);
-
-        MIN_PERFECT_ZONE = builder
-                .comment("Smallest perfect zone it can become")
-                .defineInRange("minPerfectZone", 3, 0, 100);
-
-        MINIGAME_TIMEOUT_TICKS = builder
-                .comment("Minigame resets after a certain amount of ticks")
-                .defineInRange("minigameTimeout", 6000, 0, 36000);
-
-        builder.pop();
 
         SERVER_CONFIG = builder.build();
     }

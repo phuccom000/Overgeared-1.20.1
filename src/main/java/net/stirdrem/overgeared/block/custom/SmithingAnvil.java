@@ -63,7 +63,7 @@ public class SmithingAnvil extends BaseEntityBlock {
     // Z-axis oriented shape
     private static final VoxelShape Z_AXIS_AABB = Shapes.or(Z1, Z2, Z3, Z4, Z5);
 
-    private static final int HAMMER_SOUND_DURATION_TICKS = 0; // adjust to match your sound
+    private static final int HAMMER_SOUND_DURATION_TICKS = 6; // adjust to match your sound
 
     private static String quality = null;
 
@@ -215,23 +215,15 @@ public class SmithingAnvil extends BaseEntityBlock {
 
         ItemStack held = player.getItemInHand(hand);
         boolean isHammer = held.is(ModTags.Items.SMITHING_HAMMERS);  // Tag-based check
-       /* OvergearedMod.LOGGER.info("== SmithingAnvil Debug ==");
-        OvergearedMod.LOGGER.info("isHammer: " + isHammer);
-        OvergearedMod.LOGGER.info("hasRecipe: " + anvil.hasRecipe());
-        OvergearedMod.LOGGER.info("AnvilMinigame.isVisible (CLIENT-ONLY!): " + AnvilMinigame.isVisible());
-        OvergearedMod.LOGGER.info("AnvilMinigame.isUnpaused: " + AnvilMinigame.isUnpaused());
-        OvergearedMod.LOGGER.info("== END DEBUG ==");*/
 
         AtomicBoolean isHit = new AtomicBoolean(false);
 
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-            boolean test = anvil.hasQuality();
-            boolean recipe = anvil.hasRecipe();
-            boolean poshas = pos.equals(minigame.getAnvilPos());
             if (isHammer && anvil.hasRecipe()) {
-                if (minigame.getVisible() && pos.equals(minigame.getAnvilPos()) || !anvil.hasQuality()) {
+                if (minigame.getVisible() && pos.equals(minigame.getAnvilPos()) || !anvil.hasQuality() || !ServerConfig.ENABLE_MINIGAME.get()) {
                     // Hammer logic (particles, sound, cooldown)
-                    //anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
+                    if (!ServerConfig.ENABLE_MINIGAME.get())
+                        anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
 /*            for (int i = 0; i < 3; i++) {
                 int delay = 7 * i;
                 TickScheduler.schedule(delay, () -> spawnAnvilParticles(level, pos));
@@ -248,7 +240,8 @@ public class SmithingAnvil extends BaseEntityBlock {
                     //player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                     //minigame.clientHandleHit();
                     //quality = minigame.getQuality();
-                    if (anvil.hasQuality()) quality = minigame.handleHit((ServerPlayer) player);
+                    if (anvil.hasQuality() && ServerConfig.ENABLE_MINIGAME.get())
+                        quality = minigame.handleHit((ServerPlayer) player);
                     // quality = AnvilMinigame.handleHit(serverPlayer);
                     //}
                     anvil.increaseForgingProgress(level, pos, state);

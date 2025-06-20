@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.stirdrem.overgeared.config.ServerConfig;
 
 public class ForgingQualityShapelessRecipe extends ShapelessRecipe {
 
@@ -20,9 +21,41 @@ public class ForgingQualityShapelessRecipe extends ShapelessRecipe {
     @Override
     public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
         ItemStack result = super.assemble(container, registryAccess);
-        CompoundTag resultTag = result.getOrCreateTag();
 
-        // Find first ingredient with quality data
+        if (!ServerConfig.ENABLE_MINIGAME.get()) {
+            // When minigame is disabled
+            boolean hasUnpolishedQualityItem = false;
+
+            for (int i = 0; i < container.getContainerSize(); i++) {
+                ItemStack ingredient = container.getItem(i);
+                if (ingredient.hasTag()) {
+                    CompoundTag tag = ingredient.getTag();
+                    // Check if item has quality but isn't polished
+                    if (!tag.contains("Polished") || !tag.getBoolean("Polished")) {
+                        hasUnpolishedQualityItem = true;
+                        break; // No need to check further if we found one
+                    }
+                }
+            }
+
+            // Prevent crafting if any unpolished quality items exist
+            if (hasUnpolishedQualityItem) {
+                return ItemStack.EMPTY;
+            }
+
+            // Remove any ForgingQuality tag from result if present
+            if (result.hasTag() && result.getTag().contains("ForgingQuality")) {
+                result.getTag().remove("ForgingQuality");
+                if (result.getTag().isEmpty()) {
+                    result.setTag(null); // Remove empty tag
+                }
+            }
+
+            return result;
+        }
+
+        // Original minigame-enabled logic
+        CompoundTag resultTag = result.getOrCreateTag();
         String foundQuality = null;
         boolean isPolished = false;
 
@@ -39,20 +72,16 @@ public class ForgingQualityShapelessRecipe extends ShapelessRecipe {
             }
         }
 
-        // Apply quality modification rules
         if (foundQuality != null) {
             String resultQuality = foundQuality;
-
             if (!isPolished) {
-                // Downgrade quality if not polished
                 resultQuality = switch (foundQuality) {
                     case "perfect" -> "expert";
                     case "expert" -> "well";
                     case "well" -> "poor";
-                    default -> foundQuality; // "poor" stays as "poor"
+                    default -> foundQuality;
                 };
             }
-
             resultTag.putString("ForgingQuality", resultQuality);
             result.setTag(resultTag);
         }

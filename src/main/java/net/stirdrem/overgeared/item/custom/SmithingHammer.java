@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
@@ -46,6 +47,11 @@ public class SmithingHammer extends DiggerItem {
         Player player = context.getPlayer();
         BlockPos pos = context.getClickedPos();
         BlockEntity be = level.getBlockEntity(pos);
+        if (!ServerConfig.ENABLE_MINIGAME.get()) {
+            if (player instanceof ServerPlayer player1)
+                player1.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
+            return InteractionResult.PASS;
+        }
 
         if (!(be instanceof SmithingAnvilBlockEntity anvilBE)) return InteractionResult.PASS;
         if (player == null) return InteractionResult.PASS;

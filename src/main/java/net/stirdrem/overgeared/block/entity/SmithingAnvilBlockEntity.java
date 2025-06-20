@@ -35,6 +35,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.custom.SmithingAnvil;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
@@ -251,14 +252,19 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
 
         // Only set quality if recipe supports it
         if (recipe.hasQuality()) {
-            String quality = determineForgingQuality();
-            if (!Objects.equals(quality, "no_quality")) { // Additional safety check
-                CompoundTag tag = result.getOrCreateTag();
-                tag.putString("ForgingQuality", quality);
+            CompoundTag tag = result.getOrCreateTag();
+            if (ServerConfig.ENABLE_MINIGAME.get()) {
+                String quality = determineForgingQuality();
+                if (!Objects.equals(quality, "no_quality")) { // Additional safety check
+                    tag.putString("ForgingQuality", quality);
+                    if (!(result.getItem() instanceof ArmorItem))
+                        tag.putBoolean("Polished", false);
+                }
+            } else {
                 if (!(result.getItem() instanceof ArmorItem))
                     tag.putBoolean("Polished", false);
-                result.setTag(tag);
             }
+            result.setTag(tag);
         }
 
         // Extract ingredients
