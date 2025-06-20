@@ -47,11 +47,6 @@ public class SmithingHammer extends DiggerItem {
         Player player = context.getPlayer();
         BlockPos pos = context.getClickedPos();
         BlockEntity be = level.getBlockEntity(pos);
-        if (!ServerConfig.ENABLE_MINIGAME.get()) {
-            if (player instanceof ServerPlayer player1)
-                player1.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
-            return InteractionResult.PASS;
-        }
 
         if (!(be instanceof SmithingAnvilBlockEntity anvilBE)) return InteractionResult.PASS;
         if (player == null) return InteractionResult.PASS;
@@ -70,6 +65,11 @@ public class SmithingHammer extends DiggerItem {
 
     private InteractionResult handleServerSideInteraction(SmithingAnvilBlockEntity anvilBE, BlockPos pos, ServerPlayer player, UUID playerUUID) {
         // Server always uses the block entity as source of truth
+        if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
+            player.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
+            return InteractionResult.FAIL;
+        }
+
         if (!anvilBE.hasRecipe()) {
             player.sendSystemMessage(Component.translatable("message.overgeared.no_recipe").withStyle(ChatFormatting.RED), true);
             return InteractionResult.FAIL;
@@ -106,6 +106,10 @@ public class SmithingHammer extends DiggerItem {
     }
 
     private InteractionResult handleClientSideInteraction(SmithingAnvilBlockEntity anvilBE, BlockPos pos, Player player, ItemStack heldItem) {
+        if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
+            //player.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
+            return InteractionResult.FAIL;
+        }
         if (!anvilBE.hasRecipe()) {
             //player.sendSystemMessage(Component.translatable("message.overgeared.no_recipe").withStyle(ChatFormatting.RED));
             return InteractionResult.FAIL;
