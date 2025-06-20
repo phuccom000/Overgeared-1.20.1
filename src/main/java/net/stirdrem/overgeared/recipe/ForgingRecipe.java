@@ -268,6 +268,7 @@ public class ForgingRecipe implements Recipe<Container> {
         public void toNetwork(FriendlyByteBuf buffer, ForgingRecipe recipe) {
             buffer.writeUtf(recipe.group);
             buffer.writeVarInt(recipe.hammering);
+            buffer.writeBoolean(recipe.hasQuality);
             buffer.writeBoolean(recipe.showNotification);
             buffer.writeVarInt(recipe.width);
             buffer.writeVarInt(recipe.height);
