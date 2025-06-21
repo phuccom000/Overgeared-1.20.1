@@ -33,8 +33,6 @@ import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
 import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.networking.packet.StartMinigameC2SPacket;
-import net.stirdrem.overgeared.networking.packet.StartMinigameS2CPacket;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.TickScheduler;
 import org.jetbrains.annotations.Nullable;
