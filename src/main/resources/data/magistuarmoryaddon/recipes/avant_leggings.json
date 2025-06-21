@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    "bbb",
+    "bab",
+    "bab"
+  ],
+  "key": {
+    "b": {
+      "item": "overgeared:steel_ingot"
+    },
+    "a": {
+      "tag": "magistuarmory:small_plates/steel"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:avant_leggings",
+    "count": 1
+  },
+  "show_notification": true
+}

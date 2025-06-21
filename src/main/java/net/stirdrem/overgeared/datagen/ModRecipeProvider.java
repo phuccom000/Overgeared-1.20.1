@@ -17,6 +17,7 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.item.ModItems;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -30,6 +31,40 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
             Items.RAW_IRON,
             Blocks.DEEPSLATE_IRON_ORE,
             Blocks.IRON_ORE
+    );
+
+    private static final List<ItemLike> IRON_HEADS = List.of(
+            ModItems.IRON_HOE_HEAD.get(),
+            ModItems.IRON_PICKAXE_HEAD.get(),
+            ModItems.IRON_SWORD_BLADE.get(),
+            ModItems.IRON_AXE_HEAD.get(),
+            ModItems.IRON_SHOVEL_HEAD.get()
+
+    );
+    private static final List<ItemLike> STEEL_HEADS = List.of(
+            ModItems.STEEL_HOE_HEAD.get(),
+            ModItems.STEEL_PICKAXE_HEAD.get(),
+            ModItems.STEEL_SWORD_BLADE.get(),
+            ModItems.STEEL_AXE_HEAD.get(),
+            ModItems.STEEL_SHOVEL_HEAD.get(),
+            ModItems.STEEL_HOE.get(),
+            ModItems.STEEL_PICKAXE.get(),
+            ModItems.STEEL_SWORD.get(),
+            ModItems.STEEL_AXE.get(),
+            ModItems.STEEL_SHOVEL.get(),
+            ModItems.STEEL_HELMET.get(),
+            ModItems.STEEL_CHESTPLATE.get(),
+            ModItems.STEEL_LEGGINGS.get(),
+            ModItems.STEEL_BOOTS.get()
+
+    );
+    private static final List<ItemLike> GOLDEN_HEADS = List.of(
+            ModItems.GOLDEN_HOE_HEAD.get(),
+            ModItems.GOLDEN_PICKAXE_HEAD.get(),
+            ModItems.GOLDEN_SWORD_BLADE.get(),
+            ModItems.GOLDEN_AXE_HEAD.get(),
+            ModItems.GOLDEN_SHOVEL_HEAD.get()
+
     );
 
     private static final List<ItemLike> STEEL_INGOT = List.of(
@@ -52,9 +87,23 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         //oreCampfire(pWriter, STEEL_INGOT, RecipeCategory.MISC, ModItems.HEATED_STEEL_INGOT.get(), 0.7f, 140, "steel_ingot");
         oreBlasting(pWriter, STEEL_SMELTABLES, RecipeCategory.MISC, ModItems.STEEL_INGOT.get(), 0.7f, 100, "steel_ingot");
         oreBlasting(pWriter, IRON_SOURCE, RecipeCategory.MISC, ModItems.HEATED_IRON_INGOT.get(), 0.7f, 100, "iron_ingot");
+        oreSmelting(pWriter, IRON_HEADS, RecipeCategory.MISC, Items.IRON_NUGGET, 0.1f, 200, null);
+        oreBlasting(pWriter, IRON_HEADS, RecipeCategory.MISC, Items.IRON_NUGGET, 0.1f, 100, null);
+        oreSmelting(pWriter, GOLDEN_HEADS, RecipeCategory.MISC, Items.GOLD_NUGGET, 0.1f, 200, null);
+        oreBlasting(pWriter, GOLDEN_HEADS, RecipeCategory.MISC, Items.GOLD_NUGGET, 0.1f, 100, null);
+        oreBlasting(pWriter, STEEL_HEADS, RecipeCategory.MISC, ModItems.STEEL_NUGGET.get(), 0.1f, 200, null);
         //oreBlasting(pWriter, STEEL_INGOT, RecipeCategory.MISC, ModItems.HEATED_STEEL_INGOT.get(), 0.7f, 100, "steel_ingot");
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModBlocks.STEEL_BLOCK.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_INGOT.get())
+                .pattern("###")
+                .pattern("###")
+                .pattern("###")
+                .define('#', ModItems.STEEL_NUGGET.get())
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy(getHasName(ModItems.STEEL_NUGGET.get()), has(ModItems.STEEL_NUGGET.get()))
+                .save(pWriter, OvergearedMod.MOD_ID + ":steel_ingot_from_nuggets");
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.STEEL_BLOCK.get())
                 .pattern("###")
                 .pattern("###")
                 .pattern("###")
@@ -185,7 +234,12 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.STEEL_INGOT.get(), 9)
                 .requires(ModBlocks.STEEL_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.STEEL_BLOCK.get()), has(ModBlocks.STEEL_BLOCK.get()))
-                .save(pWriter);
+                .save(pWriter, OvergearedMod.MOD_ID + ":steel_ingot_from_block");
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.STEEL_NUGGET.get(), 9)
+                .requires(ModItems.STEEL_INGOT.get())
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT.get()), has(ModItems.STEEL_INGOT.get()))
+                .save(pWriter, OvergearedMod.MOD_ID + ":steel_nugget_from_ingot");
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModBlocks.SMITHING_ANVIL.get())
                 .requires(ModItems.SMITHING_HAMMER.get())
@@ -619,11 +673,11 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         }
     }*/
 
-    protected static void oreSmelting(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTIme, String pGroup) {
+    protected static void oreSmelting(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTIme, @Nullable String pGroup) {
         oreCooking(pFinishedRecipeConsumer, RecipeSerializer.SMELTING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTIme, pGroup, "_from_smelting");
     }
 
-    protected static void oreCampfire(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup) {
+    protected static void oreCampfire(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, @Nullable String pGroup) {
         oreCooking(pFinishedRecipeConsumer, RecipeSerializer.CAMPFIRE_COOKING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_campfire");
     }
 
@@ -631,7 +685,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         oreCooking(pFinishedRecipeConsumer, RecipeSerializer.BLASTING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_blasting");
     }
 
-    protected static void oreCooking(Consumer<FinishedRecipe> pFinishedRecipeConsumer, RecipeSerializer<? extends AbstractCookingRecipe> pCookingSerializer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup, String pRecipeName) {
+    protected static void oreCooking(Consumer<FinishedRecipe> pFinishedRecipeConsumer, RecipeSerializer<? extends AbstractCookingRecipe> pCookingSerializer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, @Nullable String pGroup, String pRecipeName) {
         for (ItemLike itemlike : pIngredients) {
             SimpleCookingRecipeBuilder.generic(Ingredient.of(itemlike), pCategory, pResult,
                             pExperience, pCookingTime, pCookingSerializer)

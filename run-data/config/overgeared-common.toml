@@ -8,6 +8,9 @@
 	rockDroppingChance = 0.1
 
 ["Weapon Speed Bonuses"]
+	#Attack speed bonus for master quality weapons
+	#Range: -2.0 ~ 2.0
+	masterWeaponSpeed = 1.0
 	#Attack speed bonus for well-made quality weapons
 	#Range: -2.0 ~ 2.0
 	wellWeaponSpeed = 0.0
@@ -31,6 +34,8 @@
 	#Zone shrink factor for the forging minigame, default value here means that it shrinks to 70% of its original size
 	#Range: 0.0 ~ 1.0
 	zoneShrinkFactor = 0.7
+	#Toggle for the forging minigame. You cannot craft with unpolished tool heads and the quality modifier is disabled if set to false.
+	enableMinigame = true
 	#Default arrow speed increase for the forging minigame
 	#Range: -5.0 ~ 5.0
 	arrowSpeedIncrease = 0.8
@@ -43,6 +48,9 @@
 	#Maximum distance you can go from your Smithing Anvil before minigame reset
 	#Range: 0 ~ 1000
 	maxAnvilDistance = 100
+	#How likely it is for the player to get Masterfully Forged. Set to 0 to disable it.
+	#Range: 0.0 ~ 1.0
+	masterQualityChance = 0.05
 	#Minigame resets after a certain amount of ticks
 	#Range: 0 ~ 36000
 	minigameTimeout = 6000
@@ -73,6 +81,9 @@
 	#Armor bonus for well-made quality armor
 	#Range: -5.0 ~ 5.0
 	wellArmorBonus = 0.0
+	#Armor bonus for master quality armor
+	#Range: -5.0 ~ 5.0
+	masterArmorBonus = 2.0
 
 ["Weapon Damage Bonuses"]
 	#Damage bonus for expert quality weapons
@@ -84,6 +95,9 @@
 	#Damage penalty for poor quality weapons
 	#Range: -10.0 ~ 10.0
 	poorWeaponDamage = -1.0
+	#Damage bonus for master quality weapons
+	#Range: -10.0 ~ 10.0
+	masterWeaponDamage = 3.0
 	#Damage bonus for perfect quality weapons
 	#Range: -10.0 ~ 10.0
 	perfectWeaponDamage = 2.0

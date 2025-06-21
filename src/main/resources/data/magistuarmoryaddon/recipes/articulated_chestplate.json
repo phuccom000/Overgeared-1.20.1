@@ -1,0 +1,29 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 6,
+  "has_quality": true,
+  "pattern": [
+    "b b",
+    "aca",
+    "ddd"
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:blaze_powder"
+    },
+    "b": {
+      "item": "overgeared:steel_ingot"
+    },
+    "c": {
+      "item": "magistuarmory:halfarmor_chestplate"
+    },
+    "d": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:articulated_chestplate",
+    "count": 1
+  },
+  "show_notification": true
+}

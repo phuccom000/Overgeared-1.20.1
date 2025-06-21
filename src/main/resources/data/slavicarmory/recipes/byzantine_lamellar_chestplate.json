@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    "cac",
+    "cbc",
+    "   "
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:red_dye"
+    },
+    "b": {
+      "item": "slavicarmory:lamellar_mail_chestplate"
+    },
+    "c": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "slavicarmory:byzantine_lamellar_chestplate",
+    "count": 1
+  },
+  "show_notification": true
+}

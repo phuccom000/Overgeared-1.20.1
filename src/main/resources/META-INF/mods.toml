@@ -67,6 +67,27 @@ versionRange = "${minecraft_version_range}"
 ordering = "AFTER"
 side = "BOTH"
 
+[[dependencies.${ mod_id }]]
+modId = "magistuarmory"
+mandatory = false
+versionRange = "${magitu}"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.${ mod_id }]]
+modId = "magistuarmoryaddon"
+mandatory = false
+versionRange = "${magitu_addon}"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.${ mod_id }]]
+modId = "slavicarmory"
+mandatory = false
+versionRange = "${slavic}"
+ordering = "AFTER"
+side = "BOTH"
+
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.

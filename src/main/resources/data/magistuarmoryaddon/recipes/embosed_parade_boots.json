@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    "a a",
+    "b b",
+    "c c"
+  ],
+  "key": {
+    "a": {
+      "tag": "forge:nuggets/steel"
+    },
+    "b": {
+      "item": "overgeared:steel_plate"
+    },
+    "c": {
+      "item": "overgeared:steel_ingot"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:embosed_parade_boots",
+    "count": 1
+  },
+  "show_notification": true
+}

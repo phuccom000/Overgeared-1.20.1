@@ -45,6 +45,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.CRUDE_STEEL);
         simpleItem(ModItems.ROCK);
         simpleItem(ModItems.STEEL_INGOT);
+        simpleItem(ModItems.STEEL_NUGGET);
         simpleItem(ModItems.HEATED_IRON_INGOT);
         simpleItem(ModItems.HEATED_STEEL_INGOT);
         simpleItem(ModItems.IRON_PLATE);

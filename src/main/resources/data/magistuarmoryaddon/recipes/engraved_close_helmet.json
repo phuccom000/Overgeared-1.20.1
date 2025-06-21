@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    "aaa",
+    "bab",
+    "b b"
+  ],
+  "key": {
+    "a": {
+      "item": "overgeared:steel_ingot"
+    },
+    "b": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:engraved_close_helmet",
+    "count": 1
+  },
+  "show_notification": true
+}

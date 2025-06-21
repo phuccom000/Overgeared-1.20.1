@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 4,
+  "has_quality": true,
+  "pattern": [
+    "i i",
+    "iii",
+    "pip"
+  ],
+  "key": {
+    "i": {
+      "item": "overgeared:steel_ingot"
+    },
+    "p": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmory:halfarmor_chestplate",
+    "count": 1
+  },
+  "show_notification": true
+}

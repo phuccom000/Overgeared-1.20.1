@@ -1,0 +1,29 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+    "pattern": [
+        "pip",
+        "ifi",
+        "c c"
+    ],
+    "key": {
+        "i": {
+            "item": "overgeared:steel_ingot"
+        },
+        "f": {
+            "tag": "magistuarmory:woolen_fabrics"
+        },
+        "c": {
+            "tag": "magistuarmory:chainmails/steel"
+        },
+        "p": {
+            "item": "overgeared:steel_plate"
+        }
+    },
+    "result": {
+        "item": "slavicarmory:andreevski_helmet",
+        "count": 1
+    },
+  "show_notification": true
+}

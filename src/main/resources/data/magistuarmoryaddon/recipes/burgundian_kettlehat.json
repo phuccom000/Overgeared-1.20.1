@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    "aba",
+    "bab",
+    "c c"
+  ],
+  "key": {
+    "a": {
+      "item": "magistuarmory:steel_nugget"
+    },
+    "b": {
+      "item": "overgeared:steel_ingot"
+    },
+    "c": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:burgundian_kettlehat",
+    "count": 1
+  },
+  "show_notification": true
+}

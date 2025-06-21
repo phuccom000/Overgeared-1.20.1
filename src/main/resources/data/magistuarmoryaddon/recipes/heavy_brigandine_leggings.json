@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 3,
+  "has_quality": true,
+  "pattern": [
+    "aca",
+    "cac",
+    "c c"
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:leather"
+    },
+    "c": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:heavy_brigandine_leggings",
+    "count": 1
+  },
+  "show_notification": true
+}

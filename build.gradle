@@ -267,6 +267,7 @@ tasks.named('processResources', ProcessResources).configure {
             mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
             mod_authors         : mod_authors, mod_description: mod_description,
             bucketlib           : bucketlib_version, bucketlib_version_range: bucketlib_version_range,
+            magitu              : magitu, magitu_addon: magitu_addon, slavic: slavic
     ]
     inputs.properties replaceProperties
 

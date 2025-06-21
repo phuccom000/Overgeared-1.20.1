@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_golden_pickaxe_head": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "overgeared:golden_pickaxe_head"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "overgeared:gold_nugget_from_blasting_golden_pickaxe_head"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_golden_pickaxe_head",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "overgeared:gold_nugget_from_blasting_golden_pickaxe_head"
+    ]
+  },
+  "sends_telemetry_event": false
+}

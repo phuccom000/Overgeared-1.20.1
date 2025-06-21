@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 4,
+  "has_quality": false,
+  "pattern": [
+    " b ",
+    "a a",
+    "   "
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:ghast_tear"
+    },
+    "b": {
+      "item": "minecraft:gold_nugget"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:golden_pince_nez_decoration",
+    "count": 1
+  },
+  "show_notification": true
+}

@@ -1,0 +1,29 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 4,
+  "has_quality": true,
+  "pattern": [
+    "aca",
+    "bdb",
+    "   "
+  ],
+  "key": {
+    "a": {
+      "tag": "magistuarmory:lamellar_rows/steel"
+    },
+    "b": {
+      "item": "minecraft:leather"
+    },
+    "c": {
+      "item": "slavicarmory:rus_chainmail_chestplate"
+    },
+    "d": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "slavicarmory:yushman_chestplate",
+    "count": 1
+  },
+  "show_notification": true
+}

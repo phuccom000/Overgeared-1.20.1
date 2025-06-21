@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+    "pattern": [
+        "iii",
+        "ifi",
+        "ccc"
+    ],
+    "key": {
+        "i": {
+            "item": "overgeared:steel_ingot"
+        },
+        "f": {
+            "tag": "magistuarmory:woolen_fabrics"
+        },
+        "c": {
+            "tag": "magistuarmory:chainmails/steel"
+        }
+    },
+    "result": {
+        "item": "slavicarmory:varangian_helmet",
+        "count": 1
+    },
+  "show_notification": true
+}

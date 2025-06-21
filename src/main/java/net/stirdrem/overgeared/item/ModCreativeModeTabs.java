@@ -22,6 +22,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.CRUDE_STEEL.get());
                         pOutput.accept(ModItems.ROCK.get());
                         pOutput.accept(ModItems.STEEL_INGOT.get());
+                        pOutput.accept(ModItems.STEEL_NUGGET.get());
                         pOutput.accept(ModItems.HEATED_IRON_INGOT.get());
                         pOutput.accept(ModItems.HEATED_STEEL_INGOT.get());
                         pOutput.accept(ModItems.IRON_PLATE.get());

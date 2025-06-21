@@ -1,0 +1,22 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 4,
+  "has_quality": true,
+  "pattern": [
+     "pnp",
+     "ppp"
+   ],
+   "key": {
+     "p": {
+       "item": "overgeared:steel_plate"
+     },
+     "n": {
+       "item": "magistuarmory:norman_helmet"
+     }
+   },
+   "result": {
+     "item": "magistuarmory:grand_bascinet",
+     "count": 1
+   },
+  "show_notification": true
+}

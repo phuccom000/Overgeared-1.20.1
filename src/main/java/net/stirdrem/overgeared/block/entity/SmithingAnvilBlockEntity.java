@@ -260,7 +260,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
                         tag.putString("ForgingQuality", quality);
                     else {
                         Random random = new Random();
-                        if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 || random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
+                        if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 && random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
                             quality = "master";
                         }
                         tag.putString("ForgingQuality", quality);

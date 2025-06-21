@@ -2,6 +2,8 @@ Heat nbt tag
 
 Masterfully Forged: 10% or 1% chance of appearing in place of Perfectly Forged. Gives even more bonus than Perfectly Forged.
 
-Add fletching capability to Fletching Table
+//Add fletching capability to Fletching Table
 Add Iron-forged and Steel-forged Bows
-add compat to archery expansion
+//add compat to archery expansion
+add blueprint and blueprint slot to the anvil
+add a higher tier blast furnace
