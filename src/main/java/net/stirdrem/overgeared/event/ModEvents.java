@@ -11,16 +11,21 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
@@ -46,6 +51,7 @@ import net.stirdrem.overgeared.util.ModTags;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
@@ -86,6 +92,7 @@ public class ModEvents {
 
         handleHeatedItems(player, level);
         handleAnvilMinigameSync(event, player);
+
 
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
             if (minigame.isVisible() && minigame.hasAnvilPosition()) {
@@ -359,13 +366,12 @@ public class ModEvents {
             event.getToolTip().add(Component.translatable("tooltip.overgeared.flint_flavor")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
-    }
-
-
-   /* @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent event) {
-        if (event.getState().getBlock() == ModBlocks.SMITHING_ANVIL.get()) {
-            SmithingHammer.releaseAnvil(event.getPos());
+        if (event.getItemStack().is(ModTags.Items.HEATED_METALS)) {
+            event.getToolTip().add(Component.translatable("tooltip.overgeared.heatedingots.tooltip").withStyle(ChatFormatting.RED));
         }
-    }*/
+
+        if (event.getItemStack().is(ModTags.Items.HEATABLE_METALS)) {
+            event.getToolTip().add(Component.translatable("tooltip.overgeared.heatablemetals.tooltip").withStyle(ChatFormatting.DARK_GRAY));
+        }
+    }
 }

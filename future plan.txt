@@ -7,3 +7,19 @@ Add Iron-forged and Steel-forged Bows
 //add compat to archery expansion
 add blueprint and blueprint slot to the anvil
 add a higher tier blast furnace
+
+Fletching Table idea
+You have to use the fletching table to craft arrows but you can also use it to make tipped arrows directly
+You can now also make tipped arrows by having a potion in your offhand and rightclick with an arrow in your main hand
+But you can only make 1 arrow at a time by doing this
+Each potion can tip a max of 8 arrows (temporary numbers, I'll look into mods that add cauldron tipping to see how many arrow can be made using that functions)
+The potion that was used for tipping will have the potion duration reduced based on the remaining amount in the bottle
+You can also change the tips of the arrows in the fletching table
+So for example you have too much flint tips you can still change it to iron or steel tips
+
+Blueprint for items:
+Blueprint can be crafted in a new block called Designer Table, and it starts out at Well Forged
+The blueprint set the highest quality level you can get from that tool
+Can have items with the same recipe shape because blueprint is different
+You need to forge continuously to increase the level of the blueprint
+the max level for blueprint is customizable (default: perfect)

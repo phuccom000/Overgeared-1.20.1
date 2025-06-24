@@ -9,6 +9,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.config.ClientConfig;
 
 @OnlyIn(Dist.CLIENT)
 public class AnvilMinigameOverlay {
@@ -33,7 +34,8 @@ public class AnvilMinigameOverlay {
         int imageWidth = 238;
         int imageHeight = 36;
         int x = (screenWidth - imageWidth) / 2;
-        int y = (screenHeight - imageHeight) / 8 * 7;
+        //int y = (screenHeight - imageHeight) / 8 * 7;
+        int y = (screenHeight - imageHeight) - ClientConfig.MINIGAME_OVERLAY_HEIGHT.get();
 
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
 

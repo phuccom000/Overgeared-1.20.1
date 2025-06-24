@@ -54,7 +54,7 @@ public class KnappableRockItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(Component.translatable("tooltip.overgeared.knappable_rock.tooltip").withStyle(ChatFormatting.GRAY)
+        pTooltipComponents.add(Component.translatable("tooltip.overgeared.knappable_rock.tooltip").withStyle(ChatFormatting.DARK_GRAY)
         );
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }

@@ -220,6 +220,8 @@ dependencies {
     runtimeOnly(fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1"))*/
     //runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.3.5+1.20.1")
     //compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.3.5+1.20.1:api")
+    runtimeOnly fg.deobf("curse.maven:archery-expansion-1164945:6424928")
+    //runtimeOnly fg.deobf("curse.maven:archery-expansion-squared-1217171:6425344")
     implementation(fg.deobf("curse.maven:polymorph-388800:6450982"))
 /*    implementation fg.deobf("curse.maven:lit-it-up-916334:6415378")
     implementation(fg.deobf("curse.maven:bookling-gear-1122766:6628791"))*/

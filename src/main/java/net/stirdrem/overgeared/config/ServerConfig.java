@@ -36,6 +36,12 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue WELL_ARMOR_BONUS;
     public static final ForgeConfigSpec.DoubleValue POOR_ARMOR_BONUS;
 
+    public static final ForgeConfigSpec.DoubleValue MASTER_DURABILITY_BONUS;
+    public static final ForgeConfigSpec.DoubleValue PERFECT_DURABILITY_BONUS;
+    public static final ForgeConfigSpec.DoubleValue EXPERT_DURABILITY_BONUS;
+    public static final ForgeConfigSpec.DoubleValue WELL_DURABILITY_BONUS;
+    public static final ForgeConfigSpec.DoubleValue POOR_DURABILITY_BONUS;
+
     public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
     public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
     public static final ForgeConfigSpec.DoubleValue MAX_SPEED;
@@ -173,6 +179,28 @@ public class ServerConfig {
         POOR_ARMOR_BONUS = builder
                 .comment("Armor penalty for poor quality armor")
                 .defineInRange("poorArmorBonus", -1.0, -5.0, 5.0);
+
+        builder.push("Durability Bonuses");
+
+        MASTER_DURABILITY_BONUS = builder
+                .comment("Durability bonus for master quality durability")
+                .defineInRange("masterDurabilityBonus", 1.6, -5.0, 5.0);
+
+        PERFECT_DURABILITY_BONUS = builder
+                .comment("Durability bonus for perfect quality durability")
+                .defineInRange("perfectDurabilityBonus", 1.5, -5.0, 5.0);
+
+        EXPERT_DURABILITY_BONUS = builder
+                .comment("Durability bonus for expert quality durability")
+                .defineInRange("expertDurabilityBonus", 1.3, -5.0, 5.0);
+
+        WELL_DURABILITY_BONUS = builder
+                .comment("Durability bonus for well-made quality durability")
+                .defineInRange("wellDurabilityBonus", 1, -5.0, 5.0);
+
+        POOR_DURABILITY_BONUS = builder
+                .comment("Durability penalty for poor quality durability")
+                .defineInRange("poorDurabilityBonus", 0.7, 0, 5.0);
 
         builder.pop();
 
