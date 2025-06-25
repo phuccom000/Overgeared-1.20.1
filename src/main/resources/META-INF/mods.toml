@@ -70,7 +70,7 @@ side = "BOTH"
 [[dependencies.${ mod_id }]]
 modId = "magistuarmory"
 mandatory = false
-versionRange = "${magitu}"
+versionRange = "[9.8,)"
 ordering = "AFTER"
 side = "BOTH"
 

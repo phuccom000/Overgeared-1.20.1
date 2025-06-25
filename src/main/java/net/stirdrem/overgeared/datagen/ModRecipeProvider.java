@@ -645,6 +645,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         Items.DIAMOND_BOOTS
                 ).unlocks("has_diamond", has(Items.DIAMOND))
                 .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_boots_to_diamond_boots"));
+
     }
 
     /*protected static void oreSmelting(Consumer<FinishedRecipe> consumer, List<ItemLike> ingredients, @Nullable CompoundTag nbt,
