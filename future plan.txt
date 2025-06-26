@@ -26,3 +26,7 @@ the max level for blueprint is customizable (default: perfect)
 add a stone anvil
 change crude steel to only be craftable in stone anvil
 replace iron tongs with smithing chopsticks
+
+
+(unsure)
+add a mold system for ingots
