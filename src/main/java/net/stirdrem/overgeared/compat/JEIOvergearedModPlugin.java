@@ -15,7 +15,7 @@ import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
 import net.stirdrem.overgeared.screen.RockKnappingScreen;
-import net.stirdrem.overgeared.screen.AbstractSmithingAnvilScreen;
+import net.stirdrem.overgeared.screen.SmithingAnvilScreen;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addRecipeClickArea(AbstractSmithingAnvilScreen.class, 90, 35, 22, 15,
+        registration.addRecipeClickArea(SmithingAnvilScreen.class, 90, 35, 22, 15,
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE);
 
         registration.addRecipeClickArea(RockKnappingScreen.class, 90, 35, 22, 15,

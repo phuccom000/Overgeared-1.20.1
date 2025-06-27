@@ -21,17 +21,17 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<AbstractSmithingAnvilBlockEntity> {
+public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<SmithingAnvilBlockEntity> {
     public SmithingAnvilBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(AbstractSmithingAnvilBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack,
+    public void render(SmithingAnvilBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack,
                        MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
@@ -98,7 +98,7 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
 
 
     private void renderStack(PoseStack poseStack, MultiBufferSource buffer, ItemRenderer itemRenderer,
-                             ItemStack itemStack, AbstractSmithingAnvilBlockEntity blockEntity,
+                             ItemStack itemStack, SmithingAnvilBlockEntity blockEntity,
                              float xOffset, float yOffset, float zOffset, float rotationDegrees, float scale) {
 
         if (itemStack == null || itemStack.isEmpty()) return;
