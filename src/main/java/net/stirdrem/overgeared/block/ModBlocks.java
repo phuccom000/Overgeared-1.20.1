@@ -5,16 +5,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.custom.SmithingAnvil;
+import net.stirdrem.overgeared.block.custom.SteelSmithingAnvil;
 //import net.stirdrem.overgeared.block.custom.LayeredWaterBarrel;
 //import net.stirdrem.overgeared.block.custom.WaterBarrel;
 //import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
+import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
 import net.stirdrem.overgeared.item.ModItems;
 
 import java.util.function.Supplier;
@@ -25,7 +25,10 @@ public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, OvergearedMod.MOD_ID);
     public static final RegistryObject<Block> SMITHING_ANVIL = registerBlock("smithing_anvil",
-            () -> new SmithingAnvil(BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
+            () -> new SteelSmithingAnvil(BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
+
+    public static final RegistryObject<Block> STONE_SMITHING_ANVIL = registerBlock("stone_smithing_anvil",
+            () -> new StoneSmithingAnvil(BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
     public static final RegistryObject<Block> STEEL_BLOCK = registerBlock("steel_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     /*public static final RegistryObject<Block> ROCK = registerBlock("rock",

@@ -26,7 +26,8 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
 */
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(ModBlocks.STEEL_BLOCK.get(),
-                        ModBlocks.SMITHING_ANVIL.get()
+                        ModBlocks.SMITHING_ANVIL.get(),
+                        ModBlocks.STONE_SMITHING_ANVIL.get()
                 );
        /* this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(ModBlocks.WATER_BARREL.get(),
@@ -34,7 +35,8 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 );
 */
         this.tag(BlockTags.NEEDS_IRON_TOOL)
-                .add(ModBlocks.STEEL_BLOCK.get()
+                .add(ModBlocks.STEEL_BLOCK.get(),
+                        ModBlocks.SMITHING_ANVIL.get()
                 );
 
        /* this.tag(BlockTags.NEEDS_DIAMOND_TOOL)

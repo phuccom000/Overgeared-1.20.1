@@ -1,13 +1,10 @@
 package net.stirdrem.overgeared.networking.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
-import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 
 import java.util.function.Supplier;
 

@@ -6,26 +6,17 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
@@ -39,7 +30,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
@@ -51,8 +42,6 @@ import net.stirdrem.overgeared.util.ModTags;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
 public class ModEvents {
@@ -98,7 +87,7 @@ public class ModEvents {
             if (minigame.isVisible() && minigame.hasAnvilPosition()) {
                 BlockPos anvilPos = minigame.getAnvilPos();
                 BlockEntity be = level.getBlockEntity(anvilPos);
-                if ((be instanceof SmithingAnvilBlockEntity anvil)) {
+                if ((be instanceof AbstractSmithingAnvilBlockEntity anvil)) {
                     double distSq = player.blockPosition().distSqr(anvilPos);
                     int maxDist = ServerConfig.MAX_ANVIL_DISTANCE.get(); // e.g. 7
                     if (distSq > maxDist * maxDist) {
@@ -338,7 +327,7 @@ public class ModEvents {
             if (minigame.hasAnvilPosition()) {
                 BlockPos anvilPos = minigame.getAnvilPos();
                 BlockEntity be = player.level().getBlockEntity(anvilPos);
-                if (be instanceof SmithingAnvilBlockEntity anvil) {
+                if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
                     anvil.setProgress(0);
                     anvil.setChanged();
                 }

@@ -1,97 +1,97 @@
-[25Jun2025 15:56:38.124] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.4.0, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources, --mixin.config, mixins.overgeared.json]
-[25Jun2025 15:56:38.140] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.8 by Oracle Corporation; OS Windows 10 arch amd64 version 10.0
-[25Jun2025 15:56:38.311] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
-[25Jun2025 15:56:38.392] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/Administrator/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23129!/ Service=ModLauncher Env=CLIENT
-[25Jun2025 15:56:38.909] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.4.0\f0c0b352173d0a378cbdcec9cfc4ba65899a721\javafmllanguage-1.20.1-47.4.0.jar is missing mods.toml file
-[25Jun2025 15:56:38.917] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.4.0\e862740d8c84d08dbfedea412bef88fe42e727c5\lowcodelanguage-1.20.1-47.4.0.jar is missing mods.toml file
-[25Jun2025 15:56:38.925] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.4.0\5719b3a297a33f877ed5dde4cb4bd75c859096af\mclanguage-1.20.1-47.4.0.jar is missing mods.toml file
-[25Jun2025 15:56:38.933] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.4.0\235975dafa4309945b59c56b53f31dc5b65a6051\fmlcore-1.20.1-47.4.0.jar is missing mods.toml file
-[25Jun2025 15:56:39.229] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: Found 3 dependencies adding them to mods collection
-[25Jun2025 15:56:41.419] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by mixins.overgeared.json is higher than the maximum level supported by this version of mixin (JAVA_13).
-[25Jun2025 15:56:41.420] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
-[25Jun2025 15:56:41.441] [main/WARN] [mixin/]: Compatibility level JAVA_16 specified by polymorph-integrations.forge.mixins.json is higher than the maximum level supported by this version of mixin (JAVA_13).
-[25Jun2025 15:56:41.446] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources]
-[25Jun2025 15:56:41.593] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
-[25Jun2025 15:56:41.595] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
-[25Jun2025 15:56:41.665] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
-[25Jun2025 15:56:41.666] [main/INFO] [mixin/]: Selecting config mixins.overgeared.json
-[25Jun2025 15:56:41.670] [main/WARN] [mixin/]: Reference map 'mixins.overgeared.refmap.json' for mixins.overgeared.json could not be read. If this is a development environment you can ignore this message
-[25Jun2025 15:56:41.671] [main/INFO] [mixin/]: Selecting config mixinextras.init.mixins.json
-[25Jun2025 15:56:41.842] [main/INFO] [mixin/]: Selecting config archeryexp.mixins.json
-[25Jun2025 15:56:43.053] [main/INFO] [mixin/]: Remapping refMap archeryexp.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
-[25Jun2025 15:56:43.054] [main/INFO] [mixin/]: Selecting config archeryexp.forge.mixins.json
-[25Jun2025 15:56:43.056] [main/INFO] [mixin/]: Remapping refMap archeryexp.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
-[25Jun2025 15:56:43.056] [main/INFO] [mixin/]: Selecting config polymorph.mixins.json
-[25Jun2025 15:56:43.058] [main/INFO] [mixin/]: Remapping refMap polymorph.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
-[25Jun2025 15:56:43.058] [main/INFO] [mixin/]: Selecting config polymorph-integrations.forge.mixins.json
-[25Jun2025 15:56:43.062] [main/INFO] [mixin/]: Remapping refMap polymorph.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
-[25Jun2025 15:56:43.062] [main/INFO] [mixin/]: Preparing mixins.overgeared.json (1)
-[25Jun2025 15:56:43.125] [main/INFO] [mixin/]: Preparing mixinextras.init.mixins.json (0)
-[25Jun2025 15:56:43.125] [main/INFO] [mixin/]: Preparing archeryexp.mixins.json (12)
-[25Jun2025 15:56:43.209] [main/INFO] [mixin/]: Preparing archeryexp.forge.mixins.json (1)
-[25Jun2025 15:56:43.216] [main/INFO] [mixin/]: Preparing polymorph.mixins.json (9)
-[25Jun2025 15:56:43.242] [main/INFO] [mixin/]: Preparing polymorph-integrations.forge.mixins.json (2)
-[25Jun2025 15:56:43.324] [main/INFO] [mixin/]: Prepared 23 mixins in 1.657 sec (72.0ms avg) (0ms load, 0ms transform, 0ms plugin)
-[25Jun2025 15:56:43.756] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [overgeared]
-[25Jun2025 15:56:44.160] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
-[25Jun2025 15:56:44.195] [main/INFO] [mixin/]: Mixing LivingEntityMixin from archeryexp.mixins.json into net.minecraft.world.entity.LivingEntity
-[25Jun2025 15:56:44.252] [main/INFO] [mixin/]: Renaming synthetic method lambda$tickStuff$1(Lnet/minecraft/world/item/ItemStack;)V to mdf0aa74$lambda$tickStuff$1$0 in archeryexp.mixins.json:LivingEntityMixin
-[25Jun2025 15:56:44.252] [main/INFO] [mixin/]: Renaming synthetic method lambda$tickStuff$0(Lnet/minecraft/world/item/ItemStack;)V to mdf0aa74$lambda$tickStuff$0$1 in archeryexp.mixins.json:LivingEntityMixin
-[25Jun2025 15:56:44.755] [main/INFO] [mixin/]: Mixing PlayerMixin from archeryexp.mixins.json into net.minecraft.world.entity.player.Player
-[25Jun2025 15:56:44.757] [main/INFO] [mixin/]: Renaming synthetic method lambda$applyQuickshot$2(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V to mdf0aa74$lambda$applyQuickshot$2$0 in archeryexp.mixins.json:PlayerMixin
-[25Jun2025 15:56:44.758] [main/INFO] [mixin/]: Renaming synthetic method lambda$applyQuickshot$1(Lnet/minecraft/world/entity/LivingEntity;)V to mdf0aa74$lambda$applyQuickshot$1$1 in archeryexp.mixins.json:PlayerMixin
-[25Jun2025 15:56:44.791] [main/INFO] [mixin/]: Renaming synthetic method lambda$playerTick$0(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/phys/Vec3;)V to mdf0aa74$lambda$playerTick$0$2 in archeryexp.mixins.json:PlayerMixin
-[25Jun2025 15:56:45.219] [main/INFO] [mixin/]: Mixing ItemMixin from archeryexp.mixins.json into net.minecraft.world.item.Item
-[25Jun2025 15:56:45.568] [main/INFO] [mixin/]: Mixing EnchantmentMixin from archeryexp.mixins.json into net.minecraft.world.item.enchantment.Enchantment
-[25Jun2025 15:56:46.754] [main/INFO] [mixin/]: Mixing AccessorCraftingMenu from polymorph.mixins.json into net.minecraft.world.inventory.CraftingMenu
-[25Jun2025 15:56:46.776] [main/INFO] [mixin/]: Mixing MixinCraftingMenu from polymorph.mixins.json into net.minecraft.world.inventory.CraftingMenu
-[25Jun2025 15:56:46.811] [main/INFO] [mixin/]: Mixing AccessorAbstractFurnaceBlockEntity from polymorph.mixins.json into net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
-[25Jun2025 15:56:46.915] [main/INFO] [mixin/]: Mixing AbstractArrowMixin from archeryexp.mixins.json into net.minecraft.world.entity.projectile.AbstractArrow
-[25Jun2025 15:56:46.919] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$3(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V to mdf0aa74$lambda$enchantmentEffects$3$0 in archeryexp.mixins.json:AbstractArrowMixin
-[25Jun2025 15:56:46.919] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$2(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V to mdf0aa74$lambda$enchantmentEffects$2$1 in archeryexp.mixins.json:AbstractArrowMixin
-[25Jun2025 15:56:46.919] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$1(Lnet/minecraft/world/entity/LivingEntity;)V to mdf0aa74$lambda$enchantmentEffects$1$2 in archeryexp.mixins.json:AbstractArrowMixin
-[25Jun2025 15:56:46.920] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$0(Lnet/minecraft/world/entity/LivingEntity;)V to mdf0aa74$lambda$enchantmentEffects$0$3 in archeryexp.mixins.json:AbstractArrowMixin
-[25Jun2025 15:56:47.186] [main/INFO] [mixin/]: Mixing EnchantmentMenuMixin from archeryexp.mixins.json into net.minecraft.world.inventory.EnchantmentMenu
-[25Jun2025 15:56:47.186] [main/INFO] [mixin/]: Renaming synthetic method lambda$preventPowerEnchTable$0(Lnet/minecraft/util/RandomSource;Lnet/minecraft/world/item/enchantment/EnchantmentInstance;)Lnet/minecraft/world/item/enchantment/EnchantmentInstance; to mdf0aa74$lambda$preventPowerEnchTable$0$0 in archeryexp.mixins.json:EnchantmentMenuMixin
-[25Jun2025 15:56:47.225] [main/INFO] [mixin/]: Mixing ItemStackMixin from mixins.overgeared.json into net.minecraft.world.item.ItemStack
-[25Jun2025 15:56:47.691] [main/INFO] [mixin/]: Mixing MixinSmithingMenu from polymorph.mixins.json into net.minecraft.world.inventory.SmithingMenu
-[25Jun2025 15:56:47.972] [main/INFO] [mixin/]: Mixing BowItemMixin from archeryexp.mixins.json into net.minecraft.world.item.BowItem
-[25Jun2025 15:56:47.974] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$3(Lnet/minecraft/world/entity/player/Player;)V to mdf0aa74$lambda$onReleaseUsing$3$0 in archeryexp.mixins.json:BowItemMixin
-[25Jun2025 15:56:47.975] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$2(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/LivingEntity;Lorg/infernalstudios/archeryexp/util/ParticleData;)V to mdf0aa74$lambda$onReleaseUsing$2$1 in archeryexp.mixins.json:BowItemMixin
-[25Jun2025 15:56:47.976] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$1(Lnet/minecraft/world/entity/player/Player;Lorg/infernalstudios/archeryexp/util/PotionData;)V to mdf0aa74$lambda$onReleaseUsing$1$2 in archeryexp.mixins.json:BowItemMixin
-[25Jun2025 15:56:47.976] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$0(Lnet/minecraft/world/entity/player/Player;)V to mdf0aa74$lambda$onReleaseUsing$0$3 in archeryexp.mixins.json:BowItemMixin
-[25Jun2025 15:56:48.982] [main/INFO] [mixin/]: Mixing AbstrtactSkeletonMixin from archeryexp.mixins.json into net.minecraft.world.entity.monster.AbstractSkeleton
-[25Jun2025 15:56:48.987] [main/INFO] [mixin/]: Renaming synthetic method lambda$rangedAttack$2(Lorg/infernalstudios/archeryexp/util/ParticleData;)V to mdf0aa74$lambda$rangedAttack$2$0 in archeryexp.mixins.json:AbstrtactSkeletonMixin
-[25Jun2025 15:56:48.987] [main/INFO] [mixin/]: Renaming synthetic method lambda$rangedAttack$1(Lorg/infernalstudios/archeryexp/util/PotionData;)V to mdf0aa74$lambda$rangedAttack$1$1 in archeryexp.mixins.json:AbstrtactSkeletonMixin
-[25Jun2025 15:56:48.987] [main/INFO] [mixin/]: Renaming synthetic method lambda$rangedAttack$0(Lnet/minecraft/world/entity/monster/AbstractSkeleton;)V to mdf0aa74$lambda$rangedAttack$0$2 in archeryexp.mixins.json:AbstrtactSkeletonMixin
-[25Jun2025 15:56:49.789] [main/INFO] [mixin/]: Mixing ArrowDamageEnchantmentMixin from archeryexp.mixins.json into net.minecraft.world.item.enchantment.ArrowDamageEnchantment
-[25Jun2025 15:56:51.159] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.0, for MC 1.20.1 with MCP 20230612.114412
-[25Jun2025 15:56:51.161] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.0 Initialized
-[25Jun2025 15:56:51.171] [modloading-worker-0/INFO] [Archery Expansion/]: Finished Loading Archery Expansion
-[25Jun2025 15:56:51.203] [modloading-worker-0/INFO] [mixin/]: Mixing LocalPlayerMixin from archeryexp.mixins.json into net.minecraft.client.player.LocalPlayer
-[25Jun2025 15:56:51.233] [modloading-worker-0/INFO] [mixin/]: Mixing AbstractClientPlayerMixin from archeryexp.mixins.json into net.minecraft.client.player.AbstractClientPlayer
-[25Jun2025 15:56:51.420] [modloading-worker-0/INFO] [mixin/]: Mixing MixinTitleScreen from archeryexp.forge.mixins.json into net.minecraft.client.gui.screens.TitleScreen
-[25Jun2025 15:56:51.576] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
-[25Jun2025 15:56:51.585] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 5.237 ms
-[25Jun2025 15:56:51.591] [modloading-worker-0/INFO] [mixin/]: Mixing MixinRecipeManager from polymorph.mixins.json into net.minecraft.world.item.crafting.RecipeManager
-[25Jun2025 15:56:51.593] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$polymorph$getRecipe$1(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;Lnet/minecraft/world/item/crafting/Recipe;)V to mdf0aa74$lambda$polymorph$getRecipe$1$0 in polymorph.mixins.json:MixinRecipeManager
-[25Jun2025 15:56:51.593] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$polymorph$getRecipe$0(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/item/crafting/Recipe;)V to mdf0aa74$lambda$polymorph$getRecipe$0$1 in polymorph.mixins.json:MixinRecipeManager
-[25Jun2025 15:56:51.986] [main/INFO] [mixin/]: Mixing AccessorInventoryMenu from polymorph.mixins.json into net.minecraft.world.inventory.InventoryMenu
-[25Jun2025 15:56:52.147] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
-[25Jun2025 15:56:52.148] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
-[25Jun2025 15:56:52.422] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
-[25Jun2025 15:56:52.510] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 86 ms
-[25Jun2025 15:56:52.510] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
-[25Jun2025 15:56:52.587] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 75 ms
-[25Jun2025 15:56:52.587] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: overgeared
-[25Jun2025 15:56:52.755] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: overgeared finished after 167 ms
-[25Jun2025 15:56:52.756] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: overgeared
-[25Jun2025 15:56:52.806] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: overgeared finished after 50 ms
-[25Jun2025 15:56:52.806] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id overgeared
-[25Jun2025 15:56:52.822] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id overgeared finished after 15 ms
-[25Jun2025 15:56:52.822] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id overgeared
-[25Jun2025 15:56:52.826] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id overgeared finished after 3 ms
-[25Jun2025 15:56:52.827] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : overgeared
-[25Jun2025 15:56:52.837] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : overgeared finished after 9 ms
-[25Jun2025 15:56:52.837] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 415 ms
-[25Jun2025 15:56:52.861] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 352, old count: 351, new count: 353, removed stale: 0, written: 1
+[27Jun2025 07:57:05.760] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.4.0, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources, --mixin.config, mixins.overgeared.json]
+[27Jun2025 07:57:05.769] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.8 by Oracle Corporation; OS Windows 10 arch amd64 version 10.0
+[27Jun2025 07:57:05.957] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
+[27Jun2025 07:57:06.037] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/Administrator/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23129!/ Service=ModLauncher Env=CLIENT
+[27Jun2025 07:57:06.539] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.4.0\f0c0b352173d0a378cbdcec9cfc4ba65899a721\javafmllanguage-1.20.1-47.4.0.jar is missing mods.toml file
+[27Jun2025 07:57:06.546] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.4.0\e862740d8c84d08dbfedea412bef88fe42e727c5\lowcodelanguage-1.20.1-47.4.0.jar is missing mods.toml file
+[27Jun2025 07:57:06.554] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.4.0\5719b3a297a33f877ed5dde4cb4bd75c859096af\mclanguage-1.20.1-47.4.0.jar is missing mods.toml file
+[27Jun2025 07:57:06.561] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.4.0\235975dafa4309945b59c56b53f31dc5b65a6051\fmlcore-1.20.1-47.4.0.jar is missing mods.toml file
+[27Jun2025 07:57:06.856] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: Found 3 dependencies adding them to mods collection
+[27Jun2025 07:57:08.959] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by mixins.overgeared.json is higher than the maximum level supported by this version of mixin (JAVA_13).
+[27Jun2025 07:57:08.959] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[27Jun2025 07:57:08.978] [main/WARN] [mixin/]: Compatibility level JAVA_16 specified by polymorph-integrations.forge.mixins.json is higher than the maximum level supported by this version of mixin (JAVA_13).
+[27Jun2025 07:57:08.984] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources]
+[27Jun2025 07:57:09.135] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
+[27Jun2025 07:57:09.138] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
+[27Jun2025 07:57:09.163] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
+[27Jun2025 07:57:09.164] [main/INFO] [mixin/]: Selecting config mixins.overgeared.json
+[27Jun2025 07:57:09.169] [main/WARN] [mixin/]: Reference map 'mixins.overgeared.refmap.json' for mixins.overgeared.json could not be read. If this is a development environment you can ignore this message
+[27Jun2025 07:57:09.171] [main/INFO] [mixin/]: Selecting config mixinextras.init.mixins.json
+[27Jun2025 07:57:09.355] [main/INFO] [mixin/]: Selecting config archeryexp.mixins.json
+[27Jun2025 07:57:09.663] [main/INFO] [mixin/]: Remapping refMap archeryexp.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
+[27Jun2025 07:57:09.663] [main/INFO] [mixin/]: Selecting config archeryexp.forge.mixins.json
+[27Jun2025 07:57:09.665] [main/INFO] [mixin/]: Remapping refMap archeryexp.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
+[27Jun2025 07:57:09.666] [main/INFO] [mixin/]: Selecting config polymorph.mixins.json
+[27Jun2025 07:57:09.667] [main/INFO] [mixin/]: Remapping refMap polymorph.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
+[27Jun2025 07:57:09.667] [main/INFO] [mixin/]: Selecting config polymorph-integrations.forge.mixins.json
+[27Jun2025 07:57:09.672] [main/INFO] [mixin/]: Remapping refMap polymorph.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
+[27Jun2025 07:57:09.673] [main/INFO] [mixin/]: Preparing mixins.overgeared.json (1)
+[27Jun2025 07:57:09.742] [main/INFO] [mixin/]: Preparing mixinextras.init.mixins.json (0)
+[27Jun2025 07:57:09.742] [main/INFO] [mixin/]: Preparing archeryexp.mixins.json (12)
+[27Jun2025 07:57:09.815] [main/INFO] [mixin/]: Preparing archeryexp.forge.mixins.json (1)
+[27Jun2025 07:57:09.819] [main/INFO] [mixin/]: Preparing polymorph.mixins.json (9)
+[27Jun2025 07:57:09.837] [main/INFO] [mixin/]: Preparing polymorph-integrations.forge.mixins.json (2)
+[27Jun2025 07:57:09.891] [main/INFO] [mixin/]: Prepared 23 mixins in 0.726 sec (31.6ms avg) (0ms load, 0ms transform, 0ms plugin)
+[27Jun2025 07:57:10.172] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [overgeared]
+[27Jun2025 07:57:10.372] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
+[27Jun2025 07:57:10.379] [main/INFO] [mixin/]: Mixing LivingEntityMixin from archeryexp.mixins.json into net.minecraft.world.entity.LivingEntity
+[27Jun2025 07:57:10.404] [main/INFO] [mixin/]: Renaming synthetic method lambda$tickStuff$1(Lnet/minecraft/world/item/ItemStack;)V to mde67e50$lambda$tickStuff$1$0 in archeryexp.mixins.json:LivingEntityMixin
+[27Jun2025 07:57:10.404] [main/INFO] [mixin/]: Renaming synthetic method lambda$tickStuff$0(Lnet/minecraft/world/item/ItemStack;)V to mde67e50$lambda$tickStuff$0$1 in archeryexp.mixins.json:LivingEntityMixin
+[27Jun2025 07:57:10.629] [main/INFO] [mixin/]: Mixing PlayerMixin from archeryexp.mixins.json into net.minecraft.world.entity.player.Player
+[27Jun2025 07:57:10.631] [main/INFO] [mixin/]: Renaming synthetic method lambda$applyQuickshot$2(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V to mde67e50$lambda$applyQuickshot$2$0 in archeryexp.mixins.json:PlayerMixin
+[27Jun2025 07:57:10.631] [main/INFO] [mixin/]: Renaming synthetic method lambda$applyQuickshot$1(Lnet/minecraft/world/entity/LivingEntity;)V to mde67e50$lambda$applyQuickshot$1$1 in archeryexp.mixins.json:PlayerMixin
+[27Jun2025 07:57:10.640] [main/INFO] [mixin/]: Renaming synthetic method lambda$playerTick$0(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/phys/Vec3;)V to mde67e50$lambda$playerTick$0$2 in archeryexp.mixins.json:PlayerMixin
+[27Jun2025 07:57:10.862] [main/INFO] [mixin/]: Mixing ItemMixin from archeryexp.mixins.json into net.minecraft.world.item.Item
+[27Jun2025 07:57:11.176] [main/INFO] [mixin/]: Mixing EnchantmentMixin from archeryexp.mixins.json into net.minecraft.world.item.enchantment.Enchantment
+[27Jun2025 07:57:12.323] [main/INFO] [mixin/]: Mixing AccessorCraftingMenu from polymorph.mixins.json into net.minecraft.world.inventory.CraftingMenu
+[27Jun2025 07:57:12.345] [main/INFO] [mixin/]: Mixing MixinCraftingMenu from polymorph.mixins.json into net.minecraft.world.inventory.CraftingMenu
+[27Jun2025 07:57:12.380] [main/INFO] [mixin/]: Mixing AccessorAbstractFurnaceBlockEntity from polymorph.mixins.json into net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
+[27Jun2025 07:57:12.473] [main/INFO] [mixin/]: Mixing AbstractArrowMixin from archeryexp.mixins.json into net.minecraft.world.entity.projectile.AbstractArrow
+[27Jun2025 07:57:12.476] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$3(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V to mde67e50$lambda$enchantmentEffects$3$0 in archeryexp.mixins.json:AbstractArrowMixin
+[27Jun2025 07:57:12.477] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$2(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V to mde67e50$lambda$enchantmentEffects$2$1 in archeryexp.mixins.json:AbstractArrowMixin
+[27Jun2025 07:57:12.477] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$1(Lnet/minecraft/world/entity/LivingEntity;)V to mde67e50$lambda$enchantmentEffects$1$2 in archeryexp.mixins.json:AbstractArrowMixin
+[27Jun2025 07:57:12.477] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$0(Lnet/minecraft/world/entity/LivingEntity;)V to mde67e50$lambda$enchantmentEffects$0$3 in archeryexp.mixins.json:AbstractArrowMixin
+[27Jun2025 07:57:12.739] [main/INFO] [mixin/]: Mixing EnchantmentMenuMixin from archeryexp.mixins.json into net.minecraft.world.inventory.EnchantmentMenu
+[27Jun2025 07:57:12.739] [main/INFO] [mixin/]: Renaming synthetic method lambda$preventPowerEnchTable$0(Lnet/minecraft/util/RandomSource;Lnet/minecraft/world/item/enchantment/EnchantmentInstance;)Lnet/minecraft/world/item/enchantment/EnchantmentInstance; to mde67e50$lambda$preventPowerEnchTable$0$0 in archeryexp.mixins.json:EnchantmentMenuMixin
+[27Jun2025 07:57:12.785] [main/INFO] [mixin/]: Mixing ItemStackMixin from mixins.overgeared.json into net.minecraft.world.item.ItemStack
+[27Jun2025 07:57:13.227] [main/INFO] [mixin/]: Mixing MixinSmithingMenu from polymorph.mixins.json into net.minecraft.world.inventory.SmithingMenu
+[27Jun2025 07:57:13.514] [main/INFO] [mixin/]: Mixing BowItemMixin from archeryexp.mixins.json into net.minecraft.world.item.BowItem
+[27Jun2025 07:57:13.516] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$3(Lnet/minecraft/world/entity/player/Player;)V to mde67e50$lambda$onReleaseUsing$3$0 in archeryexp.mixins.json:BowItemMixin
+[27Jun2025 07:57:13.517] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$2(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/LivingEntity;Lorg/infernalstudios/archeryexp/util/ParticleData;)V to mde67e50$lambda$onReleaseUsing$2$1 in archeryexp.mixins.json:BowItemMixin
+[27Jun2025 07:57:13.518] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$1(Lnet/minecraft/world/entity/player/Player;Lorg/infernalstudios/archeryexp/util/PotionData;)V to mde67e50$lambda$onReleaseUsing$1$2 in archeryexp.mixins.json:BowItemMixin
+[27Jun2025 07:57:13.518] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$0(Lnet/minecraft/world/entity/player/Player;)V to mde67e50$lambda$onReleaseUsing$0$3 in archeryexp.mixins.json:BowItemMixin
+[27Jun2025 07:57:14.534] [main/INFO] [mixin/]: Mixing AbstrtactSkeletonMixin from archeryexp.mixins.json into net.minecraft.world.entity.monster.AbstractSkeleton
+[27Jun2025 07:57:14.538] [main/INFO] [mixin/]: Renaming synthetic method lambda$rangedAttack$2(Lorg/infernalstudios/archeryexp/util/ParticleData;)V to mde67e50$lambda$rangedAttack$2$0 in archeryexp.mixins.json:AbstrtactSkeletonMixin
+[27Jun2025 07:57:14.539] [main/INFO] [mixin/]: Renaming synthetic method lambda$rangedAttack$1(Lorg/infernalstudios/archeryexp/util/PotionData;)V to mde67e50$lambda$rangedAttack$1$1 in archeryexp.mixins.json:AbstrtactSkeletonMixin
+[27Jun2025 07:57:14.539] [main/INFO] [mixin/]: Renaming synthetic method lambda$rangedAttack$0(Lnet/minecraft/world/entity/monster/AbstractSkeleton;)V to mde67e50$lambda$rangedAttack$0$2 in archeryexp.mixins.json:AbstrtactSkeletonMixin
+[27Jun2025 07:57:15.317] [main/INFO] [mixin/]: Mixing ArrowDamageEnchantmentMixin from archeryexp.mixins.json into net.minecraft.world.item.enchantment.ArrowDamageEnchantment
+[27Jun2025 07:57:16.683] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.0, for MC 1.20.1 with MCP 20230612.114412
+[27Jun2025 07:57:16.685] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.0 Initialized
+[27Jun2025 07:57:16.695] [modloading-worker-0/INFO] [Archery Expansion/]: Finished Loading Archery Expansion
+[27Jun2025 07:57:16.719] [modloading-worker-0/INFO] [mixin/]: Mixing LocalPlayerMixin from archeryexp.mixins.json into net.minecraft.client.player.LocalPlayer
+[27Jun2025 07:57:16.746] [modloading-worker-0/INFO] [mixin/]: Mixing AbstractClientPlayerMixin from archeryexp.mixins.json into net.minecraft.client.player.AbstractClientPlayer
+[27Jun2025 07:57:16.899] [modloading-worker-0/INFO] [mixin/]: Mixing MixinTitleScreen from archeryexp.forge.mixins.json into net.minecraft.client.gui.screens.TitleScreen
+[27Jun2025 07:57:17.067] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
+[27Jun2025 07:57:17.072] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 3.427 ms
+[27Jun2025 07:57:17.076] [modloading-worker-0/INFO] [mixin/]: Mixing MixinRecipeManager from polymorph.mixins.json into net.minecraft.world.item.crafting.RecipeManager
+[27Jun2025 07:57:17.077] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$polymorph$getRecipe$1(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;Lnet/minecraft/world/item/crafting/Recipe;)V to mde67e50$lambda$polymorph$getRecipe$1$0 in polymorph.mixins.json:MixinRecipeManager
+[27Jun2025 07:57:17.077] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$polymorph$getRecipe$0(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/item/crafting/Recipe;)V to mde67e50$lambda$polymorph$getRecipe$0$1 in polymorph.mixins.json:MixinRecipeManager
+[27Jun2025 07:57:17.397] [main/INFO] [mixin/]: Mixing AccessorInventoryMenu from polymorph.mixins.json into net.minecraft.world.inventory.InventoryMenu
+[27Jun2025 07:57:17.637] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
+[27Jun2025 07:57:17.637] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
+[27Jun2025 07:57:17.933] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[27Jun2025 07:57:18.038] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 104 ms
+[27Jun2025 07:57:18.039] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
+[27Jun2025 07:57:18.089] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 49 ms
+[27Jun2025 07:57:18.089] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: overgeared
+[27Jun2025 07:57:18.258] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: overgeared finished after 168 ms
+[27Jun2025 07:57:18.258] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: overgeared
+[27Jun2025 07:57:18.304] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: overgeared finished after 45 ms
+[27Jun2025 07:57:18.304] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id overgeared
+[27Jun2025 07:57:18.319] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id overgeared finished after 14 ms
+[27Jun2025 07:57:18.319] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id overgeared
+[27Jun2025 07:57:18.323] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id overgeared finished after 3 ms
+[27Jun2025 07:57:18.323] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : overgeared
+[27Jun2025 07:57:18.333] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : overgeared finished after 9 ms
+[27Jun2025 07:57:18.333] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 399 ms
+[27Jun2025 07:57:18.355] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 354, old count: 354, new count: 355, removed stale: 0, written: 0

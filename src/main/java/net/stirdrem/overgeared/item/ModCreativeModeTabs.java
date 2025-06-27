@@ -80,6 +80,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.DIAMOND_SHOVEL_HEAD.get());
                         pOutput.accept(ModItems.DIAMOND_HOE_HEAD.get());
 */
+                        pOutput.accept(ModBlocks.STONE_SMITHING_ANVIL.get());
                         pOutput.accept(ModBlocks.SMITHING_ANVIL.get());
                         pOutput.accept(ModBlocks.STEEL_BLOCK.get());
                         //pOutput.accept(ModBlocks.WATER_BARREL.get());

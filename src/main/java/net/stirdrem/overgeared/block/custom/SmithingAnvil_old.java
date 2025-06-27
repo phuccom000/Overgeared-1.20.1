@@ -1,3 +1,4 @@
+/*
 package net.stirdrem.overgeared.block.custom;
 
 import net.minecraft.ChatFormatting;
@@ -31,8 +32,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
+import net.stirdrem.overgeared.block.AnvilTier;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
-import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.block.entity.SteelSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
@@ -44,7 +46,7 @@ import org.joml.Vector3f;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SmithingAnvil extends BaseEntityBlock {
+public class SmithingAnvil_old extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final VoxelShape Z1 = Block.box(3, 9, 0, 13, 16, 16);
     private static final VoxelShape Z2 = Block.box(3, 0, 1, 13, 3, 15);
@@ -67,7 +69,7 @@ public class SmithingAnvil extends BaseEntityBlock {
 
     private static String quality = null;
 
-    public SmithingAnvil(Properties properties) {
+    public SmithingAnvil_old(Properties properties) {
         super(properties);
     }
 
@@ -102,6 +104,8 @@ public class SmithingAnvil extends BaseEntityBlock {
     private float zoneShiftAmount = 15.0f;
     private BlockPos anvilPos;
     private boolean isUnpaused = false;
+    private AnvilTier tier = AnvilTier.STEEL;
+
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
@@ -109,10 +113,16 @@ public class SmithingAnvil extends BaseEntityBlock {
         return direction.getAxis() == Direction.Axis.X ? X_AXIS_AABB : Z_AXIS_AABB;
     }
 
+    public AnvilTier getTier() {
+        return tier;
+    }
+
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
     }
-    /* FACING */
+    */
+/* FACING *//*
+
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
@@ -138,15 +148,16 @@ public class SmithingAnvil extends BaseEntityBlock {
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof SmithingAnvilBlockEntity) {
-                ((SmithingAnvilBlockEntity) blockEntity).drops();
+            if (blockEntity instanceof SteelSmithingAnvilBlockEntity) {
+                ((SteelSmithingAnvilBlockEntity) blockEntity).drops();
                 resetMinigameData(pLevel, pPos);
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 
-    /*@Override
+    */
+/*@Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos,
                                  Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide()) {
@@ -193,7 +204,8 @@ public class SmithingAnvil extends BaseEntityBlock {
             }
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
-    }*/
+    }*//*
+
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos,
@@ -204,7 +216,7 @@ public class SmithingAnvil extends BaseEntityBlock {
 
         long now = level.getGameTime();
         BlockEntity be = level.getBlockEntity(pos);
-        if (!(be instanceof SmithingAnvilBlockEntity anvil)) {
+        if (!(be instanceof SteelSmithingAnvilBlockEntity anvil)) {
             return InteractionResult.PASS;
         }
 
@@ -224,10 +236,12 @@ public class SmithingAnvil extends BaseEntityBlock {
                     // Hammer logic (particles, sound, cooldown)
                     if (!ServerConfig.ENABLE_MINIGAME.get())
                         anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
+*/
 /*            for (int i = 0; i < 3; i++) {
                 int delay = 7 * i;
                 TickScheduler.schedule(delay, () -> spawnAnvilParticles(level, pos));
-            }*/
+            }*//*
+
                     spawnAnvilParticles(level, pos);
                     //level.playSound(null, pos, SoundEvents.ANVIL_, SoundSource.BLOCKS, 1f, 1f);
                     if (anvil.getHitsRemaining() == 1)
@@ -276,9 +290,11 @@ public class SmithingAnvil extends BaseEntityBlock {
                 double velocityZ = (random.nextFloat() - 0.5) * 0.1;
 
                 // For orange-colored dust particles
-                /*serverLevel.sendParticles(ParticleTypes.FLAME,
+                */
+/*serverLevel.sendParticles(ParticleTypes.FLAME,
                         pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ,
-                        velocityX, velocityY, velocityZ);*/
+                        velocityX, velocityY, velocityZ);*//*
+
                 serverLevel.sendParticles(new DustParticleOptions(new Vector3f(1.0f, 0.5f, 0.0f), 1.0f),
                         pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, 1,
                         velocityX, velocityY, velocityZ, 1);
@@ -292,10 +308,11 @@ public class SmithingAnvil extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new SmithingAnvilBlockEntity(pPos, pState);
+        return new SteelSmithingAnvilBlockEntity(pPos, pState);
     }
 
-    /*@Nullable
+    */
+/*@Nullable
     @Override
     public <T extends
             BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
@@ -306,7 +323,8 @@ public class SmithingAnvil extends BaseEntityBlock {
         return createTickerHelper(pBlockEntityType, ModBlockEntities.SMITHING_TABLE_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
     }
-    */
+    *//*
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
@@ -340,13 +358,16 @@ public class SmithingAnvil extends BaseEntityBlock {
                     minigame.reset(usingPlayer); // Implement this in your capability
                     //minigame.setIsVisible(false, usingPlayer);
 
-                    /*// Notify client to reset
+                    */
+/*//*
+/ Notify client to reset
                     CompoundTag resetTag = new CompoundTag();
                     resetTag.putBoolean("isVisible", false);
-                    ModMessages.sendToPlayer(new MinigameSyncS2CPacket(resetTag), usingPlayer);*/
+                    ModMessages.sendToPlayer(new MinigameSyncS2CPacket(resetTag), usingPlayer);*//*
+
                 });
             }
         }
     }
 
-}
+}*/
