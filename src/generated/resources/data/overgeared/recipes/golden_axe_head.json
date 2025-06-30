@@ -15,5 +15,6 @@
   "result": {
     "item": "overgeared:golden_axe_head"
   },
-  "show_notification": true
+  "show_notification": true,
+  "tier": "stone"
 }

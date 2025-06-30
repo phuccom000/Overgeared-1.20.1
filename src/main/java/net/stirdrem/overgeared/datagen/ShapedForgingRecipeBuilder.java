@@ -15,6 +15,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.core.NonNullList;
+import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.ForgingBookCategory;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
@@ -36,9 +37,12 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private final Advancement.Builder advancement = Advancement.Builder.recipeAdvancement();
 
     @Nullable
-    private Boolean hasQuality; // Can be null, true, or false
+    private Boolean hasQuality;
     @Nullable
     private String group;
+    @Nullable
+    private String tier;
+
     private boolean showNotification = true;
 
 
@@ -119,6 +123,11 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
+    public ShapedForgingRecipeBuilder tier(@Nullable AnvilTier pTier) {
+        this.tier = pTier.getDisplayName();
+        return this;
+    }
+
     public ShapedForgingRecipeBuilder setQuality(@Nullable boolean hasQuality) {
         this.hasQuality = hasQuality;
         return this;
@@ -163,7 +172,8 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 this.advancement,
                 pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/"),
                 this.showNotification,
-                this.hasQuality == null || this.hasQuality
+                this.hasQuality == null || this.hasQuality,
+                this.tier == null ? "" : this.tier
         ));
     }
 
@@ -194,9 +204,10 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final String group;
         private final ForgingBookCategory category;
         private final Boolean hasQuality;
+        private final String tier;
 
 
-        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, Boolean hasQuality) {
+        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, Boolean hasQuality, String tier) {
             this.ingredients = ingredients;
             this.hammering = hammering;
             this.result = result;
@@ -209,6 +220,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             this.advancementId = advancementId;
             this.showNotification = showNotification;
             this.hasQuality = hasQuality;
+            this.tier = tier;
         }
 
         @Override
@@ -222,7 +234,9 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             for (String s : this.pattern) {
                 patternArray.add(s);
             }
-
+            if (!this.tier.isBlank() || !this.tier.isEmpty()) {
+                json.addProperty("tier", this.tier);
+            }
             json.add("pattern", patternArray);
             JsonObject jsonobject = new JsonObject();
 

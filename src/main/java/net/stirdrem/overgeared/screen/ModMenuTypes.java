@@ -14,8 +14,11 @@ public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(ForgeRegistries.MENU_TYPES, OvergearedMod.MOD_ID);
 
-    public static final RegistryObject<MenuType<SmithingAnvilMenu>> SMITHING_ANVIL_MENU =
-            registerMenuType("smithing_anvil_menu", SmithingAnvilMenu::new);
+    public static final RegistryObject<MenuType<SteelSmithingAnvilMenu>> STEEL_SMITHING_ANVIL_MENU =
+            registerMenuType("smithing_anvil_menu", SteelSmithingAnvilMenu::new);
+
+    public static final RegistryObject<MenuType<StoneSmithingAnvilMenu>> STONE_SMITHING_ANVIL_MENU =
+            registerMenuType("stone_smithing_anvil_menu", StoneSmithingAnvilMenu::new);
 
     public static final RegistryObject<MenuType<RockKnappingMenu>> ROCK_KNAPPING_MENU =
             registerMenuType("rock_knapping_menu", RockKnappingMenu::new);

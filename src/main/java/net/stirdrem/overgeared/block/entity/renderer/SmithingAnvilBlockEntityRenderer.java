@@ -21,25 +21,25 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<SmithingAnvilBlockEntity> {
+public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<AbstractSmithingAnvilBlockEntity> {
     public SmithingAnvilBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(SmithingAnvilBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack,
+    public void render(AbstractSmithingAnvilBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack,
                        MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
         // Render the output item from slot 10
         ItemStack output = pBlockEntity.getRenderStack(10);
         if (!output.isEmpty()) {
-            float yOffset = isBlockItem(output) ? 1.05f : 1.025f;
-            renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, 0f, 120f, 0.5f);
+            float yOffset = isBlockItem(output) ? 1.05f : 1.02f;
+            renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, 0f, 110f, 0.5f);
         }
         float zOffset = -0.43f;
         if (output.isEmpty()) zOffset = 0f;
@@ -47,45 +47,57 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
         Set<Item> renderedItems = new HashSet<>();
         Set<Integer> renderedSlots = new HashSet<>(); // Track which slots we've rendered from
         int rendered = 0;
-        for (int i = 0; i < 9 && rendered < 3; i++) {
-            ItemStack stack = pBlockEntity.getRenderStack(i);
-            if (!stack.isEmpty()) {
-                Item item = stack.getItem();
-                if (!renderedItems.contains(item)) {
-                    float baseYOffset = 1.025f + (rendered * 0.025f);
-                    float yOffset = isBlockItem(stack) ? baseYOffset + 0.02f : baseYOffset;
-                    float rotation = 96f + (rendered * 14f);
-                    renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, zOffset, rotation, 0.35f);
-                    renderedItems.add(item);
-                    renderedSlots.add(i); // Mark this slot as rendered
-                    rendered++;
-                }
-            }
-        }
 
-        // 2️⃣ Fallback pass: fill remaining slots (up to 3) with non-rendered slots
+        // First pass: render unique items
+        rendered = renderPass(pPoseStack, pBuffer, itemRenderer, pBlockEntity,
+                renderedItems, renderedSlots, zOffset, rendered, true);
+
+        // Second pass: fill remaining slots with any items
         if (rendered < 3) {
-            for (int i = 0; i < 9 && rendered < 3; i++) {
-                // Skip slots that were already rendered in first pass
-                if (renderedSlots.contains(i)) {
-                    continue;
-                }
-
-                ItemStack stack = pBlockEntity.getRenderStack(i);
-                if (!stack.isEmpty()) {
-                    float baseYOffset = 1.025f + (rendered * 0.025f);
-                    float yOffset = isBlockItem(stack) ? baseYOffset + 0.02f : baseYOffset;
-                    float rotation = 96f + (rendered * 14f);
-                    renderStack(pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity, 0.0f, yOffset, zOffset, rotation, 0.35f);
-                    renderedSlots.add(i); // Mark this slot as rendered
-                    rendered++;
-                }
-            }
+            renderPass(pPoseStack, pBuffer, itemRenderer, pBlockEntity,
+                    renderedItems, renderedSlots, zOffset, rendered, false);
         }
 
         // Render the hammer from slot 9
         ItemStack hammer = pBlockEntity.getRenderStack(9);
         renderStack(pPoseStack, pBuffer, itemRenderer, hammer, pBlockEntity, 0f, 1.025f, 0.43f, 135f, 0.5f);
+    }
+
+    private int renderPass(PoseStack pPoseStack, MultiBufferSource pBuffer,
+                           ItemRenderer itemRenderer, AbstractSmithingAnvilBlockEntity pBlockEntity,
+                           Set<Item> renderedItems, Set<Integer> renderedSlots, float zOffset,
+                           int renderedCount, boolean checkUniqueness) {
+        int rendered = renderedCount;
+
+        for (int i = 0; i < 9 && rendered < 3; i++) {
+            // Skip slots that were already rendered
+            if (renderedSlots.contains(i)) {
+                continue;
+            }
+
+            ItemStack stack = pBlockEntity.getRenderStack(i);
+            if (!stack.isEmpty()) {
+                Item item = stack.getItem();
+
+                // Skip if we're checking uniqueness and this item was already rendered
+                if (checkUniqueness && renderedItems.contains(item)) {
+                    continue;
+                }
+
+                float baseYOffset = 1.01f + (rendered * 0.02f);
+                float yOffset = isBlockItem(stack) ? baseYOffset + 0.05f : baseYOffset;
+                float rotation = 96f + (rendered * 14f);
+
+                renderStack(pPoseStack, pBuffer, itemRenderer, stack,
+                        pBlockEntity, 0.0f, yOffset, zOffset, rotation, 0.35f);
+
+                renderedItems.add(item);
+                renderedSlots.add(i);
+                rendered++;
+            }
+        }
+
+        return rendered;
     }
 
     // Helper method to determine if an ItemStack is a block item
@@ -96,9 +108,8 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Smi
         return block != Blocks.AIR;
     }
 
-
     private void renderStack(PoseStack poseStack, MultiBufferSource buffer, ItemRenderer itemRenderer,
-                             ItemStack itemStack, SmithingAnvilBlockEntity blockEntity,
+                             ItemStack itemStack, AbstractSmithingAnvilBlockEntity blockEntity,
                              float xOffset, float yOffset, float zOffset, float rotationDegrees, float scale) {
 
         if (itemStack == null || itemStack.isEmpty()) return;

@@ -14,5 +14,6 @@
   "result": {
     "item": "overgeared:golden_shovel_head"
   },
-  "show_notification": true
+  "show_notification": true,
+  "tier": "stone"
 }

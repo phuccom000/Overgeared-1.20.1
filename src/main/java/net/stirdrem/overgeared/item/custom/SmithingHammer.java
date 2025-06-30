@@ -4,9 +4,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -16,13 +19,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.block.ModBlocks;
+import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
+import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
@@ -48,7 +53,19 @@ public class SmithingHammer extends DiggerItem {
         BlockPos pos = context.getClickedPos();
         BlockEntity be = level.getBlockEntity(pos);
 
-        if (!(be instanceof SmithingAnvilBlockEntity anvilBE)) return InteractionResult.PASS;
+        if (!level.isClientSide()
+                && player.isCrouching()
+                && level.getBlockState(pos).is(Blocks.STONE)) {
+            BlockState newState = ModBlocks.STONE_SMITHING_ANVIL.get()
+                    .defaultBlockState()
+                    .setValue(StoneSmithingAnvil.FACING, player.getDirection().getClockWise());
+            level.setBlock(pos, newState, 3);
+            level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.0f, 1.0f);
+
+            return InteractionResult.CONSUME;
+        }
+
+        if (!(be instanceof AbstractSmithingAnvilBlockEntity anvilBE)) return InteractionResult.PASS;
         if (player == null) return InteractionResult.PASS;
 
         UUID playerUUID = player.getUUID();
@@ -63,7 +80,7 @@ public class SmithingHammer extends DiggerItem {
         }
     }
 
-    private InteractionResult handleServerSideInteraction(SmithingAnvilBlockEntity anvilBE, BlockPos pos, ServerPlayer player, UUID playerUUID) {
+    private InteractionResult handleServerSideInteraction(AbstractSmithingAnvilBlockEntity anvilBE, BlockPos pos, ServerPlayer player, UUID playerUUID) {
         // Server always uses the block entity as source of truth
         if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
             player.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
@@ -105,7 +122,7 @@ public class SmithingHammer extends DiggerItem {
         return InteractionResult.SUCCESS;
     }
 
-    private InteractionResult handleClientSideInteraction(SmithingAnvilBlockEntity anvilBE, BlockPos pos, Player player, ItemStack heldItem) {
+    private InteractionResult handleClientSideInteraction(AbstractSmithingAnvilBlockEntity anvilBE, BlockPos pos, Player player, ItemStack heldItem) {
         if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
             //player.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
             return InteractionResult.FAIL;
@@ -173,7 +190,7 @@ public class SmithingHammer extends DiggerItem {
                 && pos.equals(ClientAnvilMinigameData.getPendingMinigamePos())) {
 
             BlockEntity be = Minecraft.getInstance().level.getBlockEntity(pos);
-            if (be instanceof SmithingAnvilBlockEntity anvilBE && anvilBE.hasRecipe()) {
+            if (be instanceof AbstractSmithingAnvilBlockEntity anvilBE && anvilBE.hasRecipe()) {
                 Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
                 recipeOpt.ifPresent(recipe -> {
                     ItemStack result = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());
@@ -189,7 +206,7 @@ public class SmithingHammer extends DiggerItem {
     public static void releaseAnvil(ServerPlayer player, BlockPos pos) {
         // 1. Clear ownership from the block entity (server-side)
         BlockEntity be = player.level().getBlockEntity(pos);
-        if (be instanceof SmithingAnvilBlockEntity anvilBE) {
+        if (be instanceof AbstractSmithingAnvilBlockEntity anvilBE) {
             anvilBE.clearOwner();
         }
 

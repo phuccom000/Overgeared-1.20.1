@@ -26,7 +26,14 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
 */
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(ModBlocks.STEEL_BLOCK.get(),
-                        ModBlocks.SMITHING_ANVIL.get()
+                        ModBlocks.SMITHING_ANVIL.get(),
+                        ModBlocks.STONE_SMITHING_ANVIL.get()
+                );
+
+        this.tag(ModTags.Blocks.SMITHING_ANVIL)
+                .add(
+                        ModBlocks.SMITHING_ANVIL.get(),
+                        ModBlocks.STONE_SMITHING_ANVIL.get()
                 );
        /* this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(ModBlocks.WATER_BARREL.get(),

@@ -62,9 +62,12 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
     public void draw(ForgingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         //guiGraphics.blit(TEXTURE, 0, 0, 0, 0, imageWidth, imageHeight);
         String hitsText = "Hits Need: " + recipe.getRemainingHits();
+        String tierRaw = recipe.getAnvilTier();
+        String tier = "Tier: " + tierRaw.substring(0, 1).toUpperCase() + tierRaw.substring(1);
         int x = imageWidth / 2;
         int y = imageHeight / 2;
-        guiGraphics.drawString(Minecraft.getInstance().font, hitsText, 57, 1, 4210752, false); // White color
+        guiGraphics.drawString(Minecraft.getInstance().font, hitsText, 57, 1, 0xFF808080, false); // White color
+        guiGraphics.drawString(Minecraft.getInstance().font, tier, 57, 45, 0xFF808080, false); // White color
     }
 
     @Override

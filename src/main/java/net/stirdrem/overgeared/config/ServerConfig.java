@@ -56,9 +56,16 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue DAMAGE_RESTORE_PER_GRIND;
     public static final ForgeConfigSpec.BooleanValue ENABLE_MINIGAME;
     public static final ForgeConfigSpec.DoubleValue MASTER_QUALITY_CHANCE;
+    public static final ForgeConfigSpec.IntValue STONE_ANVIL_MAX_CRAFTS;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        builder.push("Stone Smithing Anvil");
+        STONE_ANVIL_MAX_CRAFTS = builder
+                .comment("Number of uses before the Stone Smithing Anvil breaks")
+                .defineInRange("max_crafts", 20, 1, Integer.MAX_VALUE);
+        builder.pop();
+
         builder.push("Minigame Config");
 
         DEFAULT_ARROW_SPEED = builder

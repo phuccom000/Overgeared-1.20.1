@@ -6,44 +6,42 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 import net.stirdrem.overgeared.block.ModBlocks;
-import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
-import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class SmithingAnvilMenu extends AbstractContainerMenu {
+public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
     private final Container container = new SimpleContainer();
-    public final SmithingAnvilBlockEntity blockEntity;
+    public final AbstractSmithingAnvilBlockEntity blockEntity;
     private final Level level;
     private final ContainerData data;
     private final ResultContainer resultContainer = new ResultContainer();
     private Slot resultSlot;
     private final Player player;
 
-    public SmithingAnvilMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(11));
+    public AbstractSmithingAnvilMenu(MenuType<?> pMenuType, int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
+        this(pMenuType, pContainerId, inv, (AbstractSmithingAnvilBlockEntity) inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(11));
     }
 
 
-    public SmithingAnvilMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
-        super(ModMenuTypes.SMITHING_ANVIL_MENU.get(), pContainerId);
+    public AbstractSmithingAnvilMenu(MenuType<?> pMenuType, int pContainerId, Inventory inv, AbstractSmithingAnvilBlockEntity entity, ContainerData data) {
+        super(pMenuType, pContainerId);
         checkContainerSize(inv, 11);
-        blockEntity = (SmithingAnvilBlockEntity) entity;
+        blockEntity = entity;
         this.level = inv.player.level();
         this.data = data;
         this.player = inv.player;
@@ -83,9 +81,9 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
                 @Override
                 public void onTake(Player player, ItemStack stack) {
                     this.checkTakeAchievements(stack);
-                    Container craftingContainer = SmithingAnvilMenu.this.container;
+                    Container craftingContainer = AbstractSmithingAnvilMenu.this.container;
                     NonNullList<ItemStack> remainders = player.level()
-                            .getRecipeManager().getRemainingItemsFor(ModRecipeTypes.FORGING.get(), SmithingAnvilMenu.this.container, player.level());
+                            .getRecipeManager().getRemainingItemsFor(ModRecipeTypes.FORGING.get(), AbstractSmithingAnvilMenu.this.container, player.level());
                     for (int i = 0; i < remainders.size(); ++i) {
                         ItemStack toRemove = craftingContainer.getItem(i);
                         ItemStack toReplace = remainders.get(i);
@@ -127,9 +125,9 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
                 @Override
                 protected void checkTakeAchievements(ItemStack stack) {
                     if (this.removeCount > 0)
-                        stack.onCraftedBy(SmithingAnvilMenu.this.player.level(), SmithingAnvilMenu.this.player, this.removeCount);
+                        stack.onCraftedBy(AbstractSmithingAnvilMenu.this.player.level(), AbstractSmithingAnvilMenu.this.player, this.removeCount);
                     if (this.container instanceof RecipeHolder recipeHolder)
-                        recipeHolder.awardUsedRecipes(SmithingAnvilMenu.this.player, List.of());
+                        recipeHolder.awardUsedRecipes(AbstractSmithingAnvilMenu.this.player, List.of());
                     this.removeCount = 0;
                 }
             };
@@ -203,9 +201,19 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public boolean stillValid(Player pPlayer) {
-        return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
-                pPlayer, ModBlocks.SMITHING_ANVIL.get());
+    public boolean stillValid(Player player) {
+        // get block at the container’s position
+        BlockState state = player.level().getBlockState(blockEntity.getBlockPos());
+        Block block = state.getBlock();
+
+        // check if the block at that position is in your tag
+        boolean isValid = block.defaultBlockState().is(ModTags.Blocks.SMITHING_ANVIL);
+
+        return AbstractContainerMenu.stillValid(
+                ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
+                player,
+                block  // only passed here for distance check
+        ) && isValid;
     }
 
     private void addPlayerInventory(Inventory playerInventory) {
@@ -227,10 +235,6 @@ public class SmithingAnvilMenu extends AbstractContainerMenu {
         int maxProgress = this.data.get(1);
         //ModMessages.sendToServer(new UpdateAnvilProgressC2SPacket(maxProgress - progress));
         return maxProgress - progress;
-    }
-
-    public SmithingAnvilBlockEntity getBlockEntity() {
-        return blockEntity;
     }
 
     public ItemStack getResultItem() {

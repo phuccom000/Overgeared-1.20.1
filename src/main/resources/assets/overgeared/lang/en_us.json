@@ -1,8 +1,7 @@
 {
   "block.overgeared.smithing_anvil": "Smithing Anvil",
+  "block.overgeared.stone_anvil": "Stone Smithing Anvil",
   "block.overgeared.steel_block": "Block of Steel",
-  "block.overgeared.water_barrel": "Water Barrel",
-  "block.overgeared.water_barrel_full": "Water Barrel Full",
   "creativetab.overgeared_tab": "Overgeared",
   "gui.overgeared.remaining_hits": "Hits Left: %s",
   "gui.overgeared.smithing_anvil": "Forging",

@@ -22,33 +22,28 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.custom.SmithingAnvil;
+import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvil;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
-import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
-import net.stirdrem.overgeared.screen.SmithingAnvilMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
-    private final ItemStackHandler itemHandler = new ItemStackHandler(11) {
+public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
+    protected final ItemStackHandler itemHandler = new ItemStackHandler(11) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -58,25 +53,25 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         }
     };
 
-    private static final int INPUT_SLOT = 0;
-    private static final int OUTPUT_SLOT = 10;
+    protected static final int INPUT_SLOT = 0;
+    protected static final int OUTPUT_SLOT = 10;
 
 
-    private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+    protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     protected final ContainerData data;
-    private int progress = 0;
-    private int maxProgress = 0;
-    private int hitRemains;
-    private long busyUntilGameTime = 0L;
-    private UUID ownerUUID = null;
-    private Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
+    protected int progress = 0;
+    protected int maxProgress = 0;
+    protected int hitRemains;
+    protected long busyUntilGameTime = 0L;
+    protected UUID ownerUUID = null;
+    protected Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
 
-    private long sessionStartTime = 0L; // optional, for timeout logic
+    protected long sessionStartTime = 0L; // optional, for timeout logic
 
 
-    public SmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.SMITHING_ANVIL_BE.get(), pPos, pBlockState);
+    public AbstractSmithingAnvilBlockEntity(BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
+        super(type, pPos, pBlockState);
         this.data = new ContainerData() {
             @Override
             public int get(int pIndex) {
@@ -139,15 +134,6 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     @Override
     public Component getDisplayName() {
         return Component.translatable("gui.overgeared.smithing_anvil");
-    }
-
-    @Nullable
-    @Override
-    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
-        if (!pPlayer.isCrouching()) {
-            return new SmithingAnvilMenu(pContainerId, pPlayerInventory, this, this.data);
-        } else return null;
-
     }
 
     @Override
@@ -225,7 +211,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         }
     }
 
-    private void resetProgress() {
+    protected void resetProgress() {
         progress = 0;
         maxProgress = 0;
         lastRecipe = null;
@@ -243,7 +229,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         //AnvilMinigameOverlay.endMinigame();
     }
 
-    private void craftItem() {
+    protected void craftItem() {
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
         if (recipeOptional.isEmpty()) return;
 
@@ -312,17 +298,16 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     public boolean hasRecipe() {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
+            if (!AbstractSmithingAnvil.getTier().equals(recipe.get().getAnvilTier())) return false;
             ItemStack resultStack = recipe.get().getResultItem(level.registryAccess());
-
             return canInsertItemIntoOutputSlot(resultStack)
                     && canInsertAmountIntoOutputSlot(resultStack.getCount());
         }
-
         return false;
     }
 
 
-    private boolean hasEnoughIngredients(ForgingRecipe recipe) {
+    protected boolean hasEnoughIngredients(ForgingRecipe recipe) {
         NonNullList<Ingredient> ingredients = recipe.getIngredients();
         SimpleContainer inventory = new SimpleContainer(9);
         for (int i = 0; i < 9; i++) {
@@ -365,13 +350,13 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
                 ;
     }
 
-    private boolean canInsertItemIntoOutputSlot(ItemStack stackToInsert) {
+    protected boolean canInsertItemIntoOutputSlot(ItemStack stackToInsert) {
         ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
         return (existing.isEmpty() || ItemStack.isSameItemSameTags(existing, stackToInsert));
     }
 
 
-    private boolean canInsertAmountIntoOutputSlot(int count) {
+    protected boolean canInsertAmountIntoOutputSlot(int count) {
         return this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.itemHandler.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();
     }
 
@@ -380,7 +365,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         return progress >= maxProgress;
     }
 
-    private void increaseCraftingProgress() {
+    protected void increaseCraftingProgress() {
         progress++;
     }
 
@@ -395,7 +380,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
     }
 
 
-    private ForgingRecipe lastRecipe = null;
+    protected ForgingRecipe lastRecipe = null;
 
     public void tick(Level lvl, BlockPos pos, BlockState st) {
         try {
@@ -466,7 +451,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         tag.putString("ForgingQuality", quality.getDisplayName());
     }
 
-    private boolean matchesRecipeExactly(ForgingRecipe recipe) {
+    protected boolean matchesRecipeExactly(ForgingRecipe recipe) {
         SimpleContainer inventory = new SimpleContainer(9); // 3x3 grid
         // Copy items from input slots (0-8) to our 3x3 grid
         for (int i = 0; i < 9; i++) {
@@ -481,22 +466,7 @@ public class SmithingAnvilBlockEntity extends BlockEntity implements MenuProvide
         }
     }*/
 
-    private String determineForgingQuality() {
-        // Get quality from anvil or use default if null
-        String quality = SmithingAnvil.getQuality();
-        if (quality == null) {
-            return "no_quality"; // Default quality
-        }
-
-        // Use switch expression for better null safety
-        return switch (quality.toLowerCase()) {
-            case "poor" -> ForgingQuality.POOR.getDisplayName();
-            case "expert" -> ForgingQuality.EXPERT.getDisplayName();
-            case "perfect" -> ForgingQuality.PERFECT.getDisplayName();
-            case "well" -> ForgingQuality.WELL.getDisplayName();
-            default -> "no_quality";// Fallback
-        };
-    }
+    protected abstract String determineForgingQuality();
 
 
     public void setProgress(int progress) {

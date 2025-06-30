@@ -1,18 +1,17 @@
 package net.stirdrem.overgeared.screen;
 
-import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-import net.stirdrem.overgeared.block.entity.SmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.block.entity.SteelSmithingAnvilBlockEntity;
 
 public class ModResultSlot extends SlotItemHandler {
     private final Player player;
-    private final SmithingAnvilBlockEntity blockEntity; // to access input slots
+    private final SteelSmithingAnvilBlockEntity blockEntity; // to access input slots
     private int removeCount;
 
-    public ModResultSlot(Player player, IItemHandler itemHandler, SmithingAnvilBlockEntity blockEntity, int index, int xPosition, int yPosition) {
+    public ModResultSlot(Player player, IItemHandler itemHandler, SteelSmithingAnvilBlockEntity blockEntity, int index, int xPosition, int yPosition) {
         super(itemHandler, index, xPosition, yPosition);
         this.player = player;
         this.blockEntity = blockEntity;
