@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    "   ",
+    " ab",
+    "   "
+  ],
+  "key": {
+    "a": {
+      "item": "magistuarmory:cuirassier_helmet"
+    },
+    "b": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:savoyard_helmet",
+    "count": 1
+  },
+  "show_notification": true
+}

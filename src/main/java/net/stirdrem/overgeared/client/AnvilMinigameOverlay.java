@@ -22,8 +22,8 @@ public class AnvilMinigameOverlay {
     private static final int ARROW_HEIGHT = 20;
 
     public static final IGuiOverlay ANVIL_MG = ((gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
+        HudOverlayHandler.setHudVisibility(!ClientAnvilMinigameData.getIsVisible());
         if (!ClientAnvilMinigameData.getIsVisible()) return;
-
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 

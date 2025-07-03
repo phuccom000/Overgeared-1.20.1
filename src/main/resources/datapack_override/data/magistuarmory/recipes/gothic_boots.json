@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 4,
+  "has_quality": true,
+  "pattern": [
+    "p p",
+    "p p",
+    "n n"
+  ],
+  "key": {
+    "n": {
+      "tag": "forge:nuggets/steel"
+    },
+    "p": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmory:gothic_boots",
+    "count": 1
+  },
+  "show_notification": true
+}

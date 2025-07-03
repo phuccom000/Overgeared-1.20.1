@@ -359,14 +359,12 @@ public class ModItemInteractEvents {
     @SubscribeEvent
     public static void onWorldTick(TickEvent.LevelTickEvent event) {
         if (event.phase != TickEvent.Phase.END || event.level.isClientSide) return;
+        if (event.level.getGameTime() % 20 != 0) return; // run every second
 
-        if (event.level.getGameTime() % 20 != 0) return; // every second
-
-        Iterator<ItemEntity> itr = trackedEntities.iterator();
-        while (itr.hasNext()) {
-            ItemEntity entity = itr.next();
+        List<ItemEntity> snapshot = new ArrayList<>(trackedEntities);
+        for (ItemEntity entity : snapshot) {
             if (!entity.isAlive()) {
-                itr.remove();
+                trackedEntities.remove(entity);
                 continue;
             }
 
@@ -375,14 +373,15 @@ public class ModItemInteractEvents {
                 ItemStack stack = entity.getItem();
                 Item cooled = getCooledIngot(stack.getItem());
                 if (cooled != null) {
-                    stack.shrink(1);
+                    int count = stack.getCount();
+                    stack.shrink(count); // Remove the whole stack
                     double dx = entity.getX(), dy = entity.getY(), dz = entity.getZ();
+
                     if (state.is(Blocks.WATER_CAULDRON)) {
                         IntegerProperty levelProperty = LayeredCauldronBlock.LEVEL;
                         int waterLevel = state.getValue(levelProperty);
 
                         if (waterLevel > 0) {
-                            // Update water level
                             if (waterLevel == 1) {
                                 event.level.setBlockAndUpdate(entity.blockPosition(), Blocks.CAULDRON.defaultBlockState());
                             } else {
@@ -391,21 +390,21 @@ public class ModItemInteractEvents {
                             event.level.gameEvent(entity, GameEvent.BLOCK_CHANGE, entity.blockPosition());
                         }
                     }
-                    ItemEntity cooledEntity = new ItemEntity(event.level,
-                            dx, dy, dz,
-                            new ItemStack(cooled));
+
+                    ItemStack cooledStack = new ItemStack(cooled, count);
+                    ItemEntity cooledEntity = new ItemEntity(event.level, dx, dy, dz, cooledStack);
                     event.level.addFreshEntity(cooledEntity);
 
                     entity.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
 
-                    itr.remove(); // stop tracking this entity
+                    trackedEntities.remove(entity); // now safe
                 } else {
-                    itr.remove(); // not convertible
+                    trackedEntities.remove(entity); // invalid item, stop tracking
                 }
-
             }
         }
     }
+
 
     private static final Random RANDOM = new Random();
 

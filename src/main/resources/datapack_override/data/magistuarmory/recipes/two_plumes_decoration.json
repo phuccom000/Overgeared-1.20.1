@@ -1,0 +1,22 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 2,
+  "has_quality": false,
+  "pattern": [
+    "f f",
+    "i i"
+  ],
+  "key": {
+    "f": {
+      "tag": "forge:feathers"
+    },
+    "i": {
+      "item": "overgeared:steel_ingot"
+    }
+  },
+  "result": {
+    "item": "magistuarmory:two_plumes_decoration",
+    "count": 1
+  },
+  "show_notification": true
+}

@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 4,
+  "has_quality": false,
+  "pattern": [
+    "bab",
+    "c c",
+    "   "
+  ],
+  "key": {
+    "a": {
+      "tag": "magistuarmory:leather_strips"
+    },
+    "b": {
+      "item": "overgeared:steel_plate"
+    },
+    "c": {
+      "item": "overgeared:steel_ingot"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:articulated_pauldrons_decoration",
+    "count": 1
+  },
+  "show_notification": true
+}

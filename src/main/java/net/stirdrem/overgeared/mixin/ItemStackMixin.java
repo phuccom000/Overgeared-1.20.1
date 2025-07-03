@@ -1,22 +1,31 @@
 package net.stirdrem.overgeared.mixin;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.QualityHelper;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
@@ -142,5 +151,101 @@ public abstract class ItemStackMixin {
         // This is more complex - you might need to use @Inject instead
         return instance.getAttackDamage() * QualityHelper.getQualityMultiplier(...);
     }*/
+
+
+    // Per-player last-hit tick
+    private static final Map<UUID, Long> lastTongsHit = new WeakHashMap<>();
+
+    private static final String HEATED_TIME_TAG = "HeatedSince";
+    private static final int DEFAULT_COOLDOWN_TICKS = 20 * 60; // Default: 60 seconds
+
+    @Inject(method = "inventoryTick", at = @At("HEAD"))
+    private void onInventoryTick(Level level, Entity entity, int slot, boolean selected, CallbackInfo ci) {
+        if (level.isClientSide) return;
+        if (!(entity instanceof Player player)) return;
+        if (slot != 0) return; // Only process once per player per tick
+
+        long tick = level.getGameTime();
+        int cooldownTicks = ServerConfig.HEATED_ITEM_COOLDOWN_TICKS.get(); // add to your config
+
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.isEmpty()) continue;
+            if (!stack.is(ModTags.Items.HEATED_METALS)) continue;
+
+            CompoundTag tag = stack.getOrCreateTag();
+            long heatedSince = tag.getLong(HEATED_TIME_TAG);
+            if (heatedSince == 0L) {
+                tag.putLong(HEATED_TIME_TAG, tick); // Initialize the timestamp
+            } else if (tick - heatedSince >= cooldownTicks) {
+                Item cooled = getCooledIngot(stack.getItem());
+                if (cooled != null) {
+                    ItemStack newStack = new ItemStack(cooled, stack.getCount());
+                    stack.setCount(0); // Remove old
+                    player.getInventory().add(newStack); // Add new cooled item
+                    player.playSound(SoundEvents.FIRE_EXTINGUISH, 0.7f, 1.0f);
+                }
+            }
+        }
+
+        // 🔥 Heat Damage or Tongs Handling (unchanged)
+        boolean hasHeated = player.getInventory().items.stream()
+                .anyMatch(s -> !s.isEmpty() && s.getItem().builtInRegistryHolder().is(ModTags.Items.HEATED_METALS))
+                || player.getMainHandItem().is(ModTags.Items.HEATED_METALS)
+                || player.getOffhandItem().is(ModTags.Items.HEATED_METALS);
+
+        if (!hasHeated) return;
+
+        UUID uuid = player.getUUID();
+        ItemStack main = player.getMainHandItem();
+        ItemStack off = player.getOffhandItem();
+
+        // Check for tongs in either hand
+        ItemStack tongsStack;
+        if (!main.isEmpty() && main.getItem().builtInRegistryHolder().is(ModTags.Items.TONGS)) {
+            tongsStack = main;
+        } else if (!off.isEmpty() && off.getItem().builtInRegistryHolder().is(ModTags.Items.TONGS)) {
+            tongsStack = off;
+        } else {
+            tongsStack = ItemStack.EMPTY;
+        }
+
+        if (!tongsStack.isEmpty()) {
+            if (tick % 40 != 0) return;
+            long last = lastTongsHit.getOrDefault(uuid, -1L);
+            if (last != tick) {
+                tongsStack.hurtAndBreak(1, player, p -> {
+                    // Determine correct hand
+                    InteractionHand hand = tongsStack == player.getMainHandItem() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+                    p.broadcastBreakEvent(hand);
+                });
+                lastTongsHit.put(uuid, tick);
+            }
+        } else {
+            player.hurt(player.damageSources().hotFloor(), 1.0f);
+        }
+
+    }
+
+
+    private static Item getCooledIngot(Item heatedItem) {
+        var heatedTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATED_METALS);
+        var cooledTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATABLE_METALS);
+
+        int index = 0;
+        for (Item item : heatedTag) {
+            if (item == heatedItem) {
+                int i = 0;
+                for (Item cooledItem : cooledTag) {
+                    if (i == index) {
+                        return cooledItem;
+                    }
+                    i++;
+                }
+            }
+            index++;
+        }
+        return null;
+    }
+
 }
 

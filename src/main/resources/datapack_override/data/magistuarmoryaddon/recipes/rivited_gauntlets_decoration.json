@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 4,
+  "has_quality": false,
+  "pattern": [
+    " a ",
+    " b ",
+    " b "
+  ],
+  "key": {
+    "a": {
+      "tag": "magistuarmory:leather_strips"
+    },
+    "b": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:rivited_gauntlets_decoration",
+    "count": 1
+  },
+  "show_notification": true
+}

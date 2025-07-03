@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    "aca",
+    "aaa",
+    "bab"
+  ],
+  "key": {
+    "a": {
+      "tag": "magistuarmory:lamellar_rows/steel"
+    },
+    "b": {
+      "tag": "magistuarmory:chainmails/steel"
+    },
+    "c": {
+      "item": "slavicarmory:rus_gambeson"
+    }
+  },
+  "result": {
+    "item": "slavicarmory:byzantine_scale_chestplate",
+    "count": 1
+  },
+  "show_notification": true
+}

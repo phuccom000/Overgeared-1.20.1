@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    " m ",
+    "msm",
+    " m "
+  ],
+  "key": {
+    "m": {
+      "tag": "forge:ingots/iron"
+    },
+    "s": {
+      "item": "magistuarmory:wood_pavese"
+    }
+  },
+  "result": {
+    "item": "magistuarmory:iron_pavese",
+    "count": 1
+  },
+  "show_notification": true
+}

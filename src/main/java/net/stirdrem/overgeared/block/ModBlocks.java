@@ -10,6 +10,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.block.custom.BlueprintWorkbenchBlock;
 import net.stirdrem.overgeared.block.custom.SteelSmithingAnvil;
 //import net.stirdrem.overgeared.block.custom.LayeredWaterBarrel;
 //import net.stirdrem.overgeared.block.custom.WaterBarrel;
@@ -33,6 +34,9 @@ public class ModBlocks {
 
     public static final RegistryObject<Block> STEEL_BLOCK = registerBlock("steel_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+
+    public static final RegistryObject<Block> DRAFTING_TABLE = registerBlock("drafting_table",
+            () -> new BlueprintWorkbenchBlock(BlockBehaviour.Properties.copy(Blocks.CRAFTING_TABLE)));
     /*public static final RegistryObject<Block> ROCK = registerBlock("rock",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH).sound(SoundType.STONE)));*/
 

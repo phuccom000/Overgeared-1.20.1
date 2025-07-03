@@ -71,7 +71,7 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
         super.craftItem(); // Perform regular crafting logic
         craftCount++;
 
-        if (craftCount >= ServerConfig.STONE_ANVIL_MAX_CRAFTS.get()) {
+        if (craftCount >= ServerConfig.STONE_ANVIL_MAX_USES.get()) {
             breakAnvil();
         }
     }

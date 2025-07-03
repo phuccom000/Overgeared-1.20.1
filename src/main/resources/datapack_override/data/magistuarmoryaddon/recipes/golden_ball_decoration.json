@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 4,
+  "has_quality": false,
+  "pattern": [
+    "   ",
+    " a ",
+    " b "
+  ],
+  "key": {
+    "a": {
+      "tag": "forge:ingots/gold"
+    },
+    "b": {
+      "tag": "forge:nuggets/gold"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:golden_ball_decoration",
+    "count": 1
+  },
+  "show_notification": true
+}

@@ -9,10 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.item.custom.DiamondUpgradeTemplateItem;
-import net.stirdrem.overgeared.item.custom.KnappableRockItem;
-import net.stirdrem.overgeared.item.custom.SmithingHammer;
-import net.stirdrem.overgeared.item.custom.Tongs;
+import net.stirdrem.overgeared.item.custom.*;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
@@ -24,6 +21,9 @@ public class ModItems {
             () -> new Item(new Item.Properties()));*/
 
     public static final RegistryObject<Item> CRUDE_STEEL = ITEMS.register("crude_steel",
+            () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> HEATED_CRUDE_STEEL = ITEMS.register("heated_crude_steel",
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> ROCK = ITEMS.register("knappable_rock",
@@ -57,8 +57,10 @@ public class ModItems {
             () -> new Tongs(ModToolTiers.STEEL, -1, -2f, new Item.Properties().durability(1024)));
 
     public static final RegistryObject<Item> SMITHING_HAMMER = ITEMS.register("smithing_hammer",
-            //() -> new SmithingHammer(new Item.Properties().durability(512)));
             () -> new SmithingHammer(ModToolTiers.STEEL, -1, -2f, new Item.Properties().durability(512)));
+
+    public static final RegistryObject<Item> COPPER_SMITHING_HAMMER = ITEMS.register("copper_smithing_hammer",
+            () -> new SmithingHammer(ModToolTiers.COPPER, -1, -2f, new Item.Properties().durability(120)));
     /*public static final RegistryObject<Item> WOODEN_BUCKET = ITEMS.register("wooden_bucket",
             () -> new UniversalBucketItem(new UniversalBucketItem.Properties().durability(100)
                     .upperCrackingTemperature(ServerConfig.WOODEN_BUCKET_BREAK_TEMPERATURE)
@@ -71,6 +73,12 @@ public class ModItems {
 
     public static final RegistryObject<Item> DIAMOND_UPGRADE_SMITHING_TEMPLATE = ITEMS.register("diamond_upgrade_smithing_template",
             DiamondUpgradeTemplateItem::createDiamondUpgradeTemplate);
+
+    public static final RegistryObject<Item> EMPTY_BLUEPRINT = ITEMS.register("empty_blueprint",
+            () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> BLUEPRINT = ITEMS.register("blueprint",
+            () -> new BlueprintItem(new Item.Properties()));
 
     // Add these inside your ModItems class
     public static final RegistryObject<Item> STONE_SWORD_BLADE = ITEMS.register("stone_sword_blade",

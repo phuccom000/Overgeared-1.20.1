@@ -259,6 +259,8 @@ public class SmithingHammer extends DiggerItem {
                     .withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line2")
                     .withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line3")
+                    .withStyle(ChatFormatting.GRAY));
         }
     }
 

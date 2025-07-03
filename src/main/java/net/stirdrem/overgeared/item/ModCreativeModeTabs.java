@@ -20,6 +20,7 @@ public class ModCreativeModeTabs {
                     .displayItems((pParameters, pOutput) -> {
                         // General materials/tools
                         pOutput.accept(ModItems.CRUDE_STEEL.get());
+                        pOutput.accept(ModItems.HEATED_CRUDE_STEEL.get());
                         pOutput.accept(ModItems.ROCK.get());
                         pOutput.accept(ModItems.STEEL_INGOT.get());
                         pOutput.accept(ModItems.STEEL_NUGGET.get());
@@ -30,7 +31,10 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.STEEL_TONG.get());
                         pOutput.accept(ModItems.IRON_TONGS.get());
                         pOutput.accept(ModItems.STEEL_TONGS.get());
+                        pOutput.accept(ModItems.COPPER_SMITHING_HAMMER.get());
                         pOutput.accept(ModItems.SMITHING_HAMMER.get());
+                        pOutput.accept(ModItems.EMPTY_BLUEPRINT.get());
+                        pOutput.accept(ModItems.BLUEPRINT.get());
                         pOutput.accept(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get());
                         //pOutput.accept(ModItems.WOODEN_BUCKET.get());
 
@@ -83,6 +87,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModBlocks.SMITHING_ANVIL.get());
                         pOutput.accept(ModBlocks.STONE_SMITHING_ANVIL.get());
                         pOutput.accept(ModBlocks.STEEL_BLOCK.get());
+                        pOutput.accept(ModBlocks.DRAFTING_TABLE.get());
                         //pOutput.accept(ModBlocks.WATER_BARREL.get());
                         //pOutput.accept(ModBlocks.WATER_BARREL_FULL.get());
 

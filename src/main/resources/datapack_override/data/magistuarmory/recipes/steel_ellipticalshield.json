@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    " m ",
+    "msm",
+    " m "
+  ],
+  "key": {
+    "m": {
+      "item": "overgeared:steel_ingot"
+    },
+    "s": {
+      "item": "magistuarmory:wood_ellipticalshield"
+    }
+  },
+  "result": {
+    "item": "magistuarmory:steel_ellipticalshield",
+    "count": 1
+  },
+  "show_notification": true
+}

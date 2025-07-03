@@ -17,6 +17,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         blockWithItem(ModBlocks.STEEL_BLOCK);
+        //blockWithItem(ModBlocks.DRAFTING_TABLE);
         horizontalBlock(ModBlocks.SMITHING_ANVIL.get(),
                 new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
         //simpleBlockWithItem(ModBlocks.STONE_SMITHING_ANVIL.get(), new ModelFile.UncheckedModelFile(modLoc("block/stone_anvil")));

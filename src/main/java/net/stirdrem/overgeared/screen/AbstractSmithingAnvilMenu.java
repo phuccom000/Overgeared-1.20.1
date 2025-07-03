@@ -8,14 +8,17 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SmithingTemplateItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.util.ModTags;
@@ -32,21 +35,18 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
     private final ResultContainer resultContainer = new ResultContainer();
     private Slot resultSlot;
     private final Player player;
+    private final boolean hasBlueprint;
 
-    public AbstractSmithingAnvilMenu(MenuType<?> pMenuType, int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pMenuType, pContainerId, inv, (AbstractSmithingAnvilBlockEntity) inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(11));
-    }
-
-
-    public AbstractSmithingAnvilMenu(MenuType<?> pMenuType, int pContainerId, Inventory inv, AbstractSmithingAnvilBlockEntity entity, ContainerData data) {
+    public AbstractSmithingAnvilMenu(MenuType<?> pMenuType, int pContainerId, Inventory inv, AbstractSmithingAnvilBlockEntity entity, ContainerData data, boolean hasBlueprint) {
         super(pMenuType, pContainerId);
-        checkContainerSize(inv, 11);
+        checkContainerSize(inv, 12);
         blockEntity = entity;
         this.level = inv.player.level();
         this.data = data;
         this.player = inv.player;
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
+        this.hasBlueprint = hasBlueprint;
 
         this.blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
             this.addSlot(new SlotItemHandler(iItemHandler, 9, 152, 61) {
@@ -57,6 +57,33 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
                     } else return false;
                 }
             }); //hammer
+
+            if (hasBlueprint)
+                this.addSlot(new SlotItemHandler(iItemHandler, 11, 8, 35) {
+                    @Override
+                    public boolean mayPlace(@NotNull ItemStack stack) {
+                        if (stack.is(ModItems.BLUEPRINT.get()) || stack.getItem() instanceof SmithingTemplateItem) {
+                            return true;
+                        } else return false;
+                    }
+
+                    @Override
+                    public int getMaxStackSize() {
+                        return 1;
+                    }
+
+                    @Override
+                    public int getMaxStackSize(@NotNull ItemStack stack) {
+                        return 1;
+                    }
+
+                    @Override
+                    public void set(@NotNull ItemStack stack) {
+                        // Always limit to a single item
+                        super.set(stack.copyWithCount(1));
+                    }
+                });
+
             //crafting slot
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 3; ++j) {
@@ -153,7 +180,7 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
 
     // THIS YOU HAVE TO DEFINE!
-    private static final int TE_INVENTORY_SLOT_COUNT = 11;  // must be the number of slots you have!
+    private static final int TE_INVENTORY_SLOT_COUNT = 12;  // must be the number of slots you have!
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int pIndex) {

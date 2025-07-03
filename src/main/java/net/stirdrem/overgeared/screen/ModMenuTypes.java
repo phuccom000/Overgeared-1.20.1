@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.screen;
 
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -22,6 +23,10 @@ public class ModMenuTypes {
 
     public static final RegistryObject<MenuType<RockKnappingMenu>> ROCK_KNAPPING_MENU =
             registerMenuType("rock_knapping_menu", RockKnappingMenu::new);
+
+    public static final RegistryObject<MenuType<BlueprintWorkbenchMenu>> BLUEPRINT_WORKBENCH_MENU =
+            MENUS.register("blueprint_workbench",
+                    () -> new MenuType<>(BlueprintWorkbenchMenu::new, FeatureFlagSet.of()));
 
     private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
         return MENUS.register(name, () -> IForgeMenuType.create(factory));

@@ -1,0 +1,22 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 2,
+  "has_quality": true,
+  "pattern": [
+    "p p",
+    "l l"
+  ],
+  "key": {
+    "p": {
+      "item": "overgeared:steel_plate"
+    },
+    "l": {
+      "item": "minecraft:leather"
+    }
+  },
+  "result": {
+    "item": "magistuarmory:xivcenturyknight_boots",
+    "count": 1
+  },
+  "show_notification": true
+}

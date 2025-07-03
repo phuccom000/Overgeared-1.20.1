@@ -2,12 +2,11 @@ package net.stirdrem.overgeared.config;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
-import io.netty.util.Attribute;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ModConfig;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 public class ServerConfig {
 
@@ -56,14 +55,50 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue DAMAGE_RESTORE_PER_GRIND;
     public static final ForgeConfigSpec.BooleanValue ENABLE_MINIGAME;
     public static final ForgeConfigSpec.DoubleValue MASTER_QUALITY_CHANCE;
-    public static final ForgeConfigSpec.IntValue STONE_ANVIL_MAX_CRAFTS;
+    public static final ForgeConfigSpec.IntValue STONE_ANVIL_MAX_USES;
+    public static final ForgeConfigSpec.ConfigValue<List<String>> AVAILABLE_TOOL_TYPES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> CUSTOM_TOOL_TYPES;
+    public static final ForgeConfigSpec.IntValue HEATED_ITEM_COOLDOWN_TICKS;
+
+    public static final ForgeConfigSpec.IntValue MASTER_MAX_USE;
+    public static final ForgeConfigSpec.IntValue PERFECT_MAX_USE;
+    public static final ForgeConfigSpec.IntValue EXPERT_MAX_USE;
+    public static final ForgeConfigSpec.IntValue WELL_MAX_USE;
+    public static final ForgeConfigSpec.IntValue POOR_MAX_USE;
+
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        builder.push("Heated Items Settings");
+
+        HEATED_ITEM_COOLDOWN_TICKS = builder.comment("How many ticks before a heated item cools off in inventory (default: 1200 = 60s)")
+                .defineInRange("heatedItemCooldownTicks", 1200, 1, Integer.MAX_VALUE);
+
+        builder.pop();
+
+        builder.push("Blueprint Settings");
+
+        AVAILABLE_TOOL_TYPES = builder.comment("List of available tool types for blueprints",
+                        "Default options: SWORD, AXE, PICKAXE, SHOVEL, HOE, HAMMER, MULTITOOL",
+                        "Add custom types below in customToolTypes")
+                .define("availableToolTypes",
+                        Arrays.asList("SWORD", "AXE", "PICKAXE", "SHOVEL", "HOE", "HAMMER"));
+
+        CUSTOM_TOOL_TYPES = builder.comment("Add custom tool types as key-value pairs",
+                        "Format: [\"TYPE_ID\",\"Display Name\", \"TYPE_ID2\",\"Display Name 2\"]",
+                        "Example: [\"SPEAR\",\"Spear\", \"BROADSWORD\",\"Broadsword\"]")
+                .defineList("customToolTypes", Arrays.asList(), entry -> {
+                    if (!(entry instanceof String)) return false;
+                    // Validation will happen in ToolTypeRegistry
+                    return true;
+                });
+
+        builder.pop();
+
         builder.push("Stone Smithing Anvil");
-        STONE_ANVIL_MAX_CRAFTS = builder
+        STONE_ANVIL_MAX_USES = builder
                 .comment("Number of uses before the Stone Smithing Anvil breaks")
-                .defineInRange("max_crafts", 20, 1, Integer.MAX_VALUE);
+                .defineInRange("max_uses", 64, 1, Integer.MAX_VALUE);
         builder.pop();
 
         builder.push("Minigame Config");
@@ -87,7 +122,7 @@ public class ServerConfig {
 
         MAX_SPEED = builder
                 .comment("Maximum arrow speed for the forging minigame")
-                .defineInRange("maxArrowSpeed", 5, -10.0, 10.0);
+                .defineInRange("maxArrowSpeed", 4, -10.0, 10.0);
 
         ZONE_STARTING_SIZE = builder
                 .comment("Zone starting size for the forging minigame,  in chance")
@@ -103,10 +138,10 @@ public class ServerConfig {
 
         MIN_PERFECT_ZONE = builder
                 .comment("Smallest perfect zone it can become")
-                .defineInRange("minPerfectZone", 3, 0, 100);
+                .defineInRange("minPerfectZone", 10, 0, 100);
 
         MINIGAME_TIMEOUT_TICKS = builder
-                .comment("Minigame resets after a certain amount of ticks")
+                .comment("Minigame resets after a certain amount of seconds")
                 .defineInRange("minigameTimeout", 6000, 0, 36000);
 
         builder.pop();
@@ -233,12 +268,33 @@ public class ServerConfig {
                 .defineInRange("damageRestore", 0.1, 0, 1);
         builder.pop();
 
+        builder.push("Blueprint Config");
+        MASTER_MAX_USE = builder
+                .comment("Durability bonus for master quality durability")
+                .defineInRange("masterMaxUse", 0, 0, Integer.MAX_VALUE);
+
+        PERFECT_MAX_USE = builder
+                .comment("Durability bonus for perfect quality durability")
+                .defineInRange("perfectMaxUse", 50, 0, 1000);
+
+        EXPERT_MAX_USE = builder
+                .comment("Durability bonus for expert quality durability")
+                .defineInRange("expertMaxUse", 20, 0, 1000);
+
+        WELL_MAX_USE = builder
+                .comment("Durability bonus for well-made quality durability")
+                .defineInRange("wellMaxUse", 10, 0, 1000);
+
+        POOR_MAX_USE = builder
+                .comment("Durability penalty for poor quality durability")
+                .defineInRange("poorMaxUse", 5, 0, 1000);
+        builder.pop();
 
         SERVER_CONFIG = builder.build();
     }
 
     public static final void loadConfig(ForgeConfigSpec spec, Path path) {
-        final CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave().writingMode(WritingMode.REPLACE).build();
+        final CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave().writingMode(WritingMode.REPLACE).preserveInsertionOrder().build();
         configData.load();
         spec.setConfig(configData);
     }

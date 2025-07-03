@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    "bcb",
+    "cac",
+    "   "
+  ],
+  "key": {
+    "a": {
+      "tag": "forge:nuggets/steel"
+    },
+    "b": {
+      "item": "overgeared:steel_ingot"
+    },
+    "c": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "slavicarmory:erikhonka",
+    "count": 1
+  },
+  "show_notification": true
+}

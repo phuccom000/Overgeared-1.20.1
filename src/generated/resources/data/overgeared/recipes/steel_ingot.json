@@ -1,0 +1,20 @@
+{
+  "type": "overgeared:forging",
+  "category": "misc",
+  "hammering": 3,
+  "has_polishing": true,
+  "has_quality": false,
+  "key": {
+    "#": {
+      "item": "overgeared:heated_crude_steel"
+    }
+  },
+  "pattern": [
+    "#"
+  ],
+  "result": {
+    "item": "overgeared:steel_ingot"
+  },
+  "show_notification": true,
+  "tier": "stone"
+}

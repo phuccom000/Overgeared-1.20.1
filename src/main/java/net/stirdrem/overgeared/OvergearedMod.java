@@ -17,6 +17,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
@@ -33,14 +34,12 @@ import net.stirdrem.overgeared.event.ModAttributes;
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
 import net.stirdrem.overgeared.item.ModItems;
 
+import net.stirdrem.overgeared.item.ToolTypeRegistry;
 import net.stirdrem.overgeared.loot.ModLootModifiers;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
-import net.stirdrem.overgeared.screen.ModMenuTypes;
-import net.stirdrem.overgeared.screen.RockKnappingScreen;
-import net.stirdrem.overgeared.screen.SteelSmithingAnvilScreen;
-import net.stirdrem.overgeared.screen.StoneSmithingAnvilScreen;
+import net.stirdrem.overgeared.screen.*;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.TickScheduler;
 import org.slf4j.Logger;
@@ -63,6 +62,8 @@ public class OvergearedMod {
 
         ServerConfig.loadConfig(ServerConfig.SERVER_CONFIG, FMLPaths.GAMEDIR.get().resolve(FMLPaths.CONFIGDIR.get()).resolve(MOD_ID + "-common.toml"));
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
+
+        modEventBus.addListener(this::onConfigLoaded);
 
         ModCreativeModeTabs.register(modEventBus);
 
@@ -101,11 +102,20 @@ public class OvergearedMod {
         ModMessages.register();
     }
 
+    private void onConfigLoaded(ModConfigEvent.Loading event) {
+        //if (event.getConfig().getSpec() == ServerConfig.SERVER_CONFIG) {
+        ToolTypeRegistry.init();
+        LOGGER.info("Tool types initialized: {}",
+                ToolTypeRegistry.getRegisteredTypes().size());
+        //}
+    }
+
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModItems.IRON_TONGS);
             event.accept(ModItems.STEEL_TONGS);
+            event.accept(ModItems.COPPER_SMITHING_HAMMER);
             event.accept(ModItems.SMITHING_HAMMER);
             event.accept(ModItems.STEEL_PICKAXE.get());
             event.accept(ModItems.STEEL_AXE.get());
@@ -137,6 +147,7 @@ public class OvergearedMod {
             MenuScreens.register(ModMenuTypes.STEEL_SMITHING_ANVIL_MENU.get(), SteelSmithingAnvilScreen::new);
             MenuScreens.register(ModMenuTypes.STONE_SMITHING_ANVIL_MENU.get(), StoneSmithingAnvilScreen::new);
             MenuScreens.register(ModMenuTypes.ROCK_KNAPPING_MENU.get(), RockKnappingScreen::new);
+            MenuScreens.register(ModMenuTypes.BLUEPRINT_WORKBENCH_MENU.get(), BlueprintWorkbenchScreen::new);
             //BarrelInteraction.bootStrap();
         }
 

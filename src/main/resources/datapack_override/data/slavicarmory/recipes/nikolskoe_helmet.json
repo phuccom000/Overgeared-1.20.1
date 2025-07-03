@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+    "pattern": [
+        "ppp",
+        "pip",
+        "c c"
+    ],
+    "key": {
+        "i": {
+            "item": "overgeared:steel_ingot"
+        },
+        "c": {
+            "tag": "magistuarmory:chainmails/steel"
+        },
+        "p": {
+            "item": "overgeared:steel_plate"
+        }
+    },
+    "result": {
+        "item": "slavicarmory:nikolskoe_helmet",
+        "count": 1
+    },
+  "show_notification": true
+}

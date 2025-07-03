@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 5,
+  "has_quality": true,
+  "pattern": [
+    " b ",
+    "bab",
+    " b "
+  ],
+  "key": {
+    "a": {
+      "item": "magistuarmory:lamellar_chestplate"
+    },
+    "b": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:mirror_chestplate",
+    "count": 1
+  },
+  "show_notification": true
+}

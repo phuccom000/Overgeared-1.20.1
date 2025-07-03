@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -109,6 +110,28 @@ public class HeatedItem extends Item {
         return InteractionResult.PASS;
     }
 
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, level, entity, slot, selected);
+
+        if (level.isClientSide) return;
+        if (!(entity instanceof Player player)) return;
+
+        long time = level.getGameTime();
+
+        // Damage every second (20 ticks) only if item is heated.
+        if (time % 20 != 0) return;
+
+        if (stack.is(ModTags.Items.HEATED_METALS)) {
+            boolean hasTongs = player.getOffhandItem().is(ModTags.Items.TONGS) || player.getMainHandItem().is(ModTags.Items.TONGS);
+            if (hasTongs) {
+                stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            } else {
+                player.hurt(player.damageSources().hotFloor(), 1.0F);
+            }
+        }
+    }
+
     private Item getCooledIngot(Item heatedItem) {
         var heatedTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATED_METALS);
         var cooledTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATABLE_METALS);
@@ -133,40 +156,21 @@ public class HeatedItem extends Item {
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         String quality = pStack.getOrCreateTag().getString("ForgingQuality");
         if (!quality.isEmpty()) {
-            pTooltipComponents.add(Component.literal(getDisplayQuality(quality)).withStyle(ChatFormatting.GRAY));
+            pTooltipComponents.add(Component.translatable(getDisplayQuality(quality)).withStyle(ChatFormatting.GRAY));
         }
         pTooltipComponents.add(Component.translatable("tooltip.overgeared.heatedingots.tooltip").withStyle(ChatFormatting.GRAY)
         );
 
     }
 
-    @Override
-    public boolean isBarVisible(ItemStack stack) {
-        // Show the bar if the item has taken any damage
-        return stack.isDamaged();
-    }
-
-    @Override
-    public int getBarWidth(ItemStack stack) {
-        // Calculate the width of the bar based on remaining durability
-        return Math.round(13.0F * (1.0F - (float) stack.getDamageValue() / stack.getMaxDamage()));
-    }
-
-    @Override
-    public int getBarColor(ItemStack stack) {
-        // Calculate color from red (hot) to orange as durability decreases
-        float durabilityRatio = 1.0F - (float) stack.getDamageValue() / stack.getMaxDamage();
-        float hue = 0.05F * durabilityRatio; // Adjust hue for color transition
-        return 0xFF000000 | java.awt.Color.HSBtoRGB(hue, 1.0F, 1.0F);
-    }
-
 
     private String getDisplayQuality(String key) {
         return switch (key) {
-            case "poor" -> "Poorly Forged";
-            case "well" -> "Well Forged";
-            case "expert" -> "Expertly Forged";
-            case "perfect" -> "Perfectly Forged";
+            case "poor" -> "tooltip.overgeared.poor";
+            case "well" -> "tooltip.overgeared.well";
+            case "expert" -> "tooltip.overgeared.expert";
+            case "perfect" -> "tooltip.overgeared.perfect";
+            case "master" -> "tooltip.overgeared.master";
             default -> "";
         };
     }

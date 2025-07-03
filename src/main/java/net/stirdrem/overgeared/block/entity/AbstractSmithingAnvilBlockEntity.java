@@ -19,6 +19,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -43,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
-    protected final ItemStackHandler itemHandler = new ItemStackHandler(11) {
+    protected final ItemStackHandler itemHandler = new ItemStackHandler(12) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -251,18 +252,18 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                         }
                         tag.putString("ForgingQuality", quality);
                     }
-                    if (!(result.getItem() instanceof ArmorItem))
+                    if (!(result.getItem() instanceof ShieldItem) && recipe.hasPolishing())
                         tag.putBoolean("Polished", false);
                 }
             } else {
-                if (!(result.getItem() instanceof ArmorItem))
+                if (!(result.getItem() instanceof ShieldItem))
                     tag.putBoolean("Polished", false);
             }
             result.setTag(tag);
         }
 
         // Extract ingredients
-        for (int i = 0; i < this.itemHandler.getSlots() - 1; i++) {
+        for (int i = 0; i < 9; i++) {
             this.itemHandler.extractItem(i, 1, false);
         }
 
@@ -339,10 +340,11 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     }
 
     public Optional<ForgingRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(9);
+        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots());
         for (int i = 0; i < 9; i++) {
             inventory.setItem(i, itemHandler.getStackInSlot(i));
         }
+        inventory.setItem(11, itemHandler.getStackInSlot(11));
 
         return ForgingRecipe.findBestMatch(level, inventory)
                 .filter(this::matchesRecipeExactly)
@@ -392,7 +394,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                 return;
             }
 
-
             ForgingRecipe currentRecipe = currentRecipeOpt.get();
 
             if (lastRecipe != null) {
@@ -420,10 +421,11 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                     craftItem();
                     resetProgress();
                 }
+            } else {
+                progress = 0;
+                maxProgress = 0;
+                hitRemains = 0;
             }
-            /*else {
-                resetProgress();
-            }*/
         } catch (Exception e) {
             OvergearedMod.LOGGER.error("Error updating anvil hits remaining", e);
             resetProgress();
@@ -452,11 +454,12 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     }
 
     protected boolean matchesRecipeExactly(ForgingRecipe recipe) {
-        SimpleContainer inventory = new SimpleContainer(9); // 3x3 grid
+        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots()); // 3x3 grid
         // Copy items from input slots (0-8) to our 3x3 grid
         for (int i = 0; i < 9; i++) {
             inventory.setItem(i, this.itemHandler.getStackInSlot(i));
         }
+        inventory.setItem(11, this.itemHandler.getStackInSlot(11));
         return recipe.matches(inventory, level);
     }
 

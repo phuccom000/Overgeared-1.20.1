@@ -1,7 +1,9 @@
 {
   "type": "overgeared:forging",
+  "blueprint": "AXE",
   "category": "misc",
   "hammering": 3,
+  "has_polishing": true,
   "has_quality": true,
   "key": {
     "#": {

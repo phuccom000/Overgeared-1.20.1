@@ -70,21 +70,25 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                 .add(
                         ModItems.IRON_TONGS.get(),
                         ModItems.STEEL_TONGS.get(),
-                        ModItems.SMITHING_HAMMER.get()
+                        ModItems.SMITHING_HAMMER.get(),
+                        ModItems.COPPER_SMITHING_HAMMER.get()
                 );
         this.tag(ModTags.Items.HEATABLE_METALS)
                 .add(
                         ModItems.STEEL_INGOT.get(),
-                        Items.IRON_INGOT
+                        Items.IRON_INGOT,
+                        ModItems.CRUDE_STEEL.get()
                 );
         this.tag(ModTags.Items.HEATED_METALS)
                 .add(
                         ModItems.HEATED_STEEL_INGOT.get(),
-                        ModItems.HEATED_IRON_INGOT.get()
+                        ModItems.HEATED_IRON_INGOT.get(),
+                        ModItems.HEATED_CRUDE_STEEL.get()
                 );
         this.tag(ModTags.Items.SMITHING_HAMMERS)
                 .add(
-                        ModItems.SMITHING_HAMMER.get()
+                        ModItems.SMITHING_HAMMER.get(),
+                        ModItems.COPPER_SMITHING_HAMMER.get()
                 );
         this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel")))
                 .add(ModItems.STEEL_INGOT.get());

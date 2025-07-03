@@ -69,6 +69,13 @@ public class ModMessages {
                 .decoder(KnappingChipC2SPacket::decode)
                 .consumerMainThread(KnappingChipC2SPacket::handle)
                 .add();
+
+        net.messageBuilder(SelectToolTypeC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(SelectToolTypeC2SPacket::toBytes)
+                .decoder(SelectToolTypeC2SPacket::new)
+                .consumerMainThread(SelectToolTypeC2SPacket::handle)
+                .add();
+
         /*net.messageBuilder(AnvilOccupationSyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(AnvilOccupationSyncS2CPacket::new)
                 .encoder(AnvilOccupationSyncS2CPacket::toBytes)

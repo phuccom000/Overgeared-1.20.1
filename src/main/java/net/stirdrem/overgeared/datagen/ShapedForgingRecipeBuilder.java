@@ -17,6 +17,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.core.NonNullList;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.ForgingBookCategory;
+import net.stirdrem.overgeared.item.ToolTypeRegistry;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
 
@@ -37,7 +38,11 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private final Advancement.Builder advancement = Advancement.Builder.recipeAdvancement();
 
     @Nullable
+    private String blueprint;
+    @Nullable
     private Boolean hasQuality;
+    @Nullable
+    private Boolean hasPolishing;
     @Nullable
     private String group;
     @Nullable
@@ -133,6 +138,16 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
+    public ShapedForgingRecipeBuilder setBlueprint(@Nullable String blueprint) {
+        this.blueprint = blueprint;
+        return this;
+    }
+
+    public ShapedForgingRecipeBuilder setPolishing(@Nullable boolean hasPolishing) {
+        this.hasPolishing = hasPolishing;
+        return this;
+    }
+
     public ShapedForgingRecipeBuilder showNotification(boolean pShowNotification) {
         this.showNotification = pShowNotification;
         return this;
@@ -172,7 +187,9 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 this.advancement,
                 pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/"),
                 this.showNotification,
+                this.blueprint == null ? "" : this.blueprint,
                 this.hasQuality == null || this.hasQuality,
+                this.hasPolishing == null || this.hasPolishing,
                 this.tier == null ? "" : this.tier
         ));
     }
@@ -202,12 +219,14 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final ResourceLocation advancementId;
         private final boolean showNotification;
         private final String group;
+        private final String blueprint;
         private final ForgingBookCategory category;
         private final Boolean hasQuality;
+        private final Boolean hasPolishing;
         private final String tier;
 
 
-        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, Boolean hasQuality, String tier) {
+        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, String blueprint, Boolean hasQuality, Boolean hasPolishing, String tier) {
             this.ingredients = ingredients;
             this.hammering = hammering;
             this.result = result;
@@ -219,7 +238,9 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             this.advancement = advancement;
             this.advancementId = advancementId;
             this.showNotification = showNotification;
+            this.blueprint = blueprint;
             this.hasQuality = hasQuality;
+            this.hasPolishing = hasPolishing;
             this.tier = tier;
         }
 
@@ -227,6 +248,10 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         public void serializeRecipeData(JsonObject json) {
             if (!this.group.isEmpty()) {
                 json.addProperty("group", this.group);
+            }
+
+            if (!this.blueprint.isEmpty()) {
+                json.addProperty("blueprint", this.blueprint);
             }
             JsonArray patternArray = new JsonArray();
             json.addProperty("category", this.category.getSerializedName());
@@ -244,6 +269,10 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             // Add quality flag if not null
             if (this.hasQuality != null || this.hasQuality) {
                 json.addProperty("has_quality", this.hasQuality);
+            }
+
+            if (this.hasPolishing != null || this.hasPolishing) {
+                json.addProperty("has_polishing", this.hasPolishing);
             }
 
             for (Map.Entry<Character, Ingredient> entry : this.key.entrySet()) {

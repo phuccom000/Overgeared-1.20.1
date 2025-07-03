@@ -48,26 +48,25 @@ public class ModEvents {
     private static final int ANVIL_CLEANUP_INTERVAL = 1200; // 1 minute (60 seconds * 20 ticks)
     private static final int HEATED_ITEM_CHECK_INTERVAL = 20; // 1 second
     private static final float BURN_DAMAGE = 1.0f;
-    private static final float ZONE_SHIFT_AMOUNT = 15.0f;
+
     private static final Map<UUID, Integer> playerTimeoutCounters = new HashMap<>();
 
-   /* @SubscribeEvent
+
+    private static int serverTick = 0;
+
+    @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && event.side == LogicalSide.SERVER) {
-            // Run cleanup at regular intervals
-            if (event.getServer().getTickCount() % ANVIL_CLEANUP_INTERVAL == 0) {
-                resetMinigameForPlayer(event.get);
-                startTimeoutCounter(player);
-            }
-        }
-    }*/
+        if (event.phase != TickEvent.Phase.END) return;
+        serverTick++;
+    }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
-        if (event.side == LogicalSide.CLIENT) return; // STOP here on client
+        if (event.side == LogicalSide.CLIENT) return;
 
         ServerPlayer player = (ServerPlayer) event.player; // Safe cast
+        handleAnvilMinigameSync(event, player);
 
         // Refresh timeout counter if player is actively in minigame
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
@@ -76,13 +75,15 @@ public class ModEvents {
             }
         });
 
+        if (serverTick % HEATED_ITEM_CHECK_INTERVAL != 0) return;
 
         Level level = player.level();
+        //handleHeatedItems(player, level);
+        handleAnvilDistance(player, level);
 
-        handleHeatedItems(player, level);
-        handleAnvilMinigameSync(event, player);
+    }
 
-
+    private static void handleAnvilDistance(ServerPlayer player, Level level) {
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
             if (minigame.isVisible() && minigame.hasAnvilPosition()) {
                 BlockPos anvilPos = minigame.getAnvilPos();

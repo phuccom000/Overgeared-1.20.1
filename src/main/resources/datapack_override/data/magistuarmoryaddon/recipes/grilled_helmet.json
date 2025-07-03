@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 6,
+  "has_quality": true,
+  "pattern": [
+    "bbb",
+    "aaa",
+    "c c"
+  ],
+  "key": {
+    "a": {
+      "tag": "forge:nuggets/steel"
+    },
+    "b": {
+      "item": "overgeared:steel_ingot"
+    },
+    "c": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:grilled_helmet",
+    "count": 1
+  },
+  "show_notification": true
+}

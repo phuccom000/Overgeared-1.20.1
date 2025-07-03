@@ -1,0 +1,22 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 4,
+  "has_quality": false,
+  "pattern": [
+    " a",
+    " b"
+  ],
+  "key": {
+    "a": {
+      "tag": "magistuarmory:small_plates/steel"
+    },
+    "b": {
+      "item": "overgeared:steel_plate"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:codpiece_decoration",
+    "count": 1
+  },
+  "show_notification": true
+}

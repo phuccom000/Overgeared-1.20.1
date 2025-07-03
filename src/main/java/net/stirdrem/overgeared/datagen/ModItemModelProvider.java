@@ -43,6 +43,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         simpleItem(ModItems.CRUDE_STEEL);
+        simpleItem(ModItems.HEATED_CRUDE_STEEL);
         simpleItem(ModItems.ROCK);
         simpleItem(ModItems.STEEL_INGOT);
         simpleItem(ModItems.STEEL_NUGGET);
@@ -52,6 +53,8 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.STEEL_PLATE);
         simpleItem(ModItems.STEEL_TONG);
         simpleItem(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE);
+        simpleItem(ModItems.EMPTY_BLUEPRINT);
+        simpleItem(ModItems.BLUEPRINT);
         trimmedArmorItem(ModItems.STEEL_HELMET);
         trimmedArmorItem(ModItems.STEEL_BOOTS);
         trimmedArmorItem(ModItems.STEEL_CHESTPLATE);
@@ -59,6 +62,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleHandheld(ModItems.IRON_TONGS);
         simpleHandheld(ModItems.STEEL_TONGS);
         simpleHandheld(ModItems.SMITHING_HAMMER);
+        simpleHandheld(ModItems.COPPER_SMITHING_HAMMER);
         simpleHandheld(ModItems.STEEL_SWORD);
         simpleHandheld(ModItems.STEEL_PICKAXE);
         simpleHandheld(ModItems.STEEL_AXE);

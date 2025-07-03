@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "overgeared:smithing_hammers"
+    },
+    {
+      "item": "minecraft:anvil"
+    }
+  ],
+  "result": {
+    "item": "overgeared:smithing_anvil"
+  }
+}

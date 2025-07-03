@@ -1,0 +1,29 @@
+{
+  "type": "overgeared:forging",
+  "hammering": 3,
+  "has_quality": true,
+  "pattern": [
+    " a ",
+    "dcd",
+    " b "
+  ],
+  "key": {
+    "a": {
+      "item": "overgeared:steel_ingot"
+    },
+    "b": {
+      "tag": "magistuarmory:chainmails/steel"
+    },
+    "c": {
+      "item": "magistuarmoryaddon:tablet_helmet"
+    },
+    "d": {
+      "tag": "forge:nuggets/gold"
+    }
+  },
+  "result": {
+    "item": "magistuarmoryaddon:kulah_khud",
+    "count": 1
+  },
+  "show_notification": true
+}

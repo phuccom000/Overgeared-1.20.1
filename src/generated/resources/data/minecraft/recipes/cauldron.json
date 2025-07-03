@@ -2,6 +2,7 @@
   "type": "overgeared:forging",
   "category": "misc",
   "hammering": 5,
+  "has_polishing": true,
   "has_quality": false,
   "key": {
     "#": {

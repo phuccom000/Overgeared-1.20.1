@@ -56,7 +56,7 @@ public abstract class AbstractSmithingAnvilScreen<T extends AbstractSmithingAnvi
         //renderResultPreview(guiGraphics, x, y); // Add this line
     }
 
-    private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
+    protected void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
         if (menu.isCrafting()) {
             guiGraphics.blit(TEXTURE, x + 89, y + 35, 176, 0, menu.getScaledProgress(), 17);
         }
