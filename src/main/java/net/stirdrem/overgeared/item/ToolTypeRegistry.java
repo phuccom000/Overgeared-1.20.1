@@ -12,11 +12,11 @@ public class ToolTypeRegistry {
             ToolType.PICKAXE,
             ToolType.SHOVEL,
             ToolType.HOE,
-            //ToolType.HAMMER,
             ToolType.MULTITOOL
     );
 
     private static final List<ToolType> CUSTOM_TYPES = new ArrayList<>();
+    private static final List<ToolType> HIDDEN_CUSTOM_TYPES = new ArrayList<>();
     private static final Map<String, ToolType> BY_ID = new HashMap<>();
 
     public static void init() {
@@ -45,7 +45,21 @@ public class ToolTypeRegistry {
                 System.err.println("Invalid tool type definition: " + typeId + " - " + e.getMessage());
             }
         }
+        List<? extends String> hiddenPairs = ServerConfig.HIDDEN_TOOL_TYPES.get();
+        for (int i = 0; i < hiddenPairs.size(); i += 2) {
+            if (i + 1 >= hiddenPairs.size()) break;
 
+            String typeId = hiddenPairs.get(i);
+            String displayName = hiddenPairs.get(i + 1);
+
+            try {
+                ToolType hiddenType = new ToolType(typeId, displayName, false);
+                registerHidden(hiddenType);
+                System.out.println("Registered hidden tool type: " + hiddenType.getId()); // Debug
+            } catch (IllegalArgumentException e) {
+                System.err.println("Invalid hidden tool type definition: " + typeId + " - " + e.getMessage());
+            }
+        }
         // Debug output
         System.out.println("Currently registered tool types: " +
                 BY_ID.keySet().stream().collect(Collectors.joining(", ")));
@@ -61,11 +75,20 @@ public class ToolTypeRegistry {
         }
     }
 
+    public static void registerHidden(ToolType type) {
+        String upperId = type.getId().toUpperCase(Locale.ROOT);
+        if (!BY_ID.containsKey(upperId)) {
+            BY_ID.put(upperId, type);
+            HIDDEN_CUSTOM_TYPES.add(type);
+        }
+    }
+
     public static List<ToolType> getRegisteredTypes() {
         List<ToolType> allTypes = new ArrayList<>();
 
         // Get enabled default types
-        List<String> availableTypes = ServerConfig.AVAILABLE_TOOL_TYPES.get();
+
+        List<? extends String> availableTypes = ServerConfig.AVAILABLE_TOOL_TYPES.get();
         DEFAULT_TYPES.stream()
                 .filter(type -> availableTypes.contains(type.getId()))
                 .forEach(allTypes::add);
@@ -75,6 +98,24 @@ public class ToolTypeRegistry {
 
         return allTypes;
     }
+
+    public static List<ToolType> getRegisteredTypesAll() {
+        List<ToolType> allTypes = new ArrayList<>();
+
+        // Get enabled default types
+
+        List<? extends String> availableTypes = ServerConfig.AVAILABLE_TOOL_TYPES.get();
+        DEFAULT_TYPES.stream()
+                .filter(type -> availableTypes.contains(type.getId()))
+                .forEach(allTypes::add);
+
+        // Add all custom types
+        allTypes.addAll(CUSTOM_TYPES);
+        allTypes.addAll(HIDDEN_CUSTOM_TYPES);
+
+        return allTypes;
+    }
+
 
     public static Optional<ToolType> byId(String id) {
         if (id == null) {

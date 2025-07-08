@@ -69,6 +69,7 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     @Override
     protected void craftItem() {
         super.craftItem(); // Perform regular crafting logic
+        if (ServerConfig.STONE_ANVIL_MAX_USES.get() == 0) return;
         craftCount++;
 
         if (craftCount >= ServerConfig.STONE_ANVIL_MAX_USES.get()) {

@@ -49,6 +49,7 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue ZONE_SHRINK_FACTOR;
     public static final ForgeConfigSpec.IntValue MINIGAME_TIMEOUT_TICKS;
     public static final ForgeConfigSpec.DoubleValue BASE_DURABILITY_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> BASE_DURABILITY_BLACKLIST;
     public static final ForgeConfigSpec.DoubleValue ROCK_DROPPING_CHANCE;
     public static final ForgeConfigSpec.DoubleValue FLINT_BREAKING_CHANCE;
     public static final ForgeConfigSpec.DoubleValue DURABILITY_REDUCE_PER_GRIND;
@@ -56,8 +57,9 @@ public class ServerConfig {
     public static final ForgeConfigSpec.BooleanValue ENABLE_MINIGAME;
     public static final ForgeConfigSpec.DoubleValue MASTER_QUALITY_CHANCE;
     public static final ForgeConfigSpec.IntValue STONE_ANVIL_MAX_USES;
-    public static final ForgeConfigSpec.ConfigValue<List<String>> AVAILABLE_TOOL_TYPES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> AVAILABLE_TOOL_TYPES;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> CUSTOM_TOOL_TYPES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HIDDEN_TOOL_TYPES;
     public static final ForgeConfigSpec.IntValue HEATED_ITEM_COOLDOWN_TICKS;
 
     public static final ForgeConfigSpec.IntValue MASTER_MAX_USE;
@@ -78,11 +80,14 @@ public class ServerConfig {
 
         builder.push("Blueprint Settings");
 
-        AVAILABLE_TOOL_TYPES = builder.comment("List of available tool types for blueprints",
-                        "Default options: SWORD, AXE, PICKAXE, SHOVEL, HOE, HAMMER, MULTITOOL",
+        AVAILABLE_TOOL_TYPES = builder.comment(
+                        "List of available tool types for blueprints",
+                        "Default options: SWORD, AXE, PICKAXE, SHOVEL, HOE",
+                        "Remove any types you don't want to be available",
                         "Add custom types below in customToolTypes")
-                .define("availableToolTypes",
-                        Arrays.asList("SWORD", "AXE", "PICKAXE", "SHOVEL", "HOE", "HAMMER"));
+                .defineList("availableToolTypes",
+                        Arrays.asList("SWORD", "AXE", "PICKAXE", "SHOVEL", "HOE", "HAMMER"),
+                        entry -> entry instanceof String);
 
         CUSTOM_TOOL_TYPES = builder.comment("Add custom tool types as key-value pairs",
                         "Format: [\"TYPE_ID\",\"Display Name\", \"TYPE_ID2\",\"Display Name 2\"]",
@@ -93,12 +98,21 @@ public class ServerConfig {
                     return true;
                 });
 
+        HIDDEN_TOOL_TYPES = builder.comment("Add hidden custom tool types as key-value pairs. Does not appear in the Drafting Table",
+                        "Format: [\"TYPE_ID\",\"Display Name\", \"TYPE_ID2\",\"Display Name 2\"]",
+                        "Example: [\"SPEAR\",\"Spear\", \"BROADSWORD\",\"Broadsword\"]")
+                .defineList("hiddenToolTypes", Arrays.asList(), entry -> {
+                    if (!(entry instanceof String)) return false;
+                    // Validation will happen in ToolTypeRegistry
+                    return true;
+                });
+
         builder.pop();
 
         builder.push("Stone Smithing Anvil");
         STONE_ANVIL_MAX_USES = builder
-                .comment("Number of uses before the Stone Smithing Anvil breaks")
-                .defineInRange("max_uses", 64, 1, Integer.MAX_VALUE);
+                .comment("Number of uses before the Stone Smithing Anvil breaks. Set to 0 to disable.")
+                .defineInRange("max_uses", 64, 0, Integer.MAX_VALUE);
         builder.pop();
 
         builder.push("Minigame Config");
@@ -150,6 +164,11 @@ public class ServerConfig {
         BASE_DURABILITY_MULTIPLIER = builder
                 .comment("Defines the base durability multiplier of all items that has durability.")
                 .defineInRange("durability", 1f, 0, 10000);
+
+        BASE_DURABILITY_BLACKLIST = builder.comment("Items that will NOT receive base durability multiplier. Use item IDs like 'minecraft:flint_and_steel'")
+                .defineListAllowEmpty("base_durability_blacklist",
+                        List.of("minecraft:flint_and_steel"),
+                        o -> o instanceof String);
 
         builder.pop();
 
@@ -270,23 +289,23 @@ public class ServerConfig {
 
         builder.push("Blueprint Config");
         MASTER_MAX_USE = builder
-                .comment("Durability bonus for master quality durability")
+                .comment("Uses required to reach the next quality after Master")
                 .defineInRange("masterMaxUse", 0, 0, Integer.MAX_VALUE);
 
         PERFECT_MAX_USE = builder
-                .comment("Durability bonus for perfect quality durability")
+                .comment("Uses required to reach the next quality after Perfect")
                 .defineInRange("perfectMaxUse", 50, 0, 1000);
 
         EXPERT_MAX_USE = builder
-                .comment("Durability bonus for expert quality durability")
+                .comment("Uses required to reach the next quality after Expert")
                 .defineInRange("expertMaxUse", 20, 0, 1000);
 
         WELL_MAX_USE = builder
-                .comment("Durability bonus for well-made quality durability")
+                .comment("Uses required to reach the next quality after Well")
                 .defineInRange("wellMaxUse", 10, 0, 1000);
 
         POOR_MAX_USE = builder
-                .comment("Durability penalty for poor quality durability")
+                .comment("Uses required to reach the next quality after Poor")
                 .defineInRange("poorMaxUse", 5, 0, 1000);
         builder.pop();
 

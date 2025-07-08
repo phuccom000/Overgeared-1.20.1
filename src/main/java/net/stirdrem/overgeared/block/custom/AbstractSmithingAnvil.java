@@ -28,6 +28,7 @@ import net.stirdrem.overgeared.AnvilTier;
 
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.event.ModItemInteractEvents;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.sound.ModSounds;
@@ -206,7 +207,7 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock {
 
     protected void resetMinigameData(Level level, BlockPos pos) {
         if (!level.isClientSide()) {
-            ServerPlayer usingPlayer = SmithingHammer.getUsingPlayer(pos);
+            ServerPlayer usingPlayer = ModItemInteractEvents.getUsingPlayer(pos);
             if (usingPlayer != null) {
                 // Reset server-side data
                 usingPlayer.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {

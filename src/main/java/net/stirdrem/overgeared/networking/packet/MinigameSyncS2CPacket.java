@@ -155,6 +155,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
+import net.stirdrem.overgeared.event.ModItemInteractEvents;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
@@ -188,7 +189,7 @@ public class MinigameSyncS2CPacket {
             try {
                 // Update all client-side data at once
                 ClientAnvilMinigameData.loadFromNBT(minigameData);
-                SmithingHammer.handleAnvilOwnershipSync(minigameData);
+                ModItemInteractEvents.handleAnvilOwnershipSync(minigameData);
             } catch (Exception e) {
                 OvergearedMod.LOGGER.error("Failed to process minigame sync packet", e);
             }

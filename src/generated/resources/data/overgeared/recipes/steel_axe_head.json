@@ -1,6 +1,8 @@
 {
   "type": "overgeared:forging",
-  "blueprint": "AXE",
+  "blueprint": [
+    "axe"
+  ],
   "category": "misc",
   "hammering": 4,
   "has_polishing": true,
@@ -14,6 +16,7 @@
     "##",
     "# "
   ],
+  "requires_blueprint": false,
   "result": {
     "item": "overgeared:steel_axe_head"
   },

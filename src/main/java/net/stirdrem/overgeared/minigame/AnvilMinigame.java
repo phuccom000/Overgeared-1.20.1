@@ -10,6 +10,7 @@ import net.stirdrem.overgeared.HitResult;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.event.ModItemInteractEvents;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
@@ -46,6 +47,8 @@ public class AnvilMinigame {
     private HitResult result;
     private String quality;
     private UUID ownerUUID = null;
+    private int skill;
+    private int maxSkill;
 
 
     // Save to NBT
@@ -138,6 +141,7 @@ public class AnvilMinigame {
                 }
             }*/
             // Toggle visibility on same anvil
+            //isVisible = ClientAnvilMinigameData.getIsVisible();
             isVisible = !isVisible;
             sendUpdatePacket(player);
             return;
@@ -295,7 +299,7 @@ public class AnvilMinigame {
     public String finishForging(ServerPlayer player) {
         isVisible = false;
         minigameStarted = false;
-        SmithingHammer.releaseAnvil(player, anvilPos);
+        ModItemInteractEvents.releaseAnvil(player, anvilPos);
         float qualityScore = calculateQualityScore();
         sendUpdatePacket(player);
         reset(player);

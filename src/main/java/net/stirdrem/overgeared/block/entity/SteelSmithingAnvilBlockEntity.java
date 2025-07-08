@@ -20,12 +20,10 @@ import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.SteelSmithingAnvilMenu;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEntity {
+    private static final int BLUEPRINT_SLOT = 11;
 
     public SteelSmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.STEEL_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
@@ -50,9 +48,9 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
         if (quality == null) return "no_quality";
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
         ForgingRecipe recipe = recipeOptional.get();
-        if (!recipe.getBlueprint().isEmpty()) {
+        if (!recipe.getBlueprintTypes().isEmpty()) {
 
-            ItemStack blueprint = this.itemHandler.getStackInSlot(11);
+            ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
 
             // Define tool quality tiers in order of strength
             List<String> qualityTiers = List.of("poor", "well", "expert", "perfect", "master");
@@ -108,7 +106,7 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
         super.craftItem();
         // Handle blueprint progression (slot 11)
 
-        ItemStack blueprint = this.itemHandler.getStackInSlot(11);
+        ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
         if (!blueprint.isEmpty() && blueprint.hasTag()) {
             CompoundTag tag = blueprint.getOrCreateTag();
 
@@ -142,7 +140,7 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
                     }
 
                     blueprint.setTag(tag);
-                    this.itemHandler.setStackInSlot(11, blueprint); // Re-apply to update
+                    this.itemHandler.setStackInSlot(BLUEPRINT_SLOT, blueprint); // Re-apply to update
                 }
             }
 
@@ -156,15 +154,24 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
         if (recipeOptional.isEmpty()) return false;
 
         ForgingRecipe recipe = recipeOptional.get();
-        ItemStack blueprint = this.itemHandler.getStackInSlot(11);
+        ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
 
-        // If blueprint is present and has a ToolType, it must match the recipe
-        if (!blueprint.isEmpty() && blueprint.hasTag()) {
-            CompoundTag tag = blueprint.getTag();
-            if (tag != null && tag.contains("ToolType")) {
-                String blueprintToolType = tag.getString("ToolType");
-                if (!blueprintToolType.equals(recipe.getBlueprint())) {
-                    return false; // Blueprint present but doesn't match
+        if (recipe.requiresBlueprint()) {
+            // Must have a valid matching blueprint
+            if (blueprint.isEmpty() || !blueprint.hasTag() || !blueprint.getTag().contains("ToolType")) {
+                return false;
+            }
+
+            String blueprintToolType = blueprint.getTag().getString("ToolType").toLowerCase(Locale.ROOT);
+            if (!recipe.getBlueprintTypes().contains(blueprintToolType)) {
+                return false;
+            }
+        } else {
+            // Optional blueprint: if present, it must match
+            if (!blueprint.isEmpty() && blueprint.hasTag() && blueprint.getTag().contains("ToolType")) {
+                String blueprintToolType = blueprint.getTag().getString("ToolType").toLowerCase(Locale.ROOT);
+                if (!recipe.getBlueprintTypes().contains(blueprintToolType)) {
+                    return false;
                 }
             }
         }

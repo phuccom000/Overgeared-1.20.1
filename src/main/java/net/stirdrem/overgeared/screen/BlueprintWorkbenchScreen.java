@@ -45,11 +45,31 @@ public class BlueprintWorkbenchScreen extends AbstractContainerScreen<BlueprintW
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
+        // Initialize buttons first
+        createButtons(x, y);
+        selectButton.active = false;
 
+        // Check if there are any tool types available
+        if (toolTypes.isEmpty()) {
+            handleNoToolsAvailable(x, y);
+        } else {
+            updateToolDisplay();
+        }
+    }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        boolean hasItem = !menu.getSlot(0).getItem().isEmpty();
+        selectButton.active = hasItem && !toolTypes.isEmpty();
+    }
+
+    private void createButtons(int x, int y) {
         int centerX = x + imageWidth / 2;
         int buttonRowY = y + 15;
         int buttonWidth = 10;
         int buttonPosFromCenter = 40;
+
         // Previous tool button (left arrow)
         prevButton = Button.builder(Component.literal("<"), btn -> {
                     selectedIndex = (selectedIndex - 1 + toolTypes.size()) % toolTypes.size();
@@ -85,8 +105,21 @@ public class BlueprintWorkbenchScreen extends AbstractContainerScreen<BlueprintW
         this.addRenderableWidget(prevButton);
         this.addRenderableWidget(nextButton);
         this.addRenderableWidget(selectButton);
+    }
 
-        updateToolDisplay();
+    private void handleNoToolsAvailable(int x, int y) {
+        // Disable all buttons
+        prevButton.active = false;
+        nextButton.active = false;
+        //selectButton.active = false;
+
+        // Set appropriate tooltips
+        prevButton.setTooltip(Tooltip.create(Component.translatable("tooltip.overgeared.no_tools_available")));
+        nextButton.setTooltip(Tooltip.create(Component.translatable("tooltip.overgeared.no_tools_available")));
+        selectButton.setTooltip(Tooltip.create(Component.translatable("tooltip.overgeared.no_tools_available")));
+
+        // Set the no tools message
+        currentToolName = Component.literal("Null");
     }
 
     private void updateToolDisplay() {
@@ -94,9 +127,13 @@ public class BlueprintWorkbenchScreen extends AbstractContainerScreen<BlueprintW
             ToolType currentTool = toolTypes.get(selectedIndex);
             currentToolName = currentTool.getDisplayName();
             selectButton.setTooltip(Tooltip.create(Component.translatable("tooltip.overgeared.select_tool", currentToolName)));
+
+            // Enable all buttons
+            prevButton.active = true;
+            nextButton.active = true;
+            //selectButton.active = true;
         } else {
-            currentToolName = Component.translatable("tooltip.overgeared.no_tools");
-            selectButton.active = false;
+            handleNoToolsAvailable((this.width - this.imageWidth) / 2, (this.height - this.imageHeight) / 2);
         }
     }
 
@@ -106,11 +143,12 @@ public class BlueprintWorkbenchScreen extends AbstractContainerScreen<BlueprintW
         int y = (this.height - this.imageHeight) / 2;
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // Render current tool name
+        // Render current tool name or error message
         if (currentToolName != null) {
             int textWidth = this.font.width(currentToolName);
+            int textColor = toolTypes.isEmpty() ? 0xFF0000 : 0x404040; // Red for error, dark gray for normal
             guiGraphics.drawString(this.font, currentToolName,
-                    x + imageWidth / 2 - textWidth / 2, y + 18, 0x404040, false);
+                    x + imageWidth / 2 - textWidth / 2, y + 18, textColor, false);
         }
     }
 

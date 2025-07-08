@@ -46,7 +46,7 @@ public class SmithingHammer extends DiggerItem {
         super(attackDamage, attackSpeed, tier, ModTags.Blocks.SMITHING, properties);
     }
 
-    @Override
+   /* @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         Player player = context.getPlayer();
@@ -78,7 +78,7 @@ public class SmithingHammer extends DiggerItem {
         else {
             return handleClientSideInteraction(anvilBE, pos, player, context.getItemInHand());
         }
-    }
+    }*/
 
     private InteractionResult handleServerSideInteraction(AbstractSmithingAnvilBlockEntity anvilBE, BlockPos pos, ServerPlayer player, UUID playerUUID) {
         // Server always uses the block entity as source of truth
@@ -112,9 +112,8 @@ public class SmithingHammer extends DiggerItem {
             CompoundTag syncData = new CompoundTag();
             syncData.putUUID("anvilOwner", playerUUID);
             syncData.putLong("anvilPos", pos.asLong());
-            for (ServerPlayer other : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
-                ModMessages.sendToPlayer(new MinigameSyncS2CPacket(syncData), other);
-            }
+            ModMessages.sendToAll(new MinigameSyncS2CPacket(syncData));
+
             return InteractionResult.SUCCESS;
         }
 
@@ -251,20 +250,9 @@ public class SmithingHammer extends DiggerItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level,
                                 List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("tooltip.overgeared.smithing_hammer.hold_shift")
-                .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-
-        if (Screen.hasShiftDown()) {
-            tooltip.add(Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line1")
-                    .withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line2")
-                    .withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line3")
-                    .withStyle(ChatFormatting.GRAY));
-        }
     }
 
-    @Override
+   /* @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!level.isClientSide) {
             player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
@@ -274,7 +262,7 @@ public class SmithingHammer extends DiggerItem {
             });
         }
         return super.use(level, player, hand);
-    }
+    }*/
 
     @Override
     public boolean hasCraftingRemainingItem(ItemStack stack) {

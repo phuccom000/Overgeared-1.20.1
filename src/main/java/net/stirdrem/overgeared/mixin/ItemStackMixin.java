@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.QualityHelper;
@@ -27,9 +29,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 
+import static net.stirdrem.overgeared.OvergearedMod.getCooledIngot;
+
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
-    @Inject(
+    /*@Inject(
             method = "getTooltipLines",
             at = @At("RETURN"),
             cancellable = true
@@ -77,7 +81,7 @@ public abstract class ItemStackMixin {
         }
     }
 
-
+*/
     /*@Inject(method = "getMaxDamage", at = @At("HEAD"), cancellable = true)
     private void modifyDurability(CallbackInfoReturnable<Integer> cir) {
         ItemStack stack = (ItemStack) (Object) this;
@@ -88,6 +92,7 @@ public abstract class ItemStackMixin {
         }
     }*/
 
+/*
     @Inject(
             method = "getDestroySpeed",
             at = @At("RETURN"),
@@ -102,6 +107,7 @@ public abstract class ItemStackMixin {
             cir.setReturnValue(baseSpeed * multiplier);
         }
     }
+*/
 
     @Inject(
             method = "getMaxDamage()I",
@@ -111,40 +117,38 @@ public abstract class ItemStackMixin {
     private void modifyDurabilityBasedOnQuality(CallbackInfoReturnable<Integer> cir) {
         ItemStack stack = (ItemStack) (Object) this;
 
-        // Skip if the item doesn't have durability
         if (!stack.isDamageableItem()) {
             return;
         }
 
-        // Get the original max damage (respects overridden methods)
         int originalDurability = cir.getReturnValue();
 
-        // Skip if durability is already customized (like the flint case)
         if (originalDurability != stack.getItem().getMaxDamage()) {
             return;
         }
 
-        float baseMultiplier = ServerConfig.BASE_DURABILITY_MULTIPLIER.get().floatValue();
-        int newBaseDurability = (int) (originalDurability * baseMultiplier);
+        boolean blacklisted = OvergearedMod.isDurabilityMultiplierBlacklisted(stack);
 
-        // Apply quality multiplier if present
+        float baseMultiplier = ServerConfig.BASE_DURABILITY_MULTIPLIER.get().floatValue();
+        int newBaseDurability = blacklisted ? originalDurability : (int) (originalDurability * baseMultiplier);
+
+        // Apply quality multiplier
         if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
             float multiplier = QualityHelper.getQualityMultiplier(stack);
             newBaseDurability = (int) (newBaseDurability * multiplier);
         }
 
-        // Reduce max durability by 5% for each 'ReducedMaxDurability'
+        // Apply durability reductions
         if (stack.hasTag() && stack.getTag().contains("ReducedMaxDurability")) {
             int reductions = stack.getTag().getInt("ReducedMaxDurability");
             float durabilityPenaltyMultiplier = 1.0f - (reductions * ServerConfig.DURABILITY_REDUCE_PER_GRIND.get().floatValue());
-            durabilityPenaltyMultiplier = Math.max(0.1f, durabilityPenaltyMultiplier); // Prevent zero or negative durability
-            newBaseDurability = (int) (originalDurability * baseMultiplier *
-                    (stack.getTag().contains("ForgingQuality") ? QualityHelper.getQualityMultiplier(stack) : 1)
-                    * durabilityPenaltyMultiplier);
+            durabilityPenaltyMultiplier = Math.max(0.1f, durabilityPenaltyMultiplier);
+            newBaseDurability = (int) (newBaseDurability * durabilityPenaltyMultiplier);
         }
 
         cir.setReturnValue(newBaseDurability);
     }
+
 
     /*@Redirect(method = "getTooltipLines", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;getAttackDamage()F"))
     private float modifyAttackSpeed(Item instance) {
@@ -163,7 +167,7 @@ public abstract class ItemStackMixin {
     private void onInventoryTick(Level level, Entity entity, int slot, boolean selected, CallbackInfo ci) {
         if (level.isClientSide) return;
         if (!(entity instanceof Player player)) return;
-        if (slot != 0) return; // Only process once per player per tick
+        //if (slot != 0) return; // Only process once per player per tick
 
         long tick = level.getGameTime();
         int cooldownTicks = ServerConfig.HEATED_ITEM_COOLDOWN_TICKS.get(); // add to your config
@@ -182,7 +186,7 @@ public abstract class ItemStackMixin {
                     ItemStack newStack = new ItemStack(cooled, stack.getCount());
                     stack.setCount(0); // Remove old
                     player.getInventory().add(newStack); // Add new cooled item
-                    player.playSound(SoundEvents.FIRE_EXTINGUISH, 0.7f, 1.0f);
+                    level.playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.7f, 1.0f);
                 }
             }
         }
@@ -224,27 +228,6 @@ public abstract class ItemStackMixin {
             player.hurt(player.damageSources().hotFloor(), 1.0f);
         }
 
-    }
-
-
-    private static Item getCooledIngot(Item heatedItem) {
-        var heatedTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATED_METALS);
-        var cooledTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATABLE_METALS);
-
-        int index = 0;
-        for (Item item : heatedTag) {
-            if (item == heatedItem) {
-                int i = 0;
-                for (Item cooledItem : cooledTag) {
-                    if (i == index) {
-                        return cooledItem;
-                    }
-                    i++;
-                }
-            }
-            index++;
-        }
-        return null;
     }
 
 }

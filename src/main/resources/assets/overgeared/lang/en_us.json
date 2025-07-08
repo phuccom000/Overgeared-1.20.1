@@ -70,6 +70,7 @@
   "tooltip.overgeared.poor": "Poorly Forged",
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line1": "§7Crouch right click the §f§lSmithing Anvil§7 to start forging when you have a valid recipe.",
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line2": "Crouch right click again to stop forging.",
+  "tooltip.overgeared.smithing_hammer.advanced_tooltip.line3": "Crouch right click on a stone block to convert to a Stone Anvil.",
   "tooltip.overgeared.smithing_hammer.hold_shift": "§7Hold §f§lSHIFT§7 for more information",
   "tooltip.overgeared.tongs.tooltip": "Prevent players from burning themselves when handling hot metals by holding it in your hand.",
   "upgrade.overgeared.diamond_upgrade": "Diamond Upgrade",
@@ -108,6 +109,17 @@
   "tooltip.overgeared.next_tool": "Next Tool",
   "tooltip.overgeared.select_tool": "Select %s",
   "tooltip.overgeared.no_tools": "No tools available",
-  "tooltip.overgeared.smithing_hammer.advanced_tooltip.line3": "Crouch right click on a stone block to convert to a Stone Anvil."
+  "tooltip.overgeared.no_tools_available": "No types available",
+  "gui.overgeared.tier.stone": "Stone",
+  "gui.overgeared.tier.steel": "Steel",
+  "tooltip.overgeared.recipe.hits": "Hits: %s",
+  "tooltip.overgeared.recipe.tier": "Tier:",
+  "tooltip.overgeared.recipe.blueprint": "Type: %s",
+  "tooltip.overgeared.recipe.blueprint.none": "",
+  "tooltip.overgeared.recipe.requires_blueprint.yes": "Requires Blueprint: Yes",
+  "tooltip.overgeared.recipe.requires_blueprint.no": "Requires Blueprint: No",
+  "gui.overgeared.stone_smithing_anvil": "Forging",
+  "tooltip.overgeared.blueprint.required": "Blueprint Required",
+  "tooltip.overgeared.blueprint.optional": "Blueprint Optional"
 }
 

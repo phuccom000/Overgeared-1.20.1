@@ -13,6 +13,7 @@
     "# #",
     "# #"
   ],
+  "requires_blueprint": false,
   "result": {
     "item": "overgeared:steel_boots"
   },

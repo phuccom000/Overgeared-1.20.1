@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.item.ModItems;
 
 public class BlueprintCloningRecipe extends CustomRecipe {
@@ -31,7 +32,7 @@ public class BlueprintCloningRecipe extends CustomRecipe {
                         return false; // Only 1 empty blueprint allowed
                     }
                     emptyBlueprint = stack;
-                } else if (stack.is(ModItems.BLUEPRINT.get())) {
+                /*} else if (stack.is(ModItems.BLUEPRINT.get())) {
                     // Reject if it contains master quality
                     CompoundTag tag = stack.getTag();
                     if (tag != null && "master".equalsIgnoreCase(tag.getString("Quality"))) {
@@ -40,6 +41,13 @@ public class BlueprintCloningRecipe extends CustomRecipe {
                     blueprintCount++;
                 } else {
                     return false; // Invalid item in recipe
+                }*/
+                } else {
+                    if (!stack.is(ModItems.BLUEPRINT.get())) {
+                        return false;
+                    }
+
+                    ++blueprintCount;
                 }
             }
         }
@@ -72,7 +80,24 @@ public class BlueprintCloningRecipe extends CustomRecipe {
             }
         }
 
-        return !itemstack.isEmpty() && i >= 1 ? itemstack.copyWithCount(i + 1) : ItemStack.EMPTY;
+        if (!itemstack.isEmpty() && i >= 1) {
+            ItemStack result = itemstack.copyWithCount(i);
+
+            // Reduce quality
+            if (itemstack.hasTag() && itemstack.getTag().contains("Quality")) {
+                String currentId = itemstack.getTag().getString("Quality");
+                BlueprintQuality currentQuality = BlueprintQuality.fromString(currentId);
+                BlueprintQuality downgraded = BlueprintQuality.getPrevious(currentQuality);
+
+                if (downgraded != null) {
+                    result.getOrCreateTag().putString("Quality", downgraded.getId());
+                }
+            }
+
+            return result;
+        }
+
+        return ItemStack.EMPTY;
     }
 
     @Override

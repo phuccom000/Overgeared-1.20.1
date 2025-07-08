@@ -4,7 +4,11 @@ package net.stirdrem.overgeared;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
@@ -23,6 +27,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.renderer.SmithingAnvilBlockEntityRenderer;
@@ -31,6 +36,7 @@ import net.stirdrem.overgeared.config.ClientConfig;
 import net.stirdrem.overgeared.config.ServerConfig;
 //import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
 import net.stirdrem.overgeared.event.ModAttributes;
+import net.stirdrem.overgeared.event.ModItemInteractEvents;
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
 import net.stirdrem.overgeared.item.ModItems;
 
@@ -41,8 +47,10 @@ import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.*;
 import net.stirdrem.overgeared.sound.ModSounds;
+import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.TickScheduler;
 import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Unique;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(OvergearedMod.MOD_ID)
@@ -138,6 +146,34 @@ public class OvergearedMod {
     public void onServerStarting(ServerStartingEvent event) {
 
     }
+
+    @Unique
+    public static Item getCooledIngot(Item heatedItem) {
+        var heatedTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATED_METALS);
+        var cooledTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATABLE_METALS);
+
+        int index = 0;
+        for (Item item : heatedTag) {
+            if (item == heatedItem) {
+                int i = 0;
+                for (Item cooledItem : cooledTag) {
+                    if (i == index) {
+                        return cooledItem;
+                    }
+                    i++;
+                }
+            }
+            index++;
+        }
+        return null;
+    }
+    
+    @Unique
+    public static boolean isDurabilityMultiplierBlacklisted(ItemStack stack) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        return ServerConfig.BASE_DURABILITY_BLACKLIST.get().contains(id.toString());
+    }
+
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

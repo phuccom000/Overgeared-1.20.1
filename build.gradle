@@ -229,7 +229,7 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:archery-expansion-1164945:6424928")
     //runtimeOnly fg.deobf("curse.maven:archery-expansion-squared-1217171:6425344")
     implementation(fg.deobf("curse.maven:polymorph-388800:6450982"))
-    implementation fg.deobf("curse.maven:hold-my-items-reforged-1246920:6608415")
+    //implementation fg.deobf("curse.maven:hold-my-items-reforged-1246920:6608415")
 /*    implementation fg.deobf("curse.maven:lit-it-up-916334:6415378")
     implementation(fg.deobf("curse.maven:bookling-gear-1122766:6628791"))*/
     //implementation(fg.deobf("curse.maven:durability-tooltip-511040:4741017"))

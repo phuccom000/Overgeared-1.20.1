@@ -38,7 +38,9 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private final Advancement.Builder advancement = Advancement.Builder.recipeAdvancement();
 
     @Nullable
-    private String blueprint;
+    private final List<String> blueprintTypes = new java.util.ArrayList<>();
+    @Nullable
+    private Boolean requiresBlueprint;
     @Nullable
     private Boolean hasQuality;
     @Nullable
@@ -138,8 +140,15 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
-    public ShapedForgingRecipeBuilder setBlueprint(@Nullable String blueprint) {
-        this.blueprint = blueprint;
+    public ShapedForgingRecipeBuilder requiresBlueprint(@Nullable boolean requiresBlueprint) {
+        this.requiresBlueprint = requiresBlueprint;
+        return this;
+    }
+
+    public ShapedForgingRecipeBuilder setBlueprint(String blueprintType) {
+        if (blueprintType != null && !blueprintType.isBlank()) {
+            this.blueprintTypes.add(blueprintType.toLowerCase());
+        }
         return this;
     }
 
@@ -187,9 +196,10 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 this.advancement,
                 pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/"),
                 this.showNotification,
-                this.blueprint == null ? "" : this.blueprint,
+                this.blueprintTypes,
+                this.hasQuality != null && !this.hasQuality ? null : (this.requiresBlueprint != null ? this.requiresBlueprint : false),
                 this.hasQuality == null || this.hasQuality,
-                this.hasPolishing == null || this.hasPolishing,
+                this.hasQuality != null && !this.hasQuality ? null : (this.hasPolishing != null ? this.hasPolishing : true),
                 this.tier == null ? "" : this.tier
         ));
     }
@@ -219,14 +229,15 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final ResourceLocation advancementId;
         private final boolean showNotification;
         private final String group;
-        private final String blueprint;
+        private final List<String> blueprintTypes;
         private final ForgingBookCategory category;
+        private final Boolean requiresBlueprint;
         private final Boolean hasQuality;
         private final Boolean hasPolishing;
         private final String tier;
 
 
-        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, String blueprint, Boolean hasQuality, Boolean hasPolishing, String tier) {
+        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, List<String> blueprintTypes, Boolean requiresBlueprint, Boolean hasQuality, Boolean hasPolishing, String tier) {
             this.ingredients = ingredients;
             this.hammering = hammering;
             this.result = result;
@@ -238,7 +249,8 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             this.advancement = advancement;
             this.advancementId = advancementId;
             this.showNotification = showNotification;
-            this.blueprint = blueprint;
+            this.blueprintTypes = blueprintTypes;
+            this.requiresBlueprint = requiresBlueprint;
             this.hasQuality = hasQuality;
             this.hasPolishing = hasPolishing;
             this.tier = tier;
@@ -249,10 +261,17 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             if (!this.group.isEmpty()) {
                 json.addProperty("group", this.group);
             }
-
-            if (!this.blueprint.isEmpty()) {
-                json.addProperty("blueprint", this.blueprint);
+            if (this.requiresBlueprint != null) {
+                json.addProperty("requires_blueprint", this.requiresBlueprint);
             }
+            if (!this.blueprintTypes.isEmpty()) {
+                JsonArray blueprintArray = new JsonArray();
+                for (String type : this.blueprintTypes) {
+                    blueprintArray.add(type);
+                }
+                json.add("blueprint", blueprintArray);
+            }
+
             JsonArray patternArray = new JsonArray();
             json.addProperty("category", this.category.getSerializedName());
 
@@ -267,11 +286,11 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
 
             json.addProperty("hammering", this.hammering);
             // Add quality flag if not null
-            if (this.hasQuality != null || this.hasQuality) {
+            if (this.hasQuality != null) {
                 json.addProperty("has_quality", this.hasQuality);
             }
 
-            if (this.hasPolishing != null || this.hasPolishing) {
+            if (this.hasPolishing != null) {
                 json.addProperty("has_polishing", this.hasPolishing);
             }
 

@@ -63,6 +63,17 @@ public enum BlueprintQuality {
         return null; // Already at max
     }
 
+    /**
+     * Get the previous tier of blueprint quality.
+     */
+    public static BlueprintQuality getPrevious(BlueprintQuality current) {
+        int index = current.ordinal();
+        if (index - 1 >= 0) {
+            return values()[index - 1];
+        }
+        return null; // Already at lowest
+    }
+
     public String getId() {
         return id;
     }

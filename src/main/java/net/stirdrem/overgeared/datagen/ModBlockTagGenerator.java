@@ -2,7 +2,9 @@ package net.stirdrem.overgeared.datagen;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -43,6 +45,9 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.NEEDS_IRON_TOOL)
                 .add(ModBlocks.STEEL_BLOCK.get()
                 );
+
+        this.tag(BlockTags.create(ResourceLocation.tryBuild("forge", "storage_blocks/steel")))
+                .add(ModBlocks.STEEL_BLOCK.get());
 
        /* this.tag(BlockTags.NEEDS_DIAMOND_TOOL)
                 .add(ModBlocks.RAW_SAPPHIRE_BLOCK.get());

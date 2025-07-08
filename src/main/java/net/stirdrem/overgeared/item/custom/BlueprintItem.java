@@ -29,7 +29,7 @@ public class BlueprintItem extends Item {
         tag.putInt("UsesToLevel", getUsesToNextLevel(BlueprintQuality.POOR));
 
         // Set default tool type to first available or SWORD
-        List<ToolType> types = ToolTypeRegistry.getRegisteredTypes();
+        List<ToolType> types = ToolTypeRegistry.getRegisteredTypesAll();
         tag.putString("ToolType", !types.isEmpty() ? types.get(0).getId() : "SWORD");
 
         return stack;
@@ -43,35 +43,50 @@ public class BlueprintItem extends Item {
         CompoundTag tag = stack.getTag();
         if (tag == null) return;
 
-        BlueprintQuality quality = getQuality(stack);
-        int uses = getUses(stack);
-        int usesToLevel = getUsesToNextLevel(stack);
-        ToolType toolType = getToolType(stack);
+        // Only show quality/progress if both tags are present
+        if (tag.contains("Quality") && tag.contains("Uses")) {
+            BlueprintQuality quality = getQuality(stack);
+            int uses = getUses(stack);
+            int usesToLevel = getUsesToNextLevel(stack);
 
-        // Quality line
-        tooltip.add(Component.translatable("tooltip.overgeared.blueprint.quality").withStyle(ChatFormatting.GRAY)
-                .append(Component.translatable(quality.getTranslationKey()).withStyle(quality.getColor())));
+            tooltip.add(Component.translatable("tooltip.overgeared.blueprint.quality").withStyle(ChatFormatting.GRAY)
+                    .append(Component.translatable(quality.getTranslationKey()).withStyle(quality.getColor())));
 
-        // Progress line
-        if (quality != BlueprintQuality.PERFECT && quality != BlueprintQuality.MASTER) {
-            tooltip.add(Component.translatable("tooltip.overgeared.blueprint.progress",
-                    uses, usesToLevel).withStyle(ChatFormatting.GRAY));
-        } else {
-            tooltip.add(Component.translatable("tooltip.overgeared.blueprint.maxlevel")
-                    .withStyle(ChatFormatting.LIGHT_PURPLE));
+            if (quality != BlueprintQuality.PERFECT && quality != BlueprintQuality.MASTER) {
+                tooltip.add(Component.translatable("tooltip.overgeared.blueprint.progress", uses, usesToLevel)
+                        .withStyle(ChatFormatting.GRAY));
+            } else {
+                tooltip.add(Component.translatable("tooltip.overgeared.blueprint.maxlevel")
+                        .withStyle(ChatFormatting.LIGHT_PURPLE));
+            }
+
+            if (flag.isAdvanced()) {
+                tooltip.add(Component.translatable("tooltip.overgeared.blueprint.instructions")
+                        .withStyle(ChatFormatting.GRAY));
+                tooltip.add(Component.translatable("tooltip.overgeared.blueprint.progress", uses, usesToLevel)
+                        .withStyle(ChatFormatting.GRAY));
+            }
         }
 
-        // Tool type line
-        tooltip.add(Component.translatable("tooltip.overgeared.blueprint.tool_type").withStyle(ChatFormatting.GRAY)
-                .append(toolType.getDisplayName().withStyle(ChatFormatting.BLUE)));
-
-        // Instruction line
-        if (flag.isAdvanced()) {
-            tooltip.add(Component.translatable("tooltip.overgeared.blueprint.instructions")
-                    .withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.overgeared.blueprint.progress", uses, usesToLevel).withStyle(ChatFormatting.GRAY));
+        // ToolType line only if present
+        if (tag.contains("ToolType")) {
+            ToolType toolType = getToolType(stack);
+            tooltip.add(Component.translatable("tooltip.overgeared.blueprint.tool_type").withStyle(ChatFormatting.GRAY)
+                    .append(toolType.getDisplayName().withStyle(ChatFormatting.BLUE)));
         }
+
+        if (tag.contains("Required")) {
+            boolean required = tag.getBoolean("Required");
+
+            tooltip.add(Component.translatable(
+                    required
+                            ? "tooltip.overgeared.blueprint.required"
+                            : "tooltip.overgeared.blueprint.optional"
+            ).withStyle(required ? ChatFormatting.RED : ChatFormatting.GRAY));
+        }
+
     }
+
 
     public static BlueprintQuality getQuality(ItemStack stack) {
         CompoundTag tag = stack.getTag();
@@ -97,7 +112,7 @@ public class BlueprintItem extends Item {
     public static ToolType getToolType(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         if (tag == null || !tag.contains("ToolType")) {
-            List<ToolType> types = ToolTypeRegistry.getRegisteredTypes();
+            List<ToolType> types = ToolTypeRegistry.getRegisteredTypesAll();
             return !types.isEmpty() ? types.get(0) : ToolType.SWORD; // Default to first available or SWORD
         }
         return ToolTypeRegistry.byId(tag.getString("ToolType"))
@@ -105,7 +120,7 @@ public class BlueprintItem extends Item {
     }
 
     public static void cycleToolType(ItemStack stack) {
-        List<ToolType> available = ToolTypeRegistry.getRegisteredTypes();
+        List<ToolType> available = ToolTypeRegistry.getRegisteredTypesAll();
         if (available.isEmpty()) return;
 
         ToolType current = getToolType(stack);
@@ -123,5 +138,15 @@ public class BlueprintItem extends Item {
             case PERFECT -> BlueprintQuality.PERFECT.getUse();
             case MASTER -> BlueprintQuality.MASTER.getUse();
         };
+    }
+
+    @Override
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+        return itemStack.copy();
     }
 }

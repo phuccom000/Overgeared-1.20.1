@@ -35,7 +35,7 @@ public class ClientAnvilMinigameData {
     public static float zoneShrinkFactor = 0.80f;
     public static float zoneShiftAmount = 15.0f;
     public static Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
-
+    public static int skillLevel = 0;
 
     /*private static PlayerMinigameData ClientAnvilMinigameData {
         Minecraft mc = Minecraft.getInstance();
@@ -265,9 +265,11 @@ public class ClientAnvilMinigameData {
         pendingMinigamePos = null;
     }
 
+    public static int getSkillLevel() {
+        return skillLevel;
+    }
 
-
-    /*public static void clearData(UUID playerId) {
+/*public static void clearData(UUID playerId) {
         playerData.remove(playerId);
     }*/
 }

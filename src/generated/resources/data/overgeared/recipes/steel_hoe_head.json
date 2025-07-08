@@ -1,6 +1,8 @@
 {
   "type": "overgeared:forging",
-  "blueprint": "HOE",
+  "blueprint": [
+    "hoe"
+  ],
   "category": "misc",
   "hammering": 4,
   "has_polishing": true,
@@ -13,6 +15,7 @@
   "pattern": [
     "##"
   ],
+  "requires_blueprint": false,
   "result": {
     "item": "overgeared:steel_hoe_head"
   },

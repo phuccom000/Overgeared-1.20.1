@@ -3,6 +3,7 @@ package net.stirdrem.overgeared.event;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -40,6 +41,7 @@ import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.util.ModTags;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -332,7 +334,7 @@ public class ModEvents {
                     anvil.setProgress(0);
                     anvil.setChanged();
                 }
-                SmithingHammer.releaseAnvil(player, anvilPos);
+                ModItemInteractEvents.releaseAnvil(player, anvilPos);
             }
             minigame.reset(player);
             minigame.setIsVisible(false, player);
@@ -351,17 +353,66 @@ public class ModEvents {
 
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {
-        // You can check other vanilla items similarly
-        if (event.getItemStack().is(Items.FLINT)) {
-            event.getToolTip().add(Component.translatable("tooltip.overgeared.flint_flavor")
+        ItemStack stack = event.getItemStack();
+        List<Component> tooltip = event.getToolTip();
+        int insertOffset = 1;
+
+        if (stack.is(Items.FLINT)) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.flint_flavor")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
-        if (event.getItemStack().is(ModTags.Items.HEATED_METALS)) {
-            event.getToolTip().add(Component.translatable("tooltip.overgeared.heatedingots.tooltip").withStyle(ChatFormatting.RED));
+
+        if (stack.is(ModTags.Items.HEATED_METALS)) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatedingots.tooltip")
+                    .withStyle(ChatFormatting.RED));
         }
 
-        if (event.getItemStack().is(ModTags.Items.HEATABLE_METALS)) {
-            event.getToolTip().add(Component.translatable("tooltip.overgeared.heatablemetals.tooltip").withStyle(ChatFormatting.DARK_GRAY));
+        if (stack.is(ModTags.Items.HEATABLE_METALS)) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatablemetals.tooltip")
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        }
+
+        // Add Forging Quality
+        boolean hasForgingQuality = false;
+        if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
+            hasForgingQuality = true;
+            String quality = stack.getTag().getString("ForgingQuality");
+            Component qualityComponent = switch (quality) {
+                case "poor" -> Component.translatable("tooltip.overgeared.poor").withStyle(ChatFormatting.RED);
+                case "well" -> Component.translatable("tooltip.overgeared.well").withStyle(ChatFormatting.YELLOW);
+                case "expert" -> Component.translatable("tooltip.overgeared.expert").withStyle(ChatFormatting.BLUE);
+                case "perfect" -> Component.translatable("tooltip.overgeared.perfect").withStyle(ChatFormatting.GOLD);
+                case "master" ->
+                        Component.translatable("tooltip.overgeared.master").withStyle(ChatFormatting.LIGHT_PURPLE);
+                default -> null;
+            };
+            if (qualityComponent != null) {
+                tooltip.add(insertOffset++, qualityComponent);
+            }
+        }
+
+        // Add Polish status
+        if (stack.hasTag() && stack.getTag().contains("Polished")) {
+            boolean isPolished = stack.getTag().getBoolean("Polished");
+            Component polishComponent = isPolished
+                    ? Component.translatable("tooltip.overgeared.polished").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC)
+                    : Component.translatable("tooltip.overgeared.unpolished").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+            tooltip.add(insertOffset++, polishComponent);
+        }
+
+        // Smithing Hammer special tooltip
+        if (stack.is(ModTags.Items.SMITHING_HAMMERS)) {
+            if (!Screen.hasShiftDown()) {
+                tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.smithing_hammer.hold_shift")
+                        .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+            } else {
+                tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line1")
+                        .withStyle(ChatFormatting.GRAY));
+                tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line2")
+                        .withStyle(ChatFormatting.GRAY));
+                tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line3")
+                        .withStyle(ChatFormatting.GRAY));
+            }
         }
     }
 }

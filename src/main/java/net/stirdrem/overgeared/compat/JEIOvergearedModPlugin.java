@@ -9,16 +9,22 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraftforge.common.Tags;
+import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
+import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
 import net.stirdrem.overgeared.screen.RockKnappingScreen;
 import net.stirdrem.overgeared.screen.SteelSmithingAnvilScreen;
 import net.stirdrem.overgeared.screen.StoneSmithingAnvilScreen;
+import net.stirdrem.overgeared.util.ModTags;
 
 import java.util.List;
+import java.util.Map;
 
 @JeiPlugin
 public class JEIOvergearedModPlugin implements IModPlugin {
@@ -38,12 +44,46 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         if (Minecraft.getInstance().level == null) return;
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 
-        List<ForgingRecipe> forgingRecipes = recipeManager.getAllRecipesFor(ForgingRecipe.Type.INSTANCE);
-        registration.addRecipes(ForgingRecipeCategory.FORGING_RECIPE_TYPE, forgingRecipes);
+        List<ForgingRecipe> allForgingRecipes = recipeManager.getAllRecipesFor(ForgingRecipe.Type.INSTANCE);
+
+        // Filter stone and steel recipes
+        List<ForgingRecipe> stoneTierRecipes = allForgingRecipes.stream()
+                .filter(recipe -> recipe.getAnvilTier().equalsIgnoreCase(AnvilTier.STONE.getDisplayName()))
+                .toList();
+
+        List<ForgingRecipe> steelTierRecipes = allForgingRecipes.stream()
+                .filter(recipe -> recipe.getAnvilTier().equalsIgnoreCase(AnvilTier.STEEL.getDisplayName()))
+                .toList();
+
+        // Add only stone-tier recipes to Stone Forging JEI category
+        //registration.addRecipes(ForgingRecipeCategory.FORGING_RECIPE_TYPE, stoneTierRecipes);
+
+        // Add steel-tier AND stone-tier to Steel Forging JEI category
+        List<ForgingRecipe> combinedSteelCategory = new java.util.ArrayList<>();
+        combinedSteelCategory.addAll(stoneTierRecipes);
+        combinedSteelCategory.addAll(steelTierRecipes);
+        combinedSteelCategory.sort((a, b) -> {
+            String catA = categorizeRecipe(a);
+            String catB = categorizeRecipe(b);
+
+            int priorityA = categoryPriority.getOrDefault(catA, 999);
+            int priorityB = categoryPriority.getOrDefault(catB, 999);
+
+            if (priorityA != priorityB) {
+                return Integer.compare(priorityA, priorityB);
+            }
+
+            // Fallback: alphabetical by display name
+            return a.getResultItem(null).getDisplayName().getString()
+                    .compareToIgnoreCase(b.getResultItem(null).getDisplayName().getString());
+        });
+        registration.addRecipes(ForgingRecipeCategory.FORGING_RECIPE_TYPE, combinedSteelCategory);
+
+        // Rock Knapping
         List<RockKnappingRecipe> knappingRecipes = recipeManager.getAllRecipesFor(RockKnappingRecipe.Type.INSTANCE);
         registration.addRecipes(KnappingRecipeCategory.KNAPPING_RECIPE_TYPE, knappingRecipes);
-
     }
+
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
@@ -63,6 +103,31 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 new ItemStack(ModBlocks.SMITHING_ANVIL.get()), // or your custom source block
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE
         );
+        registration.addRecipeCatalyst(
+                new ItemStack(Items.FLINT), // or your custom source block
+                KnappingRecipeCategory.KNAPPING_RECIPE_TYPE
+        );
+        registration.addRecipeCatalyst(
+                new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()), // or your custom source block
+                ForgingRecipeCategory.FORGING_RECIPE_TYPE
+        );
+    }
+
+    Map<String, Integer> categoryPriority = Map.of(
+            "tool_head", 0,
+            "tools", 1,
+            "armor", 2,
+            "plate", 3,
+            "misc", 4
+    );
+
+    private static String categorizeRecipe(ForgingRecipe recipe) {
+        ItemStack output = recipe.getResultItem(null);
+        if (output.is(Tags.Items.ARMORS)) return "armor";
+        if (output.is(ModTags.Items.TOOL_PARTS)) return "tool_head";
+        if (output.is(Tags.Items.TOOLS)) return "tools";
+        if (output.is(ModItems.IRON_PLATE.get()) || output.is(ModItems.STEEL_PLATE.get())) return "plate";
+        return "misc";
     }
 
 }

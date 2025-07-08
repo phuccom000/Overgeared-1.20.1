@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
@@ -95,13 +96,13 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "nuggets/steel")))
                 .add(ModItems.STEEL_NUGGET.get());
 
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "armors/helmets")))
+        this.tag(Tags.Items.ARMORS_HELMETS)
                 .add(ModItems.STEEL_HELMET.get());
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "armors/chestplates")))
+        this.tag(Tags.Items.ARMORS_CHESTPLATES)
                 .add(ModItems.STEEL_CHESTPLATE.get());
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "armors/leggings")))
+        this.tag(Tags.Items.ARMORS_LEGGINGS)
                 .add(ModItems.STEEL_LEGGINGS.get());
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "armors/boots")))
+        this.tag(Tags.Items.ARMORS_BOOTS)
                 .add(ModItems.STEEL_BOOTS.get());
 
         this.tag(Tags.Items.TOOLS)

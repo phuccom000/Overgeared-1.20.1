@@ -1,15 +1,9 @@
 package net.stirdrem.overgeared.recipe;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
@@ -21,36 +15,37 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.item.ModItems;
 
 import java.util.*;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ForgingRecipe implements Recipe<Container> {
     private final ResourceLocation id;
     private final String group;
-    private final String blueprint;
+    private final Set<String> blueprintTypes;
     private final String tier;
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result;
     private final int hammering;
     private final boolean hasQuality;
+    private final boolean requiresBlueprint;
     private final boolean hasPolishing;
     private final boolean showNotification;
     public final int width;
     public final int height;
+    private static int BLUEPRINT_SLOT = 11;
 
-    public ForgingRecipe(ResourceLocation id, String group, String blueprint, String tier, NonNullList<Ingredient> ingredients,
+    public ForgingRecipe(ResourceLocation id, String group, boolean requireBlueprint, Set<String> blueprintTypes, String tier, NonNullList<Ingredient> ingredients,
                          ItemStack result, int hammering, boolean hasQuality, boolean hasPolishing, boolean showNotification, int width, int height) {
         this.id = id;
         this.group = group;
-        this.blueprint = blueprint;
+        this.blueprintTypes = blueprintTypes;
         this.tier = tier;
         this.ingredients = ingredients;
         this.result = result;
         this.hammering = hammering;
         this.hasQuality = hasQuality;
+        this.requiresBlueprint = requireBlueprint;
         this.hasPolishing = hasPolishing;
         this.showNotification = showNotification;
         this.width = width;
@@ -58,31 +53,23 @@ public class ForgingRecipe implements Recipe<Container> {
     }
 
     private boolean checkBlueprint(Container inv) {
-        // Get blueprint item from slot 11
-        ItemStack blueprintStack = inv.getItem(11);
-        // If recipe doesn't require a blueprint, skip check
-        if (this.blueprint.isEmpty()) {
-            if (!blueprintStack.isEmpty()) {
-                return false;
-            }
-            return true;
+        ItemStack blueprintStack = inv.getItem(BLUEPRINT_SLOT);
+
+        // If no blueprints required
+        if (blueprintTypes.isEmpty()) {
+            return blueprintStack.isEmpty();
         }
 
-        // Basic checks - is there a blueprint item at all?
-        if (blueprintStack.isEmpty()) {
-            return false;
-        }
+        // Blueprint required, but slot empty
+        if (blueprintStack.isEmpty()) return false;
 
-        // Check NBT data
         CompoundTag nbt = blueprintStack.getTag();
-        if (nbt == null || !nbt.contains("ToolType")) {
-            return false; // Missing required ToolType tag
-        }
+        if (nbt == null || !nbt.contains("ToolType")) return false;
 
-        // Compare ToolType with recipe's blueprint requirement
-        String blueprintToolType = nbt.getString("ToolType");
-        return blueprintToolType.equals(this.blueprint);
+        String toolType = nbt.getString("ToolType");
+        return blueprintTypes.contains(toolType);
     }
+
 
     @Override
     public boolean matches(Container inv, Level world) {
@@ -101,10 +88,6 @@ public class ForgingRecipe implements Recipe<Container> {
                 }
             }
         }
-       /* if (inv.getItem(11).is(ModItems.BLUEPRINT.get()))
-            if (!checkBlueprint(inv)) {
-                return false;
-            }*/
 
         return bestMatch == this;
     }
@@ -239,8 +222,14 @@ public class ForgingRecipe implements Recipe<Container> {
         return hasPolishing;
     }
 
-    public String getBlueprint() {
-        return blueprint;
+    public Set<String> getBlueprintTypes() {
+        return blueprintTypes.stream()
+                .map(s -> s.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+    }
+
+    public boolean requiresBlueprint() {
+        return requiresBlueprint;
     }
 
     public static class Type implements RecipeType<ForgingRecipe> {
@@ -255,7 +244,28 @@ public class ForgingRecipe implements Recipe<Container> {
         @Override
         public ForgingRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
             String group = GsonHelper.getAsString(json, "group", "");
-            String blueprint = GsonHelper.getAsString(json, "blueprint", "");
+            Set<String> blueprintTypes = new LinkedHashSet<>();
+            if (json.has("blueprint")) {
+                JsonElement blueprintElement = json.get("blueprint");
+
+                if (blueprintElement.isJsonArray()) {
+                    for (JsonElement element : blueprintElement.getAsJsonArray()) {
+                        String bp = element.getAsString().toLowerCase(Locale.ROOT);
+                        if (!bp.isBlank()) {
+                            blueprintTypes.add(bp);
+                        }
+                    }
+                } else if (blueprintElement.isJsonPrimitive()) {
+                    String bp = blueprintElement.getAsString().toLowerCase(Locale.ROOT);
+                    if (!bp.isBlank()) {
+                        blueprintTypes.add(bp);
+                    }
+                } else {
+                    throw new JsonSyntaxException("'blueprint' must be either a string or array of strings");
+                }
+            }
+            boolean requiresBlueprint = GsonHelper.getAsBoolean(json, "requires_blueprint", false);
+
             String tier = GsonHelper.getAsString(json, "tier", "steel");
             int hammering = GsonHelper.getAsInt(json, "hammering", 1);
             boolean hasQuality = GsonHelper.getAsBoolean(json, "has_quality", true);
@@ -270,7 +280,7 @@ public class ForgingRecipe implements Recipe<Container> {
             NonNullList<Ingredient> ingredients = dissolvePattern(pattern, keyMap, width, height);
 
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
-            return new ForgingRecipe(recipeId, group, blueprint, tier, ingredients, result, hammering, hasQuality, hasPolishing, showNotification, width, height);
+            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, hammering, hasQuality, hasPolishing, showNotification, width, height);
         }
 
         private static Map<Character, Ingredient> parseKey(JsonObject keyJson) {
@@ -309,7 +319,12 @@ public class ForgingRecipe implements Recipe<Container> {
         @Override
         public ForgingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             String group = buffer.readUtf();
-            String blueprint = buffer.readUtf();
+            boolean requiresBlueprint = buffer.readBoolean();  // Changed order to match writing
+            int blueprintCount = buffer.readVarInt();
+            Set<String> blueprintTypes = new LinkedHashSet<>();
+            for (int i = 0; i < blueprintCount; i++) {
+                blueprintTypes.add(buffer.readUtf());
+            }
             String tier = buffer.readUtf();
             int hammering = buffer.readVarInt();
             boolean hasQuality = buffer.readBoolean();  // Changed order to match writing
@@ -324,13 +339,17 @@ public class ForgingRecipe implements Recipe<Container> {
             }
 
             ItemStack result = buffer.readItem();
-            return new ForgingRecipe(recipeId, group, blueprint, tier, ingredients, result, hammering, hasQuality, hasPolishing, showNotification, width, height);
+            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, hammering, hasQuality, hasPolishing, showNotification, width, height);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buffer, ForgingRecipe recipe) {
             buffer.writeUtf(recipe.group);
-            buffer.writeUtf(recipe.blueprint);
+            buffer.writeBoolean(recipe.requiresBlueprint);
+            buffer.writeVarInt(recipe.blueprintTypes.size());
+            for (String type : recipe.blueprintTypes) {
+                buffer.writeUtf(type);
+            }
             buffer.writeUtf(recipe.tier);
             buffer.writeVarInt(recipe.hammering);
             buffer.writeBoolean(recipe.hasQuality);

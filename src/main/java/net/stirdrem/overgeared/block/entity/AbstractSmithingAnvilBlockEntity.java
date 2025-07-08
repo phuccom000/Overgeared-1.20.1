@@ -35,6 +35,7 @@ import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvil;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.event.ModItemInteractEvents;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
@@ -217,13 +218,13 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         maxProgress = 0;
         lastRecipe = null;
         //ClientAnvilMinigameData.setHitsRemaining(0);
-        ServerPlayer user = SmithingHammer.getUsingPlayer(getBlockPos());
+        ServerPlayer user = ModItemInteractEvents.getUsingPlayer(getBlockPos());
         if (user != null) {
             user.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                 minigame.resetNBTData();
                 //minigame.reset(user);
                 //minigame.setIsVisible(false, user);
-                SmithingHammer.releaseAnvil(user, getBlockPos());
+                ModItemInteractEvents.releaseAnvil(user, getBlockPos());
                 //ModMessages.sendToPlayer(new MinigameSyncS2CPacket(new CompoundTag().putBoolean("isVisible", false)), user);
             });
         }
@@ -252,11 +253,11 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                         }
                         tag.putString("ForgingQuality", quality);
                     }
-                    if (!(result.getItem() instanceof ShieldItem) && recipe.hasPolishing())
+                    if (!(result.getItem() instanceof ArmorItem) && !(result.getItem() instanceof ShieldItem) && recipe.hasPolishing())
                         tag.putBoolean("Polished", false);
                 }
             } else {
-                if (!(result.getItem() instanceof ShieldItem))
+                if (!(result.getItem() instanceof ArmorItem) && !(result.getItem() instanceof ShieldItem))
                     tag.putBoolean("Polished", false);
             }
             result.setTag(tag);
@@ -492,14 +493,14 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
         // Ensure any players are reset
-        ServerPlayer user = SmithingHammer.getUsingPlayer(getBlockPos());
+        ServerPlayer user = ModItemInteractEvents.getUsingPlayer(getBlockPos());
         if (user != null) {
             user.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                 //minigame.resetNBTData();
                 minigame.reset(user);
                 //minigame.setIsVisible(false, user);
                 progress = 0;
-                SmithingHammer.releaseAnvil(user, getBlockPos());
+                ModItemInteractEvents.releaseAnvil(user, getBlockPos());
                 //ModMessages.sendToPlayer(new MinigameSyncS2CPacket(new CompoundTag().putBoolean("isVisible", false)), user);
             });
         }
