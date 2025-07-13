@@ -1,18 +1,15 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "minecraft:crafting_shapeless",
   "category": "equipment",
-  "key": {
-    "x": {
-      "item": "minecraft:iron_ingot"
+  "ingredients": [
+    {
+      "item": "overgeared:iron_tong"
+    },
+    {
+      "item": "overgeared:iron_tong"
     }
-  },
-  "pattern": [
-    " x ",
-    "xxx",
-    " x "
   ],
   "result": {
     "item": "overgeared:iron_tongs"
-  },
-  "show_notification": true
+  }
 }

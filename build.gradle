@@ -234,7 +234,7 @@ dependencies {
     implementation(fg.deobf("curse.maven:bookling-gear-1122766:6628791"))*/
     //implementation(fg.deobf("curse.maven:durability-tooltip-511040:4741017"))
     //implementation(fg.deobf("curse.maven:supermartijn642s-config-lib-438332:4715408"))
-    //implementation fg.deobf("xaero:ItemNBTViewer-Forge-1.20:1.0.2")
+    //runtimeOnly fg.deobf("xaero:ItemNBTViewer-Forge-1.20:1.0.2")
     //runtimeOnly(fg.deobf("dev.latvian.mods:kubejs-forge:2001.6.4-build.95"))
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar

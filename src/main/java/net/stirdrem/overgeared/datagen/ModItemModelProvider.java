@@ -47,11 +47,15 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.ROCK);
         simpleItem(ModItems.STEEL_INGOT);
         simpleItem(ModItems.STEEL_NUGGET);
+        simpleItem(ModItems.COPPER_NUGGET);
+        simpleItem(ModItems.HEATED_COPPER_INGOT);
         simpleItem(ModItems.HEATED_IRON_INGOT);
         simpleItem(ModItems.HEATED_STEEL_INGOT);
+        simpleItem(ModItems.COPPER_PLATE);
         simpleItem(ModItems.IRON_PLATE);
         simpleItem(ModItems.STEEL_PLATE);
         simpleItem(ModItems.STEEL_TONG);
+        simpleItem(ModItems.IRON_TONG);
         simpleItem(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE);
         simpleItem(ModItems.EMPTY_BLUEPRINT);
         simpleItem(ModItems.BLUEPRINT);
@@ -59,6 +63,11 @@ public class ModItemModelProvider extends ItemModelProvider {
         trimmedArmorItem(ModItems.STEEL_BOOTS);
         trimmedArmorItem(ModItems.STEEL_CHESTPLATE);
         trimmedArmorItem(ModItems.STEEL_LEGGINGS);
+        trimmedArmorItem(ModItems.COPPER_HELMET);
+        trimmedArmorItem(ModItems.COPPER_CHESTPLATE);
+        trimmedArmorItemWithOverlay(ModItems.COPPER_LEGGINGS);
+        trimmedArmorItem(ModItems.COPPER_BOOTS);
+
         simpleHandheld(ModItems.IRON_TONGS);
         simpleHandheld(ModItems.STEEL_TONGS);
         simpleHandheld(ModItems.SMITHING_HAMMER);
@@ -68,12 +77,18 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleHandheld(ModItems.STEEL_AXE);
         simpleHandheld(ModItems.STEEL_SHOVEL);
         simpleHandheld(ModItems.STEEL_HOE);
+        simpleHandheld(ModItems.COPPER_SWORD);
+        simpleHandheld(ModItems.COPPER_PICKAXE);
+        simpleHandheld(ModItems.COPPER_AXE);
+        simpleHandheld(ModItems.COPPER_SHOVEL);
+        simpleHandheld(ModItems.COPPER_HOE);
 
         // Sword Blades
         simpleItem(ModItems.STONE_SWORD_BLADE);
         simpleItem(ModItems.IRON_SWORD_BLADE);
         simpleItem(ModItems.GOLDEN_SWORD_BLADE);
         simpleItem(ModItems.STEEL_SWORD_BLADE);
+        simpleItem(ModItems.COPPER_SWORD_BLADE);
         //simpleItem(ModItems.DIAMOND_SWORD_BLADE);
 
         // Pickaxe Heads
@@ -81,6 +96,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.IRON_PICKAXE_HEAD);
         simpleItem(ModItems.GOLDEN_PICKAXE_HEAD);
         simpleItem(ModItems.STEEL_PICKAXE_HEAD);
+        simpleItem(ModItems.COPPER_PICKAXE_HEAD);
         //simpleItem(ModItems.DIAMOND_PICKAXE_HEAD);
 
         // Axe Heads
@@ -88,6 +104,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.IRON_AXE_HEAD);
         simpleItem(ModItems.GOLDEN_AXE_HEAD);
         simpleItem(ModItems.STEEL_AXE_HEAD);
+        simpleItem(ModItems.COPPER_AXE_HEAD);
         //simpleItem(ModItems.DIAMOND_AXE_HEAD);
 
         // Shovel Heads
@@ -95,6 +112,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.IRON_SHOVEL_HEAD);
         simpleItem(ModItems.GOLDEN_SHOVEL_HEAD);
         simpleItem(ModItems.STEEL_SHOVEL_HEAD);
+        simpleItem(ModItems.COPPER_SHOVEL_HEAD);
         //simpleItem(ModItems.DIAMOND_SHOVEL_HEAD);
 
         // Hoe Heads
@@ -102,6 +120,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.IRON_HOE_HEAD);
         simpleItem(ModItems.GOLDEN_HOE_HEAD);
         simpleItem(ModItems.STEEL_HOE_HEAD);
+        simpleItem(ModItems.COPPER_HOE_HEAD);
         //simpleItem(ModItems.DIAMOND_HOE_HEAD);
 
     }
@@ -151,6 +170,53 @@ public class ModItemModelProvider extends ItemModelProvider {
                         .texture("layer0",
                                 ResourceLocation.tryBuild(MOD_ID,
                                         "item/" + itemRegistryObject.getId().getPath()));
+            });
+        }
+    }
+
+    private void trimmedArmorItemWithOverlay(RegistryObject<Item> itemRegistryObject) {
+        final String MOD_ID = OvergearedMod.MOD_ID;
+
+        if (itemRegistryObject.get() instanceof ArmorItem armorItem) {
+            trimMaterials.entrySet().forEach(entry -> {
+                ResourceKey<TrimMaterial> trimMaterial = entry.getKey();
+                float trimValue = entry.getValue();
+
+                String armorType = switch (armorItem.getEquipmentSlot()) {
+                    case HEAD -> "helmet";
+                    case CHEST -> "chestplate";
+                    case LEGS -> "leggings";
+                    case FEET -> "boots";
+                    default -> "";
+                };
+
+                String armorItemPath = "item/" + itemRegistryObject.getId().getPath();
+                String trimPath = "trims/items/" + armorType + "_trim_" + trimMaterial.location().getPath();
+                String currentTrimName = armorItemPath + "_" + trimMaterial.location().getPath() + "_trim";
+
+                ResourceLocation armorItemResLoc = ResourceLocation.tryBuild(MOD_ID, armorItemPath);
+                ResourceLocation overlayResLoc = ResourceLocation.tryBuild(MOD_ID, armorItemPath + "_overlay");
+                ResourceLocation trimResLoc = ResourceLocation.tryParse(trimPath); // "minecraft" namespace
+                ResourceLocation trimNameResLoc = ResourceLocation.tryBuild(MOD_ID, currentTrimName);
+
+                existingFileHelper.trackGenerated(trimResLoc, PackType.CLIENT_RESOURCES, ".png", "textures");
+
+                // 🔷 Trimmed variant: layer0 = base, layer1 = overlay, layer2 = trim
+                getBuilder(currentTrimName)
+                        .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                        .texture("layer0", armorItemResLoc)
+                        .texture("layer1", trimResLoc)
+                        .texture("layer2", overlayResLoc);
+
+                // 🔷 Base item model (untrimmed)
+                this.withExistingParent(itemRegistryObject.getId().getPath(),
+                                mcLoc("item/generated"))
+                        .texture("layer0", armorItemResLoc)
+                        .texture("layer1", overlayResLoc) // overlay always included
+                        .override()
+                        .model(new ModelFile.UncheckedModelFile(trimNameResLoc))
+                        .predicate(mcLoc("trim_type"), trimValue)
+                        .end();
             });
         }
     }

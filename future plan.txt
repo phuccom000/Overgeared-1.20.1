@@ -4,7 +4,6 @@ Add fletching capability to Fletching Table
 Add Iron-forged and Steel-forged Bows
 add compat to archery expansion
 
-add blueprint and blueprint slot to the anvil
 add a higher tier blast furnace (multi block structure)
 
 Fletching Table idea
@@ -16,17 +15,10 @@ The potion that was used for tipping will have the potion duration reduced based
 You can also change the tips of the arrows in the fletching table
 So for example you have too much flint tips you can still change it to iron or steel tips
 
-Blueprint for items and anvil:
-Blueprint can be crafted in a new block called Designer Table, and it starts out at Well Forged
-The blueprint set the highest quality level you can get from that tool
-Can have items with the same recipe shape because blueprint is different
-You need to forge continuously to increase the level of the blueprint
-the max level for blueprint is customizable (default: perfect)
+Add tiered horseshoes (iron, steel, diamond) that increase a horse's speed and jumping ability
+make horse armors and horse shoes craftable
 
-add a stone anvil
-change crude steel to only be craftable in stone anvil
-replace iron tongs with smithing chopsticks
-
+add copper armor and tools from 1.21.7
 
 (unsure)
 add a mold system for ingots

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "overgeared:item/copper_leggings",
+    "layer1": "minecraft:trims/items/leggings_trim_gold",
+    "layer2": "overgeared:item/copper_leggings_overlay"
+  }
+}

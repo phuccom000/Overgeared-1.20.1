@@ -1,0 +1,23 @@
+{
+  "type": "overgeared:forging",
+  "category": "armors",
+  "hammering": 5,
+  "has_polishing": false,
+  "has_quality": true,
+  "key": {
+    "#": {
+      "item": "overgeared:copper_plate"
+    }
+  },
+  "pattern": [
+    "# #",
+    "###",
+    "###"
+  ],
+  "requires_blueprint": false,
+  "result": {
+    "item": "overgeared:copper_chestplate"
+  },
+  "show_notification": true,
+  "tier": "stone"
+}

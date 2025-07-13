@@ -2,6 +2,7 @@
   "values": [
     "overgeared:steel_ingot",
     "minecraft:iron_ingot",
-    "overgeared:crude_steel"
+    "overgeared:crude_steel",
+    "minecraft:copper_ingot"
   ]
 }

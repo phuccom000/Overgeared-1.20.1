@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -230,5 +231,48 @@ public abstract class ItemStackMixin {
 
     }
 
+
+    @Inject(method = "getBarWidth", at = @At("HEAD"), cancellable = true)
+    private void fixDurabilityBar(CallbackInfoReturnable<Integer> cir) {
+        ItemStack stack = (ItemStack) (Object) this;
+
+        if (!stack.isDamageableItem()) return;
+
+        int maxDamage = stack.getMaxDamage(); // this already includes your mixin override
+        int damage = stack.getDamageValue();
+
+        // Clamp to valid range
+        if (damage >= maxDamage) {
+            cir.setReturnValue(0);
+            return;
+        }
+
+        int width = Math.round(13.0F - (float) damage * 13.0F / (float) maxDamage);
+        cir.setReturnValue(width);
+    }
+
+    @Inject(method = "getBarColor", at = @At("HEAD"), cancellable = true)
+    private void fixDurabilityBarColor(CallbackInfoReturnable<Integer> cir) {
+        ItemStack stack = (ItemStack) (Object) this;
+
+        if (!stack.isDamageableItem()) return;
+
+        int max = stack.getMaxDamage(); // Includes quality/durability changes
+        int damage = stack.getDamageValue();
+
+        if (max <= 0) {
+            cir.setReturnValue(0xFFFFFF); // fallback white
+            return;
+        }
+
+        float ratio = Math.max(0.0F, 1.0F - (float) damage / (float) max);
+
+        // Vanilla bar color: hue from red (0.0) to green (0.333...)
+        float hue = ratio / 3.0F; // [0, 0.33]
+
+        int color = Mth.hsvToRgb(hue, 1.0F, 1.0F);
+
+        cir.setReturnValue(color);
+    }
 }
 

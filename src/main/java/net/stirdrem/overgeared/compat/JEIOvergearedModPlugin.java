@@ -2,6 +2,7 @@ package net.stirdrem.overgeared.compat;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
@@ -82,6 +83,8 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         // Rock Knapping
         List<RockKnappingRecipe> knappingRecipes = recipeManager.getAllRecipesFor(RockKnappingRecipe.Type.INSTANCE);
         registration.addRecipes(KnappingRecipeCategory.KNAPPING_RECIPE_TYPE, knappingRecipes);
+
+        registration.addRecipes(RecipeTypes.CRAFTING, BlueprintCloningRecipeMaker.createRecipes(registration.getJeiHelpers()));
     }
 
 
@@ -126,7 +129,8 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         if (output.is(Tags.Items.ARMORS)) return "armor";
         if (output.is(ModTags.Items.TOOL_PARTS)) return "tool_head";
         if (output.is(Tags.Items.TOOLS)) return "tools";
-        if (output.is(ModItems.IRON_PLATE.get()) || output.is(ModItems.STEEL_PLATE.get())) return "plate";
+        if (output.is(ModItems.IRON_PLATE.get()) || output.is(ModItems.STEEL_PLATE.get()) || output.is(ModItems.COPPER_PLATE.get()))
+            return "plate";
         return "misc";
     }
 

@@ -29,11 +29,23 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
             ModItems.CRUDE_STEEL.get()
     );
 
+    private static final List<ItemLike> COPPER_SMELTABLES = List.of(
+            Items.COPPER_INGOT
+    );
+    private static final List<ItemLike> IRON_SMELTABLES = List.of(
+            Items.IRON_INGOT
+    );
+
     private static final List<ItemLike> IRON_SOURCE = List.of(
-            Items.IRON_INGOT,
             Items.RAW_IRON,
             Blocks.DEEPSLATE_IRON_ORE,
             Blocks.IRON_ORE
+    );
+
+    private static final List<ItemLike> COPPER_SOURCE = List.of(
+            Items.RAW_COPPER,
+            Blocks.DEEPSLATE_COPPER_ORE,
+            Blocks.COPPER_ORE
     );
 
     private static final List<ItemLike> IRON_HEADS = List.of(
@@ -61,6 +73,24 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
             ModItems.STEEL_BOOTS.get()
 
     );
+
+    private static final List<ItemLike> COPPER_HEADS = List.of(
+            ModItems.COPPER_HOE_HEAD.get(),
+            ModItems.COPPER_PICKAXE_HEAD.get(),
+            ModItems.COPPER_SWORD_BLADE.get(),
+            ModItems.COPPER_AXE_HEAD.get(),
+            ModItems.COPPER_SHOVEL_HEAD.get(),
+            ModItems.COPPER_HOE.get(),
+            ModItems.COPPER_PICKAXE.get(),
+            ModItems.COPPER_SWORD.get(),
+            ModItems.COPPER_AXE.get(),
+            ModItems.COPPER_SHOVEL.get(),
+            ModItems.COPPER_HELMET.get(),
+            ModItems.COPPER_CHESTPLATE.get(),
+            ModItems.COPPER_LEGGINGS.get(),
+            ModItems.COPPER_BOOTS.get()
+
+    );
     private static final List<ItemLike> GOLDEN_HEADS = List.of(
             ModItems.GOLDEN_HOE_HEAD.get(),
             ModItems.GOLDEN_PICKAXE_HEAD.get(),
@@ -68,10 +98,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
             ModItems.GOLDEN_AXE_HEAD.get(),
             ModItems.GOLDEN_SHOVEL_HEAD.get()
 
-    );
-
-    private static final List<ItemLike> STEEL_INGOT = List.of(
-            ModItems.STEEL_INGOT.get()
     );
 
 
@@ -88,13 +114,19 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         //oreCampfire(pWriter, STEEL_SMELTABLES, RecipeCategory.MISC, ModItems.STEEL_INGOT.get(), 0.7f, 140, "");
         //oreCampfire(pWriter, IRON_INGOT, RecipeCategory.MISC, ModItems.HEATED_IRON_INGOT.get(), 0.5f, 140, "iron_ingot");
         //oreCampfire(pWriter, STEEL_INGOT, RecipeCategory.MISC, ModItems.HEATED_STEEL_INGOT.get(), 0.7f, 140, "steel_ingot");
-        oreBlasting(pWriter, STEEL_SMELTABLES, RecipeCategory.MISC, ModItems.HEATED_CRUDE_STEEL.get(), 0.7f, 100, "steel_ingot");
+        oreBlasting(pWriter, STEEL_SMELTABLES, RecipeCategory.MISC, ModItems.HEATED_CRUDE_STEEL.get(), 0, 100, "steel_ingot");
+        oreBlasting(pWriter, COPPER_SMELTABLES, RecipeCategory.MISC, ModItems.HEATED_COPPER_INGOT.get(), 0, 70, "copper_ingot");
+        oreBlasting(pWriter, IRON_SMELTABLES, RecipeCategory.MISC, ModItems.HEATED_IRON_INGOT.get(), 0, 100, "iron_ingot");
+        oreSmelting(pWriter, COPPER_SMELTABLES, RecipeCategory.MISC, ModItems.HEATED_COPPER_INGOT.get(), 0, 140, "copper_ingot");
         oreBlasting(pWriter, IRON_SOURCE, RecipeCategory.MISC, ModItems.HEATED_IRON_INGOT.get(), 0.7f, 100, "iron_ingot");
+        oreBlasting(pWriter, COPPER_SOURCE, RecipeCategory.MISC, ModItems.HEATED_COPPER_INGOT.get(), 0.7f, 100, "copper_ingot");
         oreSmelting(pWriter, IRON_HEADS, RecipeCategory.MISC, Items.IRON_NUGGET, 0.1f, 200, null);
         oreBlasting(pWriter, IRON_HEADS, RecipeCategory.MISC, Items.IRON_NUGGET, 0.1f, 100, null);
         oreSmelting(pWriter, GOLDEN_HEADS, RecipeCategory.MISC, Items.GOLD_NUGGET, 0.1f, 200, null);
         oreBlasting(pWriter, GOLDEN_HEADS, RecipeCategory.MISC, Items.GOLD_NUGGET, 0.1f, 100, null);
         oreBlasting(pWriter, STEEL_HEADS, RecipeCategory.MISC, ModItems.STEEL_NUGGET.get(), 0.1f, 200, null);
+        oreSmelting(pWriter, COPPER_HEADS, RecipeCategory.MISC, ModItems.COPPER_NUGGET.get(), 0.1f, 200, null);
+        oreBlasting(pWriter, COPPER_HEADS, RecipeCategory.MISC, ModItems.COPPER_NUGGET.get(), 0.1f, 100, null);
         //oreBlasting(pWriter, STEEL_INGOT, RecipeCategory.MISC, ModItems.HEATED_STEEL_INGOT.get(), 0.7f, 100, "steel_ingot");
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_INGOT.get())
@@ -105,6 +137,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
                 .unlockedBy(getHasName(ModItems.STEEL_NUGGET.get()), has(ModItems.STEEL_NUGGET.get()))
                 .save(pWriter, OvergearedMod.MOD_ID + ":steel_ingot_from_nuggets");
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.COPPER_INGOT)
+                .pattern("###")
+                .pattern("###")
+                .pattern("###")
+                .define('#', ModItems.COPPER_NUGGET.get())
+                .unlockedBy("has_copper_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/copper"))))
+                .unlockedBy(getHasName(ModItems.COPPER_NUGGET.get()), has(ModItems.COPPER_NUGGET.get()))
+                .save(pWriter, OvergearedMod.MOD_ID + ":copper_ingot_from_nuggets");
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.STEEL_BLOCK.get())
                 .pattern("###")
@@ -219,6 +260,36 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy(getHasName(ModItems.STEEL_SWORD_BLADE.get()), has(ModItems.STEEL_SWORD_BLADE.get()))
                 .save(pWriter);
 
+        OvergearedShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.COPPER_AXE.get())
+                .requires(ModItems.COPPER_AXE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.COPPER_AXE_HEAD.get()), has(ModItems.COPPER_AXE_HEAD.get()))
+                .save(pWriter);
+
+        OvergearedShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.COPPER_PICKAXE.get())
+                .requires(ModItems.COPPER_PICKAXE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.COPPER_PICKAXE_HEAD.get()), has(ModItems.COPPER_PICKAXE_HEAD.get()))
+                .save(pWriter);
+
+        OvergearedShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.COPPER_SHOVEL.get())
+                .requires(ModItems.COPPER_SHOVEL_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.COPPER_SHOVEL_HEAD.get()), has(ModItems.COPPER_SHOVEL_HEAD.get()))
+                .save(pWriter);
+
+        OvergearedShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.COPPER_HOE.get())
+                .requires(ModItems.COPPER_HOE_HEAD.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.COPPER_HOE_HEAD.get()), has(ModItems.COPPER_HOE_HEAD.get()))
+                .save(pWriter);
+
+        OvergearedShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.COPPER_SWORD.get())
+                .requires(ModItems.COPPER_SWORD_BLADE.get())
+                .requires(Items.STICK)
+                .unlockedBy(getHasName(ModItems.COPPER_SWORD_BLADE.get()), has(ModItems.COPPER_SWORD_BLADE.get()))
+                .save(pWriter);
+
         OvergearedShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.GOLDEN_AXE)
                 .requires(ModItems.GOLDEN_AXE_HEAD.get())
                 .requires(Items.STICK)
@@ -285,6 +356,13 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('#', Items.IRON_INGOT)
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
                 .save(pWriter);
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COPPER_PLATE.get(), 3)
+                .tier(AnvilTier.STONE)
+                .setQuality(false)
+                .pattern("#")
+                .define('#', Items.COPPER_INGOT)
+                .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
+                .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_PLATE.get(), 4)
                 .tier(AnvilTier.STEEL)
@@ -335,6 +413,50 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("# ")
                 .define('#', ModItems.HEATED_IRON_INGOT.get())
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .save(pWriter);
+
+        // Copper Tools
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COPPER_PICKAXE_HEAD.get(), 3)
+                .tier(AnvilTier.STONE)
+                .setBlueprint(ToolType.PICKAXE.getId())
+                .pattern("###")
+                .define('#', ModItems.HEATED_COPPER_INGOT.get())
+                .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COPPER_SWORD_BLADE.get(), 3)
+                .tier(AnvilTier.STONE)
+                .setBlueprint(ToolType.SWORD.getId())
+                .pattern("#")
+                .pattern("#")
+                .define('#', ModItems.HEATED_COPPER_INGOT.get())
+                .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COPPER_SHOVEL_HEAD.get(), 3)
+                .tier(AnvilTier.STONE)
+                .setBlueprint(ToolType.SHOVEL.getId())
+                .pattern("#")
+                .define('#', ModItems.HEATED_COPPER_INGOT.get())
+                .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COPPER_HOE_HEAD.get(), 3)
+                .tier(AnvilTier.STONE)
+                .setBlueprint(ToolType.HOE.getId())
+                .pattern("##")
+                .define('#', ModItems.HEATED_COPPER_INGOT.get())
+                .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COPPER_AXE_HEAD.get(), 3)
+                .tier(AnvilTier.STONE)
+                .setBlueprint(ToolType.AXE.getId())
+                .pattern("##")
+                .pattern("# ")
+                .define('#', ModItems.HEATED_COPPER_INGOT.get())
+                .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
                 .save(pWriter);
 
 // Steel Tools
@@ -443,12 +565,20 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
                 .save(pWriter);*/
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.IRON_TONGS.get())
-                .pattern(" x ")
-                .pattern("xxx")
-                .pattern(" x ")
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.IRON_TONG.get(), 2)
+                .tier(AnvilTier.STONE)
+                .setQuality(false)
+                .pattern("  x")
+                .pattern(" xx")
+                .pattern("x  ")
                 .define('x', Items.IRON_INGOT)
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.IRON_TONGS.get())
+                .requires(ModItems.IRON_TONG.get())
+                .requires(ModItems.IRON_TONG.get())
+                .unlockedBy("has_iron_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/iron"))))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.STEEL_TONG.get(), 2)
@@ -580,6 +710,41 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("# #")
                 .define('#', ModItems.STEEL_PLATE.get())
                 .unlockedBy("has_steel_plate", has(ModItems.STEEL_PLATE.get()))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.COPPER_HELMET.get(), 3).tier(AnvilTier.STONE)
+                .setPolishing(false)
+
+                .pattern("###")
+                .pattern("# #")
+                .define('#', ModItems.COPPER_PLATE.get())
+                .unlockedBy("has_copper_plate", has(ModItems.COPPER_PLATE.get()))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.COPPER_CHESTPLATE.get(), 5).tier(AnvilTier.STONE)
+                .setPolishing(false)
+                .pattern("# #")
+                .pattern("###")
+                .pattern("###")
+                .define('#', ModItems.COPPER_PLATE.get())
+                .unlockedBy("has_copper_plate", has(ModItems.COPPER_PLATE.get()))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.COPPER_LEGGINGS.get(), 4).tier(AnvilTier.STONE)
+                .setPolishing(false)
+                .pattern("###")
+                .pattern("# #")
+                .pattern("# #")
+                .define('#', ModItems.COPPER_PLATE.get())
+                .unlockedBy("has_copper_plate", has(ModItems.COPPER_PLATE.get()))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.COPPER_BOOTS.get(), 3).tier(AnvilTier.STONE)
+                .setPolishing(false)
+                .pattern("# #")
+                .pattern("# #")
+                .define('#', ModItems.COPPER_PLATE.get())
+                .unlockedBy("has_copper_plate", has(ModItems.COPPER_PLATE.get()))
                 .save(pWriter);
 
 

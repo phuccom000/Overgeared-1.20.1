@@ -9,6 +9,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.item.armor.CopperHelmet;
+import net.stirdrem.overgeared.item.armor.CopperLeggings;
 import net.stirdrem.overgeared.item.custom.*;
 
 public class ModItems {
@@ -35,11 +37,20 @@ public class ModItems {
     public static final RegistryObject<Item> STEEL_NUGGET = ITEMS.register("steel_nugget",
             () -> new Item(new Item.Properties()));
 
+    public static final RegistryObject<Item> COPPER_NUGGET = ITEMS.register("copper_nugget",
+            () -> new Item(new Item.Properties()));
+
     public static final RegistryObject<Item> HEATED_IRON_INGOT = ITEMS.register("heated_iron_ingot",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> HEATED_COPPER_INGOT = ITEMS.register("heated_copper_ingot",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> HEATED_STEEL_INGOT = ITEMS.register("heated_steel_ingot",
             () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> COPPER_PLATE = ITEMS.register("copper_plate",
+            () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> IRON_PLATE = ITEMS.register("iron_plate",
             () -> new Item(new Item.Properties()));
@@ -48,6 +59,8 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> STEEL_TONG = ITEMS.register("steel_tong",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> IRON_TONG = ITEMS.register("iron_tong",
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> IRON_TONGS = ITEMS.register("iron_tongs",
@@ -89,6 +102,8 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_SWORD_BLADE = ITEMS.register("steel_sword_blade",
             () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_SWORD_BLADE = ITEMS.register("copper_sword_blade",
+            () -> new Item(new Item.Properties()));
 /*
     public static final RegistryObject<Item> DIAMOND_SWORD_BLADE = ITEMS.register("diamond_sword_blade",
             () -> new Item(new Item.Properties()));
@@ -101,6 +116,8 @@ public class ModItems {
     public static final RegistryObject<Item> GOLDEN_PICKAXE_HEAD = ITEMS.register("golden_pickaxe_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_PICKAXE_HEAD = ITEMS.register("steel_pickaxe_head",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_PICKAXE_HEAD = ITEMS.register("copper_pickaxe_head",
             () -> new Item(new Item.Properties()));
 /*
     public static final RegistryObject<Item> DIAMOND_PICKAXE_HEAD = ITEMS.register("diamond_pickaxe_head",
@@ -116,6 +133,8 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_AXE_HEAD = ITEMS.register("steel_axe_head",
             () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_AXE_HEAD = ITEMS.register("copper_axe_head",
+            () -> new Item(new Item.Properties()));
 /*    public static final RegistryObject<Item> DIAMOND_AXE_HEAD = ITEMS.register("diamond_axe_head",
             () -> new Item(new Item.Properties()));*/
 
@@ -128,6 +147,8 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_SHOVEL_HEAD = ITEMS.register("steel_shovel_head",
             () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_SHOVEL_HEAD = ITEMS.register("copper_shovel_head",
+            () -> new Item(new Item.Properties()));
 /*    public static final RegistryObject<Item> DIAMOND_SHOVEL_HEAD = ITEMS.register("diamond_shovel_head",
             () -> new Item(new Item.Properties()));*/
 
@@ -138,6 +159,8 @@ public class ModItems {
     public static final RegistryObject<Item> GOLDEN_HOE_HEAD = ITEMS.register("golden_hoe_head",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> STEEL_HOE_HEAD = ITEMS.register("steel_hoe_head",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_HOE_HEAD = ITEMS.register("copper_hoe_head",
             () -> new Item(new Item.Properties()));
 /*
     public static final RegistryObject<Item> DIAMOND_HOE_HEAD = ITEMS.register("diamond_hoe_head",
@@ -163,6 +186,26 @@ public class ModItems {
             () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.LEGGINGS, new Item.Properties()));
     public static final RegistryObject<Item> STEEL_BOOTS = ITEMS.register("steel_boots",
             () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.BOOTS, new Item.Properties()));
+
+    public static final RegistryObject<Item> COPPER_HELMET = ITEMS.register("copper_helmet",
+            () -> new CopperHelmet(ModArmorMaterials.COPPER, ArmorItem.Type.HELMET, new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_CHESTPLATE = ITEMS.register("copper_chestplate",
+            () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_LEGGINGS = ITEMS.register("copper_leggings",
+            () -> new CopperLeggings(ModArmorMaterials.COPPER, ArmorItem.Type.LEGGINGS, new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_BOOTS = ITEMS.register("copper_boots",
+            () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.BOOTS, new Item.Properties()));
+
+    public static final RegistryObject<Item> COPPER_SWORD = ITEMS.register("copper_sword",
+            () -> new SwordItem(ModToolTiers.COPPER, 3, -2.4f, new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_PICKAXE = ITEMS.register("copper_pickaxe",
+            () -> new PickaxeItem(ModToolTiers.COPPER, 1, -2.8f, new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_AXE = ITEMS.register("copper_axe",
+            () -> new AxeItem(ModToolTiers.COPPER, 5, -3f, new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_HOE = ITEMS.register("copper_hoe",
+            () -> new HoeItem(ModToolTiers.COPPER, -1, -1.5f, new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_SHOVEL = ITEMS.register("copper_shovel",
+            () -> new ShovelItem(ModToolTiers.COPPER, 1.5f, -3, new Item.Properties()));
 
 
     public static void register(IEventBus eventBus) {

@@ -44,20 +44,26 @@ public class BlueprintItem extends Item {
         if (tag == null) return;
 
         // Only show quality/progress if both tags are present
-        if (tag.contains("Quality") && tag.contains("Uses")) {
+        if (tag.contains("Quality")) {
             BlueprintQuality quality = getQuality(stack);
+
+            tooltip.add(Component.translatable("tooltip.overgeared.blueprint.quality")
+                    .withStyle(ChatFormatting.GRAY)
+                    .append(Component.translatable(quality.getTranslationKey()).withStyle(quality.getColor())));
+
+            if (quality == BlueprintQuality.PERFECT || quality == BlueprintQuality.MASTER) {
+                tooltip.add(Component.translatable("tooltip.overgeared.blueprint.maxlevel")
+                        .withStyle(ChatFormatting.LIGHT_PURPLE));
+            }
+        }
+
+        if (tag.contains("Uses")) {
             int uses = getUses(stack);
             int usesToLevel = getUsesToNextLevel(stack);
 
-            tooltip.add(Component.translatable("tooltip.overgeared.blueprint.quality").withStyle(ChatFormatting.GRAY)
-                    .append(Component.translatable(quality.getTranslationKey()).withStyle(quality.getColor())));
-
-            if (quality != BlueprintQuality.PERFECT && quality != BlueprintQuality.MASTER) {
+            if (!tag.contains("Quality") || (getQuality(stack) != BlueprintQuality.PERFECT && getQuality(stack) != BlueprintQuality.MASTER)) {
                 tooltip.add(Component.translatable("tooltip.overgeared.blueprint.progress", uses, usesToLevel)
                         .withStyle(ChatFormatting.GRAY));
-            } else {
-                tooltip.add(Component.translatable("tooltip.overgeared.blueprint.maxlevel")
-                        .withStyle(ChatFormatting.LIGHT_PURPLE));
             }
 
             if (flag.isAdvanced()) {

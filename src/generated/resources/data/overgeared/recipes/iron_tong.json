@@ -1,0 +1,21 @@
+{
+  "type": "overgeared:forging",
+  "category": "misc",
+  "hammering": 2,
+  "has_quality": false,
+  "key": {
+    "x": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "  x",
+    " xx",
+    "x  "
+  ],
+  "result": {
+    "item": "overgeared:iron_tong"
+  },
+  "show_notification": true,
+  "tier": "stone"
+}

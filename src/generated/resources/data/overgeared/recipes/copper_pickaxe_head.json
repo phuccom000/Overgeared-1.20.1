@@ -1,0 +1,24 @@
+{
+  "type": "overgeared:forging",
+  "blueprint": [
+    "pickaxe"
+  ],
+  "category": "misc",
+  "hammering": 3,
+  "has_polishing": true,
+  "has_quality": true,
+  "key": {
+    "#": {
+      "item": "overgeared:heated_copper_ingot"
+    }
+  },
+  "pattern": [
+    "###"
+  ],
+  "requires_blueprint": false,
+  "result": {
+    "item": "overgeared:copper_pickaxe_head"
+  },
+  "show_notification": true,
+  "tier": "stone"
+}

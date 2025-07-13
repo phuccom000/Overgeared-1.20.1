@@ -22,12 +22,16 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.CRUDE_STEEL.get());
                         pOutput.accept(ModItems.HEATED_CRUDE_STEEL.get());
                         pOutput.accept(ModItems.ROCK.get());
+                        pOutput.accept(ModItems.COPPER_NUGGET.get());
                         pOutput.accept(ModItems.STEEL_INGOT.get());
                         pOutput.accept(ModItems.STEEL_NUGGET.get());
+                        pOutput.accept(ModItems.HEATED_COPPER_INGOT.get());
                         pOutput.accept(ModItems.HEATED_IRON_INGOT.get());
                         pOutput.accept(ModItems.HEATED_STEEL_INGOT.get());
+                        pOutput.accept(ModItems.COPPER_PLATE.get());
                         pOutput.accept(ModItems.IRON_PLATE.get());
                         pOutput.accept(ModItems.STEEL_PLATE.get());
+                        pOutput.accept(ModItems.IRON_TONG.get());
                         pOutput.accept(ModItems.STEEL_TONG.get());
                         pOutput.accept(ModItems.IRON_TONGS.get());
                         pOutput.accept(ModItems.STEEL_TONGS.get());
@@ -37,11 +41,21 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BLUEPRINT.get());
                         pOutput.accept(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get());
                         //pOutput.accept(ModItems.WOODEN_BUCKET.get());
+                        pOutput.accept(ModItems.COPPER_HELMET.get());
+                        pOutput.accept(ModItems.COPPER_CHESTPLATE.get());
+                        pOutput.accept(ModItems.COPPER_LEGGINGS.get());
+                        pOutput.accept(ModItems.COPPER_BOOTS.get());
 
                         pOutput.accept(ModItems.STEEL_HELMET.get());
                         pOutput.accept(ModItems.STEEL_CHESTPLATE.get());
                         pOutput.accept(ModItems.STEEL_LEGGINGS.get());
                         pOutput.accept(ModItems.STEEL_BOOTS.get());
+
+                        pOutput.accept(ModItems.COPPER_SWORD.get());
+                        pOutput.accept(ModItems.COPPER_PICKAXE.get());
+                        pOutput.accept(ModItems.COPPER_AXE.get());
+                        pOutput.accept(ModItems.COPPER_SHOVEL.get());
+                        pOutput.accept(ModItems.COPPER_HOE.get());
 
                         pOutput.accept(ModItems.STEEL_SWORD.get());
                         pOutput.accept(ModItems.STEEL_PICKAXE.get());
@@ -55,6 +69,13 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.STONE_AXE_HEAD.get());
                         pOutput.accept(ModItems.STONE_SHOVEL_HEAD.get());
                         pOutput.accept(ModItems.STONE_HOE_HEAD.get());
+
+                        // === COPPER ===
+                        pOutput.accept(ModItems.COPPER_SWORD_BLADE.get());
+                        pOutput.accept(ModItems.COPPER_PICKAXE_HEAD.get());
+                        pOutput.accept(ModItems.COPPER_AXE_HEAD.get());
+                        pOutput.accept(ModItems.COPPER_SHOVEL_HEAD.get());
+                        pOutput.accept(ModItems.COPPER_HOE_HEAD.get());
 
                         // === IRON ===
                         pOutput.accept(ModItems.IRON_SWORD_BLADE.get());
