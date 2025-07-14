@@ -19,6 +19,7 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ModItems;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 
 public class ModItemModelProvider extends ItemModelProvider {
     private static LinkedHashMap<ResourceKey<TrimMaterial>, Float> trimMaterials = new LinkedHashMap<>();
@@ -220,6 +221,47 @@ public class ModItemModelProvider extends ItemModelProvider {
             });
         }
     }
+
+    private String getToolTypeFromName(String itemName) {
+        itemName = itemName.toLowerCase(Locale.ROOT);
+        if (itemName.contains("sword")) return "sword";
+        if (itemName.contains("axe")) return "axe";
+        if (itemName.contains("pickaxe")) return "pickaxe";
+        if (itemName.contains("shovel")) return "shovel";
+        if (itemName.contains("hoe")) return "hoe";
+        return "generic";
+    }
+
+    private void polishItem(RegistryObject<Item> itemRegistryObject) {
+        final String MOD_ID = OvergearedMod.MOD_ID;
+        Item item = itemRegistryObject.get();
+
+        String itemPath = itemRegistryObject.getId().getPath(); // e.g. "steel_pickaxe_head"
+        String toolType = getToolTypeFromName(itemPath);        // → "pickaxe"
+
+        ResourceLocation baseTexture = ResourceLocation.tryBuild(MOD_ID, "item/" + itemPath);
+        ResourceLocation overlayTexture = ResourceLocation.tryBuild(MOD_ID, "item/unpolished_overlay/" + toolType);
+        ResourceLocation unpolishedModelLoc = ResourceLocation.tryBuild(MOD_ID, "item/" + itemPath + "_unpolished");
+
+        // Ensure texture is tracked to avoid missing resource errors during datagen
+        existingFileHelper.trackGenerated(overlayTexture, PackType.CLIENT_RESOURCES, ".png", "textures");
+
+        // Model for unpolished version (layered with overlay)
+        getBuilder(unpolishedModelLoc.getPath())
+                .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                .texture("layer0", baseTexture)
+                .texture("layer1", overlayTexture);
+
+        // Base model: polished item with override for unpolished (predicate polished=0)
+        getBuilder(itemPath)
+                .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                .texture("layer0", baseTexture)
+                .override()
+                .model(new ModelFile.UncheckedModelFile(unpolishedModelLoc))
+                .predicate(ResourceLocation.tryBuild(MOD_ID, "polished"), 0.0f)
+                .end();
+    }
+
 
     private ItemModelBuilder simpleItem(RegistryObject<Item> item) {
         return withExistingParent(item.getId().getPath(),

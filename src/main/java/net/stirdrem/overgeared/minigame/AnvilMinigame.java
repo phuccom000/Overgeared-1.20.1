@@ -313,9 +313,9 @@ public class AnvilMinigame {
     }
 
     private String determineQuality(float qualityScore) {
-        if (qualityScore > 0.9f) return "perfect";
-        if (qualityScore > 0.75f) return "expert";
-        if (qualityScore > 0.5f) return "well";
+        if (qualityScore > ServerConfig.PERFECT_QUALITY_SCORE.get()) return "perfect";
+        if (qualityScore > ServerConfig.EXPERT_QUALITY_SCORE.get()) return "expert";
+        if (qualityScore > ServerConfig.WELL_QUALITY_SCORE.get()) return "well";
         return "poor";
     }
 

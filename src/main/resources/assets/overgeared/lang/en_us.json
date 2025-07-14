@@ -137,6 +137,10 @@
   "tooltip.overgeared.recipe.requires_blueprint.no": "Requires Blueprint: No",
   "gui.overgeared.stone_smithing_anvil": "Forging",
   "tooltip.overgeared.blueprint.required": "Blueprint Required",
-  "tooltip.overgeared.blueprint.optional": "Blueprint Optional"
+  "tooltip.overgeared.blueprint.optional": "Blueprint Optional",
+  "jei.overgeared.flint_knapping.description": "Right click continuously on a Stone block with a Flint to get Rock. The Flint has a chance to break.",
+  "jei.overgeared.category.flint_knapping": "How to get Rock",
+  "jei.overgeared.category.stone_anvil": "How to make Stone Anvil",
+  "jei.overgeared.stone_anvil.description1": "Crouch right click on a Stone block with a Smithing Hammer to convert it to a Stone Anvil."
 }
 

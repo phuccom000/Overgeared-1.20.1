@@ -41,6 +41,10 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue WELL_DURABILITY_BONUS;
     public static final ForgeConfigSpec.DoubleValue POOR_DURABILITY_BONUS;
 
+    public static final ForgeConfigSpec.DoubleValue PERFECT_QUALITY_SCORE;
+    public static final ForgeConfigSpec.DoubleValue EXPERT_QUALITY_SCORE;
+    public static final ForgeConfigSpec.DoubleValue WELL_QUALITY_SCORE;
+
     public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
     public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
     public static final ForgeConfigSpec.DoubleValue MAX_SPEED;
@@ -157,6 +161,23 @@ public class ServerConfig {
         MINIGAME_TIMEOUT_TICKS = builder
                 .comment("Minigame resets after a certain amount of seconds")
                 .defineInRange("minigameTimeout", 6000, 0, 36000);
+
+        PERFECT_QUALITY_SCORE = builder
+                .comment(
+                        "Quality score is based on your forging performance.",
+                        "Perfect hits = 1.0 points, Good hits = 0.6 points, Missed hits = 0.",
+                        "Formula: (perfectHits * 1.0 + goodHits * 0.6) / totalHits",
+                        "Lowest score required to get perfect quality"
+                )
+                .defineInRange("perfectQualityScore", 0.9, 0, 1.0);
+
+        EXPERT_QUALITY_SCORE = builder
+                .comment("Lowest score required to get expert quality")
+                .defineInRange("expertQualityScore", 0.6, 0, 1.0);
+
+        WELL_QUALITY_SCORE = builder
+                .comment("Lowest score required to get well quality")
+                .defineInRange("wellQualityScore", 0.3, 0, 1.0);
 
         builder.pop();
         builder.push("Balance Options");

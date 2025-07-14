@@ -3,11 +3,13 @@ package net.stirdrem.overgeared.compat;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -17,6 +19,7 @@ import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.item.ModItems;
+import net.stirdrem.overgeared.recipe.ExplanationRecipe;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
 import net.stirdrem.overgeared.screen.RockKnappingScreen;
@@ -38,6 +41,9 @@ public class JEIOvergearedModPlugin implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(new ForgingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new KnappingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new FlintKnappingCategory(registration.getJeiHelpers().getGuiHelper()));
+        RegistryAccess registryAccess = Minecraft.getInstance().getConnection().registryAccess();
+        registration.addRecipeCategories(new StoneAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
     }
 
     @Override
@@ -85,6 +91,18 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipes(KnappingRecipeCategory.KNAPPING_RECIPE_TYPE, knappingRecipes);
 
         registration.addRecipes(RecipeTypes.CRAFTING, BlueprintCloningRecipeMaker.createRecipes(registration.getJeiHelpers()));
+
+        List<ExplanationRecipe> recipes = List.of(
+                new ExplanationRecipe(new ItemStack(ModItems.ROCK.get()))
+                // Add more recipes as needed
+        );
+        registration.addRecipes(FlintKnappingCategory.FLINT_KNAPPING, recipes);
+
+        List<ExplanationRecipe> StoneAnvilRecipes = List.of(
+                new ExplanationRecipe(new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()))
+                // Add more recipes as needed
+        );
+        registration.addRecipes(StoneAnvilCategory.STONE_ANVIL_GET, StoneAnvilRecipes);
     }
 
 
@@ -107,7 +125,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE
         );
         registration.addRecipeCatalyst(
-                new ItemStack(Items.FLINT), // or your custom source block
+                new ItemStack(ModItems.ROCK.get()), // or your custom source block
                 KnappingRecipeCategory.KNAPPING_RECIPE_TYPE
         );
         registration.addRecipeCatalyst(

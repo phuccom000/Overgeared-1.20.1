@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.recipe;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -16,6 +17,7 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register(ForgingRecipe.Type.ID, () -> ForgingRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeType<RockKnappingRecipe>> KNAPPING =
             RECIPE_TYPES.register(RockKnappingRecipe.Type.ID, () -> RockKnappingRecipe.Type.INSTANCE);
+
    /* public static final RegistryObject<RecipeType<ForgingQualityShapelessRecipe>> CRAFTING_SHAPELESS =
             RECIPE_TYPES.register(ForgingQualityShapelessRecipe.Type.ID, () -> ForgingQualityShapelessRecipe.Type.INSTANCE);*/
 
