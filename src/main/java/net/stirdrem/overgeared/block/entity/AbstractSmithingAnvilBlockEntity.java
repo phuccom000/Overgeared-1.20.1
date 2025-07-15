@@ -31,6 +31,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
+import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvil;
@@ -68,12 +69,13 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     protected long busyUntilGameTime = 0L;
     protected UUID ownerUUID = null;
     protected Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
-
+    protected AnvilTier anvilTier;
     protected long sessionStartTime = 0L; // optional, for timeout logic
+    protected ItemStack failedResult;
 
-
-    public AbstractSmithingAnvilBlockEntity(BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
+    public AbstractSmithingAnvilBlockEntity(AnvilTier tier, BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
         super(type, pPos, pBlockState);
+        this.anvilTier = tier;
         this.data = new ContainerData() {
             @Override
             public int get(int pIndex) {
@@ -237,31 +239,64 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
         ForgingRecipe recipe = recipeOptional.get();
         ItemStack result = recipe.getResultItem(getLevel().registryAccess());
-
+        failedResult = recipe.getFailedResultItem(getLevel().registryAccess());
         // Only set quality if recipe supports it
         if (recipe.hasQuality()) {
-            CompoundTag tag = result.getOrCreateTag();
             if (ServerConfig.ENABLE_MINIGAME.get()) {
                 String quality = determineForgingQuality();
-                if (!Objects.equals(quality, "no_quality")) { // Additional safety check
-                    if (!quality.equals("perfect"))
+                if (!Objects.equals(quality, "no_quality")) {
+                    CompoundTag tag = result.getOrCreateTag();
+
+                    if (!quality.equals("perfect")) {
                         tag.putString("ForgingQuality", quality);
-                    else {
+                    } else {
                         Random random = new Random();
-                        if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 && random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
+                        if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 &&
+                                random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
                             quality = "master";
                         }
                         tag.putString("ForgingQuality", quality);
                     }
-                    if (!(result.getItem() instanceof ArmorItem) && !(result.getItem() instanceof ShieldItem) && recipe.hasPolishing())
+
+                    if (!(result.getItem() instanceof ArmorItem) &&
+                            !(result.getItem() instanceof ShieldItem) &&
+                            recipe.hasPolishing()) {
                         tag.putBoolean("Polished", false);
+                    }
+
+                    result.setTag(tag);
                 }
             } else {
-                if (!(result.getItem() instanceof ArmorItem) && !(result.getItem() instanceof ShieldItem))
+                CompoundTag tag = result.getOrCreateTag();
+                if (!(result.getItem() instanceof ArmorItem) && !(result.getItem() instanceof ShieldItem)) {
                     tag.putBoolean("Polished", false);
+                }
+                result.setTag(tag);
             }
-            result.setTag(tag);
+        } else if (recipe.needsMinigame()) {
+            // Handle minigame result without quality
+            if (ServerConfig.ENABLE_MINIGAME.get()) {
+                String quality = determineForgingQuality();
+                if (!Objects.equals(quality, "no_quality")) {
+                    boolean fail = false;
+
+                    if (quality.equals(ForgingQuality.POOR.getDisplayName())) {
+                        fail = true;
+                    } else if (quality.equals(ForgingQuality.WELL.getDisplayName())) {
+                        float failChance = ServerConfig.FAIL_ON_WELL_QUALITY_CHANCE.get().floatValue();
+                        fail = new Random().nextFloat() < failChance;
+                    } else if (quality.equals(ForgingQuality.EXPERT.getDisplayName())) {
+                        float failChance = ServerConfig.FAIL_ON_EXPERT_QUALITY_CHANCE.get().floatValue();
+                        fail = new Random().nextFloat() < failChance;
+                    }
+
+                    if (fail) {
+                        result = failedResult.copy();
+                    }
+                }
+            }
         }
+
 
         // Extract ingredients
         for (int i = 0; i < 9; i++) {
@@ -296,16 +331,28 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         }
     }
 
+    public boolean isFailedResult() {
+        ItemStack result = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+
+        return ItemStack.isSameItem(result, failedResult);
+    }
+
 
     public boolean hasRecipe() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        if (recipe.isPresent()) {
-            if (!AbstractSmithingAnvil.getTier().equals(recipe.get().getAnvilTier())) return false;
-            ItemStack resultStack = recipe.get().getResultItem(level.registryAccess());
-            return canInsertItemIntoOutputSlot(resultStack)
-                    && canInsertAmountIntoOutputSlot(resultStack.getCount());
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isEmpty()) return false;
+
+        ForgingRecipe recipe = recipeOptional.get();
+        AnvilTier requiredTier = AnvilTier.fromDisplayName(recipe.getAnvilTier());
+
+        // Safely skip if tier is invalid
+        if (requiredTier == null || !requiredTier.isEqualOrLowerThan(this.anvilTier)) {
+            return false;
         }
-        return false;
+
+        ItemStack resultStack = recipe.getResultItem(level.registryAccess());
+        return canInsertItemIntoOutputSlot(resultStack)
+                && canInsertAmountIntoOutputSlot(resultStack.getCount());
     }
 
 
@@ -568,6 +615,16 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
         // Only set quality if recipe supports it
         return recipe.hasQuality();
+    }
+
+    public boolean needsMinigame() {
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isEmpty()) return false;
+
+        ForgingRecipe recipe = recipeOptional.get();
+
+        // Only set quality if recipe supports it
+        return !recipe.hasQuality() && recipe.needsMinigame();
     }
 
     public IItemHandlerModifiable getItemHandler() {

@@ -13,5 +13,11 @@
     "sounds": [
       "overgeared:forging_complete"
     ]
+  },
+  "forging_failed": {
+    "subtitle": "sounds.overgeared.forging_failed",
+    "sounds": [
+      "overgeared:forging_failed"
+    ]
   }
 }

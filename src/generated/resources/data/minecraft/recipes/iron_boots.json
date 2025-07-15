@@ -9,6 +9,7 @@
       "item": "overgeared:iron_plate"
     }
   },
+  "needs_minigame": false,
   "pattern": [
     "# #",
     "# #"

@@ -1,10 +1,10 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
+  "result": "minecraft:iron_nugget",
   "cookingtime": 200,
   "experience": 0.1,
   "ingredient": {
     "item": "overgeared:iron_pickaxe_head"
-  },
-  "result": "minecraft:iron_nugget"
+  }
 }

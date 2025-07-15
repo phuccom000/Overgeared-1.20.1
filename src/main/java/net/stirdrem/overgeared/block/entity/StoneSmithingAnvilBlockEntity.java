@@ -21,7 +21,7 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     private int craftCount = 0;
 
     public StoneSmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.STONE_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
+        super(AnvilTier.STONE, ModBlockEntities.STONE_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
     }
 
 
@@ -55,7 +55,7 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
         };
     }
 
-    @Override
+    /*@Override
     public boolean hasRecipe() {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent() && AnvilTier.STONE.getDisplayName().equals(recipe.get().getAnvilTier())) {
@@ -64,7 +64,7 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
                     && canInsertAmountIntoOutputSlot(resultStack.getCount());
         }
         return false;
-    }
+    }*/
 
     @Override
     protected void craftItem() {

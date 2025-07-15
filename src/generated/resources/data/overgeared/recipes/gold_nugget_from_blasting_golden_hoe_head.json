@@ -1,10 +1,10 @@
 {
   "type": "minecraft:blasting",
   "category": "misc",
+  "result": "minecraft:gold_nugget",
   "cookingtime": 100,
   "experience": 0.1,
   "ingredient": {
     "item": "overgeared:golden_hoe_head"
-  },
-  "result": "minecraft:gold_nugget"
+  }
 }

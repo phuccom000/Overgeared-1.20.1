@@ -1,6 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
+  "result": {
+    "item": "overgeared:empty_blueprint"
+  },
   "ingredients": [
     {
       "item": "minecraft:paper"
@@ -14,8 +17,5 @@
     {
       "item": "minecraft:blue_dye"
     }
-  ],
-  "result": {
-    "item": "overgeared:empty_blueprint"
-  }
+  ]
 }

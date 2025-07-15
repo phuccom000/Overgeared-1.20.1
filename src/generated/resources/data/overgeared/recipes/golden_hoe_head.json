@@ -1,24 +1,25 @@
 {
   "type": "overgeared:forging",
+  "category": "misc",
   "blueprint": [
     "hoe"
   ],
-  "category": "misc",
+  "requires_blueprint": false,
+  "tier": "stone",
   "hammering": 3,
-  "has_polishing": true,
   "has_quality": true,
+  "needs_minigame": false,
+  "has_polishing": true,
+  "pattern": [
+    "##"
+  ],
   "key": {
     "#": {
       "item": "minecraft:gold_ingot"
     }
   },
-  "pattern": [
-    "##"
-  ],
-  "requires_blueprint": false,
   "result": {
     "item": "overgeared:golden_hoe_head"
   },
-  "show_notification": true,
-  "tier": "stone"
+  "show_notification": true
 }

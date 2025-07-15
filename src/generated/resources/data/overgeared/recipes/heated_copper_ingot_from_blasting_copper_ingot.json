@@ -1,11 +1,11 @@
 {
   "type": "minecraft:blasting",
+  "group": "copper_ingot",
   "category": "misc",
+  "result": "overgeared:heated_copper_ingot",
   "cookingtime": 70,
   "experience": 0.0,
-  "group": "copper_ingot",
   "ingredient": {
     "item": "minecraft:copper_ingot"
-  },
-  "result": "overgeared:heated_copper_ingot"
+  }
 }

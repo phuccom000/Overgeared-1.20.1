@@ -1,24 +1,25 @@
 {
   "type": "overgeared:forging",
+  "category": "misc",
   "blueprint": [
     "pickaxe"
   ],
-  "category": "misc",
+  "requires_blueprint": false,
+  "tier": "stone",
   "hammering": 3,
-  "has_polishing": true,
   "has_quality": true,
+  "needs_minigame": false,
+  "has_polishing": true,
+  "pattern": [
+    "###"
+  ],
   "key": {
     "#": {
       "item": "overgeared:heated_iron_ingot"
     }
   },
-  "pattern": [
-    "###"
-  ],
-  "requires_blueprint": false,
   "result": {
     "item": "overgeared:iron_pickaxe_head"
   },
-  "show_notification": true,
-  "tier": "stone"
+  "show_notification": true
 }

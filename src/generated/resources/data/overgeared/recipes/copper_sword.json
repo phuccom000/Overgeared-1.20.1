@@ -1,6 +1,9 @@
 {
   "type": "overgeared:crafting_shapeless",
   "category": "equipment",
+  "result": {
+    "item": "overgeared:copper_sword"
+  },
   "ingredients": [
     {
       "item": "overgeared:copper_sword_blade"
@@ -8,8 +11,5 @@
     {
       "item": "minecraft:stick"
     }
-  ],
-  "result": {
-    "item": "overgeared:copper_sword"
-  }
+  ]
 }

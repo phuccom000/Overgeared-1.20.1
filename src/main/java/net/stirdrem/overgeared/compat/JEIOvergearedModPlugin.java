@@ -4,6 +4,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.vanilla.IJeiAnvilRecipe;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
@@ -27,6 +28,7 @@ import net.stirdrem.overgeared.screen.SteelSmithingAnvilScreen;
 import net.stirdrem.overgeared.screen.StoneSmithingAnvilScreen;
 import net.stirdrem.overgeared.util.ModTags;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +46,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipeCategories(new FlintKnappingCategory(registration.getJeiHelpers().getGuiHelper()));
         RegistryAccess registryAccess = Minecraft.getInstance().getConnection().registryAccess();
         registration.addRecipeCategories(new StoneAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
+
     }
 
     @Override
@@ -103,6 +106,13 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 // Add more recipes as needed
         );
         registration.addRecipes(StoneAnvilCategory.STONE_ANVIL_GET, StoneAnvilRecipes);
+
+        registration.addRecipes(RecipeTypes.ANVIL,
+                OvergearedAnvilRecipes.getOvergearedAnvilRecipes(
+                        registration.getVanillaRecipeFactory(),
+                        registration.getIngredientManager()
+                ).toList()
+        );
     }
 
 

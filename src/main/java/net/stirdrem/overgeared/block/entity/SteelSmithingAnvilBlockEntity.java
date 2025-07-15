@@ -26,7 +26,7 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     private static final int BLUEPRINT_SLOT = 11;
 
     public SteelSmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.STEEL_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
+        super(AnvilTier.STEEL, ModBlockEntities.STEEL_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
     }
 
     @Override
@@ -104,8 +104,14 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     @Override
     protected void craftItem() {
         super.craftItem();
-        // Handle blueprint progression (slot 11)
 
+        // Get the crafted output item
+        ItemStack result = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+
+        // Skip blueprint progression if crafting failed
+        if (result.isEmpty() || result.getOrCreateTag().getBoolean("failedResult")) return;
+
+        // Handle blueprint progression (slot 11)
         ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
         if (!blueprint.isEmpty() && blueprint.hasTag()) {
             CompoundTag tag = blueprint.getOrCreateTag();
@@ -116,14 +122,22 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
                 int usesToLevel = tag.getInt("UsesToLevel");
 
                 BlueprintQuality currentQuality = BlueprintQuality.fromString(currentQualityStr);
-                ForgingQuality resultQuality = ForgingQuality.fromString(SteelSmithingAnvil.getQuality());
+
+                // Attempt to read the ForgingQuality from result
+                CompoundTag resultTag = result.getOrCreateTag();
+                String forgingQualityStr = resultTag.getString("ForgingQuality");
+                ForgingQuality resultQuality = ForgingQuality.fromString(forgingQualityStr);
+
                 if (currentQuality != null && currentQuality != BlueprintQuality.PERFECT && currentQuality != BlueprintQuality.MASTER) {
                     if (resultQuality == ForgingQuality.PERFECT) {
                         uses += 2;
                     } else if (resultQuality == ForgingQuality.MASTER) {
                         uses += 3;
-                    } else uses++;
-                    // If uses reached threshold, level up
+                    } else {
+                        uses++;
+                    }
+
+                    // Level up if threshold reached
                     if (uses >= usesToLevel) {
                         BlueprintQuality nextQuality = BlueprintQuality.getNext(currentQuality);
                         if (nextQuality != null) {
@@ -131,22 +145,19 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
                             tag.putInt("Uses", 0);
                             tag.putInt("UsesToLevel", nextQuality.getUse());
                         } else {
-                            // Max tier reached, clamp Uses
-                            tag.putInt("Uses", usesToLevel);
+                            tag.putInt("Uses", usesToLevel); // Clamp
                         }
                     } else {
-                        // Otherwise just update Uses count
-                        tag.putInt("Uses", uses);
+                        tag.putInt("Uses", uses); // Just increment
                     }
 
                     blueprint.setTag(tag);
-                    this.itemHandler.setStackInSlot(BLUEPRINT_SLOT, blueprint); // Re-apply to update
+                    this.itemHandler.setStackInSlot(BLUEPRINT_SLOT, blueprint);
                 }
             }
-
         }
-
     }
+
 
     @Override
     public boolean hasRecipe() {
@@ -154,6 +165,13 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
         if (recipeOptional.isEmpty()) return false;
 
         ForgingRecipe recipe = recipeOptional.get();
+
+        // Tier check
+        AnvilTier requiredTier = AnvilTier.fromDisplayName(recipe.getAnvilTier());
+        if (requiredTier == null || !requiredTier.isEqualOrLowerThan(this.anvilTier)) {
+            return false;
+        }
+
         ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
 
         if (recipe.requiresBlueprint()) {

@@ -1,10 +1,12 @@
 package net.stirdrem.overgeared.datagen;
 
+import com.mojang.patchy.BlockedServers;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -42,10 +44,23 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                         ModBlocks.WATER_BARREL_FULL.get()
                 );
 */
-        this.tag(BlockTags.NEEDS_IRON_TOOL)
-                .add(ModBlocks.STEEL_BLOCK.get()
+        this.tag(ModTags.Blocks.NEEDS_STEEL_TOOL)
+                .add(
+                        Blocks.OBSIDIAN,
+                        Blocks.CRYING_OBSIDIAN
                 );
-
+        this.tag(ModTags.Blocks.NEEDS_COPPER_TOOL)
+                .add(
+                        Blocks.IRON_ORE,
+                        Blocks.DEEPSLATE_IRON_ORE,
+                        Blocks.IRON_BLOCK
+                );
+        this.tag(BlockTags.NEEDS_DIAMOND_TOOL)
+                .add(Blocks.NETHERITE_BLOCK,
+                        Blocks.RESPAWN_ANCHOR,
+                        Blocks.ANCIENT_DEBRIS)
+                .replace(true);
+        
         this.tag(BlockTags.create(ResourceLocation.tryBuild("forge", "storage_blocks/steel")))
                 .add(ModBlocks.STEEL_BLOCK.get());
 

@@ -1,13 +1,13 @@
 {
   "type": "minecraft:smithing_transform",
+  "result": {
+    "item": "minecraft:diamond_shovel"
+  },
   "addition": {
     "item": "minecraft:diamond"
   },
   "base": {
     "item": "overgeared:steel_shovel"
-  },
-  "result": {
-    "item": "minecraft:diamond_shovel"
   },
   "template": {
     "item": "overgeared:diamond_upgrade_smithing_template"

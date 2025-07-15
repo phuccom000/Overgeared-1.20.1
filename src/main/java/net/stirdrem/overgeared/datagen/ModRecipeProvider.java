@@ -623,7 +623,8 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, Items.SHEARS, 3).tier(AnvilTier.STONE)
-
+                .needsMinigame(true)
+                .failedResult(Items.IRON_INGOT)
                 .setQuality(false)
                 .pattern(" #")
                 .pattern("# ")

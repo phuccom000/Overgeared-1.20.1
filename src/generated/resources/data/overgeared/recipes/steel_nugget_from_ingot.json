@@ -1,13 +1,13 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
+  "result": {
+    "count": 9,
+    "item": "overgeared:steel_nugget"
+  },
   "ingredients": [
     {
       "item": "overgeared:steel_ingot"
     }
-  ],
-  "result": {
-    "count": 9,
-    "item": "overgeared:steel_nugget"
-  }
+  ]
 }

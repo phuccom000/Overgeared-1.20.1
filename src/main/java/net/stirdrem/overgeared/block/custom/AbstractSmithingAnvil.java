@@ -128,7 +128,7 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock {
 
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
             if (isHammer && anvil.hasRecipe()) {
-                if (minigame.getVisible() && pos.equals(minigame.getAnvilPos()) || !anvil.hasQuality() || !ServerConfig.ENABLE_MINIGAME.get()) {
+                if (minigame.getVisible() && pos.equals(minigame.getAnvilPos()) || !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get()) {
                     // Hammer logic (particles, sound, cooldown)
                     if (!ServerConfig.ENABLE_MINIGAME.get())
                         anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
@@ -138,13 +138,17 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock {
             }*/
                     spawnAnvilParticles(level, pos);
                     //level.playSound(null, pos, SoundEvents.ANVIL_, SoundSource.BLOCKS, 1f, 1f);
-                    if (anvil.getHitsRemaining() == 1)
-                        level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
-                    else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
                     held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
-                    if (anvil.hasQuality() && ServerConfig.ENABLE_MINIGAME.get())
+                    if ((anvil.hasQuality() || anvil.needsMinigame()) && ServerConfig.ENABLE_MINIGAME.get())
                         quality = minigame.handleHit((ServerPlayer) player);
                     anvil.increaseForgingProgress(level, pos, state);
+                    if (anvil.getHitsRemaining() == 1) {
+                        boolean test = anvil.isFailedResult();
+                        if (anvil.isFailedResult()) {
+                            level.playSound(null, pos, ModSounds.FORGING_FAILED.get(), SoundSource.BLOCKS, 1f, 1f);
+                        } else
+                            level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
+                    } else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
                     held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
                     isHit.set(true);
                 } //else AnvilMinigameOverlay.endMinigame();

@@ -13,6 +13,7 @@ public class ModTags {
     public static class Blocks {
         /*public static final TagKey<Block> TONGS = tag("tongs");*/
         public static final TagKey<Block> NEEDS_STEEL_TOOL = tag("needs_steel_tool");
+        public static final TagKey<Block> NEEDS_COPPER_TOOL = tag("needs_copper_tool");
         public static final TagKey<Block> SMITHING = tag("smithing");
         public static final TagKey<Block> SMITHING_ANVIL = tag("smithing_anvil");
 

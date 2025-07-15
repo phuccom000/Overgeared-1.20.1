@@ -1,5 +1,5 @@
 {
-"block.overgeared.smithing_anvil": "Кузнечная наковальня",
+  "block.overgeared.smithing_anvil": "Кузнечная наковальня",
   "block.overgeared.stone_anvil": "Каменная кузнечная наковальня",
   "block.overgeared.steel_block": "Стальной блок",
   "block.overgeared.drafting_table": "Чертёжный стол",
@@ -87,7 +87,7 @@
   "tooltip.overgeared.poor": "Плохая ковка",
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line1": "§7ПКМ в приседе по §f§lКузнечной наковальне§7, чтобы начать ковку когда в наковальне сформирован рецепт.",
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line2": "ПКМ в приседе снова, чтобы остановить ковку.",
-  "tooltip.overgeared.smithing_hammer.advanced_tooltip.line3": "ПКМ в приседе по каменному блоку, чтобы получить каменную наковальню.",
+  "tooltip.overgeared.smithing_hammer.advanced_tooltip.line3": "ПКМ в приседе по каменному блоку, чтобы получить §f§lкаменную наковальню§7.",
   "tooltip.overgeared.smithing_hammer.hold_shift": "§7Нажмите §f§lSHIFT§7 для дополнительной информации",
   "tooltip.overgeared.tongs.tooltip": "Предотвращает ожоги от раскаленного металла, если держать в руке.",
   "upgrade.overgeared.diamond_upgrade": "Алмазное улучшение",
@@ -137,6 +137,10 @@
   "tooltip.overgeared.recipe.requires_blueprint.no": "Необходим чертёж: Нет",
   "gui.overgeared.stone_smithing_anvil": "Ковка",
   "tooltip.overgeared.blueprint.required": "Необходим чертёж",
-  "tooltip.overgeared.blueprint.optional": "Чертёж необязателен"
+  "tooltip.overgeared.blueprint.optional": "Чертёж необязателен",
+  "jei.overgeared.flint_knapping.description": "Нажимайте ПКМ по блоку камня, держа кремень в руке, чтобы получить камень. Кремень может сломаться.",
+  "jei.overgeared.category.flint_knapping": "Как получить камень",
+  "jei.overgeared.category.stone_anvil": "Как сделать каменную наковальню",
+  "jei.overgeared.stone_anvil.description1": "ПКМ в присяде по блоку камня кузнечным молотом, чтобы сделать из него каменную кузнечную наковальню."
 }
 

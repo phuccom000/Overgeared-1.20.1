@@ -1,13 +1,13 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
+  "result": {
+    "count": 9,
+    "item": "overgeared:steel_ingot"
+  },
   "ingredients": [
     {
       "item": "overgeared:steel_block"
     }
-  ],
-  "result": {
-    "count": 9,
-    "item": "overgeared:steel_ingot"
-  }
+  ]
 }

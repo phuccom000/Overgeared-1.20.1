@@ -1,22 +1,23 @@
 {
   "type": "overgeared:forging",
+  "category": "misc",
   "blueprint": [
     "axe"
   ],
-  "category": "misc",
+  "requires_blueprint": false,
   "hammering": 4,
-  "has_polishing": true,
   "has_quality": true,
+  "needs_minigame": false,
+  "has_polishing": true,
+  "pattern": [
+    "##",
+    "# "
+  ],
   "key": {
     "#": {
       "item": "overgeared:heated_steel_ingot"
     }
   },
-  "pattern": [
-    "##",
-    "# "
-  ],
-  "requires_blueprint": false,
   "result": {
     "item": "overgeared:steel_axe_head"
   },

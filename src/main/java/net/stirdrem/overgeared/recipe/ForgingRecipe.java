@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.OvergearedMod;
@@ -26,8 +27,10 @@ public class ForgingRecipe implements Recipe<Container> {
     private final String tier;
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result;
+    private final ItemStack failedResult;
     private final int hammering;
     private final boolean hasQuality;
+    private final boolean needsMinigame;
     private final boolean requiresBlueprint;
     private final boolean hasPolishing;
     private final boolean showNotification;
@@ -36,16 +39,18 @@ public class ForgingRecipe implements Recipe<Container> {
     private static int BLUEPRINT_SLOT = 11;
 
     public ForgingRecipe(ResourceLocation id, String group, boolean requireBlueprint, Set<String> blueprintTypes, String tier, NonNullList<Ingredient> ingredients,
-                         ItemStack result, int hammering, boolean hasQuality, boolean hasPolishing, boolean showNotification, int width, int height) {
+                         ItemStack result, ItemStack failedResult, int hammering, boolean hasQuality, boolean needsMinigame, boolean hasPolishing, boolean showNotification, int width, int height) {
         this.id = id;
         this.group = group;
         this.blueprintTypes = blueprintTypes;
         this.tier = tier;
         this.ingredients = ingredients;
         this.result = result;
+        this.failedResult = failedResult;
         this.hammering = hammering;
         this.hasQuality = hasQuality;
         this.requiresBlueprint = requireBlueprint;
+        this.needsMinigame = needsMinigame;
         this.hasPolishing = hasPolishing;
         this.showNotification = showNotification;
         this.width = width;
@@ -160,6 +165,10 @@ public class ForgingRecipe implements Recipe<Container> {
         return result.copy();
     }
 
+    public ItemStack getFailedResultItem(RegistryAccess registryAccess) {
+        return failedResult == null || failedResult.isEmpty() || failedResult.is(result.getItem()) ? ItemStack.EMPTY : failedResult.copy();
+    }
+
     @Override
     public NonNullList<Ingredient> getIngredients() {
         return ingredients;
@@ -204,6 +213,10 @@ public class ForgingRecipe implements Recipe<Container> {
 
     public boolean hasQuality() {
         return hasQuality;
+    }
+
+    public boolean needsMinigame() {
+        return needsMinigame;
     }
 
     public String getGroup() {
@@ -269,6 +282,7 @@ public class ForgingRecipe implements Recipe<Container> {
             String tier = GsonHelper.getAsString(json, "tier", "steel");
             int hammering = GsonHelper.getAsInt(json, "hammering", 1);
             boolean hasQuality = GsonHelper.getAsBoolean(json, "has_quality", true);
+            boolean needsMinigame = GsonHelper.getAsBoolean(json, "needs_minigame", false);
             boolean hasPolishing = GsonHelper.getAsBoolean(json, "has_polishing", true);
             boolean showNotification = GsonHelper.getAsBoolean(json, "show_notification", true);
 
@@ -280,7 +294,8 @@ public class ForgingRecipe implements Recipe<Container> {
             NonNullList<Ingredient> ingredients = dissolvePattern(pattern, keyMap, width, height);
 
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
-            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, hammering, hasQuality, hasPolishing, showNotification, width, height);
+            ItemStack failedResult = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result_failed", GsonHelper.getAsJsonObject(json, "result")));
+            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, showNotification, width, height);
         }
 
         private static Map<Character, Ingredient> parseKey(JsonObject keyJson) {
@@ -328,6 +343,7 @@ public class ForgingRecipe implements Recipe<Container> {
             String tier = buffer.readUtf();
             int hammering = buffer.readVarInt();
             boolean hasQuality = buffer.readBoolean();  // Changed order to match writing
+            boolean needsMinigame = buffer.readBoolean();  // Changed order to match writing
             boolean hasPolishing = buffer.readBoolean();  // Changed order to match writing
             boolean showNotification = buffer.readBoolean();
             int width = buffer.readVarInt();
@@ -339,7 +355,8 @@ public class ForgingRecipe implements Recipe<Container> {
             }
 
             ItemStack result = buffer.readItem();
-            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, hammering, hasQuality, hasPolishing, showNotification, width, height);
+            ItemStack failedResult = buffer.readItem();
+            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, showNotification, width, height);
         }
 
         @Override
@@ -353,6 +370,7 @@ public class ForgingRecipe implements Recipe<Container> {
             buffer.writeUtf(recipe.tier);
             buffer.writeVarInt(recipe.hammering);
             buffer.writeBoolean(recipe.hasQuality);
+            buffer.writeBoolean(recipe.needsMinigame);
             buffer.writeBoolean(recipe.hasPolishing);
             buffer.writeBoolean(recipe.showNotification);
             buffer.writeVarInt(recipe.width);
@@ -363,6 +381,7 @@ public class ForgingRecipe implements Recipe<Container> {
             }
 
             buffer.writeItem(recipe.result);
+            buffer.writeItem(recipe.failedResult);
         }
     }
 

@@ -1,16 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "key": {
-    "#": {
-      "item": "overgeared:steel_ingot"
-    }
-  },
   "pattern": [
     "###",
     "###",
     "###"
   ],
+  "key": {
+    "#": {
+      "item": "overgeared:steel_ingot"
+    }
+  },
   "result": {
     "item": "overgeared:steel_block"
   },

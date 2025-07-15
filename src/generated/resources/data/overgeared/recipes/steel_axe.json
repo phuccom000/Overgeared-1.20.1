@@ -1,6 +1,9 @@
 {
   "type": "overgeared:crafting_shapeless",
   "category": "equipment",
+  "result": {
+    "item": "overgeared:steel_axe"
+  },
   "ingredients": [
     {
       "item": "overgeared:steel_axe_head"
@@ -8,8 +11,5 @@
     {
       "item": "minecraft:stick"
     }
-  ],
-  "result": {
-    "item": "overgeared:steel_axe"
-  }
+  ]
 }

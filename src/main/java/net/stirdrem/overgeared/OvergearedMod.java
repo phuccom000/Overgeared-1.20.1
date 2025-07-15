@@ -171,7 +171,7 @@ public class OvergearedMod {
 
     @Unique
     public static boolean isDurabilityMultiplierBlacklisted(ItemStack stack) {
-        ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
         return ServerConfig.BASE_DURABILITY_BLACKLIST.get().contains(id.toString());
     }
 

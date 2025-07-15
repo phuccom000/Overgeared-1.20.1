@@ -23,6 +23,7 @@ public class ModSounds {
 
     public static final RegistryObject<SoundEvent> ANVIL_HIT = registerSoundEvents("anvil_hit");
     public static final RegistryObject<SoundEvent> FORGING_COMPLETE = registerSoundEvents("forging_complete");
+    public static final RegistryObject<SoundEvent> FORGING_FAILED = registerSoundEvents("forging_failed");
 
 
     /*public static final ForgeSoundType SOUND_BLOCK_SOUNDS = new ForgeSoundType(1f, 1f,

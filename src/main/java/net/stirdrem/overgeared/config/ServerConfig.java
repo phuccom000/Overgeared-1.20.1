@@ -72,6 +72,8 @@ public class ServerConfig {
     public static final ForgeConfigSpec.IntValue WELL_MAX_USE;
     public static final ForgeConfigSpec.IntValue POOR_MAX_USE;
 
+    public static final ForgeConfigSpec.DoubleValue FAIL_ON_WELL_QUALITY_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue FAIL_ON_EXPERT_QUALITY_CHANCE;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -190,6 +192,12 @@ public class ServerConfig {
                 .defineListAllowEmpty("base_durability_blacklist",
                         List.of("minecraft:flint_and_steel"),
                         o -> o instanceof String);
+
+        FAIL_ON_WELL_QUALITY_CHANCE = builder.comment("Chance that forging with WELL quality fails and returns the failed result (0.0 - 1.0)")
+                .defineInRange("failOnWellQualityChance", 0.1, 0.0, 1.0);
+
+        FAIL_ON_EXPERT_QUALITY_CHANCE = builder.comment("Chance that forging with EXPERT quality fails and returns the failed result (0.0 - 1.0)")
+                .defineInRange("failOnExpertQualityChance", 0.05, 0.0, 1.0);
 
         builder.pop();
 

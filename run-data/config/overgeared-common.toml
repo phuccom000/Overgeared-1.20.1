@@ -46,6 +46,18 @@
 	#Minigame resets after a certain amount of seconds
 	#Range: 0 ~ 36000
 	minigameTimeout = 6000
+	#Quality score is based on your forging performance.
+	#Perfect hits = 1.0 points, Good hits = 0.6 points, Missed hits = 0.
+	#Formula: (perfectHits * 1.0 + goodHits * 0.6) / totalHits
+	#Lowest score required to get perfect quality
+	#Range: 0.0 ~ 1.0
+	perfectQualityScore = 0.9
+	#Lowest score required to get expert quality
+	#Range: 0.0 ~ 1.0
+	expertQualityScore = 0.6
+	#Lowest score required to get well quality
+	#Range: 0.0 ~ 1.0
+	wellQualityScore = 0.3
 
 ["Stone Smithing Anvil"]
 	#Number of uses before the Stone Smithing Anvil breaks. Set to 0 to disable.
@@ -162,4 +174,8 @@
 	#How many ticks before a heated item cools off in inventory (default: 1200 = 60s)
 	#Range: > 1
 	heatedItemCooldownTicks = 1200
+
+["Stone Pickaxe Settings"]
+	#If stone pickaxe can mine iron or not or only copper pickaxe can
+	stonePickCanMineIron = false
 

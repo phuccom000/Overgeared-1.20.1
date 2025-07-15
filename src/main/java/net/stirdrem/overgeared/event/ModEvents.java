@@ -399,6 +399,10 @@ public class ModEvents {
                     : Component.translatable("tooltip.overgeared.unpolished").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
             tooltip.add(insertOffset++, polishComponent);
         }
+        if (stack.hasTag() && stack.getTag().contains("failedResult")) {
+            tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.failedResult")
+                    .withStyle(ChatFormatting.RED));
+        }
 
         // Smithing Hammer special tooltip
         if (stack.is(ModTags.Items.SMITHING_HAMMERS)) {

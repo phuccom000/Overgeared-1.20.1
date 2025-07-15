@@ -2,7 +2,9 @@ package net.stirdrem.overgeared.datagen;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -31,6 +33,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category;
     private final ForgingBookCategory bookCategory;
     private final Item result;
+
     private final int count;
     private final int hammering;
     private final List<String> rows = Lists.newArrayList();
@@ -46,9 +49,15 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     @Nullable
     private Boolean hasPolishing;
     @Nullable
+    private Boolean needsMinigame;
+    @Nullable
     private String group;
     @Nullable
     private String tier;
+    @Nullable
+    private Item failedResult;
+    @Nullable
+    private int failedResultCount;
 
     private boolean showNotification = true;
 
@@ -145,6 +154,23 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
+    public ShapedForgingRecipeBuilder needsMinigame(@Nullable boolean needsMinigame) {
+        this.needsMinigame = needsMinigame;
+        return this;
+    }
+
+    public ShapedForgingRecipeBuilder failedResult(ItemLike result) {
+        this.failedResult = result.asItem();
+        this.failedResultCount = 1;
+        return this;
+    }
+
+    public ShapedForgingRecipeBuilder failedResult(ItemLike result, int count) {
+        this.failedResult = result.asItem();
+        this.failedResultCount = count;
+        return this;
+    }
+
     public ShapedForgingRecipeBuilder setBlueprint(String blueprintType) {
         if (blueprintType != null && !blueprintType.isBlank()) {
             this.blueprintTypes.add(blueprintType.toLowerCase());
@@ -165,6 +191,10 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     @Override
     public Item getResult() {
         return this.result;
+    }
+
+    public Item getFailedResult() {
+        return this.failedResult;
     }
 
     @Override
@@ -189,6 +219,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 this.hammering,
                 new ItemStack(this.result, this.count),
                 pRecipeId,
+                this.failedResult != null ? new ItemStack(this.failedResult, this.failedResultCount) : ItemStack.EMPTY,
                 this.group == null ? "" : this.group,
                 this.bookCategory,
                 this.rows,
@@ -200,6 +231,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 this.hasQuality != null && !this.hasQuality ? null : (this.requiresBlueprint != null ? this.requiresBlueprint : false),
                 this.hasQuality == null || this.hasQuality,
                 this.hasQuality != null && !this.hasQuality ? null : (this.hasPolishing != null ? this.hasPolishing : true),
+                this.needsMinigame != null && this.needsMinigame,
                 this.tier == null ? "" : this.tier
         ));
     }
@@ -223,6 +255,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final NonNullList<Ingredient> ingredients;
         private final int hammering;
         private final ItemStack result;
+        private final ItemStack failedResult;
         private final List<String> pattern;
         private final Map<Character, Ingredient> key;
         private final Advancement.Builder advancement;
@@ -234,13 +267,15 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final Boolean requiresBlueprint;
         private final Boolean hasQuality;
         private final Boolean hasPolishing;
+        private final Boolean needsMinigame;
         private final String tier;
 
 
-        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, List<String> blueprintTypes, Boolean requiresBlueprint, Boolean hasQuality, Boolean hasPolishing, String tier) {
+        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, ItemStack failedResult, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, List<String> blueprintTypes, Boolean requiresBlueprint, Boolean hasQuality, Boolean hasPolishing, Boolean needsMinigame, String tier) {
             this.ingredients = ingredients;
             this.hammering = hammering;
             this.result = result;
+            this.failedResult = failedResult;
             this.category = category;
             this.id = id;
             this.group = group;
@@ -253,6 +288,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             this.requiresBlueprint = requiresBlueprint;
             this.hasQuality = hasQuality;
             this.hasPolishing = hasPolishing;
+            this.needsMinigame = needsMinigame;
             this.tier = tier;
         }
 
@@ -261,9 +297,11 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             if (!this.group.isEmpty()) {
                 json.addProperty("group", this.group);
             }
+
             if (this.requiresBlueprint != null) {
                 json.addProperty("requires_blueprint", this.requiresBlueprint);
             }
+
             if (!this.blueprintTypes.isEmpty()) {
                 JsonArray blueprintArray = new JsonArray();
                 for (String type : this.blueprintTypes) {
@@ -272,41 +310,57 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 json.add("blueprint", blueprintArray);
             }
 
-            JsonArray patternArray = new JsonArray();
             json.addProperty("category", this.category.getSerializedName());
 
+            JsonArray patternArray = new JsonArray();
             for (String s : this.pattern) {
                 patternArray.add(s);
             }
-            if (!this.tier.isBlank() || !this.tier.isEmpty()) {
+            json.add("pattern", patternArray);
+
+            if (!this.tier.isBlank()) {
                 json.addProperty("tier", this.tier);
             }
-            json.add("pattern", patternArray);
-            JsonObject jsonobject = new JsonObject();
 
             json.addProperty("hammering", this.hammering);
-            // Add quality flag if not null
+
             if (this.hasQuality != null) {
                 json.addProperty("has_quality", this.hasQuality);
+            }
+
+            if (this.needsMinigame != null) {
+                json.addProperty("needs_minigame", this.needsMinigame);
             }
 
             if (this.hasPolishing != null) {
                 json.addProperty("has_polishing", this.hasPolishing);
             }
 
+            JsonObject keyObj = new JsonObject();
             for (Map.Entry<Character, Ingredient> entry : this.key.entrySet()) {
-                jsonobject.add(String.valueOf(entry.getKey()), entry.getValue().toJson());
+                keyObj.add(String.valueOf(entry.getKey()), entry.getValue().toJson());
             }
-            json.add("key", jsonobject);
+            json.add("key", keyObj);
 
-            JsonObject resultObject = new JsonObject();
-            resultObject.addProperty("item", BuiltInRegistries.ITEM.getKey(this.result.getItem()).toString());
+            JsonObject resultObj = new JsonObject();
+            resultObj.addProperty("item", BuiltInRegistries.ITEM.getKey(this.result.getItem()).toString());
             if (this.result.getCount() > 1) {
-                resultObject.addProperty("count", this.result.getCount());
+                resultObj.addProperty("count", this.result.getCount());
             }
-            json.add("result", resultObject);
+            json.add("result", resultObj);
+
+            if (!this.failedResult.isEmpty() && this.failedResult.getItem() != Items.AIR) {
+                JsonObject failedResultObj = new JsonObject();
+                failedResultObj.addProperty("item", BuiltInRegistries.ITEM.getKey(this.failedResult.getItem()).toString());
+                if (this.failedResult.getCount() > 1) {
+                    failedResultObj.addProperty("count", this.failedResult.getCount());
+                }
+                json.add("result_failed", failedResultObj);
+            }
+
             json.addProperty("show_notification", this.showNotification);
         }
+
 
         @Override
         public ResourceLocation getId() {

@@ -8,6 +8,7 @@
       "item": "minecraft:iron_ingot"
     }
   },
+  "needs_minigame": false,
   "pattern": [
     "# #",
     " # "

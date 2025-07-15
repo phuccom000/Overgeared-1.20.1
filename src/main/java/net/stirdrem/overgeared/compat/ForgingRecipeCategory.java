@@ -39,6 +39,12 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
     public static final ResourceLocation TEXTURE = ResourceLocation.tryBuild(OvergearedMod.MOD_ID,
             "textures/gui/smithing_anvil_jei.png");
 
+    public static final ResourceLocation RESULT_BIG = ResourceLocation.tryBuild(OvergearedMod.MOD_ID,
+            "textures/gui/result_big.png");
+
+    public static final ResourceLocation RESULT_TWOSLOT = ResourceLocation.tryBuild(OvergearedMod.MOD_ID,
+            "textures/gui/twoslot.png");
+
     public static final RecipeType<ForgingRecipe> FORGING_RECIPE_TYPE =
             new RecipeType<>(UID, ForgingRecipe.class);
 
@@ -70,6 +76,8 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
 
     @Override
     public void draw(ForgingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        // Draw the background first
+        //this.background.draw(guiGraphics);
         String hitsText = Component.translatable("tooltip.overgeared.recipe.hits", recipe.getRemainingHits()).getString();
 
         String tierRaw = recipe.getAnvilTier();
@@ -77,28 +85,12 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
         Component tierText = Component.translatable("tooltip.overgeared.recipe.tier")
                 .append(Component.literal(" "))
                 .append(Component.translatable(tierName.getLang()));
-
-        Set<String> blueprintTypes = recipe.getBlueprintTypes();
-        boolean requiresBlueprint = recipe.requiresBlueprint();
-
-        Component blueprintText;
-        if (blueprintTypes.isEmpty()) {
-            blueprintText = Component.translatable("tooltip.overgeared.recipe.blueprint.none");
-        } else {
-            String names = blueprintTypes.stream()
-                    .map(type -> ToolTypeRegistry.byId(type)
-                            .map(ToolType::getDisplayName)
-                            .map(Component::getString)
-                            .orElse(type))
-                    .collect(java.util.stream.Collectors.joining(", "));
-
-            blueprintText = Component.translatable("tooltip.overgeared.recipe.blueprint", names);
-        }
-
-        Component requiresBlueprintText = Component.translatable("tooltip.overgeared.recipe.requires_blueprint." + (requiresBlueprint ? "yes" : "no"));
+        if (recipe.hasQuality() || !recipe.needsMinigame()) {
+            guiGraphics.blit(RESULT_BIG, 112, 14, 0, 0, 26, 26, 26, 26);
+        } else guiGraphics.blit(RESULT_TWOSLOT, 116, 9, 0, 0, 18, 36, 18, 36);
 
         guiGraphics.drawString(Minecraft.getInstance().font, hitsText, 79, 1, 0xFF808080, false);
-        guiGraphics.drawString(Minecraft.getInstance().font, tierText, 79, 45, 0xFF808080, false);
+        guiGraphics.drawString(Minecraft.getInstance().font, tierText, 79, 47, 0xFF808080, false);
         //guiGraphics.drawString(Minecraft.getInstance().font, blueprintText, 57, 1, 0xFF808080, false);
         //guiGraphics.drawString(Minecraft.getInstance().font, requiresBlueprintText, 0, 57, 0xFF808080, false);
     }
@@ -129,8 +121,22 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 19)
                 .addItemStacks(createBlueprintStacksForRecipe(recipe));
 
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 19)
-                .addItemStack(recipe.getResultItem(null));
+        if (recipe.hasQuality() || !recipe.needsMinigame()) {
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 19)
+                    .addItemStack(recipe.getResultItem(null));
+        } else {
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 10)
+                    .addItemStack(recipe.getResultItem(null));
+            ItemStack failedStack = recipe.getFailedResultItem(null).copy();
+            CompoundTag failedTag = failedStack.getOrCreateTag();
+            failedTag.putBoolean("failedResult", true);
+            failedStack.setTag(failedTag);
+
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 28)
+                    .addItemStack(failedStack);
+
+        }
+
 
     }
 

@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.event;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -126,19 +127,23 @@ public class ModItemInteractEvents {
         if (!level.isClientSide) {
             if (!(player instanceof ServerPlayer serverPlayer)) return;
             // Server-side ownership logic
+            if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
+                return;
+            }
             if (!anvilBE.hasRecipe()) {
-                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.no_recipe", true));
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.no_recipe").withStyle(ChatFormatting.RED), true);
                 return;
             }
 
-            if (!anvilBE.hasQuality()) {
-                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.item_has_no_quality", true));
+            if (!anvilBE.hasQuality() && !anvilBE.needsMinigame()) {
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.item_has_no_quality").withStyle(ChatFormatting.RED), true);
                 return;
             }
 
             UUID currentOwner = anvilBE.getOwnerUUID();
             if (currentOwner != null && !currentOwner.equals(playerUUID)) {
-                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another", true));
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED), true);
                 return;
             }
 
@@ -160,7 +165,7 @@ public class ModItemInteractEvents {
                 return;
             }
 
-            if (!anvilBE.hasQuality()) {
+            if (!anvilBE.hasQuality() && !anvilBE.needsMinigame()) {
                 //player.sendSystemMessage(Component.translatable("message.overgeared.item_has_no_quality").withStyle(ChatFormatting.RED));
                 return;
             }
@@ -185,7 +190,7 @@ public class ModItemInteractEvents {
 
             if (player.getUUID().equals(currentOwner)
                     && ClientAnvilMinigameData.getPendingMinigamePos() == null) {
-                if (anvilBE.hasRecipe()) {
+                if (anvilBE.hasRecipe() || anvilBE.needsMinigame()) {
                     Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
                     recipeOpt.ifPresent(recipe -> {
                         ItemStack result = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());

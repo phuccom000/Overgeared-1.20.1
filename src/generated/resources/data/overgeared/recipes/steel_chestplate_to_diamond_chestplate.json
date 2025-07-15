@@ -1,13 +1,13 @@
 {
   "type": "minecraft:smithing_transform",
+  "result": {
+    "item": "minecraft:diamond_chestplate"
+  },
   "addition": {
     "item": "minecraft:diamond"
   },
   "base": {
     "item": "overgeared:steel_chestplate"
-  },
-  "result": {
-    "item": "minecraft:diamond_chestplate"
   },
   "template": {
     "item": "overgeared:diamond_upgrade_smithing_template"

@@ -1,6 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
+  "result": {
+    "item": "overgeared:drafting_table"
+  },
   "ingredients": [
     {
       "item": "minecraft:crafting_table"
@@ -8,8 +11,5 @@
     {
       "item": "overgeared:empty_blueprint"
     }
-  ],
-  "result": {
-    "item": "overgeared:drafting_table"
-  }
+  ]
 }

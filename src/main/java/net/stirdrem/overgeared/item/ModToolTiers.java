@@ -22,6 +22,6 @@ public class ModToolTiers {
 
     public static final Tier COPPER = TierSortingRegistry.registerTier(
             new ForgeTier(1, 190, 5.0F, 1.0F, 12,
-                    Tags.Blocks.NEEDS_WOOD_TOOL, () -> Ingredient.of(Items.COPPER_INGOT)),
+                    ModTags.Blocks.NEEDS_COPPER_TOOL, () -> Ingredient.of(Items.COPPER_INGOT)),
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "copper_ingot"), List.of(Tiers.STONE), List.of(Tiers.IRON));
 }
