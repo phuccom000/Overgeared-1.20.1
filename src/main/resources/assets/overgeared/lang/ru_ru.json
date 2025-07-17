@@ -128,7 +128,7 @@
   "tooltip.overgeared.no_tools": "Нет подходящих инструментов",
   "tooltip.overgeared.no_tools_available": "Нет подходящих типов",
   "gui.overgeared.tier.stone": "Каменный",
-  "gui.overgeared.tier.steel": "Стальной",
+  "gui.overgeared.tier.iron": "Железо",
   "tooltip.overgeared.recipe.hits": "Необходимо ударов: %s",
   "tooltip.overgeared.recipe.tier": "Уровень:",
   "tooltip.overgeared.recipe.blueprint": "Тип: %s",
@@ -141,6 +141,7 @@
   "jei.overgeared.flint_knapping.description": "Нажимайте ПКМ по блоку камня, держа кремень в руке, чтобы получить камень. Кремень может сломаться.",
   "jei.overgeared.category.flint_knapping": "Как получить камень",
   "jei.overgeared.category.stone_anvil": "Как сделать каменную наковальню",
-  "jei.overgeared.stone_anvil.description1": "ПКМ в присяде по блоку камня кузнечным молотом, чтобы сделать из него каменную кузнечную наковальню."
+  "jei.overgeared.stone_anvil.description1": "ПКМ в присяде по блоку камня кузнечным молотом, чтобы сделать из него каменную кузнечную наковальню.",
+  "tooltip.overgeared.failedResult": "Результат неудачной ковки"
 }
 

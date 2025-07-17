@@ -1,7 +1,6 @@
 {
   "type": "overgeared:forging",
   "category": "misc",
-  "tier": "stone",
   "hammering": 3,
   "has_quality": false,
   "needs_minigame": false,

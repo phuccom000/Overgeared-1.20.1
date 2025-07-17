@@ -3,13 +3,10 @@ package net.stirdrem.overgeared.block.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.block.state.BlockState;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.BlueprintQuality;
@@ -26,7 +23,7 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     private static final int BLUEPRINT_SLOT = 11;
 
     public SteelSmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(AnvilTier.STEEL, ModBlockEntities.STEEL_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
+        super(AnvilTier.IRON, ModBlockEntities.STEEL_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
     }
 
     @Override

@@ -18,6 +18,12 @@ public class ModMenuTypes {
     public static final RegistryObject<MenuType<SteelSmithingAnvilMenu>> STEEL_SMITHING_ANVIL_MENU =
             registerMenuType("smithing_anvil_menu", SteelSmithingAnvilMenu::new);
 
+    public static final RegistryObject<MenuType<TierASmithingAnvilMenu>> TIER_A_SMITHING_ANVIL_MENU =
+            registerMenuType("tier_a_smithing_anvil_menu", TierASmithingAnvilMenu::new);
+
+    public static final RegistryObject<MenuType<TierBSmithingAnvilMenu>> TIER_B_SMITHING_ANVIL_MENU =
+            registerMenuType("tier_b_smithing_anvil_menu", TierBSmithingAnvilMenu::new);
+
     public static final RegistryObject<MenuType<StoneSmithingAnvilMenu>> STONE_SMITHING_ANVIL_MENU =
             registerMenuType("stone_smithing_anvil_menu", StoneSmithingAnvilMenu::new);
 

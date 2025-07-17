@@ -12,9 +12,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.stirdrem.overgeared.AnvilTier;
+import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 
 import java.util.*;
@@ -34,12 +35,13 @@ public class ForgingRecipe implements Recipe<Container> {
     private final boolean requiresBlueprint;
     private final boolean hasPolishing;
     private final boolean showNotification;
+    private final ForgingQuality minimumQuality;
     public final int width;
     public final int height;
     private static int BLUEPRINT_SLOT = 11;
 
     public ForgingRecipe(ResourceLocation id, String group, boolean requireBlueprint, Set<String> blueprintTypes, String tier, NonNullList<Ingredient> ingredients,
-                         ItemStack result, ItemStack failedResult, int hammering, boolean hasQuality, boolean needsMinigame, boolean hasPolishing, boolean showNotification, int width, int height) {
+                         ItemStack result, ItemStack failedResult, int hammering, boolean hasQuality, boolean needsMinigame, boolean hasPolishing, boolean showNotification, ForgingQuality minimumQuality, int width, int height) {
         this.id = id;
         this.group = group;
         this.blueprintTypes = blueprintTypes;
@@ -53,6 +55,7 @@ public class ForgingRecipe implements Recipe<Container> {
         this.needsMinigame = needsMinigame;
         this.hasPolishing = hasPolishing;
         this.showNotification = showNotification;
+        this.minimumQuality = minimumQuality;
         this.width = width;
         this.height = height;
     }
@@ -223,6 +226,10 @@ public class ForgingRecipe implements Recipe<Container> {
         return group;
     }
 
+    public ForgingQuality getMinimumQuality() {
+        return minimumQuality;
+    }
+
     public boolean showNotification() {
         return showNotification;
     }
@@ -279,13 +286,13 @@ public class ForgingRecipe implements Recipe<Container> {
             }
             boolean requiresBlueprint = GsonHelper.getAsBoolean(json, "requires_blueprint", false);
 
-            String tier = GsonHelper.getAsString(json, "tier", "steel");
+            String tier = GsonHelper.getAsString(json, "tier", AnvilTier.IRON.getDisplayName());
             int hammering = GsonHelper.getAsInt(json, "hammering", 1);
             boolean hasQuality = GsonHelper.getAsBoolean(json, "has_quality", true);
             boolean needsMinigame = GsonHelper.getAsBoolean(json, "needs_minigame", false);
             boolean hasPolishing = GsonHelper.getAsBoolean(json, "has_polishing", true);
             boolean showNotification = GsonHelper.getAsBoolean(json, "show_notification", true);
-
+            ForgingQuality minimumQuality = ForgingQuality.fromString(GsonHelper.getAsString(json, "minimumQuality", ForgingQuality.POOR.getDisplayName()));
             Map<Character, Ingredient> keyMap = parseKey(GsonHelper.getAsJsonObject(json, "key"));
             JsonArray pattern = GsonHelper.getAsJsonArray(json, "pattern");
 
@@ -295,7 +302,7 @@ public class ForgingRecipe implements Recipe<Container> {
 
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
             ItemStack failedResult = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result_failed", GsonHelper.getAsJsonObject(json, "result")));
-            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, showNotification, width, height);
+            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, showNotification, minimumQuality, width, height);
         }
 
         private static Map<Character, Ingredient> parseKey(JsonObject keyJson) {
@@ -348,7 +355,7 @@ public class ForgingRecipe implements Recipe<Container> {
             boolean showNotification = buffer.readBoolean();
             int width = buffer.readVarInt();
             int height = buffer.readVarInt();
-
+            ForgingQuality minimumQuality = ForgingQuality.fromString(buffer.readUtf());
             NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
             for (int i = 0; i < ingredients.size(); i++) {
                 ingredients.set(i, Ingredient.fromNetwork(buffer));
@@ -356,7 +363,7 @@ public class ForgingRecipe implements Recipe<Container> {
 
             ItemStack result = buffer.readItem();
             ItemStack failedResult = buffer.readItem();
-            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, showNotification, width, height);
+            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, showNotification, minimumQuality, width, height);
         }
 
         @Override
@@ -375,6 +382,7 @@ public class ForgingRecipe implements Recipe<Container> {
             buffer.writeBoolean(recipe.showNotification);
             buffer.writeVarInt(recipe.width);
             buffer.writeVarInt(recipe.height);
+            buffer.writeUtf(recipe.minimumQuality.toString());
 
             for (Ingredient ingredient : recipe.ingredients) {
                 ingredient.toNetwork(buffer);

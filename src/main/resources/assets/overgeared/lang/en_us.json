@@ -1,5 +1,7 @@
 {
   "block.overgeared.smithing_anvil": "Smithing Anvil",
+  "block.overgeared.tier_a_smithing_anvil": "Tier A Smithing Anvil (above Iron)",
+  "block.overgeared.tier_b_smithing_anvil": "Tier B Smithing Anvil (above A)",
   "block.overgeared.stone_anvil": "Stone Smithing Anvil",
   "block.overgeared.steel_block": "Block of Steel",
   "block.overgeared.drafting_table": "Drafting Table",
@@ -128,9 +130,9 @@
   "tooltip.overgeared.no_tools": "No tools available",
   "tooltip.overgeared.no_tools_available": "No types available",
   "gui.overgeared.tier.stone": "Stone",
-  "gui.overgeared.tier.steel": "Steel",
-  "gui.overgeared.tier.above_a": "Tier A (above Steel)",
-  "gui.overgeared.tier.above_b": "Tier B (above A)",
+  "gui.overgeared.tier.iron": "Iron",
+  "gui.overgeared.tier.tier_a": "Tier A (above Iron)",
+  "gui.overgeared.tier.tier_b": "Tier B (above A)",
   "tooltip.overgeared.recipe.hits": "Hits: %s",
   "tooltip.overgeared.recipe.tier": "Tier:",
   "tooltip.overgeared.recipe.blueprint": "Type: %s",
@@ -144,6 +146,7 @@
   "jei.overgeared.category.flint_knapping": "How to get Rock",
   "jei.overgeared.category.stone_anvil": "How to make Stone Anvil",
   "jei.overgeared.stone_anvil.description1": "Crouch right click on a Stone block with a Smithing Hammer to convert it to a Stone Smithing Anvil.",
-  "tooltip.overgeared.failedResult": "Get Upon Failure"
+  "tooltip.overgeared.failedResult": "Get Upon Failure",
+  "tooltip.overgeared.hotitems.tooltip": "Eternally hot! Use tongs to safely handle."
 }
 

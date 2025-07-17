@@ -3,8 +3,6 @@ package net.stirdrem.overgeared.compat;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
-import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.recipe.vanilla.IJeiAnvilRecipe;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
@@ -13,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.common.Tags;
 import net.stirdrem.overgeared.AnvilTier;
@@ -23,12 +20,9 @@ import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.ExplanationRecipe;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
-import net.stirdrem.overgeared.screen.RockKnappingScreen;
-import net.stirdrem.overgeared.screen.SteelSmithingAnvilScreen;
-import net.stirdrem.overgeared.screen.StoneSmithingAnvilScreen;
+import net.stirdrem.overgeared.screen.*;
 import net.stirdrem.overgeared.util.ModTags;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +56,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 .toList();
 
         List<ForgingRecipe> steelTierRecipes = allForgingRecipes.stream()
-                .filter(recipe -> recipe.getAnvilTier().equalsIgnoreCase(AnvilTier.STEEL.getDisplayName()))
+                .filter(recipe -> recipe.getAnvilTier().equalsIgnoreCase(AnvilTier.IRON.getDisplayName()))
                 .toList();
 
         // Add only stone-tier recipes to Stone Forging JEI category
@@ -119,6 +113,12 @@ public class JEIOvergearedModPlugin implements IModPlugin {
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addRecipeClickArea(SteelSmithingAnvilScreen.class, 90, 35, 22, 15,
+                ForgingRecipeCategory.FORGING_RECIPE_TYPE);
+
+        registration.addRecipeClickArea(TierASmithingAnvilScreen.class, 90, 35, 22, 15,
+                ForgingRecipeCategory.FORGING_RECIPE_TYPE);
+
+        registration.addRecipeClickArea(TierBSmithingAnvilScreen.class, 90, 35, 22, 15,
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE);
 
         registration.addRecipeClickArea(StoneSmithingAnvilScreen.class, 90, 35, 22, 15,

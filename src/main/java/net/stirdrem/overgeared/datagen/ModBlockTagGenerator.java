@@ -37,7 +37,9 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         this.tag(ModTags.Blocks.SMITHING_ANVIL)
                 .add(
                         ModBlocks.SMITHING_ANVIL.get(),
-                        ModBlocks.STONE_SMITHING_ANVIL.get()
+                        ModBlocks.STONE_SMITHING_ANVIL.get(),
+                        ModBlocks.TIER_A_SMITHING_ANVIL.get(),
+                        ModBlocks.TIER_B_SMITHING_ANVIL.get()
                 );
        /* this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(ModBlocks.WATER_BARREL.get(),
@@ -60,7 +62,7 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                         Blocks.RESPAWN_ANCHOR,
                         Blocks.ANCIENT_DEBRIS)
                 .replace(true);
-        
+
         this.tag(BlockTags.create(ResourceLocation.tryBuild("forge", "storage_blocks/steel")))
                 .add(ModBlocks.STEEL_BLOCK.get());
 

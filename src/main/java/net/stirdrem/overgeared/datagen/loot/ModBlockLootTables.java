@@ -29,6 +29,8 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.STEEL_BLOCK.get());
         this.dropSelf(ModBlocks.DRAFTING_TABLE.get());
         this.dropSelf(ModBlocks.SMITHING_ANVIL.get());
+        this.dropSelf(ModBlocks.TIER_A_SMITHING_ANVIL.get());
+        this.dropSelf(ModBlocks.TIER_B_SMITHING_ANVIL.get());
         this.dropOther(ModBlocks.STONE_SMITHING_ANVIL.get(), Blocks.COBBLESTONE);
         //this.dropOther(ModBlocks.ROCK.get(), ModItems.ROCK.get());
       /*  this.dropSelf(ModBlocks.WATER_BARREL.get());

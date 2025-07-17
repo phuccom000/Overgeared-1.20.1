@@ -2,10 +2,11 @@ import json
 from pathlib import Path
 
 FIELD_ORDER = [
-    "type","category", "group", "blueprint", "requires_blueprint", 
-   "tier", "hammering", "has_quality", "needs_minigame",
-    "has_polishing", "pattern", "key", "result", "failedResult", "show_notification"
+    "type", "category", "group", "blueprint", "requires_blueprint",
+    "tier", "hammering", "has_quality", "minimum_quality", "needs_minigame",
+    "has_polishing", "pattern", "key", "result", "result_failed", "show_notification"
 ]
+
 
 def reorder(data: dict) -> dict:
     reordered = {k: data[k] for k in FIELD_ORDER if k in data}
@@ -15,8 +16,9 @@ def reorder(data: dict) -> dict:
             reordered[k] = data[k]
     return reordered
 
+
 def process_all():
-    recipe_dir = Path("src/generated/resources/data/overgeared/recipes")
+    recipe_dir = Path("src/generated/resources/data")
     print(f"Scanning directory: {recipe_dir.resolve()}")
     file_count = 0
     skipped_count = 0
@@ -47,6 +49,7 @@ def process_all():
         print("File saved with reordered keys.")
 
     print(f"\nFinished. Processed {file_count} file(s), skipped {skipped_count}.")
+
 
 if __name__ == "__main__":
     process_all()

@@ -31,7 +31,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.entity.SteelSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.custom.SmithingHammer;
@@ -90,7 +90,7 @@ public class ModEvents {
             if (minigame.isVisible() && minigame.hasAnvilPosition()) {
                 BlockPos anvilPos = minigame.getAnvilPos();
                 BlockEntity be = level.getBlockEntity(anvilPos);
-                if ((be instanceof SteelSmithingAnvilBlockEntity anvil)) {
+                if ((be instanceof AbstractSmithingAnvilBlockEntity anvil)) {
                     double distSq = player.blockPosition().distSqr(anvilPos);
                     int maxDist = ServerConfig.MAX_ANVIL_DISTANCE.get(); // e.g. 7
                     if (distSq > maxDist * maxDist) {
@@ -330,7 +330,7 @@ public class ModEvents {
             if (minigame.hasAnvilPosition()) {
                 BlockPos anvilPos = minigame.getAnvilPos();
                 BlockEntity be = player.level().getBlockEntity(anvilPos);
-                if (be instanceof SteelSmithingAnvilBlockEntity anvil) {
+                if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
                     anvil.setProgress(0);
                     anvil.setChanged();
                 }
@@ -371,11 +371,12 @@ public class ModEvents {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatablemetals.tooltip")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
-
+        if (stack.is(ModTags.Items.HOT_ITEMS)) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.hotitems.tooltip")
+                    .withStyle(ChatFormatting.RED));
+        }
         // Add Forging Quality
-        boolean hasForgingQuality = false;
         if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
-            hasForgingQuality = true;
             String quality = stack.getTag().getString("ForgingQuality");
             Component qualityComponent = switch (quality) {
                 case "poor" -> Component.translatable("tooltip.overgeared.poor").withStyle(ChatFormatting.RED);
@@ -418,5 +419,6 @@ public class ModEvents {
                         .withStyle(ChatFormatting.GRAY));
             }
         }
+
     }
 }

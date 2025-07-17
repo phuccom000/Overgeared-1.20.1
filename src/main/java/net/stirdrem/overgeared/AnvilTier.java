@@ -2,9 +2,9 @@ package net.stirdrem.overgeared;
 
 public enum AnvilTier {
     STONE("stone", "gui.overgeared.tier.stone"),
-    STEEL("steel", "gui.overgeared.tier.steel"),
-    ABOVE_A("above_a", "gui.overgeared.tier.above_a"),
-    ABOVE_B("above_b", "gui.overgeared.tier.above_b");
+    IRON("iron", "gui.overgeared.tier.iron"),
+    ABOVE_A("above_a", "gui.overgeared.tier.tier_a"),
+    ABOVE_B("above_b", "gui.overgeared.tier.tier_b");
 
     private final String displayName;
     private final String lang;

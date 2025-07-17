@@ -45,9 +45,8 @@ public class SteelSmithingAnvil extends AbstractSmithingAnvil {
 
     private static final int HAMMER_SOUND_DURATION_TICKS = 6; // adjust to match your sound
 
-
-    public SteelSmithingAnvil(Properties properties) {
-        super(AnvilTier.STEEL, properties);
+    public SteelSmithingAnvil(AnvilTier tier, Properties properties) {
+        super(tier, properties);
     }
 
 

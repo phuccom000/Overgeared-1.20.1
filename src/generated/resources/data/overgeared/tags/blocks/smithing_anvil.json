@@ -1,6 +1,8 @@
 {
   "values": [
     "overgeared:smithing_anvil",
-    "overgeared:stone_anvil"
+    "overgeared:stone_anvil",
+    "overgeared:tier_a_smithing_anvil",
+    "overgeared:tier_b_smithing_anvil"
   ]
 }

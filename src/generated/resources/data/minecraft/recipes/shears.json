@@ -1,24 +1,24 @@
 {
   "type": "overgeared:forging",
   "category": "misc",
+  "tier": "stone",
   "hammering": 3,
   "has_quality": false,
-  "key": {
-    "#": {
-      "item": "minecraft:iron_ingot"
-    }
-  },
   "needs_minigame": true,
   "pattern": [
     " #",
     "# "
   ],
+  "key": {
+    "#": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
   "result": {
     "item": "minecraft:shears"
   },
   "result_failed": {
     "item": "minecraft:iron_ingot"
   },
-  "show_notification": true,
-  "tier": "stone"
+  "show_notification": true
 }

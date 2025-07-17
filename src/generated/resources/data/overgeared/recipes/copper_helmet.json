@@ -5,6 +5,7 @@
   "tier": "stone",
   "hammering": 3,
   "has_quality": true,
+  "minimum_quality": "poor",
   "needs_minigame": false,
   "has_polishing": false,
   "pattern": [

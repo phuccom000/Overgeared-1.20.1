@@ -185,20 +185,31 @@ public abstract class ItemStackMixin {
                 Item cooled = getCooledIngot(stack.getItem());
                 if (cooled != null) {
                     ItemStack newStack = new ItemStack(cooled, stack.getCount());
-                    stack.setCount(0); // Remove old
-                    player.getInventory().add(newStack); // Add new cooled item
+
+                    boolean isMain = stack == player.getMainHandItem();
+                    boolean isOff = stack == player.getOffhandItem();
+
+                    stack.setCount(0); // Remove old heated item
+
+                    if (isMain) {
+                        player.setItemInHand(InteractionHand.MAIN_HAND, newStack);
+                    } else if (isOff) {
+                        player.setItemInHand(InteractionHand.OFF_HAND, newStack);
+                    } else if (!player.getInventory().add(newStack)) {
+                        player.drop(newStack, false); // Drop if inventory is full
+                    }
+
                     level.playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.7f, 1.0f);
                 }
             }
         }
 
-        // 🔥 Heat Damage or Tongs Handling (unchanged)
-        boolean hasHeated = player.getInventory().items.stream()
-                .anyMatch(s -> !s.isEmpty() && s.getItem().builtInRegistryHolder().is(ModTags.Items.HEATED_METALS))
-                || player.getMainHandItem().is(ModTags.Items.HEATED_METALS)
-                || player.getOffhandItem().is(ModTags.Items.HEATED_METALS);
+        boolean hasHotItem = player.getInventory().items.stream()
+                .anyMatch(s -> !s.isEmpty() && (s.is(ModTags.Items.HEATED_METALS) || s.is(ModTags.Items.HOT_ITEMS)))
+                || player.getMainHandItem().is(ModTags.Items.HEATED_METALS) || player.getMainHandItem().is(ModTags.Items.HOT_ITEMS)
+                || player.getOffhandItem().is(ModTags.Items.HEATED_METALS) || player.getOffhandItem().is(ModTags.Items.HOT_ITEMS);
 
-        if (!hasHeated) return;
+        if (!hasHotItem) return;
 
         UUID uuid = player.getUUID();
         ItemStack main = player.getMainHandItem();

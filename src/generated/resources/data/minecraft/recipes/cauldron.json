@@ -3,17 +3,17 @@
   "category": "misc",
   "hammering": 5,
   "has_quality": false,
-  "key": {
-    "#": {
-      "item": "overgeared:steel_plate"
-    }
-  },
   "needs_minigame": false,
   "pattern": [
     "# #",
     "# #",
     "###"
   ],
+  "key": {
+    "#": {
+      "item": "overgeared:steel_plate"
+    }
+  },
   "result": {
     "item": "minecraft:cauldron"
   },

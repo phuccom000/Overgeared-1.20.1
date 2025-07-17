@@ -85,6 +85,12 @@
 	durability = 0
 	#Items that will NOT receive base durability multiplier. Use item IDs like 'minecraft:flint_and_steel'
 	base_durability_blacklist = ["minecraft:flint_and_steel"]
+	#Chance that forging with WELL quality fails and returns the failed result (0.0 - 1.0)
+	#Range: 0.0 ~ 1.0
+	failOnWellQualityChance = 0.1
+	#Chance that forging with EXPERT quality fails and returns the failed result (0.0 - 1.0)
+	#Range: 0.0 ~ 1.0
+	failOnExpertQualityChance = 0.05
 
 ["Armor Bonuses"]
 	#Armor bonus for expert quality armor
@@ -174,8 +180,4 @@
 	#How many ticks before a heated item cools off in inventory (default: 1200 = 60s)
 	#Range: > 1
 	heatedItemCooldownTicks = 1200
-
-["Stone Pickaxe Settings"]
-	#If stone pickaxe can mine iron or not or only copper pickaxe can
-	stonePickCanMineIron = false
 

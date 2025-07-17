@@ -128,7 +128,7 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock {
 
         player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
             if (isHammer && anvil.hasRecipe()) {
-                if (minigame.getVisible() && pos.equals(minigame.getAnvilPos()) || !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get()) {
+                if (minigame.getVisible() && pos.equals(minigame.getAnvilPos()) || !anvil.hasQuality() && !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get()) {
                     // Hammer logic (particles, sound, cooldown)
                     if (!ServerConfig.ENABLE_MINIGAME.get())
                         anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);

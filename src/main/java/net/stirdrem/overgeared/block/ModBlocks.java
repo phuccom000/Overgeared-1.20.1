@@ -9,13 +9,12 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.custom.BlueprintWorkbenchBlock;
-import net.stirdrem.overgeared.block.custom.SteelSmithingAnvil;
+import net.stirdrem.overgeared.block.custom.*;
 //import net.stirdrem.overgeared.block.custom.LayeredWaterBarrel;
 //import net.stirdrem.overgeared.block.custom.WaterBarrel;
 //import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
-import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
 import net.stirdrem.overgeared.item.ModItems;
 
 import java.util.function.Supplier;
@@ -27,7 +26,11 @@ public class ModBlocks {
             DeferredRegister.create(ForgeRegistries.BLOCKS, OvergearedMod.MOD_ID);
 
     public static final RegistryObject<Block> SMITHING_ANVIL = registerBlock("smithing_anvil",
-            () -> new SteelSmithingAnvil(BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
+            () -> new SteelSmithingAnvil(AnvilTier.IRON, BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
+    public static final RegistryObject<Block> TIER_A_SMITHING_ANVIL = registerBlock("tier_a_smithing_anvil",
+            () -> new TierASmithingAnvil(AnvilTier.ABOVE_A, BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
+    public static final RegistryObject<Block> TIER_B_SMITHING_ANVIL = registerBlock("tier_b_smithing_anvil",
+            () -> new TierBSmithingAnvil(AnvilTier.ABOVE_B, BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
 
     public static final RegistryObject<Block> STONE_SMITHING_ANVIL = registerBlock("stone_anvil",
             () -> new StoneSmithingAnvil(BlockBehaviour.Properties.copy(Blocks.STONE).noOcclusion()));

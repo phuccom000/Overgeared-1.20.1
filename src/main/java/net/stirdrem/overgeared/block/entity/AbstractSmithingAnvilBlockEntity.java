@@ -240,38 +240,40 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         ForgingRecipe recipe = recipeOptional.get();
         ItemStack result = recipe.getResultItem(getLevel().registryAccess());
         failedResult = recipe.getFailedResultItem(getLevel().registryAccess());
+        ForgingQuality minimumQuality = recipe.getMinimumQuality();
         // Only set quality if recipe supports it
         if (recipe.hasQuality()) {
             if (ServerConfig.ENABLE_MINIGAME.get()) {
-                String quality = determineForgingQuality();
-                if (!Objects.equals(quality, "no_quality")) {
-                    CompoundTag tag = result.getOrCreateTag();
-
-                    if (!quality.equals("perfect")) {
-                        tag.putString("ForgingQuality", quality);
-                    } else {
-                        Random random = new Random();
-                        if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 &&
-                                random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
-                            quality = "master";
+                String qualityStr = determineForgingQuality();
+                if (!Objects.equals(qualityStr, "no_quality")) {
+                    ForgingQuality quality = ForgingQuality.fromString(qualityStr);
+                    if (quality != null) {
+                        // Clamp to minimum quality if needed
+                        if (minimumQuality != null && quality.ordinal() < minimumQuality.ordinal()) {
+                            quality = minimumQuality;
                         }
-                        tag.putString("ForgingQuality", quality);
-                    }
 
-                    if (!(result.getItem() instanceof ArmorItem) &&
-                            !(result.getItem() instanceof ShieldItem) &&
-                            recipe.hasPolishing()) {
-                        tag.putBoolean("Polished", false);
-                    }
+                        CompoundTag tag = result.getOrCreateTag();
 
-                    result.setTag(tag);
+                        if (quality != ForgingQuality.PERFECT) {
+                            tag.putString("ForgingQuality", quality.getDisplayName());
+                        } else {
+                            if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 &&
+                                    new Random().nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
+                                quality = ForgingQuality.MASTER;
+                            }
+                            tag.putString("ForgingQuality", quality.getDisplayName());
+                        }
+
+                        if (!(result.getItem() instanceof ArmorItem) &&
+                                !(result.getItem() instanceof ShieldItem) &&
+                                recipe.hasPolishing()) {
+                            tag.putBoolean("Polished", false);
+                        }
+
+                        result.setTag(tag);
+                    }
                 }
-            } else {
-                CompoundTag tag = result.getOrCreateTag();
-                if (!(result.getItem() instanceof ArmorItem) && !(result.getItem() instanceof ShieldItem)) {
-                    tag.putBoolean("Polished", false);
-                }
-                result.setTag(tag);
             }
         } else if (recipe.needsMinigame()) {
             // Handle minigame result without quality

@@ -18,7 +18,6 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.ToolType;
-import net.stirdrem.overgeared.item.ToolTypeRegistry;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -365,7 +364,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_PLATE.get(), 4)
-                .tier(AnvilTier.STEEL)
+                .tier(AnvilTier.IRON)
                 .setQuality(false)
                 .pattern("#")
                 .define('#', ModItems.STEEL_INGOT.get())
@@ -606,7 +605,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_INGOT.get(), 3)
-                .tier(AnvilTier.STONE)
                 .setQuality(false)
                 .pattern("#")
                 .define('#', ModItems.HEATED_CRUDE_STEEL.get())

@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.block.entity.SteelSmithingAnvilBlockEntity;
 
 public class SteelSmithingAnvilMenu extends AbstractSmithingAnvilMenu {

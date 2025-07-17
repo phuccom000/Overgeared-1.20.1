@@ -29,6 +29,13 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                 .add(ModItems.IRON_TONGS.get(),
                         ModItems.STEEL_TONGS.get()
                 );
+        this.tag(Tags.Items.INGOTS)
+                .add(ModItems.STEEL_INGOT.get()
+                );
+        this.tag(Tags.Items.NUGGETS)
+                .add(ModItems.COPPER_NUGGET.get(),
+                        ModItems.STEEL_NUGGET.get()
+                );
         this.tag(ModTags.Items.TOOL_PARTS)
                 .add(
                         // Stone

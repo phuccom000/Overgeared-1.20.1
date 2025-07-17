@@ -1,21 +1,21 @@
 {
   "type": "overgeared:forging",
   "category": "misc",
+  "tier": "stone",
   "hammering": 3,
   "has_quality": false,
-  "key": {
-    "#": {
-      "item": "minecraft:iron_ingot"
-    }
-  },
   "needs_minigame": false,
   "pattern": [
     "# #",
     " # "
   ],
+  "key": {
+    "#": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
   "result": {
     "item": "minecraft:bucket"
   },
-  "show_notification": true,
-  "tier": "stone"
+  "show_notification": true
 }

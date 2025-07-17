@@ -19,6 +19,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.core.NonNullList;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.ForgingBookCategory;
+import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.item.ToolTypeRegistry;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
@@ -58,6 +59,9 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private Item failedResult;
     @Nullable
     private int failedResultCount;
+
+    @Nullable
+    private ForgingQuality minimumQuality;
 
     private boolean showNotification = true;
 
@@ -178,6 +182,11 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
+    public ShapedForgingRecipeBuilder minimumQuality(@Nullable ForgingQuality minimumQuality) {
+        this.minimumQuality = minimumQuality;
+        return this;
+    }
+
     public ShapedForgingRecipeBuilder setPolishing(@Nullable boolean hasPolishing) {
         this.hasPolishing = hasPolishing;
         return this;
@@ -231,7 +240,8 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 this.hasQuality != null && !this.hasQuality ? null : (this.requiresBlueprint != null ? this.requiresBlueprint : false),
                 this.hasQuality == null || this.hasQuality,
                 this.hasQuality != null && !this.hasQuality ? null : (this.hasPolishing != null ? this.hasPolishing : true),
-                this.needsMinigame != null && this.needsMinigame,
+                this.hasQuality != null && this.hasQuality ? null : (this.needsMinigame != null && this.needsMinigame),
+                this.hasQuality != null && !this.hasQuality ? "" : (this.minimumQuality != null ? this.minimumQuality.getDisplayName() : ForgingQuality.POOR.getDisplayName()),
                 this.tier == null ? "" : this.tier
         ));
     }
@@ -268,10 +278,11 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final Boolean hasQuality;
         private final Boolean hasPolishing;
         private final Boolean needsMinigame;
+        private final String minimumQuality;
         private final String tier;
 
 
-        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, ItemStack failedResult, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, List<String> blueprintTypes, Boolean requiresBlueprint, Boolean hasQuality, Boolean hasPolishing, Boolean needsMinigame, String tier) {
+        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, ItemStack failedResult, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, List<String> blueprintTypes, Boolean requiresBlueprint, Boolean hasQuality, Boolean hasPolishing, Boolean needsMinigame, String minimumQuality, String tier) {
             this.ingredients = ingredients;
             this.hammering = hammering;
             this.result = result;
@@ -289,6 +300,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             this.hasQuality = hasQuality;
             this.hasPolishing = hasPolishing;
             this.needsMinigame = needsMinigame;
+            this.minimumQuality = minimumQuality;
             this.tier = tier;
         }
 
@@ -327,8 +339,10 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             if (this.hasQuality != null) {
                 json.addProperty("has_quality", this.hasQuality);
             }
-
-            if (this.needsMinigame != null) {
+            if (!this.minimumQuality.isEmpty()) {
+                json.addProperty("minimum_quality", this.minimumQuality);
+            }
+            if (this.needsMinigame != null || !this.needsMinigame) {
                 json.addProperty("needs_minigame", this.needsMinigame);
             }
 

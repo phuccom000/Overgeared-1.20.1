@@ -454,25 +454,36 @@ public class ModItemInteractEvents {
         }
     }
 
-    private static void coolIngot(Player player, ItemStack heldStack) {
-        Item cooledItem = getCooledIngot(heldStack.getItem());
-        if (cooledItem != null) {
-            ItemStack cooledIngot = new ItemStack(cooledItem);
-            heldStack.shrink(1);
+    private static void coolIngot(Player player, ItemStack stack) {
+        Item cooled = getCooledIngot(stack.getItem());
+        if (cooled == null) return;
 
-            if (heldStack.isEmpty()) {
-                player.setItemInHand(player.getUsedItemHand(), cooledIngot);
-            } else {
-                if (!player.getInventory().add(cooledIngot)) {
-                    player.drop(cooledIngot, false);
-                }
-            }
+        int count = stack.getCount();
+        if (count <= 0) return; // Avoid making 0-stack cooled items
 
-            if (player != null) {
-                player.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
+        ItemStack newStack = new ItemStack(cooled, count);
+
+        // Check where the heated stack is located
+        boolean isMain = ItemStack.isSameItemSameTags(stack, player.getMainHandItem());
+        boolean isOff = ItemStack.isSameItemSameTags(stack, player.getOffhandItem());
+
+        // Set original stack to empty
+        stack.setCount(0);
+
+        if (isMain) {
+            player.setItemInHand(InteractionHand.MAIN_HAND, newStack);
+        } else if (isOff) {
+            player.setItemInHand(InteractionHand.OFF_HAND, newStack);
+        } else {
+            // Try to replace in inventory first
+            if (!player.getInventory().add(newStack)) {
+                player.drop(newStack, false); // Drop if inventory is full
             }
         }
+
+        player.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
     }
+
 
     private static void grindItem(Player player, ItemStack heldStack) {
         Item cooledItem = getGrindable(heldStack.getItem());

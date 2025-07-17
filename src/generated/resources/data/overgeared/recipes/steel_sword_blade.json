@@ -7,6 +7,7 @@
   "requires_blueprint": false,
   "hammering": 4,
   "has_quality": true,
+  "minimum_quality": "poor",
   "needs_minigame": false,
   "has_polishing": true,
   "pattern": [

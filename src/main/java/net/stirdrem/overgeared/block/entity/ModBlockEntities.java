@@ -18,6 +18,18 @@ public class ModBlockEntities {
                                     ModBlocks.SMITHING_ANVIL.get()).
                             build(null));
 
+    public static final RegistryObject<BlockEntityType<TierASmithingAnvilBlockEntity>> TIER_A_SMITHING_ANVIL_BE =
+            BLOCK_ENTITIES.register("tier_a_smithing_table_be", () ->
+                    BlockEntityType.Builder.of(TierASmithingAnvilBlockEntity::new,
+                                    ModBlocks.TIER_A_SMITHING_ANVIL.get()).
+                            build(null));
+
+    public static final RegistryObject<BlockEntityType<TierBSmithingAnvilBlockEntity>> TIER_B_SMITHING_ANVIL_BE =
+            BLOCK_ENTITIES.register("tier_b_smithing_table_be", () ->
+                    BlockEntityType.Builder.of(TierBSmithingAnvilBlockEntity::new,
+                                    ModBlocks.TIER_B_SMITHING_ANVIL.get()).
+                            build(null));
+
     public static final RegistryObject<BlockEntityType<StoneSmithingAnvilBlockEntity>> STONE_SMITHING_ANVIL_BE =
             BLOCK_ENTITIES.register("stone_smithing_table_be", () ->
                     BlockEntityType.Builder.of(StoneSmithingAnvilBlockEntity::new,
