@@ -100,7 +100,7 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
     }*/
 
     public static class Type implements RecipeType<OvergearedShapelessRecipe> {
-        public static final OvergearedShapelessRecipe.Type INSTANCE = new OvergearedShapelessRecipe.Type();
+        public static final Type INSTANCE = new Type();
         public static final String ID = "crafting_shapeless";
     }
 

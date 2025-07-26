@@ -1,9 +1,6 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "equipment",
-  "result": {
-    "item": "overgeared:iron_tongs"
-  },
   "ingredients": [
     {
       "item": "overgeared:iron_tong"
@@ -11,5 +8,8 @@
     {
       "item": "overgeared:iron_tong"
     }
-  ]
+  ],
+  "result": {
+    "item": "overgeared:iron_tongs"
+  }
 }

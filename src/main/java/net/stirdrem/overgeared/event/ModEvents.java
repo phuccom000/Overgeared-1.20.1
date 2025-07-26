@@ -6,16 +6,20 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -24,6 +28,7 @@ import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -34,7 +39,6 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
@@ -47,7 +51,6 @@ import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
 public class ModEvents {
-    private static final int ANVIL_CLEANUP_INTERVAL = 1200; // 1 minute (60 seconds * 20 ticks)
     private static final int HEATED_ITEM_CHECK_INTERVAL = 20; // 1 second
     private static final float BURN_DAMAGE = 1.0f;
 
@@ -371,10 +374,12 @@ public class ModEvents {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatablemetals.tooltip")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
+
         if (stack.is(ModTags.Items.HOT_ITEMS)) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.hotitems.tooltip")
                     .withStyle(ChatFormatting.RED));
         }
+
         // Add Forging Quality
         if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
             String quality = stack.getTag().getString("ForgingQuality");
@@ -397,9 +402,10 @@ public class ModEvents {
             boolean isPolished = stack.getTag().getBoolean("Polished");
             Component polishComponent = isPolished
                     ? Component.translatable("tooltip.overgeared.polished").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC)
-                    : Component.translatable("tooltip.overgeared.unpolished").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+                    : Component.translatable("tooltip.overgeared.unpolished").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC);
             tooltip.add(insertOffset++, polishComponent);
         }
+
         if (stack.hasTag() && stack.getTag().contains("failedResult")) {
             tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.failedResult")
                     .withStyle(ChatFormatting.RED));
@@ -420,5 +426,41 @@ public class ModEvents {
             }
         }
 
+        // 🔽 Add Potion Uses Left Tooltip
+        if (stack.is(Items.POTION) || stack.is(Items.SPLASH_POTION) || stack.is(Items.LINGERING_POTION)) {
+            CompoundTag tag = stack.getTag();
+            int maxUses = ServerConfig.MAX_POTION_TIPPING_USE.get();
+            int used = 0;
+
+            if (tag != null && tag.contains("TippedUsed", Tag.TAG_INT)) {
+                used = tag.getInt("TippedUsed");
+            }
+
+            int left = Math.max(0, maxUses - used);
+            tooltip.add(Component.translatable("tooltip.overgeared.potion_uses", left, maxUses).withStyle(ChatFormatting.GRAY));
+
+
+        }
+
     }
+
+    @SubscribeEvent
+    public static void onHammerDestroyed(PlayerDestroyItemEvent event) {
+        ItemStack stack = event.getOriginal();
+        if (!(stack.is(ModTags.Items.SMITHING_HAMMERS))) return;
+
+        Player player = event.getEntity();
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
+
+        serverPlayer.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+            if (minigame.isVisible()) {
+                BlockPos pos = minigame.getAnvilPos();
+                if (pos != null) {
+                    ModEvents.resetMinigameForPlayer(serverPlayer);
+                }
+            }
+        });
+    }
+
+
 }

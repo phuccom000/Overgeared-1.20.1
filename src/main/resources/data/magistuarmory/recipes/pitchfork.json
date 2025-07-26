@@ -1,23 +1,36 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 4,
-  "has_quality": true,
-  "pattern": [
-    "bab",
-    " a ",
-    " a "
-  ],
-  "key": {
-    "a": {
-      "tag": "forge:rods/wooden"
-    },
-    "b": {
-      "item": "overgeared:steel_ingot"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 4,
+        "has_quality": true,
+        "pattern": [
+          "bab",
+          " a ",
+          " a "
+        ],
+        "key": {
+          "a": {
+            "tag": "forge:rods/wooden"
+          },
+          "b": {
+            "item": "overgeared:steel_ingot"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:pitchfork",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:pitchfork",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

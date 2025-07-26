@@ -65,13 +65,6 @@ public class BlueprintItem extends Item {
                 tooltip.add(Component.translatable("tooltip.overgeared.blueprint.progress", uses, usesToLevel)
                         .withStyle(ChatFormatting.GRAY));
             }
-
-            if (flag.isAdvanced()) {
-                tooltip.add(Component.translatable("tooltip.overgeared.blueprint.instructions")
-                        .withStyle(ChatFormatting.GRAY));
-                tooltip.add(Component.translatable("tooltip.overgeared.blueprint.progress", uses, usesToLevel)
-                        .withStyle(ChatFormatting.GRAY));
-            }
         }
 
         // ToolType line only if present
@@ -90,7 +83,6 @@ public class BlueprintItem extends Item {
                             : "tooltip.overgeared.blueprint.optional"
             ).withStyle(required ? ChatFormatting.RED : ChatFormatting.GRAY));
         }
-
     }
 
 

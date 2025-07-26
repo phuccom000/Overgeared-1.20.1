@@ -1,22 +1,35 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-  "pattern": [
-    "mmh",
-    "mm "
-  ],
-  "key": {
-    "m": {
-      "tag": "forge:ingots/iron"
-    },
-    "h": {
-      "item": "overgeared:steel_ingot"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          "mmh",
+          "mm "
+        ],
+        "key": {
+          "m": {
+            "tag": "forge:ingots/iron"
+          },
+          "h": {
+            "item": "overgeared:steel_ingot"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:iron_buckler",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:iron_buckler",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

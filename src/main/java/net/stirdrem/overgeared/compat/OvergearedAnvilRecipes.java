@@ -35,6 +35,10 @@ public class OvergearedAnvilRecipes {
         return Stream.of(
                 // Copper tools repair
                 new RepairData(
+                        Ingredient.of(Items.IRON_INGOT),
+                        new ItemStack(ModItems.IRON_TONGS.get())
+                ),
+                new RepairData(
                         Ingredient.of(Items.COPPER_INGOT),
                         new ItemStack(ModItems.COPPER_SWORD.get()),
                         new ItemStack(ModItems.COPPER_PICKAXE.get()),
@@ -45,15 +49,12 @@ public class OvergearedAnvilRecipes {
                 // Steel tools repair
                 new RepairData(
                         Ingredient.of(ModItems.STEEL_INGOT.get()),
+                        new ItemStack(ModItems.STEEL_TONGS.get()),
                         new ItemStack(ModItems.STEEL_SWORD.get()),
                         new ItemStack(ModItems.STEEL_PICKAXE.get()),
                         new ItemStack(ModItems.STEEL_AXE.get()),
                         new ItemStack(ModItems.STEEL_SHOVEL.get()),
-                        new ItemStack(ModItems.STEEL_HOE.get())
-                ),
-                // Steel armor repair
-                new RepairData(
-                        Ingredient.of(ModItems.STEEL_INGOT.get()),
+                        new ItemStack(ModItems.STEEL_HOE.get()),
                         new ItemStack(ModItems.STEEL_HELMET.get()),
                         new ItemStack(ModItems.STEEL_CHESTPLATE.get()),
                         new ItemStack(ModItems.STEEL_LEGGINGS.get()),

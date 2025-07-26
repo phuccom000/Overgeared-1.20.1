@@ -1,29 +1,42 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 6,
-  "has_quality": true,
-  "pattern": [
-    "b b",
-    "cdc",
-    "cac"
-  ],
-  "key": {
-    "a": {
-      "item": "minecraft:red_dye"
-    },
-    "b": {
-      "tag": "magistuarmory:woolen_fabrics"
-    },
-    "c": {
-      "item": "overgeared:steel_plate"
-    },
-    "d": {
-      "item": "magistuarmory:halfarmor_chestplate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 6,
+        "has_quality": true,
+        "pattern": [
+          "b b",
+          "cdc",
+          "cac"
+        ],
+        "key": {
+          "a": {
+            "item": "minecraft:red_dye"
+          },
+          "b": {
+            "tag": "magistuarmory:woolen_fabrics"
+          },
+          "c": {
+            "item": "overgeared:steel_plate"
+          },
+          "d": {
+            "item": "magistuarmory:halfarmor_chestplate"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:alla_tedesca_chestplate",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:alla_tedesca_chestplate",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

@@ -109,7 +109,7 @@ public class TierBSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
         ItemStack result = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
 
         // Skip blueprint progression if crafting failed
-        if (result.isEmpty() || result.getOrCreateTag().getBoolean("failedResult")) return;
+        if (result.isEmpty()) return;
 
         // Handle blueprint progression (slot 11)
         ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);

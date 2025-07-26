@@ -1,23 +1,23 @@
 {
   "type": "overgeared:forging",
-  "category": "misc",
   "blueprint": [
     "hoe"
   ],
-  "requires_blueprint": false,
+  "category": "misc",
   "hammering": 4,
-  "has_quality": true,
-  "minimum_quality": "poor",
-  "needs_minigame": false,
   "has_polishing": true,
-  "pattern": [
-    "##"
-  ],
+  "has_quality": true,
   "key": {
     "#": {
       "item": "overgeared:heated_steel_ingot"
     }
   },
+  "minimum_quality": "poor",
+  "needs_minigame": false,
+  "pattern": [
+    "##"
+  ],
+  "requires_blueprint": false,
   "result": {
     "item": "overgeared:steel_hoe_head"
   },

@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 4,
-  "has_quality": true,
-    "pattern": [
-        "cgc",
-        "scs",
-        "ccc"
-    ],
-    "key": {
-        "g": {
-            "item": "slavicarmory:rus_chainmail_chestplate"
-        },
-        "c": {
-            "tag": "magistuarmory:lamellar_rows/steel"
-        },
-        "s": {
-            "tag": "magistuarmory:leather_strips"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "slavicarmory"
         }
-    },
-    "result": {
-        "item": "slavicarmory:lamellar_mail_chestplate",
-        "count": 1
-    },
-  "show_notification": true
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 4,
+        "has_quality": true,
+        "pattern": [
+          "cgc",
+          "scs",
+          "ccc"
+        ],
+        "key": {
+          "g": {
+            "item": "slavicarmory:rus_chainmail_chestplate"
+          },
+          "c": {
+            "tag": "magistuarmory:lamellar_rows/steel"
+          },
+          "s": {
+            "tag": "magistuarmory:leather_strips"
+          }
+        },
+        "result": {
+          "item": "slavicarmory:lamellar_mail_chestplate",
+          "count": 1
+        },
+        "show_notification": true
+      }
+    }
+  ]
 }

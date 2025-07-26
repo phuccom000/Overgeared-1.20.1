@@ -1,22 +1,35 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 4,
-  "has_quality": false,
-  "pattern": [
-    "pp",
-    "ll"
-  ],
-  "key": {
-    "l": {
-      "tag": "magistuarmory:leather_strips"
-    },
-    "p": {
-      "item": "overgeared:steel_plate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 4,
+        "has_quality": false,
+        "pattern": [
+          "pp",
+          "ll"
+        ],
+        "key": {
+          "l": {
+            "tag": "magistuarmory:leather_strips"
+          },
+          "p": {
+            "item": "overgeared:steel_plate"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:ecranche_decoration",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:ecranche_decoration",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

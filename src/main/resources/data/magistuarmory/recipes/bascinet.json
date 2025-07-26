@@ -1,21 +1,34 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 4,
-  "has_quality": true,
-  "pattern": [
-    "pnp"
-  ],
-  "key": {
-    "p": {
-      "item": "overgeared:steel_plate"
-    },
-    "n": {
-      "item": "magistuarmory:norman_helmet"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 4,
+        "has_quality": true,
+        "pattern": [
+          "pnp"
+        ],
+        "key": {
+          "p": {
+            "item": "overgeared:steel_plate"
+          },
+          "n": {
+            "item": "magistuarmory:norman_helmet"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:bascinet",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:bascinet",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

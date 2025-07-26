@@ -4,6 +4,8 @@ import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableAnimated;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
@@ -53,11 +55,17 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
     private static final int imageWidth = 138;
     private static final int imageHeight = 54;
 
+    private final int animationTime = 200; // full cycle in ticks
+    private final IDrawableStatic arrowStatic;
+    private final IDrawableAnimated arrowAnimated;
+
     public ForgingRecipeCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(TEXTURE, 7, 16, imageWidth, imageHeight);
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.SMITHING_ANVIL.get()));
-
+        arrowStatic = helper.createDrawable(TEXTURE, 176, 0, 24, 17);
+        arrowAnimated = helper.createAnimatedDrawable(arrowStatic, animationTime, IDrawableAnimated.StartDirection.LEFT, false);
     }
+
 
     @Override
     public RecipeType<ForgingRecipe> getRecipeType() {
@@ -76,8 +84,6 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
 
     @Override
     public void draw(ForgingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        // Draw the background first
-        //this.background.draw(guiGraphics);
         String hitsText = Component.translatable("tooltip.overgeared.recipe.hits", recipe.getRemainingHits()).getString();
 
         String tierRaw = recipe.getAnvilTier();
@@ -85,14 +91,19 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
         Component tierText = Component.translatable("tooltip.overgeared.recipe.tier")
                 .append(Component.literal(" "))
                 .append(Component.translatable(tierName.getLang()));
+
         if (recipe.hasQuality() || !recipe.needsMinigame()) {
             guiGraphics.blit(RESULT_BIG, 112, 14, 0, 0, 26, 26, 26, 26);
-        } else guiGraphics.blit(RESULT_TWOSLOT, 116, 9, 0, 0, 18, 36, 18, 36);
+        } else {
+            guiGraphics.blit(RESULT_TWOSLOT, 116, 9, 0, 0, 18, 36, 18, 36);
+        }
 
+        // Draw text
         guiGraphics.drawString(Minecraft.getInstance().font, hitsText, 79, 1, 0xFF808080, false);
         guiGraphics.drawString(Minecraft.getInstance().font, tierText, 79, 47, 0xFF808080, false);
-        //guiGraphics.drawString(Minecraft.getInstance().font, blueprintText, 57, 1, 0xFF808080, false);
-        //guiGraphics.drawString(Minecraft.getInstance().font, requiresBlueprintText, 0, 57, 0xFF808080, false);
+
+        arrowAnimated.draw(guiGraphics, 82, 19);
+
     }
 
 
@@ -158,6 +169,5 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
 
         return stacks;
     }
-
 
 }

@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 6,
-  "has_quality": true,
-  "pattern": [
-    " c ",
-    "aba",
-    " a "
-  ],
-  "key": {
-    "a": {
-      "tag": "magistuarmory:chainmails/steel"
-    },
-    "b": {
-      "item": "magistuarmory:face_helmet"
-    },
-    "c": {
-      "item": "overgeared:steel_ingot"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 6,
+        "has_quality": true,
+        "pattern": [
+          " c ",
+          "aba",
+          " a "
+        ],
+        "key": {
+          "a": {
+            "tag": "magistuarmory:chainmails/steel"
+          },
+          "b": {
+            "item": "magistuarmory:face_helmet"
+          },
+          "c": {
+            "item": "overgeared:steel_ingot"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:cuman_captain_helmet",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:cuman_captain_helmet",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

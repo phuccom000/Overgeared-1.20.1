@@ -3,17 +3,17 @@
   "category": "misc",
   "hammering": 2,
   "has_quality": false,
+  "key": {
+    "x": {
+      "item": "overgeared:heated_steel_ingot"
+    }
+  },
   "needs_minigame": false,
   "pattern": [
     "  x",
     " xx",
     "x  "
   ],
-  "key": {
-    "x": {
-      "item": "overgeared:heated_steel_ingot"
-    }
-  },
   "result": {
     "item": "overgeared:steel_tong"
   },

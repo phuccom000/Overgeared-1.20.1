@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-  "pattern": [
-    "   ",
-    "bcb",
-    " a "
-  ],
-  "key": {
-    "a": {
-      "item": "overgeared:steel_ingot"
-    },
-    "b": {
-      "tag": "forge:nuggets/steel"
-    },
-    "c": {
-      "item": "magistuarmory:armet"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          "   ",
+          "bcb",
+          " a "
+        ],
+        "key": {
+          "a": {
+            "item": "overgeared:steel_ingot"
+          },
+          "b": {
+            "tag": "forge:nuggets/steel"
+          },
+          "c": {
+            "item": "magistuarmory:armet"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:greenwich_armet",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:greenwich_armet",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

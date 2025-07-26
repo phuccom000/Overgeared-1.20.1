@@ -3,15 +3,15 @@
   "category": "misc",
   "hammering": 3,
   "has_quality": false,
-  "needs_minigame": false,
-  "pattern": [
-    "#"
-  ],
   "key": {
     "#": {
       "item": "overgeared:heated_crude_steel"
     }
   },
+  "needs_minigame": false,
+  "pattern": [
+    "#"
+  ],
   "result": {
     "item": "overgeared:steel_ingot"
   },

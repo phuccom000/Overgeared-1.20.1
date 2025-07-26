@@ -1,5 +1,7 @@
 {
   "block.overgeared.smithing_anvil": "Кузнечная наковальня",
+  "block.overgeared.tier_a_smithing_anvil": "Уровень А кузнечная наковальня (выше железного)",
+  "block.overgeared.tier_b_smithing_anvil": "Уровень Б кузнечная наковальня (выше А)",
   "block.overgeared.stone_anvil": "Каменная кузнечная наковальня",
   "block.overgeared.steel_block": "Стальной блок",
   "block.overgeared.drafting_table": "Чертёжный стол",
@@ -129,6 +131,8 @@
   "tooltip.overgeared.no_tools_available": "Нет подходящих типов",
   "gui.overgeared.tier.stone": "Каменный",
   "gui.overgeared.tier.iron": "Железо",
+  "gui.overgeared.tier.tier_a": "Уровень А (выше железного)",
+  "gui.overgeared.tier.tier_b": "Уровень Б (выше А)",
   "tooltip.overgeared.recipe.hits": "Необходимо ударов: %s",
   "tooltip.overgeared.recipe.tier": "Уровень:",
   "tooltip.overgeared.recipe.blueprint": "Тип: %s",
@@ -142,6 +146,9 @@
   "jei.overgeared.category.flint_knapping": "Как получить камень",
   "jei.overgeared.category.stone_anvil": "Как сделать каменную наковальню",
   "jei.overgeared.stone_anvil.description1": "ПКМ в присяде по блоку камня кузнечным молотом, чтобы сделать из него каменную кузнечную наковальню.",
-  "tooltip.overgeared.failedResult": "Результат неудачной ковки"
+  "tooltip.overgeared.failedResult": "Результат неудачной ковки",
+  "tooltip.overgeared.hotitems.tooltip": "Неостудимо горячее! Используйте щипцы.",
+  "tooltip.overgeared.potion_uses": "Смачиваний стрел: %s/%s",
+  "jei.overgeared.category.steel_anvil": "Как сделать кузнечную наковальню",
+  "jei.overgeared.steel_anvil.description": "ПКМ в присяде по обычной наковальне кузнечным молотом, чтобы сделать из неё кузнечную наковальню."
 }
-

@@ -1,23 +1,36 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-  "pattern": [
-    " b ",
-    "bab",
-    " b "
-  ],
-  "key": {
-    "a": {
-      "item": "magistuarmory:lamellar_chestplate"
-    },
-    "b": {
-      "item": "overgeared:steel_plate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          " b ",
+          "bab",
+          " b "
+        ],
+        "key": {
+          "a": {
+            "item": "magistuarmory:lamellar_chestplate"
+          },
+          "b": {
+            "item": "overgeared:steel_plate"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:mirror_chestplate",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:mirror_chestplate",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

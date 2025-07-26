@@ -1,25 +1,25 @@
 {
   "type": "overgeared:forging",
   "category": "armors",
-  "requires_blueprint": false,
-  "tier": "stone",
   "hammering": 4,
-  "has_quality": true,
-  "minimum_quality": "poor",
-  "needs_minigame": false,
   "has_polishing": false,
-  "pattern": [
-    "###",
-    "# #",
-    "# #"
-  ],
+  "has_quality": true,
   "key": {
     "#": {
       "item": "overgeared:copper_plate"
     }
   },
+  "minimum_quality": "poor",
+  "needs_minigame": false,
+  "pattern": [
+    "###",
+    "# #",
+    "# #"
+  ],
+  "requires_blueprint": false,
   "result": {
     "item": "overgeared:copper_leggings"
   },
-  "show_notification": true
+  "show_notification": true,
+  "tier": "stone"
 }

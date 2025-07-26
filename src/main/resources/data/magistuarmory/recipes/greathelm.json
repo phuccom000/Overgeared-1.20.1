@@ -1,23 +1,36 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 4,
-  "has_quality": true,
-  "pattern": [
-    "iii",
-    "i i",
-    "ici"
-  ],
-  "key": {
-    "i": {
-      "item": "overgeared:steel_ingot"
-    },
-    "c": {
-      "tag": "magistuarmory:chainmails/steel"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 4,
+        "has_quality": true,
+        "pattern": [
+          "iii",
+          "i i",
+          "ici"
+        ],
+        "key": {
+          "i": {
+            "item": "overgeared:steel_ingot"
+          },
+          "c": {
+            "tag": "magistuarmory:chainmails/steel"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:greathelm",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:greathelm",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

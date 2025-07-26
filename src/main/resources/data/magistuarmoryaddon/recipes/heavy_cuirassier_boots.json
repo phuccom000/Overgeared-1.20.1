@@ -1,23 +1,36 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-  "pattern": [
-    "b b",
-    "b b",
-    "a a"
-  ],
-  "key": {
-    "a": {
-      "item": "minecraft:leather"
-    },
-    "b": {
-      "item": "overgeared:steel_ingot"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          "b b",
+          "b b",
+          "a a"
+        ],
+        "key": {
+          "a": {
+            "item": "minecraft:leather"
+          },
+          "b": {
+            "item": "overgeared:steel_ingot"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:heavy_cuirassier_boots",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:heavy_cuirassier_boots",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

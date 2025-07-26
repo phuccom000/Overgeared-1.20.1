@@ -1,22 +1,35 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 2,
-  "has_quality": false,
-  "pattern": [
-    "ff",
-    "i "
-  ],
-  "key": {
-    "i": {
-      "item": "overgeared:steel_ingot"
-    },
-    "f": {
-      "tag": "magistuarmory:woolen_fabrics"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 2,
+        "has_quality": false,
+        "pattern": [
+          "ff",
+          "i "
+        ],
+        "key": {
+          "i": {
+            "item": "overgeared:steel_ingot"
+          },
+          "f": {
+            "tag": "magistuarmory:woolen_fabrics"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:spike_decoration",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:spike_decoration",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

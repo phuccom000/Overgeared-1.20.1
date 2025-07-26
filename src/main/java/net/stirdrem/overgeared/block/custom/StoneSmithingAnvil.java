@@ -2,7 +2,11 @@ package net.stirdrem.overgeared.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -128,6 +132,33 @@ public class StoneSmithingAnvil extends AbstractSmithingAnvil {
     public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
         resetMinigameData(level, pos);
         super.onBlockExploded(state, level, pos, explosion);
+    }
+
+    @Override
+    public void onLand(Level level, BlockPos pos, BlockState fallingState, BlockState hitState, FallingBlockEntity fallingBlock) {
+        if (!level.isClientSide) {
+            // Show break particles of the anvil
+            level.levelEvent(2001, pos, Block.getId(fallingState)); // 2001 = block break effect
+
+            // Replace with cobblestone block instead of dropping item
+            level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.COBBLESTONE.defaultBlockState());
+
+            // Play stone break sound
+            level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+
+        // Do not call super.onLand to prevent block re-placing
+    }
+
+
+    @Override
+    public void onBrokenAfterFall(Level level, BlockPos pos, FallingBlockEntity fallingBlock) {
+        if (!level.isClientSide) {
+            BlockState state = fallingBlock.getBlockState();
+            level.levelEvent(2001, pos, Block.getId(state)); // Show break particles
+            Block.popResource(level, pos, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE));
+            level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
     }
 
 }

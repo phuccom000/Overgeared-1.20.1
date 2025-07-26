@@ -1,25 +1,25 @@
 {
   "type": "overgeared:forging",
   "category": "armors",
-  "requires_blueprint": false,
-  "tier": "stone",
   "hammering": 5,
-  "has_quality": true,
-  "minimum_quality": "poor",
-  "needs_minigame": false,
   "has_polishing": false,
-  "pattern": [
-    "# #",
-    "###",
-    "###"
-  ],
+  "has_quality": true,
   "key": {
     "#": {
       "item": "minecraft:gold_ingot"
     }
   },
+  "minimum_quality": "poor",
+  "needs_minigame": false,
+  "pattern": [
+    "# #",
+    "###",
+    "###"
+  ],
+  "requires_blueprint": false,
   "result": {
     "item": "minecraft:golden_chestplate"
   },
-  "show_notification": true
+  "show_notification": true,
+  "tier": "stone"
 }

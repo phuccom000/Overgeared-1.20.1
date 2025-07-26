@@ -3,28 +3,34 @@ package net.stirdrem.overgeared.event;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.cauldron.CauldronInteraction;
+
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectUtil;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -32,9 +38,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.item.ItemTossEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -57,7 +62,9 @@ import net.stirdrem.overgeared.util.QualityHelper;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
+import static net.minecraft.world.item.alchemy.PotionUtils.getMobEffects;
 import static net.stirdrem.overgeared.OvergearedMod.getCooledIngot;
 
 
@@ -108,6 +115,17 @@ public class ModItemInteractEvents {
                     .setValue(StoneSmithingAnvil.FACING, player.getDirection().getClockWise());
             level.setBlock(pos, newState, 3);
             level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.0f, 1.0f);
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
+
+        if (!level.isClientSide && player.isCrouching() && clickedState.is(Blocks.ANVIL)) {
+            BlockState newState = ModBlocks.SMITHING_ANVIL.get()
+                    .defaultBlockState()
+                    .setValue(StoneSmithingAnvil.FACING, player.getDirection().getClockWise());
+            level.setBlock(pos, newState, 3);
+            level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1.0f, 1.0f);
             event.setCancellationResult(InteractionResult.SUCCESS);
             event.setCanceled(true);
             return;
@@ -176,17 +194,6 @@ public class ModItemInteractEvents {
                 //player.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED));
                 return;
             }
-
-        /*player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-            Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
-            recipeOpt.ifPresent(recipe -> {
-                ItemStack result = recipe.getResultItem(player.level().registryAccess());
-                int progress = anvilBE.getRequiredProgress();
-                ModMessages.sendToServer(new StartMinigameC2SPacket(result, progress, pos));
-            });
-        });*/
-
-            // Set "pending minigame" data if allowed to request
 
             if (player.getUUID().equals(currentOwner)
                     && ClientAnvilMinigameData.getPendingMinigamePos() == null) {
@@ -680,4 +687,67 @@ public class ModItemInteractEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onArrowTipped(PlayerInteractEvent.RightClickItem event) {
+        Player player = event.getEntity();
+        Level level = event.getLevel();
+        InteractionHand hand = event.getHand();
+
+        if (level.isClientSide()) return;
+
+        // Determine which item is arrow and which is potion
+        ItemStack usedHand = player.getItemInHand(hand);
+        InteractionHand otherHand = hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        ItemStack otherStack = player.getItemInHand(otherHand);
+
+        // Must have arrow in one hand, potion in the other
+        if (!usedHand.is(Items.ARROW) ||
+                !(otherStack.is(Items.POTION))) {
+            return;
+        }
+
+        CompoundTag potionTag = otherStack.getOrCreateTag();
+        int used = potionTag.getInt("TippedUsed");
+        int maxUse = ServerConfig.MAX_POTION_TIPPING_USE.get();
+
+        // Consume one arrow
+        usedHand.shrink(1);
+        player.setItemInHand(hand, usedHand);
+
+        // Create tipped arrow based on potion
+        Potion basePotion = PotionUtils.getPotion(otherStack);
+        ItemStack tippedArrow = PotionUtils.setPotion(new ItemStack(Items.TIPPED_ARROW), basePotion);
+        if (!player.getInventory().add(tippedArrow)) {
+            player.drop(tippedArrow, false);
+        }
+
+        // Handle potion stack (split if >1)
+        if (otherStack.getCount() > 1) {
+            ItemStack onePotion = otherStack.split(1);
+            CompoundTag oneTag = onePotion.getOrCreateTag();
+            oneTag.putInt("TippedUsed", used + 1);
+            PotionUtils.setPotion(onePotion, basePotion);
+            player.setItemInHand(otherHand, otherStack); // leftover stack
+        } else {
+            used++;
+            if (used >= maxUse) {
+                player.setItemInHand(otherHand, new ItemStack(Items.GLASS_BOTTLE));
+            } else {
+                potionTag.putInt("TippedUsed", used);
+                PotionUtils.setPotion(otherStack, basePotion);
+                player.setItemInHand(otherHand, otherStack);
+            }
+        }
+
+        level.playSound(null,
+                player.blockPosition(),
+                SoundEvents.BREWING_STAND_BREW,
+                SoundSource.PLAYERS,
+                0.6F,
+                1.2F
+        );
+
+        event.setCanceled(true);
+        event.setCancellationResult(InteractionResult.SUCCESS);
+    }
 }

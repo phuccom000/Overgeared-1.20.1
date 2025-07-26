@@ -95,7 +95,9 @@ public class BlueprintWorkbenchScreen extends AbstractContainerScreen<BlueprintW
         // Select tool button
         selectButton = Button.builder(Component.translatable("button.overgeared.select"), btn -> {
                     if (!toolTypes.isEmpty()) {
-                        ModMessages.sendToServer(new SelectToolTypeC2SPacket(toolTypes.get(selectedIndex).getId()));
+                        //menu.createBlueprint(toolTypes.get(selectedIndex));
+                        ModMessages.sendToServer(new SelectToolTypeC2SPacket(toolTypes.get(selectedIndex).getId(), menu.containerId
+                        ));
                     }
                 })
                 .pos(x + imageWidth / 2 - selectButtonWidth / 2, selectButtonY)

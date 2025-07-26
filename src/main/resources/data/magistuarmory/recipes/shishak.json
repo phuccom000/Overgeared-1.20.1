@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 4,
-  "has_quality": true,
-  "pattern": [
-    "iii",
-    "ini",
-    "ccc"
-  ],
-  "key": {
-    "n": {
-      "tag": "forge:nuggets/steel"
-    },
-    "c": {
-      "tag": "magistuarmory:chainmails/steel"
-    },
-    "i": {
-      "item": "overgeared:steel_ingot"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 4,
+        "has_quality": true,
+        "pattern": [
+          "iii",
+          "ini",
+          "ccc"
+        ],
+        "key": {
+          "n": {
+            "tag": "forge:nuggets/steel"
+          },
+          "c": {
+            "tag": "magistuarmory:chainmails/steel"
+          },
+          "i": {
+            "item": "overgeared:steel_ingot"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:shishak",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:shishak",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

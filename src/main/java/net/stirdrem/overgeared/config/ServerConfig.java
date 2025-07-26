@@ -75,6 +75,8 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue FAIL_ON_WELL_QUALITY_CHANCE;
     public static final ForgeConfigSpec.DoubleValue FAIL_ON_EXPERT_QUALITY_CHANCE;
 
+    public static final ForgeConfigSpec.IntValue MAX_POTION_TIPPING_USE;
+
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         builder.push("Heated Items Settings");
@@ -336,6 +338,14 @@ public class ServerConfig {
         POOR_MAX_USE = builder
                 .comment("Uses required to reach the next quality after Poor")
                 .defineInRange("poorMaxUse", 5, 0, 1000);
+        builder.pop();
+
+        builder.push("Potion Config");
+        MAX_POTION_TIPPING_USE
+                = builder
+                .comment("How many arrows can a bottle of potion tips before it's depleted")
+                .defineInRange("maxPotionTipping", 8, 0, Integer.MAX_VALUE);
+
         builder.pop();
 
         SERVER_CONFIG = builder.build();

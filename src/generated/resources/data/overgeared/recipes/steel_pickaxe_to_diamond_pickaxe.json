@@ -1,13 +1,13 @@
 {
   "type": "minecraft:smithing_transform",
-  "result": {
-    "item": "minecraft:diamond_pickaxe"
-  },
   "addition": {
     "item": "minecraft:diamond"
   },
   "base": {
     "item": "overgeared:steel_pickaxe"
+  },
+  "result": {
+    "item": "minecraft:diamond_pickaxe"
   },
   "template": {
     "item": "overgeared:diamond_upgrade_smithing_template"

@@ -72,8 +72,6 @@ public class OvergearedMod {
         ServerConfig.loadConfig(ServerConfig.SERVER_CONFIG, FMLPaths.GAMEDIR.get().resolve(FMLPaths.CONFIGDIR.get()).resolve(MOD_ID + "-common.toml"));
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
 
-        modEventBus.addListener(this::onConfigLoaded);
-
         ModCreativeModeTabs.register(modEventBus);
 
         ModItems.register(modEventBus);
@@ -109,10 +107,6 @@ public class OvergearedMod {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         ModMessages.register();
-    }
-
-    private void onConfigLoaded(ModConfigEvent.Loading event) {
-        //if (event.getConfig().getSpec() == ServerConfig.SERVER_CONFIG) {
         ToolTypeRegistry.init();
         LOGGER.info("Tool types initialized: {}",
                 ToolTypeRegistry.getRegisteredTypes().size());

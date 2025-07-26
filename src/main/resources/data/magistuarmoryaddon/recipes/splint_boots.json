@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 2,
-  "has_quality": true,
-  "pattern": [
-    "c c",
-    "a a",
-    "b b"
-  ],
-  "key": {
-    "a": {
-      "tag": "magistuarmory:leather_strips"
-    },
-    "b": {
-      "item": "overgeared:steel_plate"
-    },
-    "c": {
-      "tag": "magistuarmory:small_plates/steel"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 2,
+        "has_quality": true,
+        "pattern": [
+          "c c",
+          "a a",
+          "b b"
+        ],
+        "key": {
+          "a": {
+            "tag": "magistuarmory:leather_strips"
+          },
+          "b": {
+            "item": "overgeared:steel_plate"
+          },
+          "c": {
+            "tag": "magistuarmory:small_plates/steel"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:splint_boots",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:splint_boots",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

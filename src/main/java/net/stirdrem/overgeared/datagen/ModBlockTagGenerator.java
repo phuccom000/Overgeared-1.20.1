@@ -53,6 +53,7 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 );
         this.tag(ModTags.Blocks.NEEDS_COPPER_TOOL)
                 .add(
+                        Blocks.RAW_IRON_BLOCK,
                         Blocks.IRON_ORE,
                         Blocks.DEEPSLATE_IRON_ORE,
                         Blocks.IRON_BLOCK

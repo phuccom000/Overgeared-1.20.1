@@ -1,10 +1,10 @@
 {
   "type": "minecraft:blasting",
   "category": "misc",
-  "result": "overgeared:copper_nugget",
   "cookingtime": 100,
   "experience": 0.1,
   "ingredient": {
     "item": "overgeared:copper_axe"
-  }
+  },
+  "result": "overgeared:copper_nugget"
 }

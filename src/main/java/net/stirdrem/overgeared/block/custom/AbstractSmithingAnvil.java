@@ -2,19 +2,26 @@ package net.stirdrem.overgeared.block.custom;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -33,13 +40,14 @@ import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
+import net.stirdrem.overgeared.util.TickScheduler;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Random;
 import org.joml.Vector3f;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractSmithingAnvil extends BaseEntityBlock {
+public abstract class AbstractSmithingAnvil extends BaseEntityBlock implements Fallable {
 
     protected static final int HAMMER_SOUND_DURATION_TICKS = 6; // adjust to match your sound
 
@@ -132,24 +140,32 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock {
                     // Hammer logic (particles, sound, cooldown)
                     if (!ServerConfig.ENABLE_MINIGAME.get())
                         anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
-/*            for (int i = 0; i < 3; i++) {
-                int delay = 7 * i;
-                TickScheduler.schedule(delay, () -> spawnAnvilParticles(level, pos));
-            }*/
+                    /*for (int i = 0; i < 3; i++) {
+                        int delay = 7 * i;
+                        TickScheduler.schedule(delay, () -> {
+                            player.swing(InteractionHand.MAIN_HAND, true);
+                        });
+                    }*/
                     spawnAnvilParticles(level, pos);
                     //level.playSound(null, pos, SoundEvents.ANVIL_, SoundSource.BLOCKS, 1f, 1f);
-                    held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+                    held.hurtAndBreak(1, player, p -> {
+                        // 🔄 Reset minigame on the server if hammer broke
+                        p.broadcastBreakEvent(hand);
+                    });
+                    if (player instanceof ServerPlayer server && held.isEmpty()) {
+                        ModItemInteractEvents.releaseAnvil(server, pos);
+                        resetMinigameForPlayer(server);
+                    }
                     if ((anvil.hasQuality() || anvil.needsMinigame()) && ServerConfig.ENABLE_MINIGAME.get())
                         quality = minigame.handleHit((ServerPlayer) player);
                     anvil.increaseForgingProgress(level, pos, state);
                     if (anvil.getHitsRemaining() == 1) {
-                        boolean test = anvil.isFailedResult();
                         if (anvil.isFailedResult()) {
                             level.playSound(null, pos, ModSounds.FORGING_FAILED.get(), SoundSource.BLOCKS, 1f, 1f);
                         } else
                             level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
                     } else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
-                    held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
+                    //held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
                     isHit.set(true);
                 } //else AnvilMinigameOverlay.endMinigame();
             }
@@ -166,6 +182,21 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock {
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
+    private static void resetMinigameForPlayer(ServerPlayer player) {
+        player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
+            if (minigame.hasAnvilPosition()) {
+                BlockPos anvilPos = minigame.getAnvilPos();
+                BlockEntity be = player.level().getBlockEntity(anvilPos);
+                if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
+                    anvil.setProgress(0);
+                    anvil.setChanged();
+                }
+                ModItemInteractEvents.releaseAnvil(player, anvilPos);
+            }
+            minigame.reset(player);
+            minigame.setIsVisible(false, player);
+        });
+    }
 
     protected void spawnAnvilParticles(Level level, BlockPos pos) {
         if (level instanceof ServerLevel serverLevel) {
@@ -230,6 +261,52 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock {
 
     public static String getTier() {
         return tier.getDisplayName();
+    }
+
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        super.onPlace(state, level, pos, oldState, isMoving);
+        level.scheduleTick(pos, this, 2); // Schedule an immediate fall check
+    }
+
+    @Override
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource pRandom) {
+        if (!level.isClientSide) {
+            BlockPos below = pos.below();
+            BlockState stateBelow = level.getBlockState(below);
+            if (FallingBlock.isFree(stateBelow)) {
+                // Convert the block into a falling block entity
+                FallingBlockEntity falling = FallingBlockEntity.fall(level, pos, state);
+                customizeFallingEntity(falling, level);
+            }
+        }
+    }
+
+    protected void customizeFallingEntity(FallingBlockEntity entity, Level level) {
+        // Optional: prevent it from breaking on landing
+        entity.setHurtsEntities(2.0F, 40);
+
+        entity.dropItem = true; // drop as item on breaking
+        // entity.time = 1; // fall delay
+        // entity.setHurtsEntities(0.0F, 0); // disable damage
+    }
+
+    @Override
+    public void onLand(Level pLevel, BlockPos pPos, BlockState pState, BlockState pReplaceableState, FallingBlockEntity pFallingBlock) {
+        if (!pFallingBlock.isSilent()) {
+            pLevel.levelEvent(1031, pPos, 0);
+        }
+    }
+
+    @Override
+    public DamageSource getFallDamageSource(Entity pEntity) {
+        return pEntity.damageSources().anvil(pEntity);
+    }
+
+    @Override
+    public BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState, LevelAccessor pLevel, BlockPos pPos, BlockPos pNeighborPos) {
+        pLevel.scheduleTick(pPos, this, 2);
+        return super.updateShape(pState, pDirection, pNeighborState, pLevel, pPos, pNeighborPos);
     }
 
 }

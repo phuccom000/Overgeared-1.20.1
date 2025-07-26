@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 7,
-  "has_quality": true,
-  "pattern": [
-    "aba",
-    "bcb",
-    "bbb"
-  ],
-  "key": {
-    "a": {
-      "tag": "forge:nuggets/steel"
-    },
-    "b": {
-      "item": "overgeared:steel_plate"
-    },
-    "c": {
-      "item": "magistuarmory:halfarmor_chestplate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 7,
+        "has_quality": true,
+        "pattern": [
+          "aba",
+          "bcb",
+          "bbb"
+        ],
+        "key": {
+          "a": {
+            "tag": "forge:nuggets/steel"
+          },
+          "b": {
+            "item": "overgeared:steel_plate"
+          },
+          "c": {
+            "item": "magistuarmory:halfarmor_chestplate"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:embosed_parade_chestplate",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:embosed_parade_chestplate",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

@@ -1,4 +1,4 @@
-/*
+package net.stirdrem.overgeared.networking.packet;/*
 package net.stirdrem.overgeared.networking.packet;
 
 import net.minecraft.core.BlockPos;

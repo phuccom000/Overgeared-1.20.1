@@ -1,7 +1,6 @@
 {
   "type": "overgeared:forging",
   "category": "misc",
-  "tier": "iron",
   "hammering": 4,
   "has_quality": false,
   "needs_minigame": false,
@@ -10,7 +9,7 @@
   ],
   "key": {
     "#": {
-      "item": "overgeared:steel_ingot"
+      "tag": "forge:ingots/steel"
     }
   },
   "result": {

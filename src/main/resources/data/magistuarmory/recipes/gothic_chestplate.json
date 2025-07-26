@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 6,
-  "has_quality": true,
-  "pattern": [
-    "p p",
-    "php",
-    "npn"
-  ],
-  "key": {
-    "h": {
-      "item": "magistuarmory:halfarmor_chestplate"
-    },
-    "n": {
-      "tag": "forge:nuggets/steel"
-    },
-    "p": {
-      "item": "overgeared:steel_plate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 6,
+        "has_quality": true,
+        "pattern": [
+          "p p",
+          "php",
+          "npn"
+        ],
+        "key": {
+          "h": {
+            "item": "magistuarmory:halfarmor_chestplate"
+          },
+          "n": {
+            "tag": "forge:nuggets/steel"
+          },
+          "p": {
+            "item": "overgeared:steel_plate"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:gothic_chestplate",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:gothic_chestplate",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

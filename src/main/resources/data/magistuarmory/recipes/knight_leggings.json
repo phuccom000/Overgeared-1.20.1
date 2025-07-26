@@ -1,20 +1,33 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-  "pattern": [
-    "ppp",
-    "p p",
-    "p p"
-  ],
-  "key": {
-    "p": {
-      "item": "overgeared:steel_plate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          "ppp",
+          "p p",
+          "p p"
+        ],
+        "key": {
+          "p": {
+            "item": "overgeared:steel_plate"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:knight_leggings",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:knight_leggings",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

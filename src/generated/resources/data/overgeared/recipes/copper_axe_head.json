@@ -1,27 +1,27 @@
 {
   "type": "overgeared:forging",
-  "category": "misc",
   "blueprint": [
     "axe"
   ],
-  "requires_blueprint": false,
-  "tier": "stone",
+  "category": "misc",
   "hammering": 3,
-  "has_quality": true,
-  "minimum_quality": "poor",
-  "needs_minigame": false,
   "has_polishing": true,
-  "pattern": [
-    "##",
-    "# "
-  ],
+  "has_quality": true,
   "key": {
     "#": {
       "item": "overgeared:heated_copper_ingot"
     }
   },
+  "minimum_quality": "poor",
+  "needs_minigame": false,
+  "pattern": [
+    "##",
+    "# "
+  ],
+  "requires_blueprint": false,
   "result": {
     "item": "overgeared:copper_axe_head"
   },
-  "show_notification": true
+  "show_notification": true,
+  "tier": "stone"
 }

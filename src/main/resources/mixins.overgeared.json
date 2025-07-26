@@ -5,6 +5,7 @@
   "package": "net.stirdrem.overgeared.mixin",
   "refmap": "mixins.overgeared.refmap.json",
   "mixins": [
+    "BrewingStandBlockEntityMixin",
     "ItemStackMixin"
   ],
   "client": [],

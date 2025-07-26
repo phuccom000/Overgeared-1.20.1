@@ -40,6 +40,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipeCategories(new FlintKnappingCategory(registration.getJeiHelpers().getGuiHelper()));
         RegistryAccess registryAccess = Minecraft.getInstance().getConnection().registryAccess();
         registration.addRecipeCategories(new StoneAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
+        registration.addRecipeCategories(new SteelAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
 
     }
 
@@ -99,7 +100,13 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 new ExplanationRecipe(new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()))
                 // Add more recipes as needed
         );
+        
+        List<ExplanationRecipe> SteelAnvilRecipes = List.of(
+                new ExplanationRecipe(new ItemStack(ModBlocks.SMITHING_ANVIL.get()))
+                // Add more recipes as needed
+        );
         registration.addRecipes(StoneAnvilCategory.STONE_ANVIL_GET, StoneAnvilRecipes);
+        registration.addRecipes(SteelAnvilCategory.STEEL_ANVIL_GET, SteelAnvilRecipes);
 
         registration.addRecipes(RecipeTypes.ANVIL,
                 OvergearedAnvilRecipes.getOvergearedAnvilRecipes(

@@ -1,22 +1,35 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 4,
-  "has_quality": true,
-  "pattern": [
-    "psp",
-    "ppp"
-  ],
-  "key": {
-    "p": {
-      "tag": "magistuarmory:small_plates/steel"
-    },
-    "s": {
-      "item": "magistuarmory:shishak"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 4,
+        "has_quality": true,
+        "pattern": [
+          "psp",
+          "ppp"
+        ],
+        "key": {
+          "p": {
+            "tag": "magistuarmory:small_plates/steel"
+          },
+          "s": {
+            "item": "magistuarmory:shishak"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:face_helmet",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmory:face_helmet",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

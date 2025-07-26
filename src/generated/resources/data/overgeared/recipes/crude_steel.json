@@ -1,10 +1,6 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
-  "result": {
-    "count": 3,
-    "item": "overgeared:crude_steel"
-  },
   "ingredients": [
     {
       "item": "minecraft:coal"
@@ -18,5 +14,9 @@
     {
       "item": "minecraft:iron_ingot"
     }
-  ]
+  ],
+  "result": {
+    "count": 3,
+    "item": "overgeared:crude_steel"
+  }
 }

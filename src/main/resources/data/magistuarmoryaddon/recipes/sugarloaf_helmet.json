@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-  "pattern": [
-    "aca",
-    "c c",
-    "aba"
-  ],
-  "key": {
-    "a": {
-      "item": "overgeared:steel_ingot"
-    },
-    "b": {
-      "tag": "magistuarmory:chainmails/steel"
-    },
-    "c": {
-      "item": "overgeared:steel_plate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          "aca",
+          "c c",
+          "aba"
+        ],
+        "key": {
+          "a": {
+            "item": "overgeared:steel_ingot"
+          },
+          "b": {
+            "tag": "magistuarmory:chainmails/steel"
+          },
+          "c": {
+            "item": "overgeared:steel_plate"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:sugarloaf_helmet",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:sugarloaf_helmet",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

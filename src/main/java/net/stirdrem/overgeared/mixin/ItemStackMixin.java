@@ -93,7 +93,7 @@ public abstract class ItemStackMixin {
         }
     }*/
 
-/*
+
     @Inject(
             method = "getDestroySpeed",
             at = @At("RETURN"),
@@ -108,7 +108,7 @@ public abstract class ItemStackMixin {
             cir.setReturnValue(baseSpeed * multiplier);
         }
     }
-*/
+
 
     @Inject(
             method = "getMaxDamage()I",

@@ -42,7 +42,6 @@ public class StoneAnvilCategory implements IRecipeCategory<ExplanationRecipe> {
     private final IDrawable icon;
     private final Component title;
     private final List<ItemStack> hammerItems;
-    private int tickCount = 0;
     private static final int CYCLE_TIME = 60; // 3 seconds at 20 ticks/second
 
     public StoneAnvilCategory(IGuiHelper guiHelper, RegistryAccess registryAccess) {

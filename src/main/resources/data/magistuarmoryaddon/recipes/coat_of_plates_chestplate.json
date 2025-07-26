@@ -1,29 +1,42 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-  "pattern": [
-    " c ",
-    "dad",
-    " b "
-  ],
-  "key": {
-    "a": {
-      "item": "magistuarmory:chainmail_chestplate"
-    },
-    "b": {
-      "item": "minecraft:leather"
-    },
-    "c": {
-      "tag": "magistuarmory:leather_strips"
-    },
-    "d": {
-      "item": "overgeared:steel_ingot"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          " c ",
+          "dad",
+          " b "
+        ],
+        "key": {
+          "a": {
+            "item": "magistuarmory:chainmail_chestplate"
+          },
+          "b": {
+            "item": "minecraft:leather"
+          },
+          "c": {
+            "tag": "magistuarmory:leather_strips"
+          },
+          "d": {
+            "item": "overgeared:steel_ingot"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:coat_of_plates_chestplate",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:coat_of_plates_chestplate",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

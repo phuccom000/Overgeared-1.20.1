@@ -1,99 +1,104 @@
-[17Jul2025 13:13:59.521] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.4.0, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources, --mixin.config, mixins.overgeared.json]
-[17Jul2025 13:13:59.536] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.8 by Oracle Corporation; OS Windows 10 arch amd64 version 10.0
-[17Jul2025 13:13:59.696] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
-[17Jul2025 13:13:59.772] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/Administrator/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23129!/ Service=ModLauncher Env=CLIENT
-[17Jul2025 13:14:00.317] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.4.0\f0c0b352173d0a378cbdcec9cfc4ba65899a721\javafmllanguage-1.20.1-47.4.0.jar is missing mods.toml file
-[17Jul2025 13:14:00.326] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.4.0\e862740d8c84d08dbfedea412bef88fe42e727c5\lowcodelanguage-1.20.1-47.4.0.jar is missing mods.toml file
-[17Jul2025 13:14:00.334] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.4.0\5719b3a297a33f877ed5dde4cb4bd75c859096af\mclanguage-1.20.1-47.4.0.jar is missing mods.toml file
-[17Jul2025 13:14:00.343] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.4.0\235975dafa4309945b59c56b53f31dc5b65a6051\fmlcore-1.20.1-47.4.0.jar is missing mods.toml file
-[17Jul2025 13:14:00.651] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: Found 3 dependencies adding them to mods collection
-[17Jul2025 13:14:02.793] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by mixins.overgeared.json is higher than the maximum level supported by this version of mixin (JAVA_13).
-[17Jul2025 13:14:02.794] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
-[17Jul2025 13:14:02.819] [main/WARN] [mixin/]: Compatibility level JAVA_16 specified by polymorph-integrations.forge.mixins.json is higher than the maximum level supported by this version of mixin (JAVA_13).
-[17Jul2025 13:14:02.826] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\src\main\resources]
-[17Jul2025 13:14:02.981] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
-[17Jul2025 13:14:02.983] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
-[17Jul2025 13:14:03.057] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
-[17Jul2025 13:14:03.058] [main/INFO] [mixin/]: Selecting config mixins.overgeared.json
-[17Jul2025 13:14:03.063] [main/WARN] [mixin/]: Reference map 'mixins.overgeared.refmap.json' for mixins.overgeared.json could not be read. If this is a development environment you can ignore this message
-[17Jul2025 13:14:03.065] [main/INFO] [mixin/]: Selecting config mixinextras.init.mixins.json
-[17Jul2025 13:14:03.270] [main/INFO] [mixin/]: Selecting config archeryexp.mixins.json
-[17Jul2025 13:14:03.570] [main/INFO] [mixin/]: Remapping refMap archeryexp.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
-[17Jul2025 13:14:03.571] [main/INFO] [mixin/]: Selecting config archeryexp.forge.mixins.json
-[17Jul2025 13:14:03.573] [main/INFO] [mixin/]: Remapping refMap archeryexp.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
-[17Jul2025 13:14:03.573] [main/INFO] [mixin/]: Selecting config polymorph.mixins.json
-[17Jul2025 13:14:03.575] [main/INFO] [mixin/]: Remapping refMap polymorph.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
-[17Jul2025 13:14:03.575] [main/INFO] [mixin/]: Selecting config polymorph-integrations.forge.mixins.json
-[17Jul2025 13:14:03.580] [main/INFO] [mixin/]: Remapping refMap polymorph.refmap.json using D:\Minecraft Mods\Overgeared (Blacksmith mod) 1.20.1\build/createSrgToMcp/output.srg
-[17Jul2025 13:14:03.581] [main/INFO] [mixin/]: Preparing mixins.overgeared.json (1)
-[17Jul2025 13:14:03.651] [main/INFO] [mixin/]: Preparing mixinextras.init.mixins.json (0)
-[17Jul2025 13:14:03.651] [main/INFO] [mixin/]: Preparing archeryexp.mixins.json (12)
-[17Jul2025 13:14:03.726] [main/INFO] [mixin/]: Preparing archeryexp.forge.mixins.json (1)
-[17Jul2025 13:14:03.731] [main/INFO] [mixin/]: Preparing polymorph.mixins.json (9)
-[17Jul2025 13:14:03.749] [main/INFO] [mixin/]: Preparing polymorph-integrations.forge.mixins.json (2)
-[17Jul2025 13:14:03.805] [main/INFO] [mixin/]: Prepared 23 mixins in 0.746 sec (32.4ms avg) (0ms load, 0ms transform, 0ms plugin)
-[17Jul2025 13:14:04.113] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [overgeared]
-[17Jul2025 13:14:04.312] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
-[17Jul2025 13:14:04.320] [main/INFO] [mixin/]: Mixing LivingEntityMixin from archeryexp.mixins.json into net.minecraft.world.entity.LivingEntity
-[17Jul2025 13:14:04.354] [main/INFO] [mixin/]: Renaming synthetic method lambda$tickStuff$1(Lnet/minecraft/world/item/ItemStack;)V to md19492c$lambda$tickStuff$1$0 in archeryexp.mixins.json:LivingEntityMixin
-[17Jul2025 13:14:04.355] [main/INFO] [mixin/]: Renaming synthetic method lambda$tickStuff$0(Lnet/minecraft/world/item/ItemStack;)V to md19492c$lambda$tickStuff$0$1 in archeryexp.mixins.json:LivingEntityMixin
-[17Jul2025 13:14:04.586] [main/INFO] [mixin/]: Mixing PlayerMixin from archeryexp.mixins.json into net.minecraft.world.entity.player.Player
-[17Jul2025 13:14:04.587] [main/INFO] [mixin/]: Renaming synthetic method lambda$applyQuickshot$2(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V to md19492c$lambda$applyQuickshot$2$0 in archeryexp.mixins.json:PlayerMixin
-[17Jul2025 13:14:04.587] [main/INFO] [mixin/]: Renaming synthetic method lambda$applyQuickshot$1(Lnet/minecraft/world/entity/LivingEntity;)V to md19492c$lambda$applyQuickshot$1$1 in archeryexp.mixins.json:PlayerMixin
-[17Jul2025 13:14:04.595] [main/INFO] [mixin/]: Renaming synthetic method lambda$playerTick$0(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/phys/Vec3;)V to md19492c$lambda$playerTick$0$2 in archeryexp.mixins.json:PlayerMixin
-[17Jul2025 13:14:04.826] [main/INFO] [mixin/]: Mixing ItemMixin from archeryexp.mixins.json into net.minecraft.world.item.Item
-[17Jul2025 13:14:05.196] [main/INFO] [mixin/]: Mixing EnchantmentMixin from archeryexp.mixins.json into net.minecraft.world.item.enchantment.Enchantment
-[17Jul2025 13:14:06.477] [main/INFO] [mixin/]: Mixing AccessorCraftingMenu from polymorph.mixins.json into net.minecraft.world.inventory.CraftingMenu
-[17Jul2025 13:14:06.504] [main/INFO] [mixin/]: Mixing MixinCraftingMenu from polymorph.mixins.json into net.minecraft.world.inventory.CraftingMenu
-[17Jul2025 13:14:06.556] [main/INFO] [mixin/]: Mixing AccessorAbstractFurnaceBlockEntity from polymorph.mixins.json into net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
-[17Jul2025 13:14:06.704] [main/INFO] [mixin/]: Mixing AbstractArrowMixin from archeryexp.mixins.json into net.minecraft.world.entity.projectile.AbstractArrow
-[17Jul2025 13:14:06.709] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$3(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V to md19492c$lambda$enchantmentEffects$3$0 in archeryexp.mixins.json:AbstractArrowMixin
-[17Jul2025 13:14:06.710] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$2(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V to md19492c$lambda$enchantmentEffects$2$1 in archeryexp.mixins.json:AbstractArrowMixin
-[17Jul2025 13:14:06.710] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$1(Lnet/minecraft/world/entity/LivingEntity;)V to md19492c$lambda$enchantmentEffects$1$2 in archeryexp.mixins.json:AbstractArrowMixin
-[17Jul2025 13:14:06.711] [main/INFO] [mixin/]: Renaming synthetic method lambda$enchantmentEffects$0(Lnet/minecraft/world/entity/LivingEntity;)V to md19492c$lambda$enchantmentEffects$0$3 in archeryexp.mixins.json:AbstractArrowMixin
-[17Jul2025 13:14:07.185] [main/INFO] [mixin/]: Mixing EnchantmentMenuMixin from archeryexp.mixins.json into net.minecraft.world.inventory.EnchantmentMenu
-[17Jul2025 13:14:07.186] [main/INFO] [mixin/]: Renaming synthetic method lambda$preventPowerEnchTable$0(Lnet/minecraft/util/RandomSource;Lnet/minecraft/world/item/enchantment/EnchantmentInstance;)Lnet/minecraft/world/item/enchantment/EnchantmentInstance; to md19492c$lambda$preventPowerEnchTable$0$0 in archeryexp.mixins.json:EnchantmentMenuMixin
-[17Jul2025 13:14:07.227] [main/INFO] [mixin/]: Mixing ItemStackMixin from mixins.overgeared.json into net.minecraft.world.item.ItemStack
-[17Jul2025 13:14:07.228] [main/INFO] [mixin/]: Renaming synthetic method lambda$onInventoryTick$1(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/player/Player;)V to md19492c$lambda$onInventoryTick$1$0 in mixins.overgeared.json:ItemStackMixin
-[17Jul2025 13:14:07.229] [main/INFO] [mixin/]: Renaming synthetic method lambda$onInventoryTick$0(Lnet/minecraft/world/item/ItemStack;)Z to md19492c$lambda$onInventoryTick$0$1 in mixins.overgeared.json:ItemStackMixin
-[17Jul2025 13:14:07.908] [main/INFO] [mixin/]: Mixing MixinSmithingMenu from polymorph.mixins.json into net.minecraft.world.inventory.SmithingMenu
-[17Jul2025 13:14:08.302] [main/INFO] [mixin/]: Mixing BowItemMixin from archeryexp.mixins.json into net.minecraft.world.item.BowItem
-[17Jul2025 13:14:08.305] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$3(Lnet/minecraft/world/entity/player/Player;)V to md19492c$lambda$onReleaseUsing$3$0 in archeryexp.mixins.json:BowItemMixin
-[17Jul2025 13:14:08.305] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$2(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/LivingEntity;Lorg/infernalstudios/archeryexp/util/ParticleData;)V to md19492c$lambda$onReleaseUsing$2$1 in archeryexp.mixins.json:BowItemMixin
-[17Jul2025 13:14:08.306] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$1(Lnet/minecraft/world/entity/player/Player;Lorg/infernalstudios/archeryexp/util/PotionData;)V to md19492c$lambda$onReleaseUsing$1$2 in archeryexp.mixins.json:BowItemMixin
-[17Jul2025 13:14:08.306] [main/INFO] [mixin/]: Renaming synthetic method lambda$onReleaseUsing$0(Lnet/minecraft/world/entity/player/Player;)V to md19492c$lambda$onReleaseUsing$0$3 in archeryexp.mixins.json:BowItemMixin
-[17Jul2025 13:14:09.325] [main/INFO] [mixin/]: Mixing AbstrtactSkeletonMixin from archeryexp.mixins.json into net.minecraft.world.entity.monster.AbstractSkeleton
-[17Jul2025 13:14:09.329] [main/INFO] [mixin/]: Renaming synthetic method lambda$rangedAttack$2(Lorg/infernalstudios/archeryexp/util/ParticleData;)V to md19492c$lambda$rangedAttack$2$0 in archeryexp.mixins.json:AbstrtactSkeletonMixin
-[17Jul2025 13:14:09.330] [main/INFO] [mixin/]: Renaming synthetic method lambda$rangedAttack$1(Lorg/infernalstudios/archeryexp/util/PotionData;)V to md19492c$lambda$rangedAttack$1$1 in archeryexp.mixins.json:AbstrtactSkeletonMixin
-[17Jul2025 13:14:09.330] [main/INFO] [mixin/]: Renaming synthetic method lambda$rangedAttack$0(Lnet/minecraft/world/entity/monster/AbstractSkeleton;)V to md19492c$lambda$rangedAttack$0$2 in archeryexp.mixins.json:AbstrtactSkeletonMixin
-[17Jul2025 13:14:10.220] [main/INFO] [mixin/]: Mixing ArrowDamageEnchantmentMixin from archeryexp.mixins.json into net.minecraft.world.item.enchantment.ArrowDamageEnchantment
-[17Jul2025 13:14:11.835] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.0, for MC 1.20.1 with MCP 20230612.114412
-[17Jul2025 13:14:11.837] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.0 Initialized
-[17Jul2025 13:14:11.847] [modloading-worker-0/INFO] [Archery Expansion/]: Finished Loading Archery Expansion
-[17Jul2025 13:14:11.860] [modloading-worker-0/INFO] [mixin/]: Mixing LocalPlayerMixin from archeryexp.mixins.json into net.minecraft.client.player.LocalPlayer
-[17Jul2025 13:14:11.886] [modloading-worker-0/INFO] [mixin/]: Mixing AbstractClientPlayerMixin from archeryexp.mixins.json into net.minecraft.client.player.AbstractClientPlayer
-[17Jul2025 13:14:12.168] [modloading-worker-0/INFO] [mixin/]: Mixing MixinTitleScreen from archeryexp.forge.mixins.json into net.minecraft.client.gui.screens.TitleScreen
-[17Jul2025 13:14:12.638] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
-[17Jul2025 13:14:12.644] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 4.199 ms
-[17Jul2025 13:14:12.651] [modloading-worker-0/INFO] [mixin/]: Mixing MixinRecipeManager from polymorph.mixins.json into net.minecraft.world.item.crafting.RecipeManager
-[17Jul2025 13:14:12.653] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$polymorph$getRecipe$1(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;Lnet/minecraft/world/item/crafting/Recipe;)V to md19492c$lambda$polymorph$getRecipe$1$0 in polymorph.mixins.json:MixinRecipeManager
-[17Jul2025 13:14:12.653] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$polymorph$getRecipe$0(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/item/crafting/Recipe;)V to md19492c$lambda$polymorph$getRecipe$0$1 in polymorph.mixins.json:MixinRecipeManager
-[17Jul2025 13:14:13.111] [main/INFO] [mixin/]: Mixing AccessorInventoryMenu from polymorph.mixins.json into net.minecraft.world.inventory.InventoryMenu
-[17Jul2025 13:14:13.301] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
-[17Jul2025 13:14:13.302] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
-[17Jul2025 13:14:13.756] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
-[17Jul2025 13:14:15.007] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 1250 ms
-[17Jul2025 13:14:15.007] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
-[17Jul2025 13:14:15.041] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 33 ms
-[17Jul2025 13:14:15.042] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: overgeared
-[17Jul2025 13:14:15.285] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: overgeared finished after 242 ms
-[17Jul2025 13:14:15.285] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: overgeared
-[17Jul2025 13:14:15.680] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: overgeared finished after 394 ms
-[17Jul2025 13:14:15.680] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id overgeared
-[17Jul2025 13:14:15.701] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id overgeared finished after 19 ms
-[17Jul2025 13:14:15.701] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id overgeared
-[17Jul2025 13:14:15.732] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id overgeared finished after 31 ms
-[17Jul2025 13:14:15.733] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : overgeared
-[17Jul2025 13:14:15.768] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : overgeared finished after 34 ms
-[17Jul2025 13:14:15.768] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 2012 ms
-[17Jul2025 13:14:15.799] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 532, old count: 530, new count: 533, removed stale: 0, written: 2
+[25Jul2025 22:04:11.056] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.4.0, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared New instance\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared New instance\src\main\resources]
+[25Jul2025 22:04:11.063] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.8 by Oracle Corporation; OS Windows 10 arch amd64 version 10.0
+[25Jul2025 22:04:11.225] [main/WARN] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Configuration file D:\Minecraft Mods\Overgeared New instance\run-data\config\fml.toml is not correct. Correcting
+[25Jul2025 22:04:11.228] [main/INFO] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Incorrect key [earlyWindowSkipGLVersions] was corrected from null to []
+[25Jul2025 22:04:11.228] [main/INFO] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Incorrect key [earlyWindowLogHelpMessage] was corrected from null to true
+[25Jul2025 22:04:11.229] [main/INFO] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Incorrect key [earlyWindowSquir] was corrected from null to false
+[25Jul2025 22:04:11.230] [main/INFO] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Incorrect key [earlyWindowShowCPU] was corrected from null to false
+[25Jul2025 22:04:11.262] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
+[25Jul2025 22:04:11.353] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/Administrator/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23129!/ Service=ModLauncher Env=CLIENT
+[25Jul2025 22:04:11.852] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.4.0\f0c0b352173d0a378cbdcec9cfc4ba65899a721\javafmllanguage-1.20.1-47.4.0.jar is missing mods.toml file
+[25Jul2025 22:04:11.861] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.4.0\e862740d8c84d08dbfedea412bef88fe42e727c5\lowcodelanguage-1.20.1-47.4.0.jar is missing mods.toml file
+[25Jul2025 22:04:11.870] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.4.0\5719b3a297a33f877ed5dde4cb4bd75c859096af\mclanguage-1.20.1-47.4.0.jar is missing mods.toml file
+[25Jul2025 22:04:11.880] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.4.0\235975dafa4309945b59c56b53f31dc5b65a6051\fmlcore-1.20.1-47.4.0.jar is missing mods.toml file
+[25Jul2025 22:04:12.018] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
+[25Jul2025 22:04:14.305] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\Administrator\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, overgeared, --all, --output, D:\Minecraft Mods\Overgeared New instance\src\generated\resources, --existing, D:\Minecraft Mods\Overgeared New instance\src\main\resources]
+[25Jul2025 22:04:15.074] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [overgeared]
+[25Jul2025 22:04:21.650] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.0, for MC 1.20.1 with MCP 20230612.114412
+[25Jul2025 22:04:21.651] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.0 Initialized
+[25Jul2025 22:04:21.660] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Configuration file D:\Minecraft Mods\Overgeared New instance\run-data\config\overgeared-common.toml is not correct. Correcting
+[25Jul2025 22:04:21.661] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Heated Items Settings was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.662] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Heated Items Settings.heatedItemCooldownTicks was corrected from null to its default, 1200. 
+[25Jul2025 22:04:21.662] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Blueprint Settings was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.663] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Blueprint Settings.availableToolTypes was corrected from null to its default, [SWORD, AXE, PICKAXE, SHOVEL, HOE, HAMMER]. 
+[25Jul2025 22:04:21.663] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Blueprint Settings.customToolTypes was corrected from null to its default, []. 
+[25Jul2025 22:04:21.664] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Blueprint Settings.hiddenToolTypes was corrected from null to its default, []. 
+[25Jul2025 22:04:21.665] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Stone Smithing Anvil was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.665] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Stone Smithing Anvil.max_uses was corrected from null to its default, 64. 
+[25Jul2025 22:04:21.666] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.667] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.arrowSpeed was corrected from null to its default, 2.0. 
+[25Jul2025 22:04:21.667] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.enableMinigame was corrected from null to its default, true. 
+[25Jul2025 22:04:21.667] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.arrowSpeedIncrease was corrected from null to its default, 0.8. 
+[25Jul2025 22:04:21.668] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.masterQualityChance was corrected from null to its default, 0.05. 
+[25Jul2025 22:04:21.668] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.maxArrowSpeed was corrected from null to its default, 4.0. 
+[25Jul2025 22:04:21.668] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.zoneStartingSize was corrected from null to its default, 20. 
+[25Jul2025 22:04:21.669] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.zoneShrinkFactor was corrected from null to its default, 0.7. 
+[25Jul2025 22:04:21.669] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.maxAnvilDistance was corrected from null to its default, 100. 
+[25Jul2025 22:04:21.669] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.minPerfectZone was corrected from null to its default, 10. 
+[25Jul2025 22:04:21.670] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.minigameTimeout was corrected from null to its default, 6000. 
+[25Jul2025 22:04:21.670] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.perfectQualityScore was corrected from null to its default, 0.9. 
+[25Jul2025 22:04:21.671] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.expertQualityScore was corrected from null to its default, 0.6. 
+[25Jul2025 22:04:21.671] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Minigame Config.wellQualityScore was corrected from null to its default, 0.3. 
+[25Jul2025 22:04:21.673] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Balance Options was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.674] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Balance Options.durability was corrected from null to its default, 1.0. 
+[25Jul2025 22:04:21.674] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Balance Options.base_durability_blacklist was corrected from null to its default, [minecraft:flint_and_steel]. 
+[25Jul2025 22:04:21.675] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Balance Options.failOnWellQualityChance was corrected from null to its default, 0.1. 
+[25Jul2025 22:04:21.675] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Balance Options.failOnExpertQualityChance was corrected from null to its default, 0.05. 
+[25Jul2025 22:04:21.677] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Damage Bonuses was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.677] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Damage Bonuses.masterWeaponDamage was corrected from null to its default, 3.0. 
+[25Jul2025 22:04:21.677] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Damage Bonuses.perfectWeaponDamage was corrected from null to its default, 2.0. 
+[25Jul2025 22:04:21.678] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Damage Bonuses.expertWeaponDamage was corrected from null to its default, 1.5. 
+[25Jul2025 22:04:21.678] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Damage Bonuses.wellWeaponDamage was corrected from null to its default, 0.0. 
+[25Jul2025 22:04:21.678] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Damage Bonuses.poorWeaponDamage was corrected from null to its default, -1.0. 
+[25Jul2025 22:04:21.680] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Speed Bonuses was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.680] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Speed Bonuses.masterWeaponSpeed was corrected from null to its default, 1.0. 
+[25Jul2025 22:04:21.681] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Speed Bonuses.perfectWeaponSpeed was corrected from null to its default, 0.5. 
+[25Jul2025 22:04:21.681] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Speed Bonuses.expertWeaponSpeed was corrected from null to its default, 0.25. 
+[25Jul2025 22:04:21.681] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Speed Bonuses.wellWeaponSpeed was corrected from null to its default, 0.0. 
+[25Jul2025 22:04:21.682] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Weapon Speed Bonuses.poorWeaponSpeed was corrected from null to its default, -0.5. 
+[25Jul2025 22:04:21.684] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.684] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.masterArmorBonus was corrected from null to its default, 2.0. 
+[25Jul2025 22:04:21.684] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.perfectArmorBonus was corrected from null to its default, 1.5. 
+[25Jul2025 22:04:21.685] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.expertArmorBonus was corrected from null to its default, 1.0. 
+[25Jul2025 22:04:21.685] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.wellArmorBonus was corrected from null to its default, 0.0. 
+[25Jul2025 22:04:21.685] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.poorArmorBonus was corrected from null to its default, -1.0. 
+[25Jul2025 22:04:21.686] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Durability Bonuses was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.686] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Durability Bonuses.masterDurabilityBonus was corrected from null to its default, 1.6. 
+[25Jul2025 22:04:21.686] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Durability Bonuses.perfectDurabilityBonus was corrected from null to its default, 1.5. 
+[25Jul2025 22:04:21.686] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Durability Bonuses.expertDurabilityBonus was corrected from null to its default, 1.3. 
+[25Jul2025 22:04:21.687] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Durability Bonuses.wellDurabilityBonus was corrected from null to its default, 1.0. 
+[25Jul2025 22:04:21.687] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Durability Bonuses.poorDurabilityBonus was corrected from null to its default, 0.7. 
+[25Jul2025 22:04:21.687] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Knapping Config was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.687] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Knapping Config.rockDroppingChance was corrected from null to its default, 0.1. 
+[25Jul2025 22:04:21.688] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Knapping Config.flintBreakingChance was corrected from null to its default, 0.1. 
+[25Jul2025 22:04:21.688] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Grinding Config was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.688] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Grinding Config.durabilityReduce was corrected from null to its default, 0.05. 
+[25Jul2025 22:04:21.689] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Grinding Config.damageRestore was corrected from null to its default, 0.1. 
+[25Jul2025 22:04:21.689] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Blueprint Config was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.690] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Blueprint Config.masterMaxUse was corrected from null to its default, 0. 
+[25Jul2025 22:04:21.690] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Blueprint Config.perfectMaxUse was corrected from null to its default, 50. 
+[25Jul2025 22:04:21.690] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Blueprint Config.expertMaxUse was corrected from null to its default, 20. 
+[25Jul2025 22:04:21.692] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Blueprint Config.wellMaxUse was corrected from null to its default, 10. 
+[25Jul2025 22:04:21.692] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Blueprint Config.poorMaxUse was corrected from null to its default, 5. 
+[25Jul2025 22:04:21.692] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Potion Config was corrected from null to its default, SimpleCommentedConfig:{}. 
+[25Jul2025 22:04:21.693] [modloading-worker-0/WARN] [net.minecraftforge.common.ForgeConfigSpec/CORE]: Incorrect key Armor Bonuses.Potion Config.maxPotionTipping was corrected from null to its default, 8. 
+[25Jul2025 22:04:22.012] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
+[25Jul2025 22:04:22.020] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 5.628 ms
+[25Jul2025 22:04:22.704] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
+[25Jul2025 22:04:22.705] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Administrator/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.0_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
+[25Jul2025 22:04:23.080] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[25Jul2025 22:04:23.484] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 403 ms
+[25Jul2025 22:04:23.484] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
+[25Jul2025 22:04:23.527] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 42 ms
+[25Jul2025 22:04:23.527] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: overgeared
+[25Jul2025 22:04:23.687] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: overgeared finished after 159 ms
+[25Jul2025 22:04:23.688] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: overgeared
+[25Jul2025 22:04:23.818] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: overgeared finished after 129 ms
+[25Jul2025 22:04:23.818] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id overgeared
+[25Jul2025 22:04:23.843] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id overgeared finished after 24 ms
+[25Jul2025 22:04:23.843] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id overgeared
+[25Jul2025 22:04:23.854] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id overgeared finished after 10 ms
+[25Jul2025 22:04:23.854] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : overgeared
+[25Jul2025 22:04:23.981] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : overgeared finished after 126 ms
+[25Jul2025 22:04:23.982] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 902 ms
+[25Jul2025 22:04:24.025] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 530, old count: 0, new count: 531, removed stale: 0, written: 530

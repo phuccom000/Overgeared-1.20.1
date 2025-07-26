@@ -1,29 +1,42 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-  "pattern": [
-    "ccc",
-    "dad",
-    "bbb"
-  ],
-  "key": {
-    "a": {
-      "tag": "forge:nuggets/steel"
-    },
-    "b": {
-      "tag": "magistuarmory:chainmails/steel"
-    },
-    "c": {
-      "item": "overgeared:steel_ingot"
-    },
-    "d": {
-      "item": "overgeared:steel_plate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          "ccc",
+          "dad",
+          "bbb"
+        ],
+        "key": {
+          "a": {
+            "tag": "forge:nuggets/steel"
+          },
+          "b": {
+            "tag": "magistuarmory:chainmails/steel"
+          },
+          "c": {
+            "item": "overgeared:steel_ingot"
+          },
+          "d": {
+            "item": "overgeared:steel_plate"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:mamluk_helmet",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:mamluk_helmet",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

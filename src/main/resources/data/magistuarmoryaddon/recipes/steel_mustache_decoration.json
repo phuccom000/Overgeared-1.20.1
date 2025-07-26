@@ -1,20 +1,33 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 3,
-  "has_quality": false,
-  "pattern": [
-    "a a",
-    " a ",
-    "   "
-  ],
-  "key": {
-    "a": {
-      "tag": "forge:nuggets/steel"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 3,
+        "has_quality": false,
+        "pattern": [
+          "a a",
+          " a ",
+          "   "
+        ],
+        "key": {
+          "a": {
+            "tag": "forge:nuggets/steel"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:steel_mustache_decoration",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:steel_mustache_decoration",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

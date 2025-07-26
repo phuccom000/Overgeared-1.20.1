@@ -1,26 +1,26 @@
 {
   "type": "overgeared:forging",
-  "category": "misc",
   "blueprint": [
     "shovel"
   ],
-  "requires_blueprint": false,
-  "tier": "stone",
+  "category": "misc",
   "hammering": 3,
-  "has_quality": true,
-  "minimum_quality": "poor",
-  "needs_minigame": false,
   "has_polishing": true,
-  "pattern": [
-    "#"
-  ],
+  "has_quality": true,
   "key": {
     "#": {
       "item": "minecraft:gold_ingot"
     }
   },
+  "minimum_quality": "poor",
+  "needs_minigame": false,
+  "pattern": [
+    "#"
+  ],
+  "requires_blueprint": false,
   "result": {
     "item": "overgeared:golden_shovel_head"
   },
-  "show_notification": true
+  "show_notification": true,
+  "tier": "stone"
 }

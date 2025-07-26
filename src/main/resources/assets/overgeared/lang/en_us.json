@@ -147,6 +147,9 @@
   "jei.overgeared.category.stone_anvil": "How to make Stone Anvil",
   "jei.overgeared.stone_anvil.description1": "Crouch right click on a Stone block with a Smithing Hammer to convert it to a Stone Smithing Anvil.",
   "tooltip.overgeared.failedResult": "Get Upon Failure",
-  "tooltip.overgeared.hotitems.tooltip": "Eternally hot! Use tongs to safely handle."
+  "tooltip.overgeared.hotitems.tooltip": "Eternally hot! Use tongs to safely handle.",
+  "tooltip.overgeared.potion_uses": "Tipping Uses Left: %s/%s",
+  "jei.overgeared.category.steel_anvil": "How to make Smithing Anvil",
+  "jei.overgeared.steel_anvil.description": "Crouch right click on a vanilla Anvil with a Smithing Hammer to convert it to a Smithing Anvil."
 }
 

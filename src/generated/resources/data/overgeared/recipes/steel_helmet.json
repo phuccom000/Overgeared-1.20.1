@@ -1,21 +1,21 @@
 {
   "type": "overgeared:forging",
   "category": "armors",
-  "requires_blueprint": false,
   "hammering": 3,
-  "has_quality": true,
-  "minimum_quality": "poor",
-  "needs_minigame": false,
   "has_polishing": false,
-  "pattern": [
-    "###",
-    "# #"
-  ],
+  "has_quality": true,
   "key": {
     "#": {
       "item": "overgeared:steel_plate"
     }
   },
+  "minimum_quality": "poor",
+  "needs_minigame": false,
+  "pattern": [
+    "###",
+    "# #"
+  ],
+  "requires_blueprint": false,
   "result": {
     "item": "overgeared:steel_helmet"
   },

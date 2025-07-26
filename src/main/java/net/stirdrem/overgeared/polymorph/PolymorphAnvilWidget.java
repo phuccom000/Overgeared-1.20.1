@@ -1,4 +1,4 @@
-/*
+package net.stirdrem.overgeared.polymorph;/*
 package net.stirdrem.overgeared.polymorph;
 
 import net.minecraft.client.Minecraft;

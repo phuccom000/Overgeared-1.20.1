@@ -152,12 +152,12 @@ public class RockKnappingRecipe implements Recipe<Container> {
     }
 
     public static class Type implements RecipeType<RockKnappingRecipe> {
-        public static final RockKnappingRecipe.Type INSTANCE = new RockKnappingRecipe.Type();
+        public static final Type INSTANCE = new Type();
         public static final String ID = "rock_knapping";
     }
 
     public static class Serializer implements RecipeSerializer<RockKnappingRecipe> {
-        public static final RockKnappingRecipe.Serializer INSTANCE = new RockKnappingRecipe.Serializer();
+        public static final Serializer INSTANCE = new Serializer();
         public static final ResourceLocation ID = ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "rock_knapping");
 
         @Override

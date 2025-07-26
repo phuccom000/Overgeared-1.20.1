@@ -19,7 +19,7 @@ import java.util.List;
 public class Tongs extends DiggerItem {
 
 
-    public Tongs(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Item.Properties pProperties) {
+    public Tongs(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Properties pProperties) {
         super(pAttackDamageModifier, pAttackSpeedModifier, pTier, ModTags.Blocks.SMITHING, pProperties);
     }
 

@@ -1,23 +1,36 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-    "pattern": [
-        " m ",
-        "msm",
-        " m "
-    ],
-    "key": {
-        "m": {
-            "item": "overgeared:steel_ingot"
-        },
-        "s": {
-            "item": "magistuarmory:wood_kiteshield"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmory"
         }
-    },
-    "result": {
-        "item": "magistuarmory:steel_kiteshield",
-        "count": 1
-    },
-  "show_notification": true
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          " m ",
+          "msm",
+          " m "
+        ],
+        "key": {
+          "m": {
+            "item": "overgeared:steel_ingot"
+          },
+          "s": {
+            "item": "magistuarmory:wood_kiteshield"
+          }
+        },
+        "result": {
+          "item": "magistuarmory:steel_kiteshield",
+          "count": 1
+        },
+        "show_notification": true
+      }
+    }
+  ]
 }

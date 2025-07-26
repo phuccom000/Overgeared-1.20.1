@@ -1,27 +1,27 @@
 {
   "type": "overgeared:forging",
-  "category": "misc",
   "blueprint": [
     "sword"
   ],
-  "requires_blueprint": false,
-  "tier": "stone",
+  "category": "misc",
   "hammering": 3,
-  "has_quality": true,
-  "minimum_quality": "poor",
-  "needs_minigame": false,
   "has_polishing": true,
-  "pattern": [
-    "#",
-    "#"
-  ],
+  "has_quality": true,
   "key": {
     "#": {
       "item": "overgeared:heated_iron_ingot"
     }
   },
+  "minimum_quality": "poor",
+  "needs_minigame": false,
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "requires_blueprint": false,
   "result": {
     "item": "overgeared:iron_sword_blade"
   },
-  "show_notification": true
+  "show_notification": true,
+  "tier": "stone"
 }

@@ -223,7 +223,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             }
         }
 
-        pRecipeOutput.accept(new ShapedForgingRecipeBuilder.Result(
+        pRecipeOutput.accept(new Result(
                 ingredients,
                 this.hammering,
                 new ItemStack(this.result, this.count),

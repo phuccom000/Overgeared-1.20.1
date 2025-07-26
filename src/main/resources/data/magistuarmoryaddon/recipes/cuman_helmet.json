@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 5,
-  "has_quality": true,
-  "pattern": [
-    " a ",
-    " b ",
-    " c "
-  ],
-  "key": {
-    "a": {
-      "tag": "forge:nuggets/steel"
-    },
-    "b": {
-      "item": "magistuarmory:face_helmet"
-    },
-    "c": {
-      "tag": "magistuarmory:chainmails/steel"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
+        }
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 5,
+        "has_quality": true,
+        "pattern": [
+          " a ",
+          " b ",
+          " c "
+        ],
+        "key": {
+          "a": {
+            "tag": "forge:nuggets/steel"
+          },
+          "b": {
+            "item": "magistuarmory:face_helmet"
+          },
+          "c": {
+            "tag": "magistuarmory:chainmails/steel"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:cuman_helmet",
+          "count": 1
+        },
+        "show_notification": true
+      }
     }
-  },
-  "result": {
-    "item": "magistuarmoryaddon:cuman_helmet",
-    "count": 1
-  },
-  "show_notification": true
+  ]
 }

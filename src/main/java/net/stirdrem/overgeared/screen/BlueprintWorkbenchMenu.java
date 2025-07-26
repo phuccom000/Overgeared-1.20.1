@@ -9,13 +9,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.BlueprintQuality;
-import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.ToolType;
-import net.stirdrem.overgeared.item.ToolTypeRegistry;
-import net.stirdrem.overgeared.item.custom.BlueprintItem;
-import net.stirdrem.overgeared.screen.ModMenuTypes;
-import org.jetbrains.annotations.NotNull;
+
 
 public class BlueprintWorkbenchMenu extends AbstractContainerMenu {
     private final Container inputContainer;

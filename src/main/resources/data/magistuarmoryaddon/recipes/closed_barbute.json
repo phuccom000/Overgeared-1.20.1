@@ -1,26 +1,39 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 4,
-  "has_quality": true,
-    "pattern": [
-        "iii",
-        "pnp",
-        " p "
-    ],
-    "key": {
-        "i": {
-            "item": "overgeared:steel_ingot"
-        },
-        "p": {
-            "item": "overgeared:steel_plate"
-        },
-        "n": {
-            "tag": "forge:nuggets/steel"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "magistuarmoryaddon"
         }
-    },
-    "result": {
-        "item": "magistuarmoryaddon:closed_barbute",
-        "count": 1
-    },
-  "show_notification": true
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 4,
+        "has_quality": true,
+        "pattern": [
+          "iii",
+          "pnp",
+          " p "
+        ],
+        "key": {
+          "i": {
+            "item": "overgeared:steel_ingot"
+          },
+          "p": {
+            "item": "overgeared:steel_plate"
+          },
+          "n": {
+            "tag": "forge:nuggets/steel"
+          }
+        },
+        "result": {
+          "item": "magistuarmoryaddon:closed_barbute",
+          "count": 1
+        },
+        "show_notification": true
+      }
+    }
+  ]
 }

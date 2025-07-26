@@ -1,11 +1,11 @@
 {
   "type": "minecraft:blasting",
-  "group": "iron_ingot",
   "category": "misc",
-  "result": "overgeared:heated_iron_ingot",
   "cookingtime": 100,
   "experience": 0.0,
+  "group": "iron_ingot",
   "ingredient": {
     "item": "minecraft:iron_ingot"
-  }
+  },
+  "result": "overgeared:heated_iron_ingot"
 }

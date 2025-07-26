@@ -7,7 +7,7 @@ public enum ForgingBookCategory implements StringRepresentable {
     ARMORS("armors"),
     MISC("misc");
 
-    public static final StringRepresentable.EnumCodec<net.minecraft.world.item.crafting.CookingBookCategory> CODEC = StringRepresentable.fromEnum(net.minecraft.world.item.crafting.CookingBookCategory::values);
+    public static final EnumCodec<net.minecraft.world.item.crafting.CookingBookCategory> CODEC = StringRepresentable.fromEnum(net.minecraft.world.item.crafting.CookingBookCategory::values);
     private final String name;
 
     private ForgingBookCategory(String pName) {

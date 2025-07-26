@@ -247,10 +247,6 @@ public class SmithingHammer extends DiggerItem {
         return true;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                List<Component> tooltip, TooltipFlag flag) {
-    }
 
    /* @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
@@ -264,7 +260,7 @@ public class SmithingHammer extends DiggerItem {
         return super.use(level, player, hand);
     }*/
 
-    @Override
+   /* @Override
     public boolean hasCraftingRemainingItem(ItemStack stack) {
         return true;
     }
@@ -272,5 +268,5 @@ public class SmithingHammer extends DiggerItem {
     @Override
     public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
         return itemStack.copy();
-    }
+    }*/
 }

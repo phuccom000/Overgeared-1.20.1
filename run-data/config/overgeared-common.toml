@@ -1,68 +1,8 @@
 
-["Weapon Speed Bonuses"]
-	#Attack speed bonus for master quality weapons
-	#Range: -2.0 ~ 2.0
-	masterWeaponSpeed = 1.0
-	#Attack speed bonus for well-made quality weapons
-	#Range: -2.0 ~ 2.0
-	wellWeaponSpeed = 0.0
-	#Attack speed bonus for perfect quality weapons
-	#Range: -2.0 ~ 2.0
-	perfectWeaponSpeed = 0.5
-	#Attack speed penalty for poor quality weapons
-	#Range: -2.0 ~ 2.0
-	poorWeaponSpeed = -0.5
-	#Attack speed bonus for expert quality weapons
-	#Range: -2.0 ~ 2.0
-	expertWeaponSpeed = 0.25
-
-["Minigame Config"]
-	#Smallest perfect zone it can become
-	#Range: 0 ~ 100
-	minPerfectZone = 3
-	#Default arrow speed for the forging minigame
-	#Range: -5.0 ~ 5.0
-	arrowSpeed = 2.0
-	#Zone shrink factor for the forging minigame, default value here means that it shrinks to 70% of its original size
-	#Range: 0.0 ~ 1.0
-	zoneShrinkFactor = 0.7
-	#Toggle for the forging minigame. You cannot craft with unpolished tool heads and the quality modifier is disabled if set to false.
-	enableMinigame = true
-	#Default arrow speed increase for the forging minigame
-	#Range: -5.0 ~ 5.0
-	arrowSpeedIncrease = 0.8
-	#Zone starting size for the forging minigame,  in chance
-	#Range: 0 ~ 100
-	zoneStartingSize = 20
-	#Maximum arrow speed for the forging minigame
-	#Range: -10.0 ~ 10.0
-	maxArrowSpeed = 5.0
-	#Maximum distance you can go from your Smithing Anvil before minigame reset
-	#Range: 0 ~ 1000
-	maxAnvilDistance = 100
-	#How likely it is for the player to get Masterfully Forged. Set to 0 to disable it.
-	#Range: 0.0 ~ 1.0
-	masterQualityChance = 0.05
-	#Minigame resets after a certain amount of seconds
-	#Range: 0 ~ 36000
-	minigameTimeout = 6000
-	#Quality score is based on your forging performance.
-	#Perfect hits = 1.0 points, Good hits = 0.6 points, Missed hits = 0.
-	#Formula: (perfectHits * 1.0 + goodHits * 0.6) / totalHits
-	#Lowest score required to get perfect quality
-	#Range: 0.0 ~ 1.0
-	perfectQualityScore = 0.9
-	#Lowest score required to get expert quality
-	#Range: 0.0 ~ 1.0
-	expertQualityScore = 0.6
-	#Lowest score required to get well quality
-	#Range: 0.0 ~ 1.0
-	wellQualityScore = 0.3
-
-["Stone Smithing Anvil"]
-	#Number of uses before the Stone Smithing Anvil breaks. Set to 0 to disable.
-	#Range: > 0
-	max_uses = 64
+["Heated Items Settings"]
+	#How many ticks before a heated item cools off in inventory (default: 1200 = 60s)
+	#Range: > 1
+	heatedItemCooldownTicks = 1200
 
 ["Blueprint Settings"]
 	#List of available tool types for blueprints
@@ -79,10 +19,58 @@
 	#Example: ["SPEAR","Spear", "BROADSWORD","Broadsword"]
 	hiddenToolTypes = []
 
+["Stone Smithing Anvil"]
+	#Number of uses before the Stone Smithing Anvil breaks. Set to 0 to disable.
+	#Range: > 0
+	max_uses = 64
+
+["Minigame Config"]
+	#Default arrow speed for the forging minigame
+	#Range: -5.0 ~ 5.0
+	arrowSpeed = 2.0
+	#Toggle for the forging minigame. You cannot craft with unpolished tool heads and the quality modifier is disabled if set to false.
+	enableMinigame = true
+	#Default arrow speed increase for the forging minigame
+	#Range: -5.0 ~ 5.0
+	arrowSpeedIncrease = 0.8
+	#How likely it is for the player to get Masterfully Forged. Set to 0 to disable it.
+	#Range: 0.0 ~ 1.0
+	masterQualityChance = 0.05
+	#Maximum arrow speed for the forging minigame
+	#Range: -10.0 ~ 10.0
+	maxArrowSpeed = 4.0
+	#Zone starting size for the forging minigame,  in chance
+	#Range: 0 ~ 100
+	zoneStartingSize = 20
+	#Zone shrink factor for the forging minigame, default value here means that it shrinks to 70% of its original size
+	#Range: 0.0 ~ 1.0
+	zoneShrinkFactor = 0.7
+	#Maximum distance you can go from your Smithing Anvil before minigame reset
+	#Range: 0 ~ 1000
+	maxAnvilDistance = 100
+	#Smallest perfect zone it can become
+	#Range: 0 ~ 100
+	minPerfectZone = 10
+	#Minigame resets after a certain amount of seconds
+	#Range: 0 ~ 36000
+	minigameTimeout = 6000
+	#Quality score is based on your forging performance.
+	#Perfect hits = 1.0 points, Good hits = 0.6 points, Missed hits = 0.
+	#Formula: (perfectHits * 1.0 + goodHits * 0.6) / totalHits
+	#Lowest score required to get perfect quality
+	#Range: 0.0 ~ 1.0
+	perfectQualityScore = 0.9
+	#Lowest score required to get expert quality
+	#Range: 0.0 ~ 1.0
+	expertQualityScore = 0.6
+	#Lowest score required to get well quality
+	#Range: 0.0 ~ 1.0
+	wellQualityScore = 0.3
+
 ["Balance Options"]
 	#Defines the base durability multiplier of all items that has durability.
 	#Range: 0.0 ~ 10000.0
-	durability = 0
+	durability = 1.0
 	#Items that will NOT receive base durability multiplier. Use item IDs like 'minecraft:flint_and_steel'
 	base_durability_blacklist = ["minecraft:flint_and_steel"]
 	#Chance that forging with WELL quality fails and returns the failed result (0.0 - 1.0)
@@ -92,30 +80,81 @@
 	#Range: 0.0 ~ 1.0
 	failOnExpertQualityChance = 0.05
 
+["Weapon Damage Bonuses"]
+	#Damage bonus for master quality weapons
+	#Range: -10.0 ~ 10.0
+	masterWeaponDamage = 3.0
+	#Damage bonus for perfect quality weapons
+	#Range: -10.0 ~ 10.0
+	perfectWeaponDamage = 2.0
+	#Damage bonus for expert quality weapons
+	#Range: -10.0 ~ 10.0
+	expertWeaponDamage = 1.5
+	#Damage bonus for well-made quality weapons
+	#Range: -10.0 ~ 10.0
+	wellWeaponDamage = 0.0
+	#Damage penalty for poor quality weapons
+	#Range: -10.0 ~ 10.0
+	poorWeaponDamage = -1.0
+
+["Weapon Speed Bonuses"]
+	#Attack speed bonus for master quality weapons
+	#Range: -2.0 ~ 2.0
+	masterWeaponSpeed = 1.0
+	#Attack speed bonus for perfect quality weapons
+	#Range: -2.0 ~ 2.0
+	perfectWeaponSpeed = 0.5
+	#Attack speed bonus for expert quality weapons
+	#Range: -2.0 ~ 2.0
+	expertWeaponSpeed = 0.25
+	#Attack speed bonus for well-made quality weapons
+	#Range: -2.0 ~ 2.0
+	wellWeaponSpeed = 0.0
+	#Attack speed penalty for poor quality weapons
+	#Range: -2.0 ~ 2.0
+	poorWeaponSpeed = -0.5
+
 ["Armor Bonuses"]
-	#Armor bonus for expert quality armor
-	#Range: -5.0 ~ 5.0
-	expertArmorBonus = 1.0
-	#Armor bonus for perfect quality armor
-	#Range: -5.0 ~ 5.0
-	perfectArmorBonus = 1.5
-	#Armor penalty for poor quality armor
-	#Range: -5.0 ~ 5.0
-	poorArmorBonus = -1.0
-	#Armor bonus for well-made quality armor
-	#Range: -5.0 ~ 5.0
-	wellArmorBonus = 0.0
 	#Armor bonus for master quality armor
 	#Range: -5.0 ~ 5.0
 	masterArmorBonus = 2.0
+	#Armor bonus for perfect quality armor
+	#Range: -5.0 ~ 5.0
+	perfectArmorBonus = 1.5
+	#Armor bonus for expert quality armor
+	#Range: -5.0 ~ 5.0
+	expertArmorBonus = 1.0
+	#Armor bonus for well-made quality armor
+	#Range: -5.0 ~ 5.0
+	wellArmorBonus = 0.0
+	#Armor penalty for poor quality armor
+	#Range: -5.0 ~ 5.0
+	poorArmorBonus = -1.0
+
+	["Armor Bonuses"."Durability Bonuses"]
+		#Durability bonus for master quality durability
+		#Range: -5.0 ~ 5.0
+		masterDurabilityBonus = 1.6
+		#Durability bonus for perfect quality durability
+		#Range: -5.0 ~ 5.0
+		perfectDurabilityBonus = 1.5
+		#Durability bonus for expert quality durability
+		#Range: -5.0 ~ 5.0
+		expertDurabilityBonus = 1.3
+		#Durability bonus for well-made quality durability
+		#Range: -5.0 ~ 5.0
+		wellDurabilityBonus = 1.0
+		#Durability penalty for poor quality durability
+		#Range: 0.0 ~ 5.0
+		poorDurabilityBonus = 0.7
 
 	["Armor Bonuses"."Knapping Config"]
-		#How likely it is for flint to break when carving stone
-		#Range: 0.0 ~ 1.0
-		flintBreakingChance = 0.1
 		#How likely it is for rock to drop from flint carving stone
 		#Range: 0.0 ~ 1.0
 		rockDroppingChance = 0.1
+		#How likely it is for flint to break when carving stone
+		#Range: 0.0 ~ 1.0
+		flintBreakingChance = 0.1
 
 	["Armor Bonuses"."Grinding Config"]
 		#How much the item durability reduce per grindstone use
@@ -125,27 +164,10 @@
 		#Range: 0.0 ~ 1.0
 		damageRestore = 0.1
 
-	["Armor Bonuses"."Durability Bonuses"]
-		#Durability bonus for master quality durability
-		#Range: -5.0 ~ 5.0
-		masterDurabilityBonus = 1.6
-		#Durability bonus for perfect quality durability
-		#Range: -5.0 ~ 5.0
-		perfectDurabilityBonus = 1.5
-		#Durability bonus for well-made quality durability
-		#Range: -5.0 ~ 5.0
-		wellDurabilityBonus = 1.0
-		#Durability penalty for poor quality durability
-		#Range: 0.0 ~ 5.0
-		poorDurabilityBonus = 0.7
-		#Durability bonus for expert quality durability
-		#Range: -5.0 ~ 5.0
-		expertDurabilityBonus = 1.3
-
 	["Armor Bonuses"."Blueprint Config"]
 		#Uses required to reach the next quality after Master
 		#Range: > 0
-		masterMaxUse = 1000
+		masterMaxUse = 0
 		#Uses required to reach the next quality after Perfect
 		#Range: 0 ~ 1000
 		perfectMaxUse = 50
@@ -159,25 +181,8 @@
 		#Range: 0 ~ 1000
 		poorMaxUse = 5
 
-["Weapon Damage Bonuses"]
-	#Damage bonus for expert quality weapons
-	#Range: -10.0 ~ 10.0
-	expertWeaponDamage = 1.5
-	#Damage bonus for well-made quality weapons
-	#Range: -10.0 ~ 10.0
-	wellWeaponDamage = 0.0
-	#Damage penalty for poor quality weapons
-	#Range: -10.0 ~ 10.0
-	poorWeaponDamage = -1.0
-	#Damage bonus for master quality weapons
-	#Range: -10.0 ~ 10.0
-	masterWeaponDamage = 3.0
-	#Damage bonus for perfect quality weapons
-	#Range: -10.0 ~ 10.0
-	perfectWeaponDamage = 2.0
-
-["Heated Items Settings"]
-	#How many ticks before a heated item cools off in inventory (default: 1200 = 60s)
-	#Range: > 1
-	heatedItemCooldownTicks = 1200
+	["Armor Bonuses"."Potion Config"]
+		#How many arrows can a bottle of potion tips before it's depleted
+		#Range: > 0
+		maxPotionTipping = 8
 

@@ -37,12 +37,14 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
 
         // Render the output item from slot 10
         ItemStack output = pBlockEntity.getRenderStack(10);
+        boolean inputsEmpty = areInputSlotsEmpty(pBlockEntity);
+        float zOffset = inputsEmpty ? 0f : -0.43f;
+
         if (!output.isEmpty()) {
             float yOffset = isBlockItem(output) ? 1.05f : 1.02f;
-            renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, 0f, 110f, 0.5f);
+            renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, zOffset, 110f, 0.4f);
         }
-        float zOffset = -0.43f;
-        if (output.isEmpty()) zOffset = 0f;
+
         // 1️⃣ First pass: render up to three unique input items
         Set<Item> renderedItems = new HashSet<>();
         Set<Integer> renderedSlots = new HashSet<>(); // Track which slots we've rendered from
@@ -50,17 +52,26 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
 
         // First pass: render unique items
         rendered = renderPass(pPoseStack, pBuffer, itemRenderer, pBlockEntity,
-                renderedItems, renderedSlots, zOffset, rendered, true);
+                renderedItems, renderedSlots, 0f, rendered, true);
 
         // Second pass: fill remaining slots with any items
         if (rendered < 3) {
             renderPass(pPoseStack, pBuffer, itemRenderer, pBlockEntity,
-                    renderedItems, renderedSlots, zOffset, rendered, false);
+                    renderedItems, renderedSlots, 0f, rendered, false);
         }
 
         // Render the hammer from slot 9
         ItemStack hammer = pBlockEntity.getRenderStack(9);
         renderStack(pPoseStack, pBuffer, itemRenderer, hammer, pBlockEntity, 0f, 1.025f, 0.43f, 135f, 0.5f);
+    }
+
+    private boolean areInputSlotsEmpty(AbstractSmithingAnvilBlockEntity be) {
+        for (int i = 0; i < 9; i++) {  // assuming slots 0–8 are inputs
+            if (!be.getRenderStack(i).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private int renderPass(PoseStack pPoseStack, MultiBufferSource pBuffer,

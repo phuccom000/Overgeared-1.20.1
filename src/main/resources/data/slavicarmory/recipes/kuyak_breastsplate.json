@@ -1,23 +1,36 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 3,
-  "has_quality": true,
-    "pattern": [
-        "p p",
-        "plp",
-        "   "
-    ],
-    "key": {
-        "p": {
-            "item": "overgeared:steel_plate"
-		},
-        "l": {
-            "item": "minecraft:leather_chestplate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "slavicarmory"
         }
-    },
-    "result": {
-        "item": "slavicarmory:kuyak_breastplate",
-        "count": 1
-    },
-  "show_notification": true
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 3,
+        "has_quality": true,
+        "pattern": [
+          "p p",
+          "plp",
+          "   "
+        ],
+        "key": {
+          "p": {
+            "item": "overgeared:steel_plate"
+          },
+          "l": {
+            "item": "minecraft:leather_chestplate"
+          }
+        },
+        "result": {
+          "item": "slavicarmory:kuyak_breastplate",
+          "count": 1
+        },
+        "show_notification": true
+      }
+    }
+  ]
 }

@@ -69,9 +69,7 @@ public class ToolTypeRegistry {
         String upperId = type.getId().toUpperCase(Locale.ROOT);
         if (!BY_ID.containsKey(upperId)) {
             BY_ID.put(upperId, type);
-            if (!type.isTranslatable()) {
-                CUSTOM_TYPES.add(type);
-            }
+            CUSTOM_TYPES.add(type);
         }
     }
 

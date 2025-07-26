@@ -1,23 +1,36 @@
 {
-  "type": "overgeared:forging",
-  "hammering": 2,
-  "has_quality": true,
-    "pattern": [
-        " g ",
-        " k ",
-        "   "
-    ],
-    "key": {
-        "g": {
-            "item": "slavicarmory:rus_chainmail_chestplate"
-        },
-        "k": {
-            "item": "slavicarmory:kuyak_breastplate"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "slavicarmory"
         }
-    },
-    "result": {
-        "item": "slavicarmory:kuyak_chestplate",
-        "count": 1
-    },
-  "show_notification": true
+      ],
+      "recipe": {
+        "type": "overgeared:forging",
+        "hammering": 2,
+        "has_quality": true,
+        "pattern": [
+          " g ",
+          " k ",
+          "   "
+        ],
+        "key": {
+          "g": {
+            "item": "slavicarmory:rus_chainmail_chestplate"
+          },
+          "k": {
+            "item": "slavicarmory:kuyak_breastplate"
+          }
+        },
+        "result": {
+          "item": "slavicarmory:kuyak_chestplate",
+          "count": 1
+        },
+        "show_notification": true
+      }
+    }
+  ]
 }
