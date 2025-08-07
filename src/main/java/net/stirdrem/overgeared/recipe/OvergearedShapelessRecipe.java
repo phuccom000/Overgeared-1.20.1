@@ -12,6 +12,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.BlueprintQuality;
+import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 
@@ -80,17 +81,13 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
         if (foundQuality != null) {
             String resultQuality = foundQuality;
             if (!isPolished) {
-                resultQuality = switch (foundQuality) {
-                    case "perfect" -> "expert";
-                    case "expert" -> "well";
-                    case "well" -> "poor";
-                    default -> foundQuality;
-                };
+                ForgingQuality quality = ForgingQuality.fromString(foundQuality);
+                resultQuality = quality.getLowerQuality().getDisplayName();
             }
             resultTag.putString("ForgingQuality", resultQuality);
             result.setTag(resultTag);
-        }
 
+        }
         return result;
     }
 

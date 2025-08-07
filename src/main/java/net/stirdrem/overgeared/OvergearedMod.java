@@ -2,17 +2,32 @@ package net.stirdrem.overgeared;
 
 //import cech12.bucketlib.api.BucketLibApi;
 
+import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.entity.ArrowRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.brewing.BrewingRecipe;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -28,6 +43,11 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.stirdrem.overgeared.block.UpgradeArrowDispenseBehavior;
+import net.stirdrem.overgeared.entity.ModEntities;
+
+import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
+import net.stirdrem.overgeared.entity.renderer.UpgradeArrowEntityRenderer;
 import net.stirdrem.overgeared.item.armor.model.CustomCopperHelmet;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
@@ -44,6 +64,7 @@ import net.stirdrem.overgeared.item.ToolTypeRegistry;
 import net.stirdrem.overgeared.item.armor.model.CustomCopperLeggings;
 import net.stirdrem.overgeared.loot.ModLootModifiers;
 import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.recipe.BetterBrewingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.*;
@@ -52,6 +73,10 @@ import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.TickScheduler;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Unique;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(OvergearedMod.MOD_ID)
@@ -90,7 +115,10 @@ public class OvergearedMod {
 
         ModSounds.register(modEventBus);
 
+        ModEntities.register(modEventBus);
+
         ModAttributes.register(modEventBus);
+
 
         MinecraftForge.EVENT_BUS.register(TickScheduler.class);
 
@@ -111,6 +139,13 @@ public class OvergearedMod {
         LOGGER.info("Tool types initialized: {}",
                 ToolTypeRegistry.getRegisteredTypes().size());
         //}
+        BrewingRecipeRegistry.addRecipe(
+                new BetterBrewingRecipe(
+                        Potions.THICK,
+                        Items.CHORUS_FRUIT,
+                        new ItemStack(Items.DRAGON_BREATH)
+                )
+        );
     }
 
     // Add the example block item to the building blocks tab
@@ -120,13 +155,69 @@ public class OvergearedMod {
             event.accept(ModItems.STEEL_TONGS);
             event.accept(ModItems.COPPER_SMITHING_HAMMER);
             event.accept(ModItems.SMITHING_HAMMER);
+            event.accept(ModItems.COPPER_SHOVEL.get());
+            event.accept(ModItems.COPPER_PICKAXE.get());
+            event.accept(ModItems.COPPER_AXE.get());
+            event.accept(ModItems.COPPER_HOE.get());
+            event.accept(ModItems.STEEL_SHOVEL.get());
             event.accept(ModItems.STEEL_PICKAXE.get());
             event.accept(ModItems.STEEL_AXE.get());
-            event.accept(ModItems.STEEL_SHOVEL.get());
             event.accept(ModItems.STEEL_HOE.get());
         }
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
+            for (Potion potion : ForgeRegistries.POTIONS) {
+                if (potion == Potions.EMPTY) continue;
+
+                ItemStack arrow = new ItemStack(ModItems.LINGERING_ARROW.get());
+                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                event.accept(arrow);
+            }
+            for (Potion potion : ForgeRegistries.POTIONS) {
+                if (potion == Potions.EMPTY) continue;
+
+                ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
+                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                event.accept(arrow);
+            }
+            for (Potion potion : ForgeRegistries.POTIONS) {
+                if (potion == Potions.EMPTY) continue;
+
+                ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
+                arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                event.accept(arrow);
+            }
+            for (Potion potion : ForgeRegistries.POTIONS) {
+                if (potion == Potions.EMPTY) continue;
+
+                ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
+                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                event.accept(arrow);
+            }
+            for (Potion potion : ForgeRegistries.POTIONS) {
+                if (potion == Potions.EMPTY) continue;
+
+                ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
+                arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                event.accept(arrow);
+            }
+            for (Potion potion : ForgeRegistries.POTIONS) {
+                if (potion == Potions.EMPTY) continue;
+
+                ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
+                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                event.accept(arrow);
+            }
+            for (Potion potion : ForgeRegistries.POTIONS) {
+                if (potion == Potions.EMPTY) continue;
+
+                ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
+                arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                event.accept(arrow);
+            }
+            event.accept(ModItems.COPPER_SWORD.get());
             event.accept(ModItems.STEEL_SWORD.get());
+            event.accept(ModItems.COPPER_AXE.get());
+            event.accept(ModItems.STEEL_AXE.get());
         }
 
     }
@@ -169,6 +260,19 @@ public class OvergearedMod {
         return ServerConfig.BASE_DURABILITY_BLACKLIST.get().contains(id.toString());
     }
 
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    public static class CommonModEvents {
+        @SubscribeEvent
+        public static void onCommonSetup(FMLCommonSetupEvent event) {
+            event.enqueueWork(() -> {
+                // Register dispenser behaviors on COMMON side
+                DispenserBlock.registerBehavior(ModItems.LINGERING_ARROW.get(), new UpgradeArrowDispenseBehavior());
+                DispenserBlock.registerBehavior(ModItems.IRON_UPGRADE_ARROW.get(), new UpgradeArrowDispenseBehavior());
+                DispenserBlock.registerBehavior(ModItems.STEEL_UPGRADE_ARROW.get(), new UpgradeArrowDispenseBehavior());
+                DispenserBlock.registerBehavior(ModItems.DIAMOND_UPGRADE_ARROW.get(), new UpgradeArrowDispenseBehavior());
+            });
+        }
+    }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -181,7 +285,23 @@ public class OvergearedMod {
             MenuScreens.register(ModMenuTypes.STONE_SMITHING_ANVIL_MENU.get(), StoneSmithingAnvilScreen::new);
             MenuScreens.register(ModMenuTypes.ROCK_KNAPPING_MENU.get(), RockKnappingScreen::new);
             MenuScreens.register(ModMenuTypes.BLUEPRINT_WORKBENCH_MENU.get(), BlueprintWorkbenchScreen::new);
-            //BarrelInteraction.bootStrap();
+            MenuScreens.register(ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingStationScreen::new);
+
+            registerArrowProperties(ModItems.IRON_UPGRADE_ARROW.get());
+            registerArrowProperties(ModItems.STEEL_UPGRADE_ARROW.get());
+            registerArrowProperties(ModItems.DIAMOND_UPGRADE_ARROW.get());
+        }
+
+        private static void registerArrowProperties(Item item) {
+            ItemProperties.register(item,
+                    new ResourceLocation(OvergearedMod.MOD_ID, "potion_type"),
+                    (stack, level, entity, seed) -> {
+                        if (!stack.hasTag()) return 0.0F;
+                        var tag = stack.getTag();
+                        if (tag.contains("LingeringPotion")) return 2.0F;
+                        if (tag.contains("Potion") || tag.contains("CustomPotionEffects")) return 1.0F;
+                        return 0.0F;
+                    });
         }
 
         @SubscribeEvent
@@ -201,6 +321,115 @@ public class OvergearedMod {
         public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(CustomCopperHelmet.LAYER_LOCATION, CustomCopperHelmet::createBodyLayer);
             event.registerLayerDefinition(CustomCopperLeggings.LAYER_LOCATION, CustomCopperLeggings::createBodyLayer);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
+            // Helper method for color registration
+            registerArrowColor(event, ModItems.IRON_UPGRADE_ARROW.get());
+            registerArrowColor(event, ModItems.STEEL_UPGRADE_ARROW.get());
+            registerArrowColor(event, ModItems.DIAMOND_UPGRADE_ARROW.get());
+            registerArrowColor(event, ModItems.LINGERING_ARROW.get());
+        }
+
+        private static void registerArrowColor(RegisterColorHandlersEvent.Item event, Item item) {
+            event.register((stack, tintIndex) ->
+                            tintIndex == 0 && stack.hasTag() ? getColor(stack) : 0xFFFFFFFF,
+                    item);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            //event.registerEntityRenderer(ModEntities.MODULAR_ARROW.get(), ModularArrowEntityRenderer::new);
+            event.registerEntityRenderer(ModEntities.LINGERING_ARROW.get(), LingeringArrowEntityRenderer::new);
+            event.registerEntityRenderer(ModEntities.UPGRADE_ARROW.get(), UpgradeArrowEntityRenderer::new);
+        }
+
+        public static int getColor(ItemStack pStack) {
+            CompoundTag compoundtag = pStack.getTag();
+            if (compoundtag != null && compoundtag.contains("CustomPotionColor", 99)) {
+                return compoundtag.getInt("CustomPotionColor");
+            } else {
+                return getPotion(pStack) == Potions.EMPTY ? 16253176 : getColor(getMobEffects(pStack));
+            }
+        }
+
+        public static int getColor(Collection<MobEffectInstance> pEffects) {
+            int i = 3694022;
+            if (pEffects.isEmpty()) {
+                return 3694022;
+            } else {
+                float f = 0.0F;
+                float f1 = 0.0F;
+                float f2 = 0.0F;
+                int j = 0;
+
+                for (MobEffectInstance mobeffectinstance : pEffects) {
+                    if (mobeffectinstance.isVisible()) {
+                        int k = mobeffectinstance.getEffect().getColor();
+                        int l = mobeffectinstance.getAmplifier() + 1;
+                        f += (float) (l * (k >> 16 & 255)) / 255.0F;
+                        f1 += (float) (l * (k >> 8 & 255)) / 255.0F;
+                        f2 += (float) (l * (k >> 0 & 255)) / 255.0F;
+                        j += l;
+                    }
+                }
+
+                if (j == 0) {
+                    return 0;
+                } else {
+                    f = f / (float) j * 255.0F;
+                    f1 = f1 / (float) j * 255.0F;
+                    f2 = f2 / (float) j * 255.0F;
+                    return (int) f << 16 | (int) f1 << 8 | (int) f2;
+                }
+            }
+        }
+
+        public static Potion getPotion(ItemStack pStack) {
+            return getPotion(pStack.getTag());
+        }
+
+        public static Potion getPotion(@Nullable CompoundTag tag) {
+            if (tag == null) return Potions.EMPTY;
+
+            // Prioritize "LingeringPotion" if present
+            if (tag.contains("LingeringPotion", 8)) { // 8 = string type
+                return Potion.byName(tag.getString("LingeringPotion"));
+            }
+
+            if (tag.contains("Potion", 8)) {
+                return Potion.byName(tag.getString("Potion"));
+            }
+
+            return Potions.EMPTY;
+        }
+
+
+        public static List<MobEffectInstance> getMobEffects(ItemStack pStack) {
+            return getAllEffects(pStack.getTag());
+        }
+
+        public static List<MobEffectInstance> getAllEffects(@Nullable CompoundTag pCompoundTag) {
+            List<MobEffectInstance> list = Lists.newArrayList();
+            list.addAll(getPotion(pCompoundTag).getEffects());
+            getCustomEffects(pCompoundTag, list);
+            return list;
+        }
+
+        public static void getCustomEffects(@Nullable CompoundTag pCompoundTag, List<MobEffectInstance> pEffectList) {
+            if (pCompoundTag != null && pCompoundTag.contains("CustomPotionEffects", 9)) {
+                ListTag listtag = pCompoundTag.getList("CustomPotionEffects", 10);
+
+                for (int i = 0; i < listtag.size(); ++i) {
+                    CompoundTag compoundtag = listtag.getCompound(i);
+                    MobEffectInstance mobeffectinstance = MobEffectInstance.load(compoundtag);
+                    if (mobeffectinstance != null) {
+                        pEffectList.add(mobeffectinstance);
+                    }
+                }
+            }
+
         }
     }
 }

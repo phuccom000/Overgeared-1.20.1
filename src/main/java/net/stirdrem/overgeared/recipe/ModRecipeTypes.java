@@ -17,6 +17,8 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register(ForgingRecipe.Type.ID, () -> ForgingRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeType<RockKnappingRecipe>> KNAPPING =
             RECIPE_TYPES.register(RockKnappingRecipe.Type.ID, () -> RockKnappingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<FletchingRecipe>> FLETCHING =
+            RECIPE_TYPES.register(FletchingRecipe.Type.ID, () -> FletchingRecipe.Type.INSTANCE);
 
    /* public static final RegistryObject<RecipeType<ForgingQualityShapelessRecipe>> CRAFTING_SHAPELESS =
             RECIPE_TYPES.register(ForgingQualityShapelessRecipe.Type.ID, () -> ForgingQualityShapelessRecipe.Type.INSTANCE);*/

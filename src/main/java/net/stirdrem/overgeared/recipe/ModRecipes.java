@@ -22,6 +22,8 @@ public class ModRecipes {
             SERIALIZERS.register("crafting_shapeless", () -> OvergearedShapelessRecipe.Serializer.INSTANCE);
     public static final RegistryObject<RecipeSerializer<BlueprintCloningRecipe>> CRAFTING_BLUEPRINTCLONING =
             SERIALIZERS.register("crafting_cloning", () -> new SimpleCraftingRecipeSerializer<>(BlueprintCloningRecipe::new));
+    public static final RegistryObject<RecipeSerializer<FletchingRecipe>> FLETCHING_SERIALIZER =
+            SERIALIZERS.register("fletching", () -> FletchingRecipe.Serializer.INSTANCE);
 
     public static void register(IEventBus eventBus) {
         SERIALIZERS.register(eventBus);

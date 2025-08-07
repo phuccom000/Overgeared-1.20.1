@@ -23,5 +23,11 @@ public enum ForgingQuality {
     public String getDisplayName() {
         return displayName;
     }
+
+    public ForgingQuality getLowerQuality() {
+        ForgingQuality[] values = values();
+        int index = this.ordinal();
+        return index > 0 ? values[index - 1] : this; // POOR stays POOR
+    }
 }
 

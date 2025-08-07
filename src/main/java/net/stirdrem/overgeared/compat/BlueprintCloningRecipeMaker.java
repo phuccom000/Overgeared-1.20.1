@@ -49,7 +49,7 @@ public class BlueprintCloningRecipeMaker {
                     emptyIngredient
             );
 
-            ResourceLocation id = ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "jei/blueprint_cloning/" + quality.getId());
+            ResourceLocation id = ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "blueprint_cloning/" + quality.getId());
             ShapelessRecipe fakeRecipe = new ShapelessRecipe(id, "jei.blueprint.clone", CraftingBookCategory.MISC, output, inputs);
             recipes.add(fakeRecipe);
         }

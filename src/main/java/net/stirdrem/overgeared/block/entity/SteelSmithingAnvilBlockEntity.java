@@ -121,8 +121,7 @@ public class SteelSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
                 BlueprintQuality currentQuality = BlueprintQuality.fromString(currentQualityStr);
 
                 // Attempt to read the ForgingQuality from result
-                CompoundTag resultTag = result.getOrCreateTag();
-                String forgingQualityStr = resultTag.getString("ForgingQuality");
+                String forgingQualityStr = SteelSmithingAnvil.getQuality();
                 ForgingQuality resultQuality = ForgingQuality.fromString(forgingQualityStr);
 
                 if (currentQuality != null && currentQuality != BlueprintQuality.PERFECT && currentQuality != BlueprintQuality.MASTER) {

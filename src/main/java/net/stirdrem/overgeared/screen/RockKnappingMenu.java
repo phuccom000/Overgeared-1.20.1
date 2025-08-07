@@ -27,6 +27,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     private boolean resultCollected = false;
     private boolean rockConsumed = false; // Track if rock has been consumed
 
+
     public boolean isResultCollected() {
         return resultCollected;
     }
@@ -53,6 +54,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         this.recipeManager = recipeManager;
         this.player = playerInv.player;
 // Determine which hand has the rock (main hand takes priority)
+
         this.inputRock = mainHandItem.getItem() instanceof KnappableRockItem ? mainHandItem.copy() :
                 offHandItem.getItem() instanceof KnappableRockItem ? offHandItem.copy() :
                         ItemStack.EMPTY;
@@ -82,7 +84,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
 
             @Override
             public void onTake(Player player, ItemStack stack) {
-                handleResultCollection(player, stack);
+                knappingFinished = true;
                 markResultCollected();
                 super.onTake(player, stack);
             }
@@ -114,30 +116,19 @@ public class RockKnappingMenu extends AbstractContainerMenu {
 
     public void handleResultCollection(Player player, ItemStack result) {
         if (player instanceof ServerPlayer) {
-            // Consume the input rock
-          /*  ItemStack mainHand = player.getMainHandItem();
-            if (ItemStack.isSameItemSameTags(mainHand, inputRock)) {
-                mainHand.shrink(1);
-            }*/
-
-           /* // Give the result item
-            if (!player.getInventory().add(result.copy())) {
-                player.drop(result.copy(), false);
-            }*/
-
-            // Reset the GUI
-            //clearGrid();
             knappingFinished = true; // ✅ Disable further interaction
-
         }
     }
 
     @Override
     public boolean stillValid(Player player) {
-        // Check if the input rock still exists in either hand or inventory
-        //return hasInputRock(player);
+        //hasInputRock(player);
+        if (!rockConsumed) {
+            return hasInputRock(player);
+        }
         return true;
     }
+
 
     private boolean hasInputRock(Player player) {
         // Check main hand and offhand first
@@ -147,14 +138,6 @@ public class RockKnappingMenu extends AbstractContainerMenu {
             return true;
         }
 
-        /*// Check inventory slots
-        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-            ItemStack stack = player.getInventory().getItem(i);
-            if (ItemStack.isSameItemSameTags(stack, inputRock)) {
-                return true;
-            }
-        }*/
-
         // Rock not found - close menu
         if (!player.level().isClientSide) {
             player.closeContainer();
@@ -162,17 +145,6 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         }
         return false;
     }
-
-    /*@Override
-    public void slotsChanged(Container container) {
-        super.slotsChanged(container);
-        // Check for rock existence whenever inventory changes
-        if (!level.isClientSide && player instanceof ServerPlayer) {
-            if (!hasInputRock(player)) {
-                player.closeContainer();
-            }
-        }
-    }*/
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
@@ -185,7 +157,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
 
             // Result slot (slot 9)
             if (index == 9) {
-                this.handleResultCollection(player, itemstack1);
+                knappingFinished = true;
                 // Try to move the result to player inventory
                 if (!this.moveItemStackTo(itemstack1, 10, 46, true)) {
                     return ItemStack.EMPTY;
@@ -287,10 +259,6 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         broadcastChanges();
     }
 
-    public ItemStack getInputRock() {
-        return inputRock;
-    }
-
     public boolean isKnappingFinished() {
         return knappingFinished;
     }
@@ -304,9 +272,21 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         return false;
     }
 
-    public boolean isPatternSpot(int index) {
-        // Implement logic to determine if this spot is part of a valid pattern
-        // This could check against your recipe patterns
-        return true; // Default implementation
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+
+        // If the player hasn't taken the result, but it's there
+        ItemStack result = resultContainer.getItem(0);
+        if (!result.isEmpty() && !resultCollected) {
+            if (!player.getInventory().add(result.copy())) {
+                // Drop if inventory is full
+                player.drop(result.copy(), false);
+            }
+        }
+
+        // Optionally: clear the grid
+        this.markResultCollected();
     }
+
 }

@@ -49,6 +49,12 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.STEEL_INGOT);
         simpleItem(ModItems.STEEL_NUGGET);
         simpleItem(ModItems.COPPER_NUGGET);
+        simpleItem(ModItems.DIAMOND_SHARD);
+        simpleItem(ModItems.IRON_ARROW_HEAD);
+        simpleItem(ModItems.STEEL_ARROW_HEAD);
+        upgradeArrowModel(ModItems.IRON_UPGRADE_ARROW);
+        upgradeArrowModel(ModItems.STEEL_UPGRADE_ARROW);
+        upgradeArrowModel(ModItems.DIAMOND_UPGRADE_ARROW);
         simpleItem(ModItems.HEATED_COPPER_INGOT);
         simpleItem(ModItems.HEATED_IRON_INGOT);
         simpleItem(ModItems.HEATED_STEEL_INGOT);
@@ -317,4 +323,42 @@ public class ModItemModelProvider extends ItemModelProvider {
                 ResourceLocation.tryParse("item/generated")).texture("layer0",
                 ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "block/" + item.getId().getPath()));
     }
+
+    private void upgradeArrowModel(RegistryObject<Item> item) {
+        String baseName = item.getId().getPath();
+
+        String head = "item/" + baseName;
+
+        String tippedHead = "item/tipped_" + baseName + "_head";
+        String tippedBase = "item/tipped_" + baseName + "_base";
+
+        String lingeringHead = "item/lingering_" + baseName + "_head";
+        String lingeringBase = "item/lingering_" + baseName + "_base";
+
+        // Base arrow (no potion) — only layer0
+        getBuilder(baseName)
+                .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                .texture("layer0", modLoc(head))
+                .override()
+                .predicate(new ResourceLocation("overgeared", "potion_type"), 1f)
+                .model(new ModelFile.UncheckedModelFile(modLoc("item/" + baseName + "_tipped")))
+                .end()
+                .override()
+                .predicate(new ResourceLocation("overgeared", "potion_type"), 2f)
+                .model(new ModelFile.UncheckedModelFile(modLoc("item/" + baseName + "_lingering")))
+                .end();
+
+        // Tipped arrow — 2 layers
+        getBuilder(baseName + "_tipped")
+                .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                .texture("layer0", modLoc(tippedHead))
+                .texture("layer1", modLoc(tippedBase));
+
+        // Lingering arrow — 2 layers
+        getBuilder(baseName + "_lingering")
+                .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                .texture("layer0", modLoc(lingeringHead))
+                .texture("layer1", modLoc(lingeringBase));
+    }
+
 }

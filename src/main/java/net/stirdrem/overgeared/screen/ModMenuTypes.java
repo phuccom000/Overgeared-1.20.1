@@ -34,6 +34,10 @@ public class ModMenuTypes {
             MENUS.register("blueprint_workbench",
                     () -> new MenuType<>(BlueprintWorkbenchMenu::new, FeatureFlagSet.of()));
 
+    public static final RegistryObject<MenuType<FletchingStationMenu>> FLETCHING_STATION_MENU =
+            MENUS.register("fletching_station",
+                    () -> new MenuType<>(FletchingStationMenu::new, FeatureFlagSet.of()));
+
     private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
         return MENUS.register(name, () -> IForgeMenuType.create(factory));
     }

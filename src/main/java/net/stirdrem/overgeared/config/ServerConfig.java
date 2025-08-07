@@ -76,9 +76,22 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue FAIL_ON_EXPERT_QUALITY_CHANCE;
 
     public static final ForgeConfigSpec.IntValue MAX_POTION_TIPPING_USE;
+    //public static final ForgeConfigSpec.IntValue SLIME_ARROW_BOUNCE;
+    //public static final ForgeConfigSpec.DoubleValue SLIME_ARROW_BOUNCE_MULTIPLIER;
+    public static final ForgeConfigSpec.BooleanValue UPGRADE_ARROW_POTION_TOGGLE;
+
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        builder.push("Arrow Settings");
+        //SLIME_ARROW_BOUNCE = builder.comment("Defines how many times slime arrows bounce before coming to a stop.").worldRestart().defineInRange("slimeArrowsBounceAmount", 3, 0, 1000);
+        //SLIME_ARROW_BOUNCE_MULTIPLIER = builder.comment("Defines the bounce multiplier of slime arrows.").worldRestart().defineInRange("slimeArrowsBounceMultiplier", (double) 5.0F, (double) 0.0F, (double) 1000.0F);
+        UPGRADE_ARROW_POTION_TOGGLE = builder
+                .comment("Toggle for the ability to tip iron, steel, diamond arrows.")
+                .define("enableUpgradeArrowTipping", true);
+
+        builder.pop();
+
         builder.push("Heated Items Settings");
 
         HEATED_ITEM_COOLDOWN_TICKS = builder.comment("How many ticks before a heated item cools off in inventory (default: 1200 = 60s)")
@@ -271,7 +284,7 @@ public class ServerConfig {
         POOR_ARMOR_BONUS = builder
                 .comment("Armor penalty for poor quality armor")
                 .defineInRange("poorArmorBonus", -1.0, -5.0, 5.0);
-
+        builder.pop();
         builder.push("Durability Bonuses");
 
         MASTER_DURABILITY_BONUS = builder

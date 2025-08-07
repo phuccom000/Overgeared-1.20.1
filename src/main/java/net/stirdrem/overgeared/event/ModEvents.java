@@ -37,6 +37,7 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
@@ -362,9 +363,12 @@ public class ModEvents {
 
         if (stack.is(Items.FLINT)) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.flint_flavor")
-                    .withStyle(ChatFormatting.DARK_GRAY));
+                    .withStyle(ChatFormatting.GRAY));
         }
-
+        if (stack.is(ModItems.DIAMOND_SHARD.get())) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.diamond_shard")
+                    .withStyle(ChatFormatting.GRAY));
+        }
         if (stack.is(ModTags.Items.HEATED_METALS)) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatedingots.tooltip")
                     .withStyle(ChatFormatting.RED));
@@ -372,7 +376,7 @@ public class ModEvents {
 
         if (stack.is(ModTags.Items.HEATABLE_METALS)) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatablemetals.tooltip")
-                    .withStyle(ChatFormatting.DARK_GRAY));
+                    .withStyle(ChatFormatting.GRAY));
         }
 
         if (stack.is(ModTags.Items.HOT_ITEMS)) {
@@ -401,7 +405,7 @@ public class ModEvents {
         if (stack.hasTag() && stack.getTag().contains("Polished")) {
             boolean isPolished = stack.getTag().getBoolean("Polished");
             Component polishComponent = isPolished
-                    ? Component.translatable("tooltip.overgeared.polished").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC)
+                    ? Component.translatable("tooltip.overgeared.polished").withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)
                     : Component.translatable("tooltip.overgeared.unpolished").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC);
             tooltip.add(insertOffset++, polishComponent);
         }
@@ -409,6 +413,11 @@ public class ModEvents {
         if (stack.hasTag() && stack.getTag().contains("failedResult")) {
             tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.failedResult")
                     .withStyle(ChatFormatting.RED));
+        }
+
+        if (stack.is(ModTags.Items.GRINDABLE)) {
+            tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.grindable")
+                    .withStyle(ChatFormatting.GRAY));
         }
 
         // Smithing Hammer special tooltip
@@ -427,7 +436,7 @@ public class ModEvents {
         }
 
         // 🔽 Add Potion Uses Left Tooltip
-        if (stack.is(Items.POTION) || stack.is(Items.SPLASH_POTION) || stack.is(Items.LINGERING_POTION)) {
+        if (stack.is(Items.POTION)) {
             CompoundTag tag = stack.getTag();
             int maxUses = ServerConfig.MAX_POTION_TIPPING_USE.get();
             int used = 0;
@@ -437,8 +446,8 @@ public class ModEvents {
             }
 
             int left = Math.max(0, maxUses - used);
+            //PotionUtils.addPotionTooltip(stack, tooltip, 1 - (float) used / ServerConfig.MAX_POTION_TIPPING_USE.get());
             tooltip.add(Component.translatable("tooltip.overgeared.potion_uses", left, maxUses).withStyle(ChatFormatting.GRAY));
-
 
         }
 

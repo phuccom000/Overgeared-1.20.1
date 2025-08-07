@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.ForgingQuality;
+import net.stirdrem.overgeared.block.custom.SteelSmithingAnvil;
 import net.stirdrem.overgeared.block.custom.TierBSmithingAnvil;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
@@ -124,8 +125,7 @@ public class TierBSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
                 BlueprintQuality currentQuality = BlueprintQuality.fromString(currentQualityStr);
 
                 // Attempt to read the ForgingQuality from result
-                CompoundTag resultTag = result.getOrCreateTag();
-                String forgingQualityStr = resultTag.getString("ForgingQuality");
+                String forgingQualityStr = SteelSmithingAnvil.getQuality();
                 ForgingQuality resultQuality = ForgingQuality.fromString(forgingQualityStr);
 
                 if (currentQuality != null && currentQuality != BlueprintQuality.PERFECT && currentQuality != BlueprintQuality.MASTER) {

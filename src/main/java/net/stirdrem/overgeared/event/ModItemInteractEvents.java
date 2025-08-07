@@ -14,6 +14,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -42,6 +44,7 @@ import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.stirdrem.overgeared.OvergearedMod;
@@ -57,6 +60,7 @@ import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.networking.packet.StartMinigameC2SPacket;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
+import net.stirdrem.overgeared.screen.FletchingStationMenu;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.QualityHelper;
 
@@ -338,6 +342,9 @@ public class ModItemInteractEvents {
 
                 if (stack.is(ModTags.Items.GRINDABLE)) {
                     grindItem(player, stack);
+                    world.playSound(null, player.blockPosition(),
+                            SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS,
+                            1.0f, 1.2f); // Higher pitch for polishing sound
                     spawnGrindParticles(world, pos);
                     event.setCancellationResult(InteractionResult.SUCCESS);
                     event.setCanceled(true);
@@ -688,46 +695,73 @@ public class ModItemInteractEvents {
     }
 
     @SubscribeEvent
-    public static void onArrowTipped(PlayerInteractEvent.RightClickItem event) {
+    public static void onArrowTipping(PlayerInteractEvent.RightClickItem event) {
         Player player = event.getEntity();
         Level level = event.getLevel();
         InteractionHand hand = event.getHand();
 
         if (level.isClientSide()) return;
 
-        // Determine which item is arrow and which is potion
+        // Get items in both hands
         ItemStack usedHand = player.getItemInHand(hand);
         InteractionHand otherHand = hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack otherStack = player.getItemInHand(otherHand);
 
-        // Must have arrow in one hand, potion in the other
-        if (!usedHand.is(Items.ARROW) ||
-                !(otherStack.is(Items.POTION))) {
+        // Check if we're dealing with arrow + potion combination
+        boolean isVanillaArrow = usedHand.is(Items.ARROW) && otherStack.is(Items.POTION);
+        boolean isCustomArrow = ServerConfig.UPGRADE_ARROW_POTION_TOGGLE.get() && (usedHand.is(ModItems.IRON_UPGRADE_ARROW.get()) ||
+                usedHand.is(ModItems.STEEL_UPGRADE_ARROW.get()) ||
+                usedHand.is(ModItems.DIAMOND_UPGRADE_ARROW.get())) &&
+                otherStack.is(Items.POTION);
+
+        if (!isVanillaArrow && !isCustomArrow) {
             return;
         }
 
         CompoundTag potionTag = otherStack.getOrCreateTag();
         int used = potionTag.getInt("TippedUsed");
         int maxUse = ServerConfig.MAX_POTION_TIPPING_USE.get();
-
-        // Consume one arrow
-        usedHand.shrink(1);
-        player.setItemInHand(hand, usedHand);
-
-        // Create tipped arrow based on potion
         Potion basePotion = PotionUtils.getPotion(otherStack);
-        ItemStack tippedArrow = PotionUtils.setPotion(new ItemStack(Items.TIPPED_ARROW), basePotion);
-        if (!player.getInventory().add(tippedArrow)) {
-            player.drop(tippedArrow, false);
+
+        // Create the appropriate tipped arrow BEFORE consuming
+        ItemStack resultArrow;
+        if (isVanillaArrow) {
+            resultArrow = PotionUtils.setPotion(new ItemStack(Items.TIPPED_ARROW), basePotion);
+        } else {
+            resultArrow = usedHand.copy();
+            resultArrow.setCount(1);
+
+            CompoundTag arrowTag = resultArrow.getOrCreateTag();
+            arrowTag.putString("Potion", basePotion.getName(""));
+
+            if (potionTag.contains("CustomPotionEffects", 9)) {
+                arrowTag.put("CustomPotionEffects", potionTag.getList("CustomPotionEffects", 10));
+            }
+            if (potionTag.contains("CustomPotionColor", 3)) {
+                arrowTag.putInt("CustomPotionColor", potionTag.getInt("CustomPotionColor"));
+            }
         }
 
-        // Handle potion stack (split if >1)
+        // Only consume arrow after we've successfully created the tipped version
+        if (usedHand.getCount() == 1) {
+            // For single arrow, replace it with the tipped version
+            player.setItemInHand(hand, resultArrow);
+        } else {
+            // For stack, shrink and add new tipped arrow
+            usedHand.shrink(1);
+            player.setItemInHand(hand, usedHand);
+            if (!player.getInventory().add(resultArrow)) {
+                player.drop(resultArrow, false);
+            }
+        }
+
+        // Handle potion stack
         if (otherStack.getCount() > 1) {
             ItemStack onePotion = otherStack.split(1);
             CompoundTag oneTag = onePotion.getOrCreateTag();
             oneTag.putInt("TippedUsed", used + 1);
             PotionUtils.setPotion(onePotion, basePotion);
-            player.setItemInHand(otherHand, otherStack); // leftover stack
+            player.setItemInHand(otherHand, otherStack);
         } else {
             used++;
             if (used >= maxUse) {
@@ -749,5 +783,39 @@ public class ModItemInteractEvents {
 
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
+    }
+
+    @SubscribeEvent
+    public static void onRightClickFletching(PlayerInteractEvent.RightClickBlock event) {
+        Level level = event.getLevel();
+        BlockPos pos = event.getPos();
+        Player player = event.getEntity();
+
+        // Only respond to main-hand to avoid double-open with offhand
+        if (event.getHand() != InteractionHand.MAIN_HAND) return;
+
+        BlockState state = level.getBlockState(pos);
+        if (!state.is(Blocks.FLETCHING_TABLE)) return;
+
+        // Optional: sneak to bypass opening (let players interact as normal)
+        // if (player.isShiftKeyDown()) return;
+
+        // Client: mark success so the hand anim plays; open screen ONLY on server
+        if (level.isClientSide) {
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
+
+        // Server: open our custom menu via a SimpleMenuProvider (vanilla table has no BE)
+        SimpleMenuProvider provider = new SimpleMenuProvider(
+                (windowId, playerInv, p) ->
+                        new FletchingStationMenu(windowId, playerInv, ContainerLevelAccess.create(level, pos)),
+                Component.translatable("container.overgeared.fletching_table")
+        );
+
+        NetworkHooks.openScreen((ServerPlayer) player, provider, pos);
+        event.setCancellationResult(InteractionResult.sidedSuccess(false));
+        event.setCanceled(true);
     }
 }

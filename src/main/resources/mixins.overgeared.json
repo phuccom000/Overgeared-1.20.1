@@ -6,7 +6,8 @@
   "refmap": "mixins.overgeared.refmap.json",
   "mixins": [
     "BrewingStandBlockEntityMixin",
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "PotionItemMixin"
   ],
   "client": [],
   "injectors": {

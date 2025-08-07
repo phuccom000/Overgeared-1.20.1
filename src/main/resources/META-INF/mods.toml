@@ -88,6 +88,19 @@ versionRange = "${slavic}"
 ordering = "AFTER"
 side = "BOTH"
 
+[[dependencies.${ mod_id }]]
+modId = "emi"
+mandatory = false
+versionRange = "[1.1.10+1.20.1,)"
+ordering = "BEFORE"
+side = "BOTH"
+
+[[dependencies.${ mod_id }]]
+modId = "quark"
+mandatory = false
+versionRange = "[4.0-462,)"
+ordering = "AFTER"
+side = "BOTH"
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.

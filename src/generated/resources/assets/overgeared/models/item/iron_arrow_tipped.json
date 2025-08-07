@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "overgeared:item/tipped_iron_arrow_head",
+    "layer1": "overgeared:item/tipped_iron_arrow_base"
+  }
+}

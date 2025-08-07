@@ -33,6 +33,7 @@ minecraft {
     // Use non-default mappings at your own risk. They may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
     mappings channel: mapping_channel, version: mapping_version
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // When true, this property will have all Eclipse/IntelliJ IDEA run configurations run the "prepareX" task for the given run configuration before launching the game.
     // In most cases, it is not necessary to enable.
@@ -85,6 +86,8 @@ minecraft {
 
         client {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             property 'forge.enabledGameTestNamespaces', mod_id
         }
 
@@ -181,9 +184,21 @@ repositories {
     maven {
         url "https://maven.theillusivec4.top/"
     }
-    maven { url "https://maven.terraformersmc.com/releases/" }
-    flatDir {
-        dir 'libs'
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
+        filter {
+            includeGroup "maven.modrinth"
+        }
     }
 }
 
@@ -199,16 +214,27 @@ dependencies {
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
-     compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-     compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
-     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
-    runtimeOnly fg.deobf("curse.maven:epic-knights-armor-and-weapons-509041:6373737")
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
+    //runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
+    runtimeOnly fg.deobf("curse.maven:tmrv-1194921:6717421")
+
+    compileOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1:api")
+    runtimeOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1")
+    runtimeOnly fg.deobf("curse.maven:item-nbt-viewer-514135:4578522")
+    //runtimeOnly fg.deobf("maven.modrinth:kap_lib:v1.26.3-mc1.20.1-FML47.3.0")
+    runtimeOnly fg.deobf("curse.maven:zeta-968868:6432578")
+    runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")
+    implementation fg.deobf("curse.maven:xtra-arrows-566441:6434918")
+    runtimeOnly fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6826548")
+    runtimeOnly fg.deobf("curse.maven:selene-499980:6815733")
+    //runtimeOnly fg.deobf("curse.maven:epic-knights-armor-and-weapons-509041:6373737")
     //runtimeOnly fg.deobf("curse.maven:epic-knights-addon-925866:6036869")
     //runtimeOnly fg.deobf("curse.maven:epic-knights-slavic-armory-942000:5458480")
-    runtimeOnly fg.deobf("curse.maven:cloth-config-348521:5729105")
-    runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137938")
-    runtimeOnly fg.deobf("curse.maven:archery-expansion-1164945:6424928")
-    runtimeOnly fg.deobf("curse.maven:archery-expansion-squared-1217171:6425344")
+    //runtimeOnly fg.deobf("curse.maven:cloth-config-348521:5729105")
+    //runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137938")
+    //runtimeOnly fg.deobf("curse.maven:archery-expansion-1164945:6424928")
+    //runtimeOnly fg.deobf("curse.maven:archery-expansion-squared-1217171:6425344")
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"

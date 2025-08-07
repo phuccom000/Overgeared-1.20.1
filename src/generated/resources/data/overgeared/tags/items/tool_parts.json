@@ -24,6 +24,9 @@
     "overgeared:steel_pickaxe_head",
     "overgeared:steel_axe_head",
     "overgeared:steel_shovel_head",
-    "overgeared:steel_hoe_head"
+    "overgeared:steel_hoe_head",
+    "overgeared:iron_arrow_head",
+    "overgeared:steel_arrow_head",
+    "overgeared:diamond_shard"
   ]
 }
