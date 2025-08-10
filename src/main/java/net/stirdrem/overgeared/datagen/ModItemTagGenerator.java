@@ -86,7 +86,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.DIAMOND_SHARD.get()
                 );
 
-        this.tag(Tags.Items.TOOLS)
+        this.tag(ItemTags.TOOLS)
                 .add(
                         ModItems.IRON_TONGS.get(),
                         ModItems.STEEL_TONGS.get(),

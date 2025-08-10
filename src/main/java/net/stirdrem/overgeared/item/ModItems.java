@@ -84,6 +84,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> COPPER_SMITHING_HAMMER = ITEMS.register("copper_smithing_hammer",
             () -> new SmithingHammer(ModToolTiers.COPPER, -1, -2f, new Item.Properties().durability(120)));
+
     /*public static final RegistryObject<Item> WOODEN_BUCKET = ITEMS.register("wooden_bucket",
             () -> new UniversalBucketItem(new UniversalBucketItem.Properties().durability(100)
                     .upperCrackingTemperature(ServerConfig.WOODEN_BUCKET_BREAK_TEMPERATURE)

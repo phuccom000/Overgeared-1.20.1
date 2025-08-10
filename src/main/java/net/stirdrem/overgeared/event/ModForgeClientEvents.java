@@ -1,6 +1,8 @@
 package net.stirdrem.overgeared.event;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -92,4 +94,46 @@ public class ModForgeClientEvents {
         }
     }
 
+    private static final int TICKS_PER_PRINT = 20;
+
+    // Current internal tick accumulator
+    private static int tickAccumulator = 0;
+
+    // Current counter value
+    private static int counter = 1;
+
+    // Direction 1 = counting up, -1 = counting down
+    private static int direction = 1;
+
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        // only act at the END phase to avoid doing twice per tick
+        if (event.phase != TickEvent.Phase.END) return;
+
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return; // not in-game (main menu, etc.)
+
+        tickAccumulator++;
+        if (tickAccumulator < TICKS_PER_PRINT) return;
+        tickAccumulator = 0;
+
+        // Display the current counter value in the player's chat (client-only).
+        // The second boolean 'false' means the message is not marked as actionBar,
+        // so it appears in normal chat and is persisted in chat history.
+        mc.player.displayClientMessage(Component.literal(Integer.toString(counter)), false);
+
+        // Flip direction at endpoints so we go 1..100..1..100..
+        if (counter == 100) {
+            direction = -1;
+        } else if (counter == 1) {
+            direction = 1;
+        }
+
+        // Step for the next print
+        counter += direction;
+    }
+
+    public static int getCurrentCounter() {
+        return counter;
+    }
 }
