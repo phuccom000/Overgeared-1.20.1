@@ -476,6 +476,9 @@ public class ModItemInteractEvents {
         if (count <= 0) return; // Avoid making 0-stack cooled items
 
         ItemStack newStack = new ItemStack(cooled, count);
+        if (stack.hasTag()) {
+            newStack.setTag(stack.getTag().copy());
+        }
 
         // Check where the heated stack is located
         boolean isMain = ItemStack.isSameItemSameTags(stack, player.getMainHandItem());
@@ -503,6 +506,10 @@ public class ModItemInteractEvents {
         Item cooledItem = getGrindable(heldStack.getItem());
         if (cooledItem != null) {
             ItemStack cooledIngot = new ItemStack(cooledItem);
+            if (heldStack.hasTag()) {
+                cooledIngot.setTag(heldStack.getTag().copy());
+            }
+            cooledIngot.getOrCreateTag().putBoolean("Polished", true);
             heldStack.shrink(1);
 
             if (heldStack.isEmpty()) {
