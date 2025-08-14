@@ -11,15 +11,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -159,7 +156,7 @@ public class ModEvents {
             minigame.saveNBTData(minigameData); // Use your existing NBT serialization
 
             // Add server config values that the client needs
-            minigameData.putFloat("maxArrowSpeed", ServerConfig.MAX_SPEED.get().floatValue());
+            minigameData.putFloat("maxArrowSpeed", ServerConfig.MAX_ARROW_SPEED.get().floatValue());
             minigameData.putFloat("speedIncreasePerHit", ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue());
             minigameData.putFloat("zoneShrinkFactor", ServerConfig.ZONE_SHRINK_FACTOR.get().floatValue());
 
@@ -248,8 +245,7 @@ public class ModEvents {
     }
 
     private static boolean isWeapon(Item item) {
-        return item instanceof SwordItem ||
-                item instanceof DiggerItem ||
+        return item instanceof TieredItem ||
                 item instanceof ProjectileWeaponItem;
     }
 

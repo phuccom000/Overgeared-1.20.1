@@ -11,7 +11,6 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.event.ModItemInteractEvents;
-import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.networking.packet.MinigameHitResultC2SPacket;
@@ -26,7 +25,7 @@ public class AnvilMinigame {
     private int hitsRemaining = ClientAnvilMinigameData.getHitsRemaining();
     private float arrowPosition = ClientAnvilMinigameData.getArrowPosition();
     private float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
-    private final float maxArrowSpeed = ServerConfig.MAX_SPEED.get().floatValue();
+    private final float maxArrowSpeed = ServerConfig.MAX_ARROW_SPEED.get().floatValue();
     private float speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
     private boolean movingRight = ClientAnvilMinigameData.isMovingRight();
     private int perfectHits = ClientAnvilMinigameData.getPerfectHits();
@@ -197,7 +196,7 @@ public class AnvilMinigame {
 
     public void clientHandleHit() {
         arrowSpeed = Math.min(arrowSpeed + ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue(),
-                ServerConfig.MAX_SPEED.get().floatValue());
+                ServerConfig.MAX_ARROW_SPEED.get().floatValue());
 
         // Client-side visual updates
         shrinkAndShiftZones();

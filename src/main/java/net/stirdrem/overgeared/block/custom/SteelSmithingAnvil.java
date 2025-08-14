@@ -24,7 +24,7 @@ import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.SteelSmithingAnvilBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
-public class SteelSmithingAnvil extends AbstractSmithingAnvil {
+public class SteelSmithingAnvil extends AbstractSmithingAnvilNew {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final VoxelShape Z1 = Block.box(3, 9, 0, 13, 16, 16);
     private static final VoxelShape Z2 = Block.box(3, 0, 1, 13, 3, 15);
@@ -83,18 +83,6 @@ public class SteelSmithingAnvil extends AbstractSmithingAnvil {
         return new SteelSmithingAnvilBlockEntity(pPos, pState);
     }
 
-    /*@Nullable
-    @Override
-    public <T extends
-            BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        if (pLevel.isClientSide()) {
-            return null;
-        }
-
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.SMITHING_TABLE_BE.get(),
-                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
-    }
-    */
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {

@@ -145,7 +145,17 @@ public class ModItemInteractEvents {
         UUID playerUUID = player.getUUID();
 
         if (!player.isCrouching()) return;
-
+        if (level.isClientSide) {
+            if (AnvilMinigameEvents.minigameStarted) {
+                AnvilMinigameEvents.setIsVisible(pos, !AnvilMinigameEvents.isIsVisible());
+            } else {
+                anvilBE.resetProgress();
+                AnvilMinigameEvents.setMinigameStarted(true);
+                AnvilMinigameEvents.setIsVisible(pos, true);
+                int test = anvilBE.getRequiredProgress();
+                AnvilMinigameEvents.setHitsRemaining(anvilBE.getRequiredProgress());
+            }
+        }
         if (!level.isClientSide) {
             if (!(player instanceof ServerPlayer serverPlayer)) return;
             // Server-side ownership logic

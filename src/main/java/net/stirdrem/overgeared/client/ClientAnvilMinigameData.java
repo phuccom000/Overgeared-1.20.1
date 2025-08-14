@@ -1,10 +1,8 @@
 package net.stirdrem.overgeared.client;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.config.ServerConfig;
 
@@ -22,7 +20,7 @@ public class ClientAnvilMinigameData {
     public static int hitsRemaining = 0;
     public static float arrowPosition = 0;
     public static float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
-    public static final float maxArrowSpeed = ServerConfig.MAX_SPEED.get().floatValue();
+    public static final float maxArrowSpeed = ServerConfig.MAX_ARROW_SPEED.get().floatValue();
     public static float speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
     public static boolean movingRight = true;
     public static int perfectHits = 0;

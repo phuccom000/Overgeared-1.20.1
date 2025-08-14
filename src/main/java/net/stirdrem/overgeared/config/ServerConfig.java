@@ -47,7 +47,7 @@ public class ServerConfig {
 
     public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
     public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
-    public static final ForgeConfigSpec.DoubleValue MAX_SPEED;
+    public static final ForgeConfigSpec.DoubleValue MAX_ARROW_SPEED;
     public static final ForgeConfigSpec.IntValue ZONE_STARTING_SIZE;
     public static final ForgeConfigSpec.IntValue MIN_PERFECT_ZONE;
     public static final ForgeConfigSpec.DoubleValue ZONE_SHRINK_FACTOR;
@@ -137,27 +137,31 @@ public class ServerConfig {
         builder.pop();
 
         builder.push("Minigame Config");
-
-        DEFAULT_ARROW_SPEED = builder
-                .comment("Default arrow speed for the forging minigame")
-                .defineInRange("arrowSpeed", 2.0, -5.0, 5.0);
-
         ENABLE_MINIGAME = builder
                 .comment("Toggle for the forging minigame. " +
                         "You cannot craft with unpolished tool heads and the quality modifier is disabled if set to false.")
                 .define("enableMinigame", true);
 
-        DEFAULT_ARROW_SPEED_INCREASE = builder
-                .comment("Default arrow speed increase for the forging minigame")
-                .defineInRange("arrowSpeedIncrease", 0.8, -5.0, 5.0);
-
         MASTER_QUALITY_CHANCE = builder
                 .comment("How likely it is for the player to get Masterfully Forged. Set to 0 to disable it.")
                 .defineInRange("masterQualityChance", 0.05, 0, 1);
 
-        MAX_SPEED = builder
+        MAX_ANVIL_DISTANCE = builder
+                .comment("Maximum distance you can go from your Smithing Anvil before minigame reset")
+                .defineInRange("maxAnvilDistance", 100, 0, 1000);
+        
+        DEFAULT_ARROW_SPEED = builder
+                .comment("Default arrow speed for the forging minigame")
+                .defineInRange("arrowSpeed", 2.0, -5.0, 5.0);
+
+
+        DEFAULT_ARROW_SPEED_INCREASE = builder
+                .comment("Default arrow speed increase for the forging minigame")
+                .defineInRange("arrowSpeedIncrease", 0.75, -5.0, 5.0);
+
+        MAX_ARROW_SPEED = builder
                 .comment("Maximum arrow speed for the forging minigame")
-                .defineInRange("maxArrowSpeed", 4, -10.0, 10.0);
+                .defineInRange("maxArrowSpeed", 5, 0, 10.0);
 
         ZONE_STARTING_SIZE = builder
                 .comment("Zone starting size for the forging minigame,  in chance")
@@ -166,10 +170,6 @@ public class ServerConfig {
         ZONE_SHRINK_FACTOR = builder
                 .comment("Zone shrink factor for the forging minigame, default value here means that it shrinks to 70% of its original size")
                 .defineInRange("zoneShrinkFactor", 0.7, 0, 1);
-
-        MAX_ANVIL_DISTANCE = builder
-                .comment("Maximum distance you can go from your Smithing Anvil before minigame reset")
-                .defineInRange("maxAnvilDistance", 100, 0, 1000);
 
         MIN_PERFECT_ZONE = builder
                 .comment("Smallest perfect zone it can become")

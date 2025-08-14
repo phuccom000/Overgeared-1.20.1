@@ -75,8 +75,30 @@ public class ModMessages {
                 .decoder(SelectToolTypeC2SPacket::new)
                 .consumerMainThread(SelectToolTypeC2SPacket::handle)
                 .add();
-        
 
+        net.messageBuilder(PacketSendCounterC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(PacketSendCounterC2SPacket::encode)
+                .decoder(PacketSendCounterC2SPacket::decode)
+                .consumerMainThread(PacketSendCounterC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(PacketSendMinigameC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(PacketSendMinigameC2SPacket::encode)
+                .decoder(PacketSendMinigameC2SPacket::decode)
+                .consumerMainThread(PacketSendMinigameC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(MinigameSetStartedC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(MinigameSetStartedC2SPacket::encode)
+                .decoder(MinigameSetStartedC2SPacket::decode)
+                .consumerMainThread(MinigameSetStartedC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(MinigameSetStartedS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(MinigameSetStartedS2CPacket::new)
+                .encoder(MinigameSetStartedS2CPacket::toBytes)
+                .consumerMainThread(MinigameSetStartedS2CPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {

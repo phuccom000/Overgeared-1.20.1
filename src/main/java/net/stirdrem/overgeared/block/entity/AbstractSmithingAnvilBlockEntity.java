@@ -13,9 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -34,11 +32,10 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvil;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.event.ModItemInteractEvents;
-import net.stirdrem.overgeared.item.custom.SmithingHammer;
-import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
+import net.stirdrem.overgeared.event.AnvilMinigameEvents;
+import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.networking.packet.MinigameSetStartedC2SPacket;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -215,12 +212,13 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         }
     }
 
-    protected void resetProgress() {
+    public void resetProgress() {
         progress = 0;
         maxProgress = 0;
         lastRecipe = null;
+        AnvilMinigameEvents.reset();
         //ClientAnvilMinigameData.setHitsRemaining(0);
-        ServerPlayer user = ModItemInteractEvents.getUsingPlayer(getBlockPos());
+       /* ServerPlayer user = ModItemInteractEvents.getUsingPlayer(getBlockPos());
         if (user != null) {
             user.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                 minigame.resetNBTData();
@@ -229,7 +227,9 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                 ModItemInteractEvents.releaseAnvil(user, getBlockPos());
                 //ModMessages.sendToPlayer(new MinigameSyncS2CPacket(new CompoundTag().putBoolean("isVisible", false)), user);
             });
-        }
+        }*/
+
+
         //AnvilMinigameOverlay.endMinigame();
     }
 
@@ -435,6 +435,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     protected ForgingRecipe lastRecipe = null;
 
     public void tick(Level lvl, BlockPos pos, BlockState st) {
+        if (!new BlockPos(pos).equals(this.worldPosition))
+            return;
         try {
             Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
             // Check if recipe has changed by comparing with last known recipe
@@ -458,6 +460,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
             if (recipeChanged) {
                 resetProgress();
+                ModMessages.sendToServer(new MinigameSetStartedC2SPacket(pos));
                 return;
             }
 
@@ -513,12 +516,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         return recipe.matches(inventory, level);
     }
 
-   /* public void startForgingMinigame(Player player, ItemStack result) {
-        if (player.level().isClientSide) {
-            Minecraft.getInstance().setScreen(new ForgingMinigameScreen(result));
-        }
-    }*/
-
     protected abstract String determineForgingQuality();
 
 
@@ -535,14 +532,14 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     public int getRequiredProgress() {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
         ForgingRecipe currentRecipe = recipe.get();
-        return currentRecipe.getHammeringRequired() - progress;
+        return currentRecipe.getHammeringRequired();
     }
 
     @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
         // Ensure any players are reset
-        ServerPlayer user = ModItemInteractEvents.getUsingPlayer(getBlockPos());
+        /*ServerPlayer user = ModItemInteractEvents.getUsingPlayer(getBlockPos());
         if (user != null) {
             user.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                 //minigame.resetNBTData();
@@ -552,34 +549,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                 ModItemInteractEvents.releaseAnvil(user, getBlockPos());
                 //ModMessages.sendToPlayer(new MinigameSyncS2CPacket(new CompoundTag().putBoolean("isVisible", false)), user);
             });
-        }
+        }*/
     }
-
-  /*  public void completeForgingWithQuality(String quality) {
-        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
-        if (recipeOptional.isPresent()) {
-            ForgingRecipe recipe = recipeOptional.get();
-            ItemStack result = recipe.getResultItem(level.registryAccess()).copy();
-
-            // Apply quality
-            result.getOrCreateTag().putString("ForgingQuality", quality);
-
-            // Clear inputs
-            for (int i = 0; i < 9; i++) {
-                itemHandler.extractItem(i, 1, false);
-            }
-
-            // Set output
-            ItemStack currentOutput = itemHandler.getStackInSlot(OUTPUT_SLOT);
-            if (currentOutput.isEmpty()) {
-                itemHandler.setStackInSlot(OUTPUT_SLOT, result);
-            } else {
-                currentOutput.grow(1);
-            }
-
-            resetForgingState();
-        }
-    }*/
 
     public void setOwner(UUID uuid) {
         ownerUUID = uuid;

@@ -12,14 +12,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -44,6 +42,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.block.UpgradeArrowDispenseBehavior;
+import net.stirdrem.overgeared.client.AnvilMinigameOverlay2;
 import net.stirdrem.overgeared.entity.ModEntities;
 
 import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
@@ -150,19 +149,103 @@ public class OvergearedMod {
 
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            var entries = event.getEntries();
+            entries.putAfter(
+                    new ItemStack(Blocks.CRAFTING_TABLE),
+                    new ItemStack(ModBlocks.DRAFTING_TABLE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+        }
+        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            var entries = event.getEntries();
+            entries.putAfter(
+                    new ItemStack(Blocks.GOLD_BLOCK),
+                    new ItemStack(ModBlocks.STEEL_BLOCK.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+        }
+        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            var entries = event.getEntries();
+            entries.putAfter(
+                    new ItemStack(Items.GOLD_INGOT),
+                    new ItemStack(ModItems.STEEL_INGOT.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putAfter(
+                    new ItemStack(Items.RAW_GOLD),
+                    new ItemStack(ModItems.CRUDE_STEEL.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+        }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
-            event.accept(ModItems.IRON_TONGS);
-            event.accept(ModItems.STEEL_TONGS);
-            event.accept(ModItems.COPPER_SMITHING_HAMMER);
-            event.accept(ModItems.SMITHING_HAMMER);
-            event.accept(ModItems.COPPER_SHOVEL.get());
-            event.accept(ModItems.COPPER_PICKAXE.get());
-            event.accept(ModItems.COPPER_AXE.get());
-            event.accept(ModItems.COPPER_HOE.get());
-            event.accept(ModItems.STEEL_SHOVEL.get());
-            event.accept(ModItems.STEEL_PICKAXE.get());
-            event.accept(ModItems.STEEL_AXE.get());
-            event.accept(ModItems.STEEL_HOE.get());
+            var entries = event.getEntries();
+
+            entries.putAfter(
+                    new ItemStack(Items.NETHERITE_HOE),
+                    new ItemStack(ModItems.IRON_TONGS.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+
+            entries.putAfter(
+                    new ItemStack(ModItems.IRON_TONGS.get()),
+                    new ItemStack(ModItems.STEEL_TONGS.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putAfter(
+                    new ItemStack(ModItems.STEEL_TONGS.get()),
+                    new ItemStack(ModItems.COPPER_SMITHING_HAMMER.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putAfter(
+                    new ItemStack(ModItems.COPPER_SMITHING_HAMMER.get()),
+                    new ItemStack(ModItems.SMITHING_HAMMER.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+
+            // Copper tools after Stone tools
+            entries.putAfter(
+                    new ItemStack(Items.STONE_HOE),
+                    new ItemStack(ModItems.COPPER_SHOVEL.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putAfter(
+                    new ItemStack(ModItems.COPPER_SHOVEL.get()),
+                    new ItemStack(ModItems.COPPER_PICKAXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putAfter(
+                    new ItemStack(ModItems.COPPER_PICKAXE.get()),
+                    new ItemStack(ModItems.COPPER_AXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putAfter(
+                    new ItemStack(ModItems.COPPER_AXE.get()),
+                    new ItemStack(ModItems.COPPER_HOE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+
+            // Steel tools after Iron tools
+            entries.putAfter(
+                    new ItemStack(Items.GOLDEN_HOE),
+                    new ItemStack(ModItems.COPPER_SHOVEL.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putAfter(
+                    new ItemStack(ModItems.COPPER_SHOVEL.get()),
+                    new ItemStack(ModItems.COPPER_PICKAXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putAfter(
+                    new ItemStack(ModItems.COPPER_PICKAXE.get()),
+                    new ItemStack(ModItems.COPPER_AXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putAfter(
+                    new ItemStack(ModItems.COPPER_AXE.get()),
+                    new ItemStack(ModItems.COPPER_HOE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
         }
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             for (Potion potion : ForgeRegistries.POTIONS) {
@@ -214,10 +297,68 @@ public class OvergearedMod {
                 arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
                 event.accept(arrow);
             }
-            event.accept(ModItems.COPPER_SWORD.get());
-            event.accept(ModItems.STEEL_SWORD.get());
-            event.accept(ModItems.COPPER_AXE.get());
-            event.accept(ModItems.STEEL_AXE.get());
+            event.getEntries().putAfter(
+                    new ItemStack(Items.STONE_SWORD),           // anchor: Stone Sword
+                    new ItemStack(ModItems.COPPER_SWORD.get()), // item to insert
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(Items.GOLDEN_SWORD),
+                    new ItemStack(ModItems.STEEL_SWORD.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(Items.STONE_AXE),
+                    new ItemStack(ModItems.COPPER_AXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(Items.GOLDEN_AXE),
+                    new ItemStack(ModItems.STEEL_AXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+
+            event.getEntries().putAfter(
+                    new ItemStack(Items.GOLDEN_BOOTS),
+                    new ItemStack(ModItems.STEEL_HELMET.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.STEEL_HELMET.get()),
+                    new ItemStack(ModItems.STEEL_CHESTPLATE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.STEEL_CHESTPLATE.get()),
+                    new ItemStack(ModItems.STEEL_LEGGINGS.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.STEEL_LEGGINGS.get()),
+                    new ItemStack(ModItems.STEEL_BOOTS.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(Items.LEATHER_BOOTS),
+                    new ItemStack(ModItems.STEEL_HELMET.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.STEEL_HELMET.get()),
+                    new ItemStack(ModItems.STEEL_CHESTPLATE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.STEEL_CHESTPLATE.get()),
+                    new ItemStack(ModItems.STEEL_LEGGINGS.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.STEEL_LEGGINGS.get()),
+                    new ItemStack(ModItems.STEEL_BOOTS.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+
         }
 
     }
@@ -315,6 +456,7 @@ public class OvergearedMod {
         @SubscribeEvent
         public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
             event.registerBelowAll("anvil_mg", AnvilMinigameOverlay.ANVIL_MG);
+            event.registerBelowAll("anvil_mg_2", AnvilMinigameOverlay2.ANVIL_MG);
         }
 
         @SubscribeEvent

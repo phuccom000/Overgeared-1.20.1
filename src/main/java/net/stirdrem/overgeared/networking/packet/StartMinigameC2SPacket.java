@@ -55,7 +55,7 @@ public class StartMinigameC2SPacket {
                 // Create sync packet data
                 CompoundTag syncData = new CompoundTag();
                 minigame.saveNBTData(syncData);
-                syncData.putFloat("maxArrowSpeed", ServerConfig.MAX_SPEED.get().floatValue());
+                syncData.putFloat("maxArrowSpeed", ServerConfig.MAX_ARROW_SPEED.get().floatValue());
                 syncData.putFloat("speedIncreasePerHit", ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue());
                 syncData.putFloat("zoneShrinkFactor", ServerConfig.ZONE_SHRINK_FACTOR.get().floatValue());
 
