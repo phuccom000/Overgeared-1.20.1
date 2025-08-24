@@ -82,10 +82,10 @@ public class ModMessages {
                 .consumerMainThread(PacketSendCounterC2SPacket::handle)
                 .add();
 
-        net.messageBuilder(PacketSendMinigameC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .encoder(PacketSendMinigameC2SPacket::encode)
-                .decoder(PacketSendMinigameC2SPacket::decode)
-                .consumerMainThread(PacketSendMinigameC2SPacket::handle)
+        net.messageBuilder(SetMinigameVisibleC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(SetMinigameVisibleC2SPacket::encode)
+                .decoder(SetMinigameVisibleC2SPacket::decode)
+                .consumerMainThread(SetMinigameVisibleC2SPacket::handle)
                 .add();
 
         net.messageBuilder(MinigameSetStartedC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
@@ -98,6 +98,24 @@ public class ModMessages {
                 .decoder(MinigameSetStartedS2CPacket::new)
                 .encoder(MinigameSetStartedS2CPacket::toBytes)
                 .consumerMainThread(MinigameSetStartedS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(HideMinigameS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(HideMinigameS2CPacket::new)
+                .encoder(HideMinigameS2CPacket::toBytes)
+                .consumerMainThread(HideMinigameS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(ResetMinigameS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ResetMinigameS2CPacket::new)
+                .encoder(ResetMinigameS2CPacket::toBytes)
+                .consumerMainThread(ResetMinigameS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(OnlyResetMinigameS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(OnlyResetMinigameS2CPacket::new)
+                .encoder(OnlyResetMinigameS2CPacket::toBytes)
+                .consumerMainThread(OnlyResetMinigameS2CPacket::handle)
                 .add();
     }
 

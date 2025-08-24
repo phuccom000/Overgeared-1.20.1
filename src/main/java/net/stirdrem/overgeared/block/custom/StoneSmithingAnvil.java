@@ -30,7 +30,7 @@ import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.StoneSmithingAnvilBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
-public class StoneSmithingAnvil extends AbstractSmithingAnvil {
+public class StoneSmithingAnvil extends AbstractSmithingAnvilNew {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
@@ -99,18 +99,6 @@ public class StoneSmithingAnvil extends AbstractSmithingAnvil {
         return new StoneSmithingAnvilBlockEntity(pPos, pState);
     }
 
-    /*@Nullable
-    @Override
-    public <T extends
-            BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        if (pLevel.isClientSide()) {
-            return null;
-        }
-
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.SMITHING_TABLE_BE.get(),
-                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
-    }
-    */
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
@@ -120,18 +108,6 @@ public class StoneSmithingAnvil extends AbstractSmithingAnvil {
                             pBlockEntity.tick(pLevel, pPos, pState1));
         }
         return null;
-    }
-
-    @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        resetMinigameData(level, pos);
-        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
-    }
-
-    @Override
-    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
-        resetMinigameData(level, pos);
-        super.onBlockExploded(state, level, pos, explosion);
     }
 
     @Override

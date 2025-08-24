@@ -2,6 +2,7 @@ package net.stirdrem.overgeared.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -22,6 +23,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.SteelSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.event.AnvilMinigameEvents;
+import net.stirdrem.overgeared.event.ModEvents;
 import org.jetbrains.annotations.Nullable;
 
 public class SteelSmithingAnvil extends AbstractSmithingAnvilNew {
@@ -92,18 +95,6 @@ public class SteelSmithingAnvil extends AbstractSmithingAnvilNew {
                             pBlockEntity.tick(pLevel, pPos, pState1));
         }
         return null;
-    }
-
-    @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        resetMinigameData(level, pos);
-        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
-    }
-
-    @Override
-    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
-        resetMinigameData(level, pos);
-        super.onBlockExploded(state, level, pos, explosion);
     }
 
 }

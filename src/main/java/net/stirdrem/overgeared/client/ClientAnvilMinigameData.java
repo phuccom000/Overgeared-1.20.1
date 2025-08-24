@@ -14,7 +14,7 @@ import java.util.UUID;
 public class ClientAnvilMinigameData {
     //private static final Map<UUID, PlayerMinigameData> playerData = new HashMap<>();
     public static UUID ownerUUID = null;
-    public static boolean isVisible = false;
+    private static boolean isVisible = false;
     public static boolean minigameStarted = false;
     public static ItemStack resultItem = null;
     public static int hitsRemaining = 0;

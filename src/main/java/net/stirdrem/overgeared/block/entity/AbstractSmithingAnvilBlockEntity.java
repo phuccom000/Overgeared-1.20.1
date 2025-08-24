@@ -34,8 +34,8 @@ import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
-import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.networking.packet.MinigameSetStartedC2SPacket;
+import net.stirdrem.overgeared.event.ModEvents;
+
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -205,32 +205,20 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
             if (hasProgressFinished()) {
                 craftItem();
-                resetProgress();
+                resetProgress(pPos);
             }
         } else {
-            resetProgress();
+            resetProgress(pPos);
         }
     }
 
-    public void resetProgress() {
+    public void resetProgress(BlockPos pos) {
         progress = 0;
         maxProgress = 0;
         lastRecipe = null;
-        AnvilMinigameEvents.reset();
-        //ClientAnvilMinigameData.setHitsRemaining(0);
-       /* ServerPlayer user = ModItemInteractEvents.getUsingPlayer(getBlockPos());
-        if (user != null) {
-            user.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                minigame.resetNBTData();
-                //minigame.reset(user);
-                //minigame.setIsVisible(false, user);
-                ModItemInteractEvents.releaseAnvil(user, getBlockPos());
-                //ModMessages.sendToPlayer(new MinigameSyncS2CPacket(new CompoundTag().putBoolean("isVisible", false)), user);
-            });
-        }*/
-
-
-        //AnvilMinigameOverlay.endMinigame();
+        if (!level.isClientSide()) {
+            ModEvents.resetMinigameForAnvil(level, pos);
+        }
     }
 
     protected void craftItem() {
@@ -435,55 +423,58 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     protected ForgingRecipe lastRecipe = null;
 
     public void tick(Level lvl, BlockPos pos, BlockState st) {
-        if (!new BlockPos(pos).equals(this.worldPosition))
-            return;
+        if (!pos.equals(this.worldPosition)) return; // sanity check
+
         try {
             Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
-            // Check if recipe has changed by comparing with last known recipe
-            boolean recipeChanged = false;
+
             if (currentRecipeOpt.isEmpty()) {
-                resetProgress();
-                return;
+                // Only reset if this anvil had progress or a previous recipe
+                if (progress > 0 || lastRecipe != null) {
+                    resetProgress(pos);
+                }
+                return; // nothing to do for an empty anvil
             }
 
             ForgingRecipe currentRecipe = currentRecipeOpt.get();
 
+            boolean recipeChanged = false;
             if (lastRecipe != null) {
-                // Compare recipes by their IDs or other unique properties
                 recipeChanged = !currentRecipe.getId().equals(lastRecipe.getId());
             } else if (maxProgress > 0) {
-                // We had progress but no last recipe (shouldn't normally happen)
                 recipeChanged = true;
+            }
+
+            if (recipeChanged) {
+                resetProgress(pos);
+                //ModMessages.sendToServer(new MinigameSetStartedC2SPacket(pos));
+                lastRecipe = currentRecipe;
+                return;
             }
 
             lastRecipe = currentRecipe;
 
-            if (recipeChanged) {
-                resetProgress();
-                ModMessages.sendToServer(new MinigameSetStartedC2SPacket(pos));
-                return;
-            }
-
             if (hasRecipe()) {
-                ForgingRecipe recipe = currentRecipeOpt.get();
-                maxProgress = recipe.getHammeringRequired();
+                maxProgress = currentRecipe.getHammeringRequired();
                 hitRemains = maxProgress - progress;
                 setChanged(lvl, pos, st);
 
                 if (hasProgressFinished()) {
                     craftItem();
-                    resetProgress();
+                    resetProgress(pos);
                 }
             } else {
-                progress = 0;
-                maxProgress = 0;
-                hitRemains = 0;
+                // No valid insertable result → just clear progress for this anvil
+                if (progress > 0 || maxProgress > 0) {
+                    resetProgress(pos);
+                }
             }
         } catch (Exception e) {
-            OvergearedMod.LOGGER.error("Error updating anvil hits remaining", e);
-            resetProgress();
+            OvergearedMod.LOGGER.error("Error ticking smithing anvil at {}", pos, e);
+            resetProgress(pos);
         }
     }
+
 
     public int getHitsRemaining() {
         return hitRemains;

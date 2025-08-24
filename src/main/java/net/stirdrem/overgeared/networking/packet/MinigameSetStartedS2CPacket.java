@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.networking.packet;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
@@ -24,7 +25,7 @@ public class MinigameSetStartedS2CPacket {
 
     public boolean handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            AnvilMinigameEvents.setMinigameStarted(true);
+            AnvilMinigameEvents.setMinigameStarted(pos, true);
             AnvilMinigameEvents.setIsVisible(pos, true);
         });
         ctx.get().setPacketHandled(true);

@@ -26,7 +26,7 @@ import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.TierASmithingAnvilBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
-public class TierASmithingAnvil extends AbstractSmithingAnvil {
+public class TierASmithingAnvil extends AbstractSmithingAnvilNew {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final VoxelShape Z1 = Block.box(3, 9, 0, 13, 16, 16);
     private static final VoxelShape Z2 = Block.box(3, 0, 1, 13, 3, 15);
@@ -85,18 +85,6 @@ public class TierASmithingAnvil extends AbstractSmithingAnvil {
         return new TierASmithingAnvilBlockEntity(pPos, pState);
     }
 
-    /*@Nullable
-    @Override
-    public <T extends
-            BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        if (pLevel.isClientSide()) {
-            return null;
-        }
-
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.SMITHING_TABLE_BE.get(),
-                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
-    }
-    */
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
@@ -106,18 +94,6 @@ public class TierASmithingAnvil extends AbstractSmithingAnvil {
                             pBlockEntity.tick(pLevel, pPos, pState1));
         }
         return null;
-    }
-
-    @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        resetMinigameData(level, pos);
-        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
-    }
-
-    @Override
-    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
-        resetMinigameData(level, pos);
-        super.onBlockExploded(state, level, pos, explosion);
     }
 
 }

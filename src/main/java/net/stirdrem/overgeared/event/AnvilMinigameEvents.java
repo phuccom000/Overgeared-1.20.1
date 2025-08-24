@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.networking.packet.PacketSendMinigameC2SPacket;
+import net.stirdrem.overgeared.networking.packet.SetMinigameVisibleC2SPacket;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class AnvilMinigameEvents {
     public static UUID ownerUUID = null;
-    public static boolean isVisible = false;
+    private static boolean isVisible = false;
     public static boolean minigameStarted = false;
     public static ItemStack resultItem = null;
     public static int hitsRemaining = 0;
@@ -40,7 +40,7 @@ public class AnvilMinigameEvents {
     public static float zoneShiftAmount = 15.0f;
     public static Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
     public static int skillLevel = 0;
-    public static BlockPos anvilPos;
+    //public static BlockPos anvilPos;
 
     private static int TICKS_PER_PRINT = 1;
 
@@ -93,11 +93,14 @@ public class AnvilMinigameEvents {
 
     public static void setIsVisible(BlockPos pos, boolean isVisible) {
         AnvilMinigameEvents.isVisible = isVisible;
-        ModMessages.sendToServer(new PacketSendMinigameC2SPacket(pos, isVisible));
+        ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, isVisible));
     }
+
 
     public static void reset() {
         isVisible = false;
+       /* if (anvilPos != null)
+            ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(anvilPos, false));*/
         minigameStarted = false;
         hitsRemaining = 0;
         perfectHits = 0;
@@ -196,7 +199,6 @@ public class AnvilMinigameEvents {
         float qualityScore = 0;
         if (totalHits > 0)
             qualityScore = (perfectHits * 1.0f + goodHits * 0.6f) / totalHits;
-        reset();
         if (qualityScore > ServerConfig.PERFECT_QUALITY_SCORE.get()) return "perfect";
         if (qualityScore > ServerConfig.EXPERT_QUALITY_SCORE.get()) return "expert";
         if (qualityScore > ServerConfig.WELL_QUALITY_SCORE.get()) return "well";
@@ -271,15 +273,43 @@ public class AnvilMinigameEvents {
                 currentCenter + direction * zoneShiftAmount * shiftMagnitude));
     }
 
-    public static BlockPos getAnvilPos() {
-        return anvilPos;
+    public static BlockPos getAnvilPos(UUID playerId) {
+        return ModItemInteractEvents.playerAnvilPositions.getOrDefault(playerId, BlockPos.ZERO);
     }
 
-    public static void setAnvilPos(BlockPos anvilPos) {
-        AnvilMinigameEvents.anvilPos = anvilPos;
+    public static void setAnvilPos(UUID playerId, BlockPos pos) {
+        ModItemInteractEvents.playerAnvilPositions.put(playerId, pos);
     }
 
-    public static void setMinigameStarted(boolean minigameStarted) {
+    public static void clearAnvilPos(UUID playerId) {
+        ModItemInteractEvents.playerAnvilPositions.remove(playerId);
+    }
+
+    public static void setMinigameStarted(BlockPos pos, boolean minigameStarted) {
         AnvilMinigameEvents.minigameStarted = minigameStarted;
+
+    }
+
+    public static UUID getOccupiedAnvil(BlockPos pos) {
+        return occupiedAnvils.get(pos);
+    }
+
+    public static void putOccupiedAnvil(BlockPos pos, UUID me) {
+        occupiedAnvils.put(pos, me);
+    }
+
+    public static boolean hasAnvilPosition(UUID playerId) {
+        BlockPos pos = ModItemInteractEvents.playerAnvilPositions.get(playerId);
+        return pos != null && !pos.equals(BlockPos.ZERO);
+    }
+
+    // ✅ Player-specific hide
+    public static void hideMinigame(UUID playerId) {
+        isVisible = false;
+        BlockPos pos = ModItemInteractEvents.playerAnvilPositions.get(playerId);
+        if (pos != null && !pos.equals(BlockPos.ZERO)) {
+            ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, false));
+        }
+        //clearAnvilPos(playerId);
     }
 }

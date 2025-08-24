@@ -1,9 +1,12 @@
 package net.stirdrem.overgeared.block.custom;
 
+import com.mojang.authlib.GameProfile;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -19,10 +22,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Fallable;
-import net.minecraft.world.level.block.FallingBlock;
-import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -34,17 +34,20 @@ import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
+import net.stirdrem.overgeared.event.ModEvents;
 import net.stirdrem.overgeared.event.ModItemInteractEvents;
 import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.MinigameSetStartedC2SPacket;
 import net.stirdrem.overgeared.networking.packet.PacketSendCounterC2SPacket;
+import net.stirdrem.overgeared.networking.packet.ResetMinigameS2CPacket;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Random;
 import org.joml.Vector3f;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implements Fallable {
@@ -70,10 +73,14 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
     }
 
     private boolean minigameOn = false;
-    private BlockPos pos;
+    private boolean minigameStarted = false;
 
     public void setMinigameOn(boolean minigameOn) {
         this.minigameOn = minigameOn;
+    }
+
+    public void setMinigameStarted(boolean minigameStarted) {
+        this.minigameStarted = minigameStarted;
     }
 
     @Override
@@ -89,7 +96,11 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof AbstractSmithingAnvilBlockEntity) {
                 ((AbstractSmithingAnvilBlockEntity) blockEntity).drops();
-                resetMinigameData(pLevel, pPos);
+
+                // Fix: Use server-side reset method for the specific player
+                if (!pLevel.isClientSide()) {
+                    ModEvents.resetMinigameForAnvil(pLevel, pPos);
+                }
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
@@ -106,31 +117,19 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
             return InteractionResult.PASS;
         }
         if (level.isClientSide()) {
-            if (anvil.hasRecipe()) {
-                if (!player.isCrouching()) {
-                    if (!AnvilMinigameEvents.isIsVisible()) return InteractionResult.SUCCESS;
-                    // Read the current counter at the moment of right-click:
-                    String quality = AnvilMinigameEvents.handleHit();
-                    ModMessages.sendToServer(new PacketSendCounterC2SPacket(pos, quality));
-                    AnvilMinigameEvents.speedUp();
-                    //if (AnvilMinigameEvents.getHitsRemaining() == 0) {
-                    //AnvilMinigameEvents.setIsVisible(pos, false);
-                    //AnvilMinigameEvents.reset();
-                    //}
+            if (player.isCrouching()) return InteractionResult.SUCCESS;
+            if (anvil.hasRecipe() && isHammer) {
+                if (!pos.equals(AnvilMinigameEvents.getAnvilPos(player.getUUID()))) {
+                    //player.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED));
                     return InteractionResult.SUCCESS;
-                } else {
-                    if (AnvilMinigameEvents.minigameStarted) {
-                        AnvilMinigameEvents.setIsVisible(pos, !AnvilMinigameEvents.isIsVisible());
-                    } else {
-                        //ModMessages.sendToServer(new MinigameSetStartedC2SPacket(pos));
-                        AnvilMinigameEvents.reset();
-                        AnvilMinigameEvents.setMinigameStarted(true);
-                        AnvilMinigameEvents.setMinigameStarted(true);
-                        AnvilMinigameEvents.setIsVisible(pos, true);
-                        int test = anvil.getRequiredProgress();
-                        AnvilMinigameEvents.setHitsRemaining(anvil.getRequiredProgress());
-                    }
                 }
+                if (!AnvilMinigameEvents.isIsVisible()) return InteractionResult.SUCCESS;
+                // Read the current counter at the moment of right-click:
+                String quality = AnvilMinigameEvents.handleHit();
+                ModMessages.sendToServer(new PacketSendCounterC2SPacket(pos, quality));
+                AnvilMinigameEvents.speedUp();
+
+                return InteractionResult.SUCCESS;
             } else
                 AnvilMinigameEvents.setIsVisible(pos, false);
             return InteractionResult.SUCCESS;
@@ -139,50 +138,64 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
         long now = level.getGameTime();
 
         // Reject if still playing hammer sound
-        if (anvil.isBusy(now)) {
+       /* if (anvil.isBusy(now)) {
             return InteractionResult.CONSUME;
-        }
+        }*/
 
+        if (anvil.hasRecipe() && isHammer) {
+            UUID currentOwner = anvil.getOwnerUUID();
+            if (currentOwner != null && !currentOwner.equals(player.getUUID()) && player instanceof ServerPlayer serverPlayer) {
+                // Get the player entity from the UUID
+                Player ownerPlayer = level.getPlayerByUUID(currentOwner);
+                String ownerName;
 
-        /*AtomicBoolean isHit = new AtomicBoolean(false);
-
-        // Open GUI if not hammering
-        if (isHit.get())
-            return InteractionResult.SUCCESS;*/
-        if (anvil.hasRecipe()) {
-            if (!player.isCrouching()) {
-                if (minigameOn || !anvil.hasQuality() && !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get()) {
-                    anvil.increaseForgingProgress(level, pos, state);
-                    spawnAnvilParticles(level, pos);
-                    if (anvil.getHitsRemaining() == 1) {
-                        if (anvil.isFailedResult()) {
-                            level.playSound(null, pos, ModSounds.FORGING_FAILED.get(), SoundSource.BLOCKS, 1f, 1f);
-                        } else
-                            level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
-                    } else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
+                if (ownerPlayer != null) {
+                    // Player is online - use their display name
+                    ownerName = ownerPlayer.getDisplayName().getString();
+                } else {
+                    // Player is offline - try to get username from server
+                    GameProfile ownerProfile = level.getServer().getProfileCache().get(currentOwner).orElse(null);
+                    if (ownerProfile != null) {
+                        ownerName = ownerProfile.getName();
+                    } else {
+                        // Fallback if we can't get the name
+                        ownerName = "Another player";
+                    }
                 }
+
+                serverPlayer.sendSystemMessage(
+                        Component.translatable("message.overgeared.anvil_in_use_by_another", ownerName)
+                                .withStyle(ChatFormatting.RED),
+                        true
+                );
+                return InteractionResult.FAIL;
             }
-        }
-        if (!minigameOn)
+            if (minigameOn || !anvil.hasQuality() && !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get()) {
+                BlockPos pos1 = ModItemInteractEvents.playerAnvilPositions.get(player.getUUID());
+                if (!pos.equals(ModItemInteractEvents.playerAnvilPositions.get(player.getUUID()))) {
+                    ServerPlayer serverPlayer = (ServerPlayer) player;
+                    serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED), true);
+                    return InteractionResult.FAIL;
+                }
+                if (!ServerConfig.ENABLE_MINIGAME.get())
+                    anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
+                anvil.increaseForgingProgress(level, pos, state);
+                spawnAnvilParticles(level, pos);
+                if (anvil.getHitsRemaining() == 1) {
+                    if (anvil.isFailedResult()) {
+                        level.playSound(null, pos, ModSounds.FORGING_FAILED.get(), SoundSource.BLOCKS, 1f, 1f);
+                    } else
+                        level.playSound(null, pos, ModSounds.FORGING_COMPLETE.get(), SoundSource.BLOCKS, 1f, 1f);
+                } else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
+                return InteractionResult.sidedSuccess(level.isClientSide());
+            }
             NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
+        } else {
+            ModItemInteractEvents.releaseAnvil((ServerPlayer) player, pos);
+            NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
+        }
 
         return InteractionResult.sidedSuccess(level.isClientSide());
-    }
-
-    static void resetMinigameForPlayer(ServerPlayer player) {
-        player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-            if (minigame.hasAnvilPosition()) {
-                BlockPos anvilPos = minigame.getAnvilPos();
-                BlockEntity be = player.level().getBlockEntity(anvilPos);
-                if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
-                    anvil.setProgress(0);
-                    anvil.setChanged();
-                }
-                ModItemInteractEvents.releaseAnvil(player, anvilPos);
-            }
-            minigame.reset(player);
-            minigame.setIsVisible(false, player);
-        });
     }
 
     protected void spawnAnvilParticles(Level level, BlockPos pos) {
@@ -217,31 +230,34 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
 
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        resetMinigameData(level, pos);
+        if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
+            // For player destruction, we can still use the targeted approach
+            ModEvents.resetMinigameForPlayer(serverPlayer, pos);
+        }
         return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 
     @Override
     public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
-        resetMinigameData(level, pos);
+        if (!level.isClientSide()) {
+            ModEvents.resetMinigameForAnvil(level, pos);
+        }
         super.onBlockExploded(state, level, pos, explosion);
     }
 
     protected void resetMinigameData(Level level, BlockPos pos) {
         if (!level.isClientSide()) {
-            ServerPlayer usingPlayer = ModItemInteractEvents.getUsingPlayer(pos);
-            if (usingPlayer != null) {
-                // Reset server-side data
-                usingPlayer.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                    //minigame.resetNBTData();
-                    minigame.reset(usingPlayer); // Implement this in your capability
-                    //minigame.setIsVisible(false, usingPlayer);
+            for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
+                UUID playerId = player.getUUID();
+                if (ModItemInteractEvents.playerAnvilPositions.getOrDefault(playerId, BlockPos.ZERO).equals(pos)) {
+                    // Send reset packet only to this specific player
+                    ModMessages.sendToPlayer(new ResetMinigameS2CPacket(pos), player);
 
-                    /*// Notify client to reset
-                    CompoundTag resetTag = new CompoundTag();
-                    resetTag.putBoolean("isVisible", false);
-                    ModMessages.sendToPlayer(new MinigameSyncS2CPacket(resetTag), usingPlayer);*/
-                });
+                    // Clear server-side tracking for this player
+                    ModItemInteractEvents.playerAnvilPositions.remove(playerId);
+                    ModItemInteractEvents.playerMinigameVisibility.remove(playerId);
+                    break; // Only reset the first player found (should only be one)
+                }
             }
         }
     }
@@ -295,5 +311,6 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
         pLevel.scheduleTick(pPos, this, 2);
         return super.updateShape(pState, pDirection, pNeighborState, pLevel, pPos, pNeighborPos);
     }
+
 
 }

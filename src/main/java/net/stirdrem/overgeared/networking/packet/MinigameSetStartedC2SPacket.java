@@ -3,13 +3,18 @@ package net.stirdrem.overgeared.networking.packet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
+import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvilNew;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 import net.stirdrem.overgeared.networking.ModMessages;
 
 import java.util.function.Supplier;
+
+import static net.stirdrem.overgeared.event.ModItemInteractEvents.playerAnvilPositions;
+import static net.stirdrem.overgeared.event.ModItemInteractEvents.playerMinigameVisibility;
 
 public class MinigameSetStartedC2SPacket {
     private final BlockPos pos;
@@ -33,8 +38,14 @@ public class MinigameSetStartedC2SPacket {
             if (sender != null) {
                 BlockEntity be = sender.level().getBlockEntity(msg.pos);
                 if (be instanceof AbstractSmithingAnvilBlockEntity anvilEntity) {
-                    anvilEntity.resetProgress(); // or resetProgress(), whichever you want
+                    //anvilEntity.resetProgress(); // or resetProgress(), whichever you want
+                    AnvilMinigameEvents.setMinigameStarted(msg.pos, true);
                     ModMessages.sendToPlayer(new MinigameSetStartedS2CPacket(msg.pos), sender);
+                    playerAnvilPositions.put(sender.getUUID(), msg.pos);
+                    playerMinigameVisibility.put(sender.getUUID(), true);
+                }
+                if (sender.level().getBlockState(msg.pos).getBlock() instanceof AbstractSmithingAnvilNew anvilBlock) {
+                    anvilBlock.setMinigameStarted(true);
                 }
             }
         });

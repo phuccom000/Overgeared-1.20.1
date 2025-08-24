@@ -20,7 +20,7 @@ public class CounterBlock extends Block {
     @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos,
                                  Player player, InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
-        if (world.isClientSide()) {
+       /* if (world.isClientSide()) {
             if (!player.isCrouching()) {
                 if (!AnvilMinigameEvents.isIsVisible()) return InteractionResult.SUCCESS;
                 // Read the current counter at the moment of right-click:
@@ -36,7 +36,7 @@ public class CounterBlock extends Block {
                 AnvilMinigameEvents.setIsVisible(pos, !AnvilMinigameEvents.isIsVisible());
                 return InteractionResult.SUCCESS;
             }
-        }
+        }*/
         return InteractionResult.PASS;
     }
 }
