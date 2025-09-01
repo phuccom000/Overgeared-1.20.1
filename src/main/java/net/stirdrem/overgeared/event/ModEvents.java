@@ -8,11 +8,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -21,8 +21,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
+
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -35,14 +34,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvilNew;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.item.ModItems;
-import net.stirdrem.overgeared.minigame.AnvilMinigame;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
 import net.stirdrem.overgeared.networking.packet.OnlyResetMinigameS2CPacket;
 import net.stirdrem.overgeared.networking.packet.ResetMinigameS2CPacket;
 import net.stirdrem.overgeared.util.ModTags;
@@ -103,71 +98,6 @@ public class ModEvents {
         }
     }
 
-    private static void updateArrowPosition(AnvilMinigame minigame) {
-        float arrowPosition = minigame.getArrowPosition();
-        float arrowSpeed = minigame.getArrowSpeed();
-        boolean movingRight = minigame.getMovingRight();
-
-        if (movingRight) {
-            minigame.setArrowPosition(Math.min(100, arrowPosition + arrowSpeed));
-            if (arrowPosition >= 100) {
-                minigame.setMovingRight(false);
-            }
-        } else {
-            minigame.setArrowPosition(Math.max(0, arrowPosition - arrowSpeed));
-            if (arrowPosition <= 0) {
-                minigame.setMovingRight(true);
-            }
-        }
-    }
-
-    private static void syncMinigameData(AnvilMinigame minigame, ServerPlayer player) {
-        try {
-            // Create a CompoundTag to hold all minigame data
-            CompoundTag minigameData = new CompoundTag();
-            minigame.saveNBTData(minigameData); // Use your existing NBT serialization
-
-            // Add server config values that the client needs
-            minigameData.putFloat("maxArrowSpeed", ServerConfig.MAX_ARROW_SPEED.get().floatValue());
-            minigameData.putFloat("speedIncreasePerHit", ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue());
-            minigameData.putFloat("zoneShrinkFactor", ServerConfig.ZONE_SHRINK_FACTOR.get().floatValue());
-
-            // Send the packet
-            ModMessages.sendToPlayer(new MinigameSyncS2CPacket(minigameData), player);
-
-            // Optional debug logging
-            // OvergearedMod.LOGGER.debug("Sent minigame sync packet to player {}", player.getName().getString());
-        } catch (Exception e) {
-            OvergearedMod.LOGGER.error("Failed to sync minigame data to player {}", player.getName().getString(), e);
-        }
-    }
-
-    /*@SubscribeEvent
-    public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof Player &&
-                !event.getObject().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).isPresent()) {
-            event.addCapability(
-                    ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "properties"),
-                    new AnvilMinigameProvider()
-            );
-        }
-    }*/
-
-    /*@SubscribeEvent
-    public static void onPlayerCloned(PlayerEvent.Clone event) {
-        if (event.isWasDeath()) {
-            event.getOriginal().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
-                    .ifPresent(oldStore -> {
-                        event.getEntity().getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
-                                .ifPresent(newStore -> newStore.copyFrom(oldStore));
-                    });
-        }
-    }*/
-
-   /* @SubscribeEvent
-    public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-        event.register(AnvilMinigame.class);
-    }*/
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onItemAttributes(ItemAttributeModifierEvent event) {
@@ -177,11 +107,11 @@ public class ModEvents {
             String quality = stack.getTag().getString("ForgingQuality");
             Item item = stack.getItem();
 
-            if (isWeapon(item)) {
-                applyWeaponAttributes(event, quality);
-            } else if (isArmor(item)) {
-                applyArmorAttributes(event, quality);
-            }
+            //if (isWeapon(item)) {
+            applyWeaponAttributes(event, quality);
+            //} else if (isArmor(item)) {
+            applyArmorAttributes(event, quality);
+            //}
         }
     }
 
@@ -297,9 +227,11 @@ public class ModEvents {
         OvergearedMod.LOGGER.info("Reset all minigames on server stop.");
     }
 
-    private static void resetMinigameForPlayer(ServerPlayer player) {
+    public static void resetMinigameForPlayer(ServerPlayer player) {
+        if (player == null) return;
         UUID playerId = player.getUUID();
         ModMessages.sendToPlayer(new OnlyResetMinigameS2CPacket(), player);
+
         if (ModItemInteractEvents.playerAnvilPositions.containsKey(player.getUUID())) {
             BlockPos anvilPos = ModItemInteractEvents.playerAnvilPositions.get(player.getUUID());
             BlockEntity be = player.level().getBlockEntity(anvilPos);
@@ -308,20 +240,22 @@ public class ModEvents {
             if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
                 anvil.setProgress(0);
                 anvil.setChanged();
+                anvil.setMinigameOn(false);
+
+                // Send reset packet to the specific player
+                ModMessages.sendToPlayer(new ResetMinigameS2CPacket(anvilPos), player);
+                ModItemInteractEvents.releaseAnvil(player, anvilPos);
+                ModItemInteractEvents.playerAnvilPositions.remove(playerId);
+                ModItemInteractEvents.playerMinigameVisibility.remove(playerId);
+                Block block = player.level().getBlockState(anvilPos).getBlock();
+                /*if (block instanceof AbstractSmithingAnvilNew anvilNew) {
+                    anvilNew.setMinigameOn(false);
+                }*/
             }
 
-            // Send reset packet to the specific player
-            ModMessages.sendToPlayer(new ResetMinigameS2CPacket(anvilPos), player);
-            ModItemInteractEvents.releaseAnvil(player, anvilPos);
 
-            Block block = player.level().getBlockState(anvilPos).getBlock();
-            if (block instanceof AbstractSmithingAnvilNew anvilNew) {
-                anvilNew.setMinigameOn(false);
-            }
-
-            ModItemInteractEvents.playerAnvilPositions.remove(playerId);
-            ModItemInteractEvents.playerMinigameVisibility.remove(playerId);
         }
+
 
         AnvilMinigameEvents.reset();
         //playerTimeoutCounters.remove(player.getUUID());
@@ -329,19 +263,19 @@ public class ModEvents {
 
     public static void resetMinigameForPlayer(ServerPlayer player, BlockPos anvilPos) {
         // Only execute on server side
+        if (player == null) return;
         ModMessages.sendToPlayer(new OnlyResetMinigameS2CPacket(), player);
         BlockEntity be = player.level().getBlockEntity(anvilPos);
         if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
             anvil.setProgress(0);
             anvil.setChanged();
+            anvil.setMinigameOn(false);
         }
         AnvilMinigameEvents.reset();
         Block block = player.level().getBlockState(anvilPos).getBlock();
-        if (block instanceof AbstractSmithingAnvilNew anvilNew) {
-            anvilNew.setMinigameOn(false);
-        }
+
         // Send reset packet to the specific player
-        ModMessages.sendToPlayer(new ResetMinigameS2CPacket(anvilPos), player);
+        //ModMessages.sendToPlayer(new ResetMinigameS2CPacket(anvilPos), player);
         ModItemInteractEvents.playerAnvilPositions.remove(player.getUUID());
         ModItemInteractEvents.playerMinigameVisibility.remove(player.getUUID());
     }
@@ -356,12 +290,10 @@ public class ModEvents {
         if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
             anvil.setProgress(0);
             anvil.setChanged();
+            anvil.setMinigameOn(false);
             anvil.clearOwner(); // Clear ownership from the anvil itself
         }
-        Block block = level.getBlockState(anvilPos).getBlock();
-        if (block instanceof AbstractSmithingAnvilNew anvilNew) {
-            anvilNew.setMinigameOn(false);
-        }
+
         AnvilMinigameEvents.reset();
         // Find the specific player using this anvil and reset only them
         if (level instanceof ServerLevel serverLevel) {
@@ -381,13 +313,6 @@ public class ModEvents {
         }
     }
 
-
-    private static void startTimeoutCounter(ServerPlayer player) {
-        if (player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME)
-                .map(AnvilMinigame::isVisible).orElse(false)) {
-            // playerTimeoutCounters.put(player.getUUID(), ServerConfig.MINIGAME_TIMEOUT_TICKS.get());
-        }
-    }
 
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {

@@ -58,6 +58,8 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue FLINT_BREAKING_CHANCE;
     public static final ForgeConfigSpec.DoubleValue DURABILITY_REDUCE_PER_GRIND;
     public static final ForgeConfigSpec.DoubleValue DAMAGE_RESTORE_PER_GRIND;
+    public static final ForgeConfigSpec.BooleanValue GRINDING_RESTORE_DURABILITY;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GRINDING_BLACKLIST;
     public static final ForgeConfigSpec.BooleanValue ENABLE_MINIGAME;
     public static final ForgeConfigSpec.DoubleValue MASTER_QUALITY_CHANCE;
     public static final ForgeConfigSpec.IntValue STONE_ANVIL_MAX_USES;
@@ -79,6 +81,7 @@ public class ServerConfig {
     //public static final ForgeConfigSpec.IntValue SLIME_ARROW_BOUNCE;
     //public static final ForgeConfigSpec.DoubleValue SLIME_ARROW_BOUNCE_MULTIPLIER;
     public static final ForgeConfigSpec.BooleanValue UPGRADE_ARROW_POTION_TOGGLE;
+    public static final ForgeConfigSpec.DoubleValue MASTER_FROM_INGREDIENT_CHANCE;
 
 
     static {
@@ -146,10 +149,14 @@ public class ServerConfig {
                 .comment("How likely it is for the player to get Masterfully Forged. Set to 0 to disable it.")
                 .defineInRange("masterQualityChance", 0.05, 0, 1);
 
+        MASTER_FROM_INGREDIENT_CHANCE = builder
+                .comment("Chance (0.0 - 1.0) that using a Master-quality ingredient upgrades a Perfect hit to Master")
+                .defineInRange("masterFromIngredientChance", 0.5, 0.0, 1.0);
+
         MAX_ANVIL_DISTANCE = builder
                 .comment("Maximum distance you can go from your Smithing Anvil before minigame reset")
                 .defineInRange("maxAnvilDistance", 100, 0, 1000);
-        
+
         DEFAULT_ARROW_SPEED = builder
                 .comment("Default arrow speed for the forging minigame")
                 .defineInRange("arrowSpeed", 2.0, -5.0, 5.0);
@@ -321,7 +328,14 @@ public class ServerConfig {
         builder.pop();
 
         builder.push("Grinding Config");
-
+        GRINDING_RESTORE_DURABILITY = builder
+                .comment("Can the grindstone be used for restoring durability or not")
+                .define("grindingToggle", true);
+        GRINDING_BLACKLIST = builder
+                .comment("List of item IDs (e.g., 'minecraft:diamond_sword') that cannot be repaired or affected by grinding")
+                .defineList("grindingBlacklist",
+                        List.of("minecraft:elytra"), // Example default
+                        obj -> obj instanceof String);
         DURABILITY_REDUCE_PER_GRIND = builder
                 .comment("How much the item durability reduce per grindstone use")
                 .defineInRange("durabilityReduce", 0.05, 0, 1);

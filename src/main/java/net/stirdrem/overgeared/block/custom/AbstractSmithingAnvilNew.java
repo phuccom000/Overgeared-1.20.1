@@ -36,9 +36,7 @@ import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 import net.stirdrem.overgeared.event.ModEvents;
 import net.stirdrem.overgeared.event.ModItemInteractEvents;
-import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.networking.packet.MinigameSetStartedC2SPacket;
 import net.stirdrem.overgeared.networking.packet.PacketSendCounterC2SPacket;
 import net.stirdrem.overgeared.networking.packet.ResetMinigameS2CPacket;
 import net.stirdrem.overgeared.sound.ModSounds;
@@ -48,7 +46,6 @@ import org.joml.Random;
 import org.joml.Vector3f;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implements Fallable {
 
@@ -70,17 +67,6 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
 
     public static void setQuality(String quality) {
         AbstractSmithingAnvilNew.quality = quality;
-    }
-
-    private boolean minigameOn = false;
-    private boolean minigameStarted = false;
-
-    public void setMinigameOn(boolean minigameOn) {
-        this.minigameOn = minigameOn;
-    }
-
-    public void setMinigameStarted(boolean minigameStarted) {
-        this.minigameStarted = minigameStarted;
     }
 
     @Override
@@ -170,7 +156,8 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
                 );
                 return InteractionResult.FAIL;
             }
-            if (minigameOn || !anvil.hasQuality() && !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get()) {
+
+            if (anvil.isMinigameOn() || !anvil.hasQuality() && !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get()) {
                 BlockPos pos1 = ModItemInteractEvents.playerAnvilPositions.get(player.getUUID());
                 if (!pos.equals(ModItemInteractEvents.playerAnvilPositions.get(player.getUUID()))) {
                     ServerPlayer serverPlayer = (ServerPlayer) player;
@@ -179,6 +166,7 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
                 }
                 if (!ServerConfig.ENABLE_MINIGAME.get())
                     anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
+                held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
                 anvil.increaseForgingProgress(level, pos, state);
                 spawnAnvilParticles(level, pos);
                 if (anvil.getHitsRemaining() == 1) {

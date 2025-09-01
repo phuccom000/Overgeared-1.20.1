@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,7 +49,6 @@ import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
-import net.stirdrem.overgeared.minigame.AnvilMinigameProvider;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.*;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
@@ -100,6 +100,7 @@ public class ModItemInteractEvents {
         ItemStack heldItem = event.getItemStack();
 
         if (!heldItem.is(ModTags.Items.SMITHING_HAMMERS)) return;
+        if (event.getHand() != InteractionHand.MAIN_HAND) return;
 
         BlockEntity be = level.getBlockEntity(pos);
         BlockState clickedState = level.getBlockState(pos);
@@ -175,6 +176,11 @@ public class ModItemInteractEvents {
                 ModMessages.sendToAll(new MinigameSyncS2CPacket(sync));
                 return;
             }
+
+            if (playerAnvilPositions.get(player.getUUID()) != null && !pos.equals(playerAnvilPositions.get(player.getUUID()))) {
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED), true);
+                return;
+            }
         } else {
             if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
                 //player.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
@@ -203,7 +209,7 @@ public class ModItemInteractEvents {
                 BlockPos pos1 = pos;
                 BlockPos anvilPos = playerAnvilPositions.get(player.getUUID());
                 if (playerAnvilPositions.get(player.getUUID()) != null && !pos.equals(playerAnvilPositions.get(player.getUUID()))) {
-                    player.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED));
+                    //player.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED));
                     event.setCanceled(true);
                     event.setCancellationResult(InteractionResult.PASS);
                     return;
@@ -267,9 +273,6 @@ public class ModItemInteractEvents {
             if (be instanceof AbstractSmithingAnvilBlockEntity anvilBE && anvilBE.hasRecipe()) {
                 Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
                 recipeOpt.ifPresent(recipe -> {
-                    ItemStack result = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());
-                    int progress = anvilBE.getRequiredProgress();
-                    ModMessages.sendToServer(new StartMinigameC2SPacket(result, progress, pos));
                     ClientAnvilMinigameData.clearPendingMinigame(); // ✅ Done
                 });
             }
@@ -415,6 +418,21 @@ public class ModItemInteractEvents {
                 }
 
                 if (stack.isDamageableItem() && stack.getDamageValue() > 0) {
+                    if (!ServerConfig.GRINDING_RESTORE_DURABILITY.get()) {
+                        event.setCancellationResult(InteractionResult.SUCCESS);
+                        event.setCanceled(true);
+                        return;
+                    }
+                    Item item = stack.getItem();
+                    ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(item);
+
+// Check blacklist
+                    if (itemId != null && ServerConfig.GRINDING_BLACKLIST.get().contains(itemId.toString())) {
+                        event.setCancellationResult(InteractionResult.PASS); // Allow vanilla behavior, or SUCCESS if you want to eat the event
+                        event.setCanceled(true); // Prevent your custom grind logic
+                        return;
+                    }
+
                     CompoundTag tag = stack.getOrCreateTag();
                     int reducedCount = tag.getInt("ReducedMaxDurability");
 
@@ -468,10 +486,12 @@ public class ModItemInteractEvents {
             }
         }
         if (!world.isClientSide()) {
-            boolean test = event.getItemStack().is(ModTags.Items.SMITHING_HAMMERS);
-            if (!event.getItemStack().is(ModTags.Items.SMITHING_HAMMERS) && (!event.isCanceled() || event.getCancellationResult() == InteractionResult.PASS)) {
+            ItemStack mainHand = player.getMainHandItem();
+
+            // Only hide if MAIN HAND is not a hammer
+            if (!mainHand.is(ModTags.Items.SMITHING_HAMMERS)
+                    && (!event.isCanceled() || event.getCancellationResult() == InteractionResult.PASS)) {
                 hideMinigame((ServerPlayer) player);
-                ; // Any general item use
             }
         }
     }

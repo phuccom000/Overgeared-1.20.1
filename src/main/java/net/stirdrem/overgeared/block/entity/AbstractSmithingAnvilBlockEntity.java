@@ -69,6 +69,9 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     protected AnvilTier anvilTier;
     protected long sessionStartTime = 0L; // optional, for timeout logic
     protected ItemStack failedResult;
+    protected Player player;
+    private boolean minigameOn = false;
+
 
     public AbstractSmithingAnvilBlockEntity(AnvilTier tier, BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
         super(type, pPos, pBlockState);
@@ -194,6 +197,13 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         }
     }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
 
     public void increaseForgingProgress(Level pLevel, BlockPos pPos, BlockState pState) {
         Optional<ForgingRecipe> recipe = getCurrentRecipe();
@@ -217,8 +227,9 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         maxProgress = 0;
         lastRecipe = null;
         if (!level.isClientSide()) {
-            ModEvents.resetMinigameForAnvil(level, pos);
+            ModEvents.resetMinigameForPlayer((ServerPlayer) player);
         }
+        player = null;
     }
 
     protected void craftItem() {
@@ -424,7 +435,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
     public void tick(Level lvl, BlockPos pos, BlockState st) {
         if (!pos.equals(this.worldPosition)) return; // sanity check
-
         try {
             Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
 
@@ -607,5 +617,14 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
     public UUID getOwnerUUID() {
         return ownerUUID;
+    }
+
+    public void setMinigameOn(boolean value) {
+        this.minigameOn = value;
+        setChanged(); // mark dirty for save
+    }
+
+    public boolean isMinigameOn() {
+        return minigameOn;
     }
 }

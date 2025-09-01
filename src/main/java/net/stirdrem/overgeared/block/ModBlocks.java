@@ -41,8 +41,8 @@ public class ModBlocks {
     public static final RegistryObject<Block> DRAFTING_TABLE = registerBlock("drafting_table",
             () -> new BlueprintWorkbenchBlock(BlockBehaviour.Properties.copy(Blocks.CRAFTING_TABLE)));
 
-    public static final RegistryObject<Block> SMITHING_ANVIL_TEST = registerBlock("smithing_anvil_test",
-            () -> new CounterBlock(BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
+    /*public static final RegistryObject<Block> SMITHING_ANVIL_TEST = registerBlock("smithing_anvil_test",
+            () -> new CounterBlock(BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));*/
 
     /*public static final RegistryObject<Block> ROCK = registerBlock("rock",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH).sound(SoundType.STONE)));*/

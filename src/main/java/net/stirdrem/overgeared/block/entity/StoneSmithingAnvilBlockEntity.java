@@ -55,17 +55,6 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
         };
     }
 
-    /*@Override
-    public boolean hasRecipe() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        if (recipe.isPresent() && AnvilTier.STONE.getDisplayName().equals(recipe.get().getAnvilTier())) {
-            ItemStack resultStack = recipe.get().getResultItem(level.registryAccess());
-            return canInsertItemIntoOutputSlot(resultStack)
-                    && canInsertAmountIntoOutputSlot(resultStack.getCount());
-        }
-        return false;
-    }*/
-
     @Override
     protected void craftItem() {
         super.craftItem(); // Perform regular crafting logic

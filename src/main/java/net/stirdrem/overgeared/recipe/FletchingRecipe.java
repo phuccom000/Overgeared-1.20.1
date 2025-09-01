@@ -39,10 +39,10 @@ public class FletchingRecipe implements Recipe<Container> {
 
     @Override
     public boolean matches(Container container, Level level) {
-        return tip.test(container.getItem(0)) &&
-                shaft.test(container.getItem(1)) &&
-                feather.test(container.getItem(2)) &&
-                (potion == Ingredient.EMPTY || potion.test(container.getItem(3))); // slot 3 is potion
+        return (tip == Ingredient.EMPTY || tip.test(container.getItem(0))) &&
+                (shaft == Ingredient.EMPTY || shaft.test(container.getItem(1))) &&
+                (feather == Ingredient.EMPTY || feather.test(container.getItem(2))) &&
+                (potion == Ingredient.EMPTY || potion.test(container.getItem(3)));
     }
 
     @Override
@@ -135,13 +135,19 @@ public class FletchingRecipe implements Recipe<Container> {
         @Override
         public FletchingRecipe fromJson(ResourceLocation id, JsonObject json) {
             JsonObject material = GsonHelper.getAsJsonObject(json, "material");
-            Ingredient tip = Ingredient.fromJson(material.get("tip"));
-            Ingredient shaft = Ingredient.fromJson(material.get("shaft"));
-            Ingredient feather = Ingredient.fromJson(material.get("feather"));
+
+            // Allow tip, shaft, feather to be optional
+            Ingredient tip = material.has("tip") ? Ingredient.fromJson(material.get("tip")) : Ingredient.EMPTY;
+            Ingredient shaft = material.has("shaft") ? Ingredient.fromJson(material.get("shaft")) : Ingredient.EMPTY;
+            Ingredient feather = material.has("feather") ? Ingredient.fromJson(material.get("feather")) : Ingredient.EMPTY;
+
+            // Optional potion
             Ingredient potion = json.has("potion") ? Ingredient.fromJson(json.get("potion")) : Ingredient.EMPTY;
 
+            // Base result
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
 
+            // Optional tipped result
             ItemStack resultTipped = ItemStack.EMPTY;
             String tippedTag = null;
             if (json.has("result_tipped")) {
@@ -152,6 +158,7 @@ public class FletchingRecipe implements Recipe<Container> {
                 }
             }
 
+            // Optional lingering result
             ItemStack resultLingering = ItemStack.EMPTY;
             String lingeringTag = null;
             if (json.has("result_lingering")) {
@@ -168,17 +175,21 @@ public class FletchingRecipe implements Recipe<Container> {
         }
 
         @Override
-        public @Nullable FletchingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            Ingredient tip = Ingredient.fromNetwork(buf);
-            Ingredient shaft = Ingredient.fromNetwork(buf);
-            Ingredient feather = Ingredient.fromNetwork(buf);
-            Ingredient potion = Ingredient.fromNetwork(buf);
+        public FletchingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
+            // Read ingredients (can be EMPTY)
+            Ingredient tip = Ingredient.fromNetwork(buffer);
+            Ingredient shaft = Ingredient.fromNetwork(buffer);
+            Ingredient feather = Ingredient.fromNetwork(buffer);
+            Ingredient potion = Ingredient.fromNetwork(buffer);
 
-            ItemStack result = buf.readItem();
-            ItemStack resultTipped = buf.readItem();
-            ItemStack resultLingering = buf.readItem();
-            String tippedTag = buf.readUtf();
-            String lingeringTag = buf.readUtf();
+            // Read result stacks
+            ItemStack result = buffer.readItem();
+            ItemStack resultTipped = buffer.readItem();
+            ItemStack resultLingering = buffer.readItem();
+
+            // Read optional tags
+            String tippedTag = buffer.readBoolean() ? buffer.readUtf() : null;
+            String lingeringTag = buffer.readBoolean() ? buffer.readUtf() : null;
 
             return new FletchingRecipe(id, tip, shaft, feather, potion, result,
                     resultTipped, resultLingering,
@@ -186,17 +197,33 @@ public class FletchingRecipe implements Recipe<Container> {
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf buf, FletchingRecipe recipe) {
-            recipe.tip.toNetwork(buf);
-            recipe.shaft.toNetwork(buf);
-            recipe.feather.toNetwork(buf);
-            recipe.potion.toNetwork(buf);
+        public void toNetwork(FriendlyByteBuf buffer, FletchingRecipe recipe) {
+            // Write ingredients (Ingredient.EMPTY is supported by vanilla serializer)
+            recipe.tip.toNetwork(buffer);
+            recipe.shaft.toNetwork(buffer);
+            recipe.feather.toNetwork(buffer);
+            recipe.potion.toNetwork(buffer);
 
-            buf.writeItem(recipe.result);
-            buf.writeItem(recipe.resultTipped);
-            buf.writeItem(recipe.resultLingering);
-            buf.writeUtf(recipe.tippedTag);
-            buf.writeUtf(recipe.lingeringTag);
+            // Write result stacks
+            buffer.writeItem(recipe.result);
+            buffer.writeItem(recipe.resultTipped);
+            buffer.writeItem(recipe.resultLingering);
+
+            // Write optional tags
+            if (recipe.tippedTag != null) {
+                buffer.writeBoolean(true);
+                buffer.writeUtf(recipe.tippedTag);
+            } else {
+                buffer.writeBoolean(false);
+            }
+
+            if (recipe.lingeringTag != null) {
+                buffer.writeBoolean(true);
+                buffer.writeUtf(recipe.lingeringTag);
+            } else {
+                buffer.writeBoolean(false);
+            }
         }
+
     }
 }

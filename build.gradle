@@ -221,6 +221,10 @@ dependencies {
 
     compileOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1:api")
     runtimeOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1")
+
+    runtimeOnly fg.deobf("curse.maven:curios-309927:6418456")
+    runtimeOnly fg.deobf("curse.maven:lionfish-api-1001614:5922047")
+    runtimeOnly fg.deobf("curse.maven:lendercataclysm-551586:6906993")
     //runtimeOnly fg.deobf("curse.maven:item-nbt-viewer-514135:4578522")
     //runtimeOnly fg.deobf("maven.modrinth:kap_lib:v1.26.3-mc1.20.1-FML47.3.0")
     //runtimeOnly fg.deobf("curse.maven:zeta-968868:6432578")

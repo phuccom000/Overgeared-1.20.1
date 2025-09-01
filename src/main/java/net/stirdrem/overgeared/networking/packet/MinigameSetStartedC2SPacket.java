@@ -43,9 +43,8 @@ public class MinigameSetStartedC2SPacket {
                     ModMessages.sendToPlayer(new MinigameSetStartedS2CPacket(msg.pos), sender);
                     playerAnvilPositions.put(sender.getUUID(), msg.pos);
                     playerMinigameVisibility.put(sender.getUUID(), true);
-                }
-                if (sender.level().getBlockState(msg.pos).getBlock() instanceof AbstractSmithingAnvilNew anvilBlock) {
-                    anvilBlock.setMinigameStarted(true);
+                    anvilEntity.setPlayer(sender);
+                    anvilEntity.setMinigameOn(true);
                 }
             }
         });

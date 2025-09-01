@@ -28,41 +28,12 @@ public class ModMessages {
 
         INSTANCE = net;
 
-        net.messageBuilder(MinigameHitResultC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(MinigameHitResultC2SPacket::decode)
-                .encoder(MinigameHitResultC2SPacket::encode)
-                .consumerMainThread(MinigameHitResultC2SPacket::handle)
-                .add();
-
-        net.messageBuilder(StartMinigameC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(StartMinigameC2SPacket::new)
-                .encoder(StartMinigameC2SPacket::toBytes)
-                .consumerMainThread(StartMinigameC2SPacket::handle)
-                .add();
-
-        /*net.messageBuilder(UpdateAnvilProgressC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(UpdateAnvilProgressC2SPacket::new)
-                .encoder(UpdateAnvilProgressC2SPacket::toBytes)
-                .consumerMainThread(UpdateAnvilProgressC2SPacket::handle)
-                .add();*/
-
-        net.messageBuilder(FinalizeForgingC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(FinalizeForgingC2SPacket::new)
-                .encoder(FinalizeForgingC2SPacket::toBytes)
-                .consumerMainThread(FinalizeForgingC2SPacket::handle)
-                .add();
-
         net.messageBuilder(MinigameSyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(MinigameSyncS2CPacket::new)
                 .encoder(MinigameSyncS2CPacket::toBytes)
                 .consumerMainThread(MinigameSyncS2CPacket::handle)
                 .add();
 
-        net.messageBuilder(MinigameHitResultC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .encoder(MinigameHitResultC2SPacket::encode)
-                .decoder(MinigameHitResultC2SPacket::decode)
-                .consumerMainThread(MinigameHitResultC2SPacket::handle)
-                .add();
 
         net.messageBuilder(KnappingChipC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(KnappingChipC2SPacket::encode)

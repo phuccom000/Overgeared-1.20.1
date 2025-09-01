@@ -11,11 +11,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.ForgingQuality;
-import net.stirdrem.overgeared.block.custom.SteelSmithingAnvil;
 import net.stirdrem.overgeared.block.custom.TierASmithingAnvil;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
-import net.stirdrem.overgeared.screen.SteelSmithingAnvilMenu;
 import net.stirdrem.overgeared.screen.TierASmithingAnvilMenu;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,19 +84,49 @@ public class TierASmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
 
             int finalIndex = Math.min(anvilTierIndex, blueprintTierIndex);
 
-            return switch (qualityTiers.get(finalIndex)) {
-                case "poor" -> ForgingQuality.POOR.getDisplayName();
-                case "well" -> ForgingQuality.WELL.getDisplayName();
-                case "expert" -> ForgingQuality.EXPERT.getDisplayName();
-                case "perfect" -> {
+            switch (qualityTiers.get(finalIndex)) {
+                case "poor":
+                    return ForgingQuality.POOR.getDisplayName();
+                case "well":
+                    return ForgingQuality.WELL.getDisplayName();
+                case "expert":
+                    return ForgingQuality.EXPERT.getDisplayName();
+                case "perfect": {
                     Random random = new Random();
-                    if ("master".equals(blueprintToolType) || ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 && random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
-                        yield ForgingQuality.MASTER.getDisplayName();
-                    } else yield ForgingQuality.PERFECT.getDisplayName();
+
+                    // 🔹 Check if any crafting slot contains a Master-quality ingredient
+                    boolean hasMasterIngredient = false;
+                    for (int i = 0; i < this.itemHandler.getSlots(); i++) {
+                        if (i == OUTPUT_SLOT || i == BLUEPRINT_SLOT) continue; // skip output + blueprint
+                        ItemStack stack = this.itemHandler.getStackInSlot(i);
+                        if (!stack.isEmpty() && stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
+                            String ingQuality = stack.getTag().getString("ForgingQuality").toLowerCase();
+                            if ("master".equals(ingQuality)) {
+                                hasMasterIngredient = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Normal Master roll from config
+                    boolean masterRoll = ServerConfig.MASTER_QUALITY_CHANCE.get() != 0
+                            && random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get();
+
+                    // Ingredient-based boost
+                    boolean ingredientMasterRoll = hasMasterIngredient
+                            && random.nextFloat() < ServerConfig.MASTER_FROM_INGREDIENT_CHANCE.get();
+
+                    if ("master".equals(blueprintToolType) || masterRoll || ingredientMasterRoll) {
+                        return ForgingQuality.MASTER.getDisplayName();
+                    } else {
+                        return ForgingQuality.PERFECT.getDisplayName();
+                    }
                 }
-                case "master" -> ForgingQuality.MASTER.getDisplayName();
-                default -> "no_quality";
-            };
+                case "master":
+                    return ForgingQuality.MASTER.getDisplayName();
+                default:
+                    return "no_quality";
+            }
         }
         return quality;
     }
@@ -126,7 +154,7 @@ public class TierASmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
                 BlueprintQuality currentQuality = BlueprintQuality.fromString(currentQualityStr);
 
                 // Attempt to read the ForgingQuality from result
-                String forgingQualityStr = SteelSmithingAnvil.getQuality();
+                String forgingQualityStr = TierASmithingAnvil.getQuality();
                 ForgingQuality resultQuality = ForgingQuality.fromString(forgingQualityStr);
 
                 if (currentQuality != null && currentQuality != BlueprintQuality.PERFECT && currentQuality != BlueprintQuality.MASTER) {

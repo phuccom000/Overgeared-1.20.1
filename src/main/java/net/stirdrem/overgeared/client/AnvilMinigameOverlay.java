@@ -10,6 +10,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ClientConfig;
+import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 
 @OnlyIn(Dist.CLIENT)
 public class AnvilMinigameOverlay {
@@ -22,8 +23,8 @@ public class AnvilMinigameOverlay {
     private static final int ARROW_HEIGHT = 20;
 
     public static final IGuiOverlay ANVIL_MG = ((gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
-        HudOverlayHandler.setHudVisibility(!ClientAnvilMinigameData.getIsVisible());
-        if (!ClientAnvilMinigameData.getIsVisible()) return;
+        //HudOverlayHandler.setHudVisibility(!AnvilMinigameEvents.isIsVisible());
+        if (!AnvilMinigameEvents.isIsVisible()) return;
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
@@ -47,11 +48,11 @@ public class AnvilMinigameOverlay {
         int barHeight = 18;
 
         // Fetch zone data
-        int perfectZoneStart = ClientAnvilMinigameData.getPerfectZoneStart();
-        int perfectZoneEnd = ClientAnvilMinigameData.getPerfectZoneEnd();
-        int goodZoneStart = ClientAnvilMinigameData.getGoodZoneStart();
-        int goodZoneEnd = ClientAnvilMinigameData.getGoodZoneEnd();
-        float arrowPosition = ClientAnvilMinigameData.getArrowPosition();
+        int perfectZoneStart = AnvilMinigameEvents.getPerfectZoneStart();
+        int perfectZoneEnd = AnvilMinigameEvents.getPerfectZoneEnd();
+        int goodZoneStart = AnvilMinigameEvents.getGoodZoneStart();
+        int goodZoneEnd = AnvilMinigameEvents.getGoodZoneEnd();
+        float arrowPosition = AnvilMinigameEvents.getArrowPosition();
 
         // Draw good zone (textured instead of filled rectangle)
         int goodStartPx = (int) (barWidth * goodZoneStart / 100f);
@@ -87,14 +88,15 @@ public class AnvilMinigameOverlay {
         // Draw the arrow
         int arrowX = barX + (int) (barWidth * arrowPosition / 100f) - 5;
         guiGraphics.blit(TEXTURE, arrowX, barY - 1, 8, 39, ARROW_WIDTH, ARROW_HEIGHT, textureWidth, textureHeight);
+        int hitsRemain = AnvilMinigameEvents.getHitsRemaining();
 
         // Display forging stats
         Component stats = Component.translatable(
                 "gui.overgeared.forging_stats",
-                ClientAnvilMinigameData.getHitsRemaining(),
-                ClientAnvilMinigameData.getPerfectHits(),
-                ClientAnvilMinigameData.getGoodHits(),
-                ClientAnvilMinigameData.getMissedHits()
+                AnvilMinigameEvents.getHitsRemaining(),
+                AnvilMinigameEvents.getPerfectHits(),
+                AnvilMinigameEvents.getGoodHits(),
+                AnvilMinigameEvents.getMissedHits()
         );
 
         guiGraphics.drawString(

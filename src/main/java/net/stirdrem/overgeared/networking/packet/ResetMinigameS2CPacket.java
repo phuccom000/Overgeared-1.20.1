@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.networking.packet;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
@@ -29,12 +30,16 @@ public class ResetMinigameS2CPacket {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             try {
-                var player = net.minecraft.client.Minecraft.getInstance().player;
+                var player = Minecraft.getInstance().player;
+                if (player != null) {
+                    OvergearedMod.LOGGER.info("Resetting player's position for {} at anvil {}", player.getName().getString(), anvilPos);
+                }
                 // Only reset if the current anvil position matches the one in the packet
-                AnvilMinigameEvents.reset();
-
-                ModItemInteractEvents.playerAnvilPositions.remove(player.getUUID());
-                ModItemInteractEvents.playerMinigameVisibility.remove(player.getUUID());
+                if (ModItemInteractEvents.playerAnvilPositions.getOrDefault(player.getUUID(), BlockPos.ZERO).equals(anvilPos)) {
+                    ModItemInteractEvents.playerAnvilPositions.remove(player.getUUID());
+                    ModItemInteractEvents.playerMinigameVisibility.remove(player.getUUID());
+                    AnvilMinigameEvents.reset();
+                }
             } catch (Exception e) {
                 OvergearedMod.LOGGER.error("Failed to process ResetMinigameS2CPacket for anvil at {}", anvilPos, e);
             }
