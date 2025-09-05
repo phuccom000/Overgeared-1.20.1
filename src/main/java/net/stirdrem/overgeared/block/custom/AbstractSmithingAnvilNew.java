@@ -37,6 +37,7 @@ import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 import net.stirdrem.overgeared.event.ModEvents;
 import net.stirdrem.overgeared.event.ModItemInteractEvents;
 import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.networking.packet.HideMinigameS2CPacket;
 import net.stirdrem.overgeared.networking.packet.PacketSendCounterC2SPacket;
 import net.stirdrem.overgeared.networking.packet.ResetMinigameS2CPacket;
 import net.stirdrem.overgeared.sound.ModSounds;
@@ -159,7 +160,7 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
 
             if (anvil.isMinigameOn() || !anvil.hasQuality() && !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get()) {
                 BlockPos pos1 = ModItemInteractEvents.playerAnvilPositions.get(player.getUUID());
-                if (!pos.equals(ModItemInteractEvents.playerAnvilPositions.get(player.getUUID()))) {
+                if (pos1 != null && !pos.equals(ModItemInteractEvents.playerAnvilPositions.get(player.getUUID()))) {
                     ServerPlayer serverPlayer = (ServerPlayer) player;
                     serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED), true);
                     return InteractionResult.FAIL;
@@ -177,6 +178,7 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
                 } else level.playSound(null, pos, ModSounds.ANVIL_HIT.get(), SoundSource.BLOCKS, 1f, 1f);
                 return InteractionResult.sidedSuccess(level.isClientSide());
             }
+            ModItemInteractEvents.hideMinigame((ServerPlayer) player);
             NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
         } else {
             ModItemInteractEvents.releaseAnvil((ServerPlayer) player, pos);

@@ -106,7 +106,8 @@ public class ModItemInteractEvents {
         BlockState clickedState = level.getBlockState(pos);
 
         // Shift-right-click to convert stone into smithing anvil
-        if (!level.isClientSide && player.isCrouching() && clickedState.is(Blocks.STONE)) {
+        if (!level.isClientSide && player.isCrouching() && clickedState.is(Blocks.STONE)
+                && ServerConfig.ENABLE_STONE_TO_ANVIL.get()) {
             BlockState newState = ModBlocks.STONE_SMITHING_ANVIL.get()
                     .defaultBlockState()
                     .setValue(StoneSmithingAnvil.FACING, player.getDirection().getClockWise());
@@ -117,7 +118,8 @@ public class ModItemInteractEvents {
             return;
         }
 
-        if (!level.isClientSide && player.isCrouching() && clickedState.is(Blocks.ANVIL)) {
+        if (!level.isClientSide && player.isCrouching() && clickedState.is(Blocks.ANVIL)
+                && ServerConfig.ENABLE_ANVIL_TO_SMITHING.get()) {
             BlockState newState = ModBlocks.SMITHING_ANVIL.get()
                     .defaultBlockState()
                     .setValue(StoneSmithingAnvil.FACING, player.getDirection().getClockWise());
@@ -135,7 +137,8 @@ public class ModItemInteractEvents {
             }
         }
 
-        if (!(be instanceof AbstractSmithingAnvilBlockEntity anvilBE)) return;
+        if (!(be instanceof
+                AbstractSmithingAnvilBlockEntity anvilBE)) return;
         UUID playerUUID = player.getUUID();
 
         if (!player.isCrouching()) return;
@@ -333,7 +336,7 @@ public class ModItemInteractEvents {
         hideMinigame((ServerPlayer) player);
     }
 
-    private static void hideMinigame(ServerPlayer player) {
+    public static void hideMinigame(ServerPlayer player) {
        /* if (!player.isCrouching()) {
             player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
                 if (minigame.getVisible()) {
@@ -341,7 +344,7 @@ public class ModItemInteractEvents {
                 }
             });
         }*/
-        //AnvilMinigameEvents.hideMinigame();
+        //AnvilMinigameEvents.hideMinigame(player.getUUID());
         ModMessages.sendToPlayer(new HideMinigameS2CPacket(), player);
     }
 
@@ -489,8 +492,7 @@ public class ModItemInteractEvents {
             ItemStack mainHand = player.getMainHandItem();
 
             // Only hide if MAIN HAND is not a hammer
-            if (!mainHand.is(ModTags.Items.SMITHING_HAMMERS)
-                    && (!event.isCanceled() || event.getCancellationResult() == InteractionResult.PASS)) {
+            if (!mainHand.is(ModTags.Items.SMITHING_HAMMERS)) {
                 hideMinigame((ServerPlayer) player);
             }
         }
@@ -684,7 +686,7 @@ public class ModItemInteractEvents {
         Player player = event.getEntity();
 
         // Check: Right-clicked block is stone and holding flint
-        if (state.is(Blocks.STONE) && heldItem.is(Items.FLINT)) {
+        if (state.is(Blocks.STONE) && heldItem.is(Items.FLINT) && ServerConfig.GET_ROCK_USING_FLINT.get()) {
 
             ServerLevel serverLevel = (ServerLevel) level;
             boolean shouldConsumeFlint = false;

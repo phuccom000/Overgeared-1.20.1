@@ -320,7 +320,7 @@ public class ModEvents {
         List<Component> tooltip = event.getToolTip();
         int insertOffset = 1;
 
-        if (stack.is(Items.FLINT)) {
+        if (stack.is(Items.FLINT) && ServerConfig.GET_ROCK_USING_FLINT.get()) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.flint_flavor")
                     .withStyle(ChatFormatting.GRAY));
         }

@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared.screen;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -413,27 +414,14 @@ public class FletchingStationMenu extends AbstractContainerMenu {
     @Override
     public void removed(Player player) {
         super.removed(player);
-        this.access.execute((level, pos) -> {
-            // Only handle item return if the menu is still valid (player didn't just die/logout)
-            if (stillValid(player)) {
-                for (int i = 0; i < input.getContainerSize(); i++) {
-                    ItemStack stack = input.getItem(i);
-                    if (!stack.isEmpty()) {
-                        // In Creative mode, force-add to inventory (no drops)
-                        if (player.isCreative()) {
-                            player.getInventory().add(stack);
-                        }
-                        // In Survival mode, try to add to inventory or drop
-                        else {
-                            boolean added = player.getInventory().add(stack);
-                            if (!added) {
-                                player.drop(stack, false); // Drop near player
-                            }
-                        }
-                        input.setItem(i, ItemStack.EMPTY); // Clear the slot
-                    }
+        for (int i = 0; i < input.getContainerSize(); i++) {
+            ItemStack stack = input.getItem(i);
+            if (!stack.isEmpty()) {
+                if (!player.getInventory().add(stack)) {
+                    player.drop(stack, false);
                 }
             }
-        });
+        }
     }
+
 }

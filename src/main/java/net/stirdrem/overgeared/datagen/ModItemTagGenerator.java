@@ -222,6 +222,10 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                 .add(
                         ModItems.DIAMOND_SHARD.get()
                 );
+        this.tag(ModTags.Items.HOT_ITEMS)
+                .add(
+                        Items.LAVA_BUCKET
+                );
     }
 }
 

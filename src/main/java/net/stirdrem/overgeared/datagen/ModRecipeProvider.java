@@ -953,7 +953,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .withLingeringResult(ModItems.DIAMOND_UPGRADE_ARROW.get())
                 .unlockedBy("has_diamond", has(Items.DIAMOND))  // Add this unlock condition
                 .save(pWriter);
-
+        FletchingRecipeBuilder.fletching(
+                        Ingredient.of(Items.GLOWSTONE_DUST),
+                        Ingredient.of(Items.ARROW),
+                        Ingredient.EMPTY,
+                        Items.SPECTRAL_ARROW,
+                        1
+                )
+                .unlockedBy("has_arrow", has(Items.ARROW))  // Add this unlock condition
+                .save(pWriter);
     }
 
     /*protected static void oreSmelting(Consumer<FinishedRecipe> consumer, List<ItemLike> ingredients, @Nullable CompoundTag nbt,
