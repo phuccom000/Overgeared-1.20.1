@@ -368,7 +368,9 @@ public class ModEvents {
                     : Component.translatable("tooltip.overgeared.unpolished").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC);
             tooltip.add(insertOffset++, polishComponent);
         }
-
+        if (stack.hasTag() && stack.getTag().contains("Heated")) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heated").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
+        }
         if (stack.hasTag() && stack.getTag().contains("failedResult")) {
             tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.failedResult")
                     .withStyle(ChatFormatting.RED));
@@ -389,8 +391,12 @@ public class ModEvents {
                         .withStyle(ChatFormatting.GRAY));
                 tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line2")
                         .withStyle(ChatFormatting.GRAY));
-                tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line3")
-                        .withStyle(ChatFormatting.GRAY));
+                if (ServerConfig.ENABLE_STONE_TO_ANVIL.get())
+                    tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line3")
+                            .withStyle(ChatFormatting.GRAY));
+                if (ServerConfig.ENABLE_ANVIL_TO_SMITHING.get())
+                    tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.smithing_hammer.advanced_tooltip.line4")
+                            .withStyle(ChatFormatting.GRAY));
             }
         }
 

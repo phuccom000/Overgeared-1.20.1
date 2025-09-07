@@ -76,21 +76,25 @@ public class ModItemInteractEvents {
         Player player = event.getEntity();
         BlockState state = level.getBlockState(pos);
 
-        // Only handle if holding a heated metal
-        if (!heldStack.is(ModTags.Items.HEATED_METALS)) {
+        // Check if the item is heated either by tag or NBT
+        boolean isHeatedItem = heldStack.is(ModTags.Items.HEATED_METALS)
+                || (heldStack.hasTag() && heldStack.getTag().getBoolean("Heated"));
+
+        if (!isHeatedItem) {
             return;
         }
 
         // Handle water cauldron interaction
         if (state.is(Blocks.WATER_CAULDRON)) {
             handleCauldronInteraction(level, pos, player, heldStack, state);
+            // Remove the "Heated" tag if it exists
+
+
             event.setCancellationResult(InteractionResult.SUCCESS);
             event.setCanceled(true);
-
         }
-
-
     }
+
 
     @SubscribeEvent
     public static void onUseSmithingHammer(PlayerInteractEvent.RightClickBlock event) {
@@ -514,12 +518,12 @@ public class ModItemInteractEvents {
 
         if (waterLevel > 0) {
             // Update water level
-            if (waterLevel == 1) {
+            /*if (waterLevel == 1) {
                 level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
             } else {
                 level.setBlockAndUpdate(pos, state.setValue(levelProperty, waterLevel - 1));
             }
-            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);*/
 
             // Cool the ingot
             coolIngot(player, heldStack);
@@ -530,29 +534,33 @@ public class ModItemInteractEvents {
         Item cooled = getCooledIngot(stack.getItem());
         if (cooled == null) return;
 
-        int count = stack.getCount();
-        if (count <= 0) return; // Avoid making 0-stack cooled items
+        if (stack.getCount() <= 0) return;
 
-        ItemStack newStack = new ItemStack(cooled, count);
+        // Create a cooled copy (1 item only)
+        ItemStack cooledStack = new ItemStack(cooled, 1);
         if (stack.hasTag()) {
-            newStack.setTag(stack.getTag().copy());
+            cooledStack.setTag(stack.getTag().copy());
+            cooledStack.removeTagKey("HeatedSince"); // clean heat marker
+            cooledStack.removeTagKey("Heated");
         }
 
-        // Check where the heated stack is located
-        boolean isMain = ItemStack.isSameItemSameTags(stack, player.getMainHandItem());
-        boolean isOff = ItemStack.isSameItemSameTags(stack, player.getOffhandItem());
+        // Shrink the heated stack by 1
+        stack.shrink(1);
 
-        // Set original stack to empty
-        stack.setCount(0);
-
-        if (isMain) {
-            player.setItemInHand(InteractionHand.MAIN_HAND, newStack);
-        } else if (isOff) {
-            player.setItemInHand(InteractionHand.OFF_HAND, newStack);
+        // Decide where to place cooled ingot
+        if (stack.isEmpty()) {
+            // Replace directly if last one was used
+            if (player.getMainHandItem() == stack) {
+                player.setItemInHand(InteractionHand.MAIN_HAND, cooledStack);
+            } else if (player.getOffhandItem() == stack) {
+                player.setItemInHand(InteractionHand.OFF_HAND, cooledStack);
+            } else if (!player.getInventory().add(cooledStack)) {
+                player.drop(cooledStack, false);
+            }
         } else {
-            // Try to replace in inventory first
-            if (!player.getInventory().add(newStack)) {
-                player.drop(newStack, false); // Drop if inventory is full
+            // If there are still heated ingots left, try to add cooled one separately
+            if (!player.getInventory().add(cooledStack)) {
+                player.drop(cooledStack, false);
             }
         }
 
@@ -608,7 +616,9 @@ public class ModItemInteractEvents {
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof ItemEntity itemEntity) {
             ItemStack stack = itemEntity.getItem();
-            if (stack.is(ModTags.Items.HEATED_METALS)) {
+            boolean isHeatedItem = stack.is(ModTags.Items.HEATED_METALS)
+                    || (stack.hasTag() && stack.getTag().getBoolean("Heated"));
+            if (isHeatedItem) {
                 trackedEntities.add(itemEntity);
             }
         }
@@ -633,10 +643,11 @@ public class ModItemInteractEvents {
 
                 if (cooled != null && stack.getCount() > 0) {
                     // Cool only 1 item
+                    CompoundTag oldTag = stack.hasTag() ? stack.getTag().copy() : null;
                     stack.shrink(1);
                     entity.setItem(stack); // update remaining stack
 
-                    // Handle cauldron water level
+                   /* // Handle cauldron water level
                     if (state.is(Blocks.WATER_CAULDRON)) {
                         IntegerProperty levelProperty = LayeredCauldronBlock.LEVEL;
                         int waterLevel = state.getValue(levelProperty);
@@ -649,10 +660,15 @@ public class ModItemInteractEvents {
                             }
                             event.level.gameEvent(entity, GameEvent.BLOCK_CHANGE, entity.blockPosition());
                         }
-                    }
+                    }*/
 
                     // Spawn the cooled ingot
                     ItemStack cooledStack = new ItemStack(cooled, 1);
+                    if (oldTag != null) {
+                        oldTag.remove("HeatedSince"); // clean heat marker
+                        oldTag.remove("Heated");
+                        cooledStack.setTag(oldTag);
+                    }
                     ItemEntity cooledEntity = new ItemEntity(
                             event.level, entity.getX(), entity.getY(), entity.getZ(), cooledStack
                     );

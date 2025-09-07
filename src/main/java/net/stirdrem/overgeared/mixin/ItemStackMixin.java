@@ -34,66 +34,6 @@ import static net.stirdrem.overgeared.OvergearedMod.getCooledIngot;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
-    /*@Inject(
-            method = "getTooltipLines",
-            at = @At("RETURN"),
-            cancellable = true
-    )
-    private void insertQualityTooltip(Player player, TooltipFlag context, CallbackInfoReturnable<List<Component>> cir) {
-        ItemStack stack = (ItemStack) (Object) this;
-        List<Component> tooltip = cir.getReturnValue() != null ? new ArrayList<>(cir.getReturnValue()) : new ArrayList<>();
-        boolean modified = false;
-
-        // Handle quality tooltip
-        if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
-            String quality = stack.getTag().getString("ForgingQuality");
-            Component qualityComponent = switch (quality) {
-                case "poor" -> Component.translatable("tooltip.overgeared.poor").withStyle(ChatFormatting.RED);
-                case "well" -> Component.translatable("tooltip.overgeared.well").withStyle(ChatFormatting.YELLOW);
-                case "expert" -> Component.translatable("tooltip.overgeared.expert").withStyle(ChatFormatting.BLUE);
-                case "perfect" -> Component.translatable("tooltip.overgeared.perfect").withStyle(ChatFormatting.GOLD);
-                case "master" ->
-                        Component.translatable("tooltip.overgeared.master").withStyle(ChatFormatting.LIGHT_PURPLE);
-                default -> null;
-            };
-
-            if (qualityComponent != null) {
-                int insertPos = Math.min(1, tooltip.size());
-                tooltip.add(insertPos, qualityComponent);
-                modified = true;
-            }
-        }
-
-        // Handle polished/unpolished tooltip
-        if (stack.hasTag() && stack.getTag().contains("Polished")) {
-            boolean isPolished = stack.getTag().getBoolean("Polished");
-            Component polishComponent = isPolished
-                    ? Component.translatable("tooltip.overgeared.polished").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC)
-                    : Component.translatable("tooltip.overgeared.unpolished").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-
-            // Insert after quality tooltip or at position 1 if no quality
-            int insertPos = modified ? 2 : Math.min(1, tooltip.size());
-            tooltip.add(insertPos, polishComponent);
-            modified = true;
-        }
-
-        if (modified) {
-            cir.setReturnValue(tooltip);
-        }
-    }
-
-*/
-    /*@Inject(method = "getMaxDamage", at = @At("HEAD"), cancellable = true)
-    private void modifyDurability(CallbackInfoReturnable<Integer> cir) {
-        ItemStack stack = (ItemStack) (Object) this;
-        if (stack.getItem().canBeDepleted()) { // Only for damageable items
-            float multiplier = QualityHelper.getQualityMultiplier(stack);
-            int baseDurability = stack.getItem().getMaxDamage();
-            cir.setReturnValue((int) (baseDurability * multiplier));
-        }
-    }*/
-
-
     @Inject(
             method = "getDestroySpeed",
             at = @At("RETURN"),
@@ -151,18 +91,11 @@ public abstract class ItemStackMixin {
     }
 
 
-    /*@Redirect(method = "getTooltipLines", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;getAttackDamage()F"))
-    private float modifyAttackSpeed(Item instance) {
-        // This is more complex - you might need to use @Inject instead
-        return instance.getAttackDamage() * QualityHelper.getQualityMultiplier(...);
-    }*/
-
-
     // Per-player last-hit tick
     private static final Map<UUID, Long> lastTongsHit = new WeakHashMap<>();
 
     private static final String HEATED_TIME_TAG = "HeatedSince";
-    private static final int DEFAULT_COOLDOWN_TICKS = 20 * 60; // Default: 60 seconds
+    private static final String HEATED_TAG = "Heated";
 
     @Inject(method = "inventoryTick", at = @At("HEAD"))
     private void onInventoryTick(Level level, Entity entity, int slot, boolean selected, CallbackInfo ci) {
@@ -205,7 +138,8 @@ public abstract class ItemStackMixin {
         }
 
         boolean hasHotItem = player.getInventory().items.stream()
-                .anyMatch(s -> !s.isEmpty() && (s.is(ModTags.Items.HEATED_METALS) || s.is(ModTags.Items.HOT_ITEMS)))
+                .anyMatch(s -> !s.isEmpty() && (s.is(ModTags.Items.HEATED_METALS) || s.is(ModTags.Items.HOT_ITEMS))
+                        || (s.hasTag() && s.getTag().contains("Heated")))
                 || player.getMainHandItem().is(ModTags.Items.HEATED_METALS) || player.getMainHandItem().is(ModTags.Items.HOT_ITEMS)
                 || player.getOffhandItem().is(ModTags.Items.HEATED_METALS) || player.getOffhandItem().is(ModTags.Items.HOT_ITEMS);
 

@@ -37,6 +37,7 @@ import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 import net.stirdrem.overgeared.event.ModEvents;
 
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
+import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -269,8 +270,10 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                                 recipe.hasPolishing()) {
                             tag.putBoolean("Polished", false);
                         }
-
-                        result.setTag(tag);
+                        if (recipe.needQuenching() && (!result.is(ModTags.Items.HEATED_METALS) || !result.is(ModTags.Items.HOT_ITEMS))) {
+                            tag.putBoolean("Heated", true);
+                            result.setTag(tag);
+                        }
                     }
                 }
             }

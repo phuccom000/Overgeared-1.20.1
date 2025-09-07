@@ -8,12 +8,13 @@
       "item": "overgeared:heated_crude_steel"
     }
   },
+  "need_quenching": false,
   "needs_minigame": false,
   "pattern": [
     "#"
   ],
   "result": {
-    "item": "overgeared:steel_ingot"
+    "item": "overgeared:heated_steel_ingot"
   },
   "show_notification": true
 }

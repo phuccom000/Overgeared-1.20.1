@@ -8,6 +8,7 @@
       "item": "overgeared:heated_steel_ingot"
     }
   },
+  "need_quenching": true,
   "needs_minigame": false,
   "pattern": [
     "  x",

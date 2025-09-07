@@ -8,6 +8,7 @@
       "item": "overgeared:steel_plate"
     }
   },
+  "need_quenching": false,
   "needs_minigame": false,
   "pattern": [
     "# #",

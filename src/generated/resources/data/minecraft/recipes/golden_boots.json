@@ -10,6 +10,7 @@
     }
   },
   "minimum_quality": "poor",
+  "need_quenching": false,
   "needs_minigame": false,
   "pattern": [
     "# #",

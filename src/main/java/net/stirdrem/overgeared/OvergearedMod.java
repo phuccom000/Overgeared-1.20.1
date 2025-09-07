@@ -385,7 +385,7 @@ public class OvergearedMod {
             }
             index++;
         }
-        return null;
+        return heatedItem;
     }
 
     @Unique

@@ -34,6 +34,7 @@ public class ForgingRecipe implements Recipe<Container> {
     private final boolean needsMinigame;
     private final boolean requiresBlueprint;
     private final boolean hasPolishing;
+    private final boolean needQuenching;
     private final boolean showNotification;
     private final ForgingQuality minimumQuality;
     public final int width;
@@ -41,7 +42,7 @@ public class ForgingRecipe implements Recipe<Container> {
     private static int BLUEPRINT_SLOT = 11;
 
     public ForgingRecipe(ResourceLocation id, String group, boolean requireBlueprint, Set<String> blueprintTypes, String tier, NonNullList<Ingredient> ingredients,
-                         ItemStack result, ItemStack failedResult, int hammering, boolean hasQuality, boolean needsMinigame, boolean hasPolishing, boolean showNotification, ForgingQuality minimumQuality, int width, int height) {
+                         ItemStack result, ItemStack failedResult, int hammering, boolean hasQuality, boolean needsMinigame, boolean hasPolishing, boolean needQuenching, boolean showNotification, ForgingQuality minimumQuality, int width, int height) {
         this.id = id;
         this.group = group;
         this.blueprintTypes = blueprintTypes;
@@ -54,6 +55,7 @@ public class ForgingRecipe implements Recipe<Container> {
         this.requiresBlueprint = requireBlueprint;
         this.needsMinigame = needsMinigame;
         this.hasPolishing = hasPolishing;
+        this.needQuenching = needQuenching;
         this.showNotification = showNotification;
         this.minimumQuality = minimumQuality;
         this.width = width;
@@ -252,6 +254,10 @@ public class ForgingRecipe implements Recipe<Container> {
         return requiresBlueprint;
     }
 
+    public boolean needQuenching() {
+        return needQuenching;
+    }
+
     public static class Type implements RecipeType<ForgingRecipe> {
         public static final Type INSTANCE = new Type();
         public static final String ID = "forging";
@@ -291,6 +297,7 @@ public class ForgingRecipe implements Recipe<Container> {
             boolean hasQuality = GsonHelper.getAsBoolean(json, "has_quality", true);
             boolean needsMinigame = GsonHelper.getAsBoolean(json, "needs_minigame", false);
             boolean hasPolishing = GsonHelper.getAsBoolean(json, "has_polishing", true);
+            boolean needQuenching = GsonHelper.getAsBoolean(json, "need_quenching", true);
             boolean showNotification = GsonHelper.getAsBoolean(json, "show_notification", true);
             ForgingQuality minimumQuality = ForgingQuality.fromString(GsonHelper.getAsString(json, "minimumQuality", ForgingQuality.POOR.getDisplayName()));
             Map<Character, Ingredient> keyMap = parseKey(GsonHelper.getAsJsonObject(json, "key"));
@@ -302,7 +309,8 @@ public class ForgingRecipe implements Recipe<Container> {
 
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
             ItemStack failedResult = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result_failed", GsonHelper.getAsJsonObject(json, "result")));
-            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, showNotification, minimumQuality, width, height);
+            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult,
+                    hammering, hasQuality, needsMinigame, hasPolishing, needQuenching, showNotification, minimumQuality, width, height);
         }
 
         private static Map<Character, Ingredient> parseKey(JsonObject keyJson) {
@@ -352,6 +360,7 @@ public class ForgingRecipe implements Recipe<Container> {
             boolean hasQuality = buffer.readBoolean();  // Changed order to match writing
             boolean needsMinigame = buffer.readBoolean();  // Changed order to match writing
             boolean hasPolishing = buffer.readBoolean();  // Changed order to match writing
+            boolean needQuenching = buffer.readBoolean();
             boolean showNotification = buffer.readBoolean();
             int width = buffer.readVarInt();
             int height = buffer.readVarInt();
@@ -363,7 +372,7 @@ public class ForgingRecipe implements Recipe<Container> {
 
             ItemStack result = buffer.readItem();
             ItemStack failedResult = buffer.readItem();
-            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, showNotification, minimumQuality, width, height);
+            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, needQuenching, showNotification, minimumQuality, width, height);
         }
 
         @Override
@@ -379,6 +388,7 @@ public class ForgingRecipe implements Recipe<Container> {
             buffer.writeBoolean(recipe.hasQuality);
             buffer.writeBoolean(recipe.needsMinigame);
             buffer.writeBoolean(recipe.hasPolishing);
+            buffer.writeBoolean(recipe.needQuenching);
             buffer.writeBoolean(recipe.showNotification);
             buffer.writeVarInt(recipe.width);
             buffer.writeVarInt(recipe.height);

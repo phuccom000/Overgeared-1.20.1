@@ -8,6 +8,7 @@
       "item": "overgeared:steel_nugget"
     }
   },
+  "need_quenching": false,
   "needs_minigame": false,
   "pattern": [
     "###",

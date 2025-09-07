@@ -67,6 +67,12 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         List<ForgingRecipe> steelTierRecipes = allForgingRecipes.stream()
                 .filter(recipe -> recipe.getAnvilTier().equalsIgnoreCase(AnvilTier.IRON.getDisplayName()))
                 .toList();
+        List<ForgingRecipe> ATierRecipes = allForgingRecipes.stream()
+                .filter(recipe -> recipe.getAnvilTier().equalsIgnoreCase(AnvilTier.ABOVE_A.getDisplayName()))
+                .toList();
+        List<ForgingRecipe> BTierRecipes = allForgingRecipes.stream()
+                .filter(recipe -> recipe.getAnvilTier().equalsIgnoreCase(AnvilTier.ABOVE_B.getDisplayName()))
+                .toList();
 
         // Add only stone-tier recipes to Stone Forging JEI category
         //registration.addRecipes(ForgingRecipeCategory.FORGING_RECIPE_TYPE, stoneTierRecipes);
@@ -75,6 +81,8 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         List<ForgingRecipe> combinedSteelCategory = new java.util.ArrayList<>();
         combinedSteelCategory.addAll(stoneTierRecipes);
         combinedSteelCategory.addAll(steelTierRecipes);
+        combinedSteelCategory.addAll(ATierRecipes);
+        combinedSteelCategory.addAll(BTierRecipes);
         combinedSteelCategory.sort((a, b) -> {
             String catA = categorizeRecipe(a);
             String catB = categorizeRecipe(b);
@@ -281,6 +289,10 @@ public class JEIOvergearedModPlugin implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addRecipeCatalyst(
+                new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()), // or your custom source block
+                ForgingRecipeCategory.FORGING_RECIPE_TYPE
+        );
+        registration.addRecipeCatalyst(
                 new ItemStack(ModBlocks.SMITHING_ANVIL.get()), // or your custom source block
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE
         );
@@ -288,8 +300,13 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 new ItemStack(ModItems.ROCK.get()), // or your custom source block
                 KnappingRecipeCategory.KNAPPING_RECIPE_TYPE
         );
+
         registration.addRecipeCatalyst(
-                new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()), // or your custom source block
+                new ItemStack(ModBlocks.TIER_A_SMITHING_ANVIL.get()), // or your custom source block
+                ForgingRecipeCategory.FORGING_RECIPE_TYPE
+        );
+        registration.addRecipeCatalyst(
+                new ItemStack(ModBlocks.TIER_B_SMITHING_ANVIL.get()), // or your custom source block
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE
         );
         registration.addRecipeCatalyst(

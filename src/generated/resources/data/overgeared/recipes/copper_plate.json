@@ -8,6 +8,7 @@
       "item": "minecraft:copper_ingot"
     }
   },
+  "need_quenching": true,
   "needs_minigame": false,
   "pattern": [
     "#"

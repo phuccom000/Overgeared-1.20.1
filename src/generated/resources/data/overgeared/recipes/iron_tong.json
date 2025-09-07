@@ -5,9 +5,10 @@
   "has_quality": false,
   "key": {
     "x": {
-      "item": "minecraft:iron_ingot"
+      "item": "overgeared:heated_iron_ingot"
     }
   },
+  "need_quenching": true,
   "needs_minigame": false,
   "pattern": [
     "  x",

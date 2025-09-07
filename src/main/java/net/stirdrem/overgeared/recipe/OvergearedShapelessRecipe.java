@@ -31,21 +31,25 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
         if (!ServerConfig.ENABLE_MINIGAME.get()) {
             // When minigame is disabled
             boolean hasUnpolishedQualityItem = false;
+            boolean unquenched = false;
 
             for (int i = 0; i < container.getContainerSize(); i++) {
                 ItemStack ingredient = container.getItem(i);
                 if (ingredient.hasTag()) {
                     CompoundTag tag = ingredient.getTag();
-                    // Check if item has quality but isn't polished
                     if (!tag.contains("Polished") || !tag.getBoolean("Polished")) {
                         hasUnpolishedQualityItem = true;
                         break; // No need to check further if we found one
+                    }
+                    if (tag.contains("Heated") && tag.getBoolean("Heated")) {
+                        unquenched = true;
+                        break;
                     }
                 }
             }
 
             // Prevent crafting if any unpolished quality items exist
-            if (hasUnpolishedQualityItem) {
+            if (hasUnpolishedQualityItem || unquenched) {
                 return ItemStack.EMPTY;
             }
 
@@ -64,7 +68,7 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
         CompoundTag resultTag = result.getOrCreateTag();
         String foundQuality = null;
         boolean isPolished = false;
-
+        boolean unquenched = false;
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack ingredient = container.getItem(i);
             if (ingredient.hasTag()) {
@@ -75,8 +79,13 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                 if (tag.contains("Polished") && tag.getBoolean("Polished")) {
                     isPolished = true;
                 }
+                if (tag.contains("Heated") && tag.getBoolean("Heated")) {
+                    unquenched = true;
+                    break;
+                }
             }
         }
+        if (unquenched) return ItemStack.EMPTY;
 
         if (foundQuality != null) {
             String resultQuality = foundQuality;

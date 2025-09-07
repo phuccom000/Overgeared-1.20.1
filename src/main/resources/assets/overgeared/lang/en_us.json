@@ -122,6 +122,7 @@
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line1": "§7Crouch right click the §f§lSmithing Anvil§7 to start forging when you have a valid recipe.",
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line2": "Crouch right click again to stop forging.",
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line3": "§7Crouch right click on a stone block to convert to a §f§lStone Smithing Anvil§7.",
+  "tooltip.overgeared.smithing_hammer.advanced_tooltip.line4": "§7Crouch right click on an Anvil block to convert to a §f§lSmithing Anvil§7.",
   "tooltip.overgeared.smithing_hammer.hold_shift": "§7Hold §f§lSHIFT§7 for more information",
   "tooltip.overgeared.tongs.tooltip": "Prevent players from burning themselves when handling hot metals by holding it in your hand.",
   "upgrade.overgeared.diamond_upgrade": "Diamond Upgrade",
@@ -219,6 +220,7 @@
   "item.overgeared.arrow.effect.turtle_master": "the Turtle Master",
   "item.overgeared.arrow.effect.quark.resilience": "Stability",
   "tooltip.overgeared.grindable": "Can be grinded",
-  "tooltip.overgeared.diamond_shard": "Sharpened diamond tip from grinding diamond"
+  "tooltip.overgeared.diamond_shard": "Sharpened diamond tip from grinding diamond",
+  "tooltip.overgeared.heated": "Needs quenching"
 }
 
