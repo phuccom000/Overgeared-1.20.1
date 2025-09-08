@@ -32,11 +32,12 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
             // When minigame is disabled
             boolean hasUnpolishedQualityItem = false;
             boolean unquenched = false;
-
+            String foundQuality = null;
             for (int i = 0; i < container.getContainerSize(); i++) {
                 ItemStack ingredient = container.getItem(i);
                 if (ingredient.hasTag()) {
                     CompoundTag tag = ingredient.getTag();
+
                     if (!tag.contains("Polished") || !tag.getBoolean("Polished")) {
                         hasUnpolishedQualityItem = true;
                         break; // No need to check further if we found one
@@ -45,6 +46,9 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                         unquenched = true;
                         break;
                     }
+                    if (tag.contains("ForgingQuality")) {
+                        foundQuality = tag.getString("ForgingQuality");
+                    }
                 }
             }
 
@@ -52,15 +56,10 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
             if (hasUnpolishedQualityItem || unquenched) {
                 return ItemStack.EMPTY;
             }
-
-            // Remove any ForgingQuality tag from result if present
-            if (result.hasTag() && result.getTag().contains("ForgingQuality")) {
-                result.getTag().remove("ForgingQuality");
-                if (result.getTag().isEmpty()) {
-                    result.setTag(null); // Remove empty tag
-                }
-            }
-
+            CompoundTag resultTag = result.getOrCreateTag();
+            ForgingQuality quality = ForgingQuality.fromString(foundQuality);
+            resultTag.putString("ForgingQuality", quality.getDisplayName());
+            result.setTag(resultTag);
             return result;
         }
 
@@ -81,22 +80,21 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                 }
                 if (tag.contains("Heated") && tag.getBoolean("Heated")) {
                     unquenched = true;
-                    break;
                 }
             }
         }
-        if (unquenched) return ItemStack.EMPTY;
 
         if (foundQuality != null) {
-            String resultQuality = foundQuality;
+            ForgingQuality quality = ForgingQuality.fromString(foundQuality);
             if (!isPolished) {
-                ForgingQuality quality = ForgingQuality.fromString(foundQuality);
-                resultQuality = quality.getLowerQuality().getDisplayName();
+                quality = quality.getLowerQuality();
             }
-            resultTag.putString("ForgingQuality", resultQuality);
+            if (unquenched) {
+                quality = quality.getLowerQuality();
+            }
+            resultTag.putString("ForgingQuality", quality.getDisplayName());
             result.setTag(resultTag);
-
-        }
+        } else if (unquenched) return ItemStack.EMPTY;
         return result;
     }
 

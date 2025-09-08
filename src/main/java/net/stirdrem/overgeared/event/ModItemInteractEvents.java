@@ -110,7 +110,7 @@ public class ModItemInteractEvents {
         BlockState clickedState = level.getBlockState(pos);
 
         // Shift-right-click to convert stone into smithing anvil
-        if (!level.isClientSide && player.isCrouching() && clickedState.is(Blocks.STONE)
+        if (!level.isClientSide && player.isCrouching() && clickedState.is(ModTags.Blocks.ANVIL_BASES)
                 && ServerConfig.ENABLE_STONE_TO_ANVIL.get()) {
             BlockState newState = ModBlocks.STONE_SMITHING_ANVIL.get()
                     .defaultBlockState()

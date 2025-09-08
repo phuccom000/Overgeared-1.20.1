@@ -16,6 +16,7 @@ public class ModTags {
         public static final TagKey<Block> NEEDS_COPPER_TOOL = tag("needs_copper_tool");
         public static final TagKey<Block> SMITHING = tag("smithing");
         public static final TagKey<Block> SMITHING_ANVIL = tag("smithing_anvil");
+        public static final TagKey<Block> ANVIL_BASES = tag("stone_anvil_bases");
 
         private static TagKey<Block> tag(String name) {
             return BlockTags.create(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, name));
