@@ -131,14 +131,17 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                         registration.getIngredientManager()
                 ).toList()
         );
-        List<FletchingRecipe> fletchingRecipes = recipeManager.getAllRecipesFor(FletchingRecipe.Type.INSTANCE);
+        // Fletching
+        if (ServerConfig.ENABLE_FLETCHING_RECIPES.get()) {
+            List<FletchingRecipe> fletchingRecipes = recipeManager.getAllRecipesFor(FletchingRecipe.Type.INSTANCE);
+            registration.addRecipes(FletchingCategory.FLETCHING_RECIPE_TYPE, fletchingRecipes);
 
-        registration.addRecipes(FletchingCategory.FLETCHING_RECIPE_TYPE, fletchingRecipes);
-
-        // Add dynamic "potion conversion" recipes
-        List<FletchingRecipe> dynamicConversions = generatePotionConversions();
-        if (ServerConfig.UPGRADE_ARROW_POTION_TOGGLE.get())
-            registration.addRecipes(FletchingCategory.FLETCHING_RECIPE_TYPE, dynamicConversions);
+            // Add dynamic "potion conversion" recipes
+            List<FletchingRecipe> dynamicConversions = generatePotionConversions();
+            if (ServerConfig.UPGRADE_ARROW_POTION_TOGGLE.get()) {
+                registration.addRecipes(FletchingCategory.FLETCHING_RECIPE_TYPE, dynamicConversions);
+            }
+        }
     }
 
     private List<IJeiBrewingRecipe> dragonBreathRecipe() {
@@ -170,13 +173,17 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         List<FletchingRecipe> list = new ArrayList<>();
 
         // Upgradeable arrow types
-        ItemStack[] arrowTypes = {
-                new ItemStack(Items.ARROW),
-                new ItemStack(ModItems.IRON_UPGRADE_ARROW.get()),
-                new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get()),
-                new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get())
+        ItemStack[] arrowTypes;
+        if (ServerConfig.UPGRADE_ARROW_POTION_TOGGLE.get())
+            arrowTypes = new ItemStack[]{
+                    new ItemStack(Items.ARROW),
+                    new ItemStack(ModItems.IRON_UPGRADE_ARROW.get()),
+                    new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get()),
+                    new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get())
+            };
+        else arrowTypes = new ItemStack[]{
+                new ItemStack(Items.ARROW)
         };
-
         int idCounter = 0;
 
         // --- Generate tipped conversions ---

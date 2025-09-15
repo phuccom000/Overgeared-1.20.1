@@ -23,6 +23,7 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.ToolType;
+import net.stirdrem.overgeared.util.ModTags;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -159,7 +160,14 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('#', ModItems.STEEL_INGOT.get())
                 .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
                 .save(pWriter);
-
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WOODEN_TONGS.get())
+                .pattern(" # ")
+                .pattern("###")
+                .pattern(" # ")
+                .define('#', Items.STICK)
+                .unlockedBy("has_hot_item", has(ModTags.Items.HOT_ITEMS))
+                .unlockedBy("has_heated_metal", has(ModTags.Items.HEATED_METALS))
+                .save(pWriter);
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.EMPTY_BLUEPRINT.get())
                 .requires(Items.PAPER)
                 .requires(Items.PAPER)
@@ -180,6 +188,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .requires(Items.STICK)
                 .unlockedBy(getHasName(ModItems.STONE_AXE_HEAD.get()), has(ModItems.STONE_AXE_HEAD.get()))
                 .save(pWriter);
+
 
         OvergearedShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, Items.STONE_PICKAXE)
                 .requires(ModItems.STONE_PICKAXE_HEAD.get())

@@ -436,17 +436,28 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
     protected ForgingRecipe lastRecipe = null;
 
+    protected ItemStack lastBlueprint = ItemStack.EMPTY;
+
     public void tick(Level lvl, BlockPos pos, BlockState st) {
         if (!pos.equals(this.worldPosition)) return; // sanity check
         try {
-            Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
+            // Check if blueprint changed mid-forging
+            ItemStack currentBlueprint = this.itemHandler.getStackInSlot(11);
+            if (!ItemStack.isSameItemSameTags(currentBlueprint, lastBlueprint)) {
+                if (progress > 0 || lastRecipe != null || isMinigameOn()) {
+                    resetProgress(pos);
+                    setMinigameOn(false);
+                    OvergearedMod.LOGGER.debug("Blueprint changed at {}, minigame reset", pos);
+                }
+            }
+            lastBlueprint = currentBlueprint.copy();
 
+            Optional<ForgingRecipe> currentRecipeOpt = getCurrentRecipe();
             if (currentRecipeOpt.isEmpty()) {
-                // Only reset if this anvil had progress or a previous recipe
                 if (progress > 0 || lastRecipe != null) {
                     resetProgress(pos);
                 }
-                return; // nothing to do for an empty anvil
+                return;
             }
 
             ForgingRecipe currentRecipe = currentRecipeOpt.get();
@@ -460,7 +471,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
             if (recipeChanged) {
                 resetProgress(pos);
-                //ModMessages.sendToServer(new MinigameSetStartedC2SPacket(pos));
                 lastRecipe = currentRecipe;
                 return;
             }
@@ -477,7 +487,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                     resetProgress(pos);
                 }
             } else {
-                // No valid insertable result → just clear progress for this anvil
                 if (progress > 0 || maxProgress > 0) {
                     resetProgress(pos);
                 }
@@ -522,6 +531,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
     protected abstract String determineForgingQuality();
 
+    public abstract String blueprintQuality();
 
     public void setProgress(int progress) {
         this.progress = progress;

@@ -19,15 +19,15 @@ public class ClientAnvilMinigameData {
     public static ItemStack resultItem = null;
     public static int hitsRemaining = 0;
     public static float arrowPosition = 0;
-    public static float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
-    public static final float maxArrowSpeed = ServerConfig.MAX_ARROW_SPEED.get().floatValue();
-    public static float speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
+    public static float arrowSpeed = ServerConfig.POOR_ARROW_SPEED.get().floatValue();
+    public static final float maxArrowSpeed = ServerConfig.POOR_MAX_ARROW_SPEED.get().floatValue();
+    public static float speedIncreasePerHit = ServerConfig.POOR_ARROW_SPEED_INCREASE.get().floatValue();
     public static boolean movingRight = true;
     public static int perfectHits = 0;
     public static int goodHits = 0;
     public static int missedHits = 0;
-    public static int perfectZoneStart = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-    public static int perfectZoneEnd = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+    public static int perfectZoneStart = (100 - ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
+    public static int perfectZoneEnd = (100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
     public static int goodZoneStart = perfectZoneStart - 10;
     public static int goodZoneEnd = perfectZoneEnd + 10;
     public static float zoneShrinkFactor = 0.80f;
@@ -213,15 +213,15 @@ public class ClientAnvilMinigameData {
         missedHits = nbt.contains("missedHits") ? nbt.getInt("missedHits") : 0;
 
         arrowPosition = nbt.contains("arrowPosition") ? nbt.getFloat("arrowPosition") : 0f;
-        arrowSpeed = nbt.contains("arrowSpeed") ? nbt.getFloat("arrowSpeed") : ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        arrowSpeed = nbt.contains("arrowSpeed") ? nbt.getFloat("arrowSpeed") : ServerConfig.POOR_ARROW_SPEED.get().floatValue();
         speedIncreasePerHit = nbt.contains("speedIncreasePerHit")
                 ? nbt.getFloat("speedIncreasePerHit")
-                : ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
+                : ServerConfig.POOR_ARROW_SPEED_INCREASE.get().floatValue();
 
         movingRight = !nbt.contains("movingRight") || nbt.getBoolean("movingRight");
 
-        perfectZoneStart = nbt.contains("perfectZoneStart") ? nbt.getInt("perfectZoneStart") : (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-        perfectZoneEnd = nbt.contains("perfectZoneEnd") ? nbt.getInt("perfectZoneEnd") : (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
+        perfectZoneStart = nbt.contains("perfectZoneStart") ? nbt.getInt("perfectZoneStart") : (100 - ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
+        perfectZoneEnd = nbt.contains("perfectZoneEnd") ? nbt.getInt("perfectZoneEnd") : (100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
         goodZoneStart = nbt.contains("goodZoneStart") ? nbt.getInt("goodZoneStart") : Mth.clamp(perfectZoneStart - 20, 0, 100);
         goodZoneEnd = nbt.contains("goodZoneEnd") ? nbt.getInt("goodZoneEnd") : Mth.clamp(perfectZoneEnd + 20, goodZoneStart, 100);
 

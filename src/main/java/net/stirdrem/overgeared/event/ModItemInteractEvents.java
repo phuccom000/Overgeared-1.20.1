@@ -30,7 +30,6 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.TickEvent;
@@ -58,6 +57,7 @@ import net.stirdrem.overgeared.util.QualityHelper;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static net.stirdrem.overgeared.OvergearedMod.getCooledIngot;
 
@@ -223,7 +223,7 @@ public class ModItemInteractEvents {
                 }
                 if (anvilBE.hasRecipe() || anvilBE.needsMinigame()) {
                     anvilBE.setOwner(playerUUID);
-
+                    AtomicReference<String> quality = new AtomicReference<>("perfect");
                     Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
                     recipeOpt.ifPresent(recipe -> {
                         //ItemStack result = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());
@@ -235,7 +235,8 @@ public class ModItemInteractEvents {
                             ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, !isVisible));
                             playerMinigameVisibility.put(player.getUUID(), !isVisible);
                         } else {
-                            AnvilMinigameEvents.reset();
+                            quality.set(anvilBE.blueprintQuality());
+                            AnvilMinigameEvents.reset(quality.get());
                             playerAnvilPositions.put(player.getUUID(), pos);
                             playerMinigameVisibility.put(player.getUUID(), true);
                             AnvilMinigameEvents.setMinigameStarted(pos, true);
@@ -292,8 +293,10 @@ public class ModItemInteractEvents {
 
         // 1. Clear ownership from the block entity (server-side)
         BlockEntity be = player.level().getBlockEntity(pos);
+        String quality = "perfect";
         if (be instanceof AbstractSmithingAnvilBlockEntity anvilBE) {
             anvilBE.clearOwner();
+            quality = anvilBE.blueprintQuality();
         }
 
         // 2. Clear server-side tracking - FIXED: use UUID instead of Player object
@@ -303,7 +306,7 @@ public class ModItemInteractEvents {
         }
         // 3. Clear client-side state
         ClientAnvilMinigameData.putOccupiedAnvil(pos, null);
-        AnvilMinigameEvents.reset();
+        AnvilMinigameEvents.reset(quality);
         // 4. Sync null ownership to all clients
         CompoundTag syncData = new CompoundTag();
         syncData.putLong("anvilPos", pos.asLong());
@@ -378,7 +381,7 @@ public class ModItemInteractEvents {
             HitResult hit = player.pick(5.0D, 0.0F, false);
             BlockPos pos = ((BlockHitResult) hit).getBlockPos();
             BlockState state = world.getBlockState(pos);
-            if (player.isCrouching() && state.is(Blocks.GRINDSTONE)) {
+            if (player.isCrouching() && state.is(ModTags.Blocks.GRINDSTONES)) {
 
                 if (player.getMainHandItem() != stack) {
                     return;
@@ -494,9 +497,11 @@ public class ModItemInteractEvents {
         }
         if (!world.isClientSide()) {
             ItemStack mainHand = player.getMainHandItem();
-
+            HitResult hit = player.pick(5.0D, 0.0F, false);
+            BlockPos pos = ((BlockHitResult) hit).getBlockPos();
+            BlockState state = world.getBlockState(pos);
             // Only hide if MAIN HAND is not a hammer
-            if (!mainHand.is(ModTags.Items.SMITHING_HAMMERS)) {
+            if (!mainHand.is(ModTags.Items.SMITHING_HAMMERS) || !state.is(ModTags.Blocks.SMITHING_ANVIL)) {
                 hideMinigame((ServerPlayer) player);
             }
         }
@@ -871,7 +876,7 @@ public class ModItemInteractEvents {
         Level level = event.getLevel();
         BlockPos pos = event.getPos();
         Player player = event.getEntity();
-
+        if (!ServerConfig.ENABLE_FLETCHING_RECIPES.get()) return;
         // Only respond to main-hand to avoid double-open with offhand
         if (event.getHand() != InteractionHand.MAIN_HAND) return;
 

@@ -221,5 +221,6 @@
   "item.overgeared.arrow.effect.quark.resilience": "Stability",
   "tooltip.overgeared.grindable": "Có thể mài",
   "tooltip.overgeared.diamond_shard": "Mảnh kim cương nhọn từ việc mài kim cương",
-  "tooltip.overgeared.heated": "Cần được làm nguội"
+  "tooltip.overgeared.heated": "Cần được làm nguội",
+  "item.overgeared.wooden_tongs": "Kẹp gỗ"
 }

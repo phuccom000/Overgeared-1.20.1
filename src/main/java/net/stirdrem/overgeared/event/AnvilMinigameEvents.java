@@ -25,19 +25,20 @@ public class AnvilMinigameEvents {
     public static ItemStack resultItem = null;
     public static int hitsRemaining = 0;
     public static float arrowPosition = 1;
-    public static float arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
-    public static final float maxArrowSpeed = ServerConfig.MAX_ARROW_SPEED.get().floatValue();
-    public static float speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
+    public static float arrowSpeed = ServerConfig.POOR_ARROW_SPEED.get().floatValue();
+    public static float maxArrowSpeed = ServerConfig.POOR_MAX_ARROW_SPEED.get().floatValue();
+    public static float speedIncreasePerHit = ServerConfig.POOR_ARROW_SPEED_INCREASE.get().floatValue();
     public static boolean movingRight = true;
     public static int perfectHits = 0;
     public static int goodHits = 0;
     public static int missedHits = 0;
-    public static int perfectZoneStart = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-    public static int perfectZoneEnd = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-    public static int goodZoneStart = Math.max((100 - ServerConfig.ZONE_STARTING_SIZE.get() * 3) / 2, 1);
-    public static int goodZoneEnd = Math.min((100 + ServerConfig.ZONE_STARTING_SIZE.get() * 3) / 2, 100);
-    public static float zoneShrinkFactor = 0.80f;
+    public static int perfectZoneStart = (100 - ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
+    public static int perfectZoneEnd = (100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
+    public static int goodZoneStart = Math.max((100 - ServerConfig.POOR_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
+    public static int goodZoneEnd = Math.min((100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+    public static float zoneShrinkFactor = ServerConfig.POOR_ZONE_SHRINK_FACTOR.get().floatValue();
     public static float zoneShiftAmount = 15.0f;
+    public static float perfectZoneSize = perfectZoneEnd - perfectZoneStart;
     public static Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
     public static int skillLevel = 0;
     //public static BlockPos anvilPos;
@@ -51,6 +52,68 @@ public class AnvilMinigameEvents {
 
     // Direction 1 = counting up, -1 = counting down
     private static boolean movingDown = false;
+
+
+    public static void setupForQuality(String quality) {
+        switch (quality.toLowerCase()) {
+            case "master" -> {
+                arrowSpeed = ServerConfig.MASTER_ARROW_SPEED.get().floatValue();
+                speedIncreasePerHit = ServerConfig.MASTER_ARROW_SPEED_INCREASE.get().floatValue();
+                maxArrowSpeed = ServerConfig.MASTER_MAX_ARROW_SPEED.get().floatValue();
+                zoneShrinkFactor = ServerConfig.MASTER_ZONE_SHRINK_FACTOR.get().floatValue();
+                perfectZoneStart = (100 - ServerConfig.MASTER_ZONE_STARTING_SIZE.get()) / 2;
+                perfectZoneEnd = (100 + ServerConfig.MASTER_ZONE_STARTING_SIZE.get()) / 2;
+                goodZoneStart = Math.max((100 - ServerConfig.MASTER_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
+                goodZoneEnd = Math.min((100 + ServerConfig.MASTER_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                perfectZoneSize = perfectZoneEnd - perfectZoneStart;
+            }
+            case "perfect" -> {
+                arrowSpeed = ServerConfig.PERFECT_ARROW_SPEED.get().floatValue();
+                speedIncreasePerHit = ServerConfig.PERFECT_ARROW_SPEED_INCREASE.get().floatValue();
+                maxArrowSpeed = ServerConfig.PERFECT_MAX_ARROW_SPEED.get().floatValue();
+                zoneShrinkFactor = ServerConfig.PERFECT_ZONE_SHRINK_FACTOR.get().floatValue();
+                perfectZoneStart = (100 - ServerConfig.PERFECT_ZONE_STARTING_SIZE.get()) / 2;
+                perfectZoneEnd = (100 + ServerConfig.PERFECT_ZONE_STARTING_SIZE.get()) / 2;
+                goodZoneStart = Math.max((100 - ServerConfig.PERFECT_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
+                goodZoneEnd = Math.min((100 + ServerConfig.PERFECT_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                perfectZoneSize = perfectZoneEnd - perfectZoneStart;
+            }
+            case "expert" -> {
+                arrowSpeed = ServerConfig.EXPERT_ARROW_SPEED.get().floatValue();
+                speedIncreasePerHit = ServerConfig.EXPERT_ARROW_SPEED_INCREASE.get().floatValue();
+                maxArrowSpeed = ServerConfig.EXPERT_MAX_ARROW_SPEED.get().floatValue();
+                zoneShrinkFactor = ServerConfig.EXPERT_ZONE_SHRINK_FACTOR.get().floatValue();
+                perfectZoneStart = (100 - ServerConfig.EXPERT_ZONE_STARTING_SIZE.get()) / 2;
+                perfectZoneEnd = (100 + ServerConfig.EXPERT_ZONE_STARTING_SIZE.get()) / 2;
+                goodZoneStart = Math.max((100 - ServerConfig.EXPERT_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
+                goodZoneEnd = Math.min((100 + ServerConfig.EXPERT_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                perfectZoneSize = perfectZoneEnd - perfectZoneStart;
+            }
+            case "well" -> {
+                arrowSpeed = ServerConfig.WELL_ARROW_SPEED.get().floatValue();
+                speedIncreasePerHit = ServerConfig.WELL_ARROW_SPEED_INCREASE.get().floatValue();
+                maxArrowSpeed = ServerConfig.WELL_MAX_ARROW_SPEED.get().floatValue();
+                zoneShrinkFactor = ServerConfig.WELL_ZONE_SHRINK_FACTOR.get().floatValue();
+                perfectZoneStart = (100 - ServerConfig.WELL_ZONE_STARTING_SIZE.get()) / 2;
+                perfectZoneEnd = (100 + ServerConfig.WELL_ZONE_STARTING_SIZE.get()) / 2;
+                goodZoneStart = Math.max((100 - ServerConfig.WELL_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
+                goodZoneEnd = Math.min((100 + ServerConfig.WELL_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                perfectZoneSize = perfectZoneEnd - perfectZoneStart;
+            }
+            default -> { // poor
+                arrowSpeed = ServerConfig.POOR_ARROW_SPEED.get().floatValue();
+                speedIncreasePerHit = ServerConfig.POOR_ARROW_SPEED_INCREASE.get().floatValue();
+                maxArrowSpeed = ServerConfig.POOR_MAX_ARROW_SPEED.get().floatValue();
+                zoneShrinkFactor = ServerConfig.POOR_ZONE_SHRINK_FACTOR.get().floatValue();
+                perfectZoneStart = (100 - ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
+                perfectZoneEnd = (100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
+                goodZoneStart = Math.max((100 - ServerConfig.POOR_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
+                goodZoneEnd = Math.min((100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                perfectZoneSize = perfectZoneEnd - perfectZoneStart;
+            }
+        }
+    }
+
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
@@ -77,10 +140,7 @@ public class AnvilMinigameEvents {
     }
 
     public static void speedUp() {
-        arrowSpeed = Math.min(
-                arrowSpeed + ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue(),
-                ServerConfig.MAX_ARROW_SPEED.get().floatValue()
-        );
+        arrowSpeed = Math.min(arrowSpeed + speedIncreasePerHit, maxArrowSpeed);
     }
 
     public static float getArrowPosition() {
@@ -97,10 +157,8 @@ public class AnvilMinigameEvents {
     }
 
 
-    public static void reset() {
+    public static void reset(String blueprintQuality) {
         isVisible = false;
-       /* if (anvilPos != null)
-            ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(anvilPos, false));*/
         minigameStarted = false;
         hitsRemaining = 0;
         perfectHits = 0;
@@ -108,12 +166,26 @@ public class AnvilMinigameEvents {
         missedHits = 0;
         arrowPosition = 50;
         movingDown = false;
-        perfectZoneStart = (100 - ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-        perfectZoneEnd = (100 + ServerConfig.ZONE_STARTING_SIZE.get()) / 2;
-        goodZoneStart = Math.max((100 - ServerConfig.ZONE_STARTING_SIZE.get() * 3) / 2, 1);
-        goodZoneEnd = Math.min((100 + ServerConfig.ZONE_STARTING_SIZE.get() * 3) / 2, 100);
-        arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+        currentPerfectZoneSize = 0;
+        currentGoodZoneSize = 0;
+
+        setupForQuality(blueprintQuality); // 🔥 initialize from blueprint
+
+        randomizeCenter();
+    }
+
+    public static void reset() {
+        isVisible = false;
+        minigameStarted = false;
         hitsRemaining = 0;
+        perfectHits = 0;
+        goodHits = 0;
+        missedHits = 0;
+        arrowPosition = 50;
+        movingDown = false;
+
+        setupForQuality("poor"); // 🔥 initialize from blueprint
+
         randomizeCenter();
     }
 
@@ -205,15 +277,24 @@ public class AnvilMinigameEvents {
         return "poor";
     }
 
+    // Add two static fields to track current sizes independently of clamped values:
+    private static float currentPerfectZoneSize = 0;
+    private static float currentGoodZoneSize = 0;
+
     public static void shrinkAndShiftZones() {
-        float perfectZoneSize = perfectZoneEnd - perfectZoneStart;
-        float goodZoneSize = goodZoneEnd - goodZoneStart;
+        // Initialize once if not set
+        if (currentPerfectZoneSize == 0 || currentGoodZoneSize == 0) {
+            currentPerfectZoneSize = perfectZoneEnd - perfectZoneStart;
+            currentGoodZoneSize = goodZoneEnd - goodZoneStart;
+        }
 
-        perfectZoneSize *= zoneShrinkFactor;
-        goodZoneSize *= zoneShrinkFactor;
+        // Shrink based on stored sizes, not clamped bounds
+        currentPerfectZoneSize *= zoneShrinkFactor;
+        currentGoodZoneSize *= zoneShrinkFactor;
 
-        perfectZoneSize = Math.max(perfectZoneSize, ServerConfig.MIN_PERFECT_ZONE.get());
-        goodZoneSize = Math.max(goodZoneSize, perfectZoneSize + 20);
+        // Ensure minimum sizes
+        currentPerfectZoneSize = Math.max(currentPerfectZoneSize, AnvilMinigameEvents.perfectZoneSize);
+        currentGoodZoneSize = Math.max(currentGoodZoneSize, currentPerfectZoneSize * 3);
 
         float originalCenter = (perfectZoneStart + perfectZoneEnd) / 2f;
 
@@ -227,10 +308,10 @@ public class AnvilMinigameEvents {
             attempts++;
             float zoneCenter = getWeightedRandomCenter(originalCenter);
 
-            int ps = (int) (zoneCenter - perfectZoneSize / 2);
-            int pe = (int) (zoneCenter + perfectZoneSize / 2);
-            int gs = (int) (zoneCenter - goodZoneSize / 2);
-            int ge = (int) (zoneCenter + goodZoneSize / 2);
+            int ps = (int) (zoneCenter - currentPerfectZoneSize / 2);
+            int pe = (int) (zoneCenter + currentPerfectZoneSize / 2);
+            int gs = (int) (zoneCenter - currentGoodZoneSize / 2);
+            int ge = (int) (zoneCenter + currentGoodZoneSize / 2);
 
             ps = clamp(ps, 0, 100);
             pe = clamp(pe, 0, 100);
@@ -246,7 +327,7 @@ public class AnvilMinigameEvents {
             }
         }
 
-        // Apply the shifts—either a shifted version, or fallback to the last attempt
+        // Apply the shifts
         perfectZoneStart = newPerfectStart;
         perfectZoneEnd = newPerfectEnd;
         goodZoneStart = newGoodStart;

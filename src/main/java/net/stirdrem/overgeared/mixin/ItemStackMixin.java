@@ -7,6 +7,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -171,11 +172,11 @@ public abstract class ItemStackMixin {
                 lastTongsHit.put(uuid, tick);
             }
         } else {
-            player.hurt(player.damageSources().hotFloor(), 1.0f);
+            if (!player.hasEffect(MobEffects.FIRE_RESISTANCE)) {
+                player.hurt(player.damageSources().hotFloor(), 1.0f);
+            }
         }
-
     }
-
 
     @Inject(method = "getBarWidth", at = @At("HEAD"), cancellable = true)
     private void fixDurabilityBar(CallbackInfoReturnable<Integer> cir) {

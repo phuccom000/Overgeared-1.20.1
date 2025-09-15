@@ -11,6 +11,8 @@
   "tag.item.overgeared.smithing_hammers": "Smithing Hammers",
   "tag.item.overgeared.grindable": "Grindable",
   "tag.item.overgeared.grinded": "Grinded",
+  "tag.block.overgeared.grindstones": "Grindstones",
+  "tag.block.overgeared.stone_anvil_bases": "Stone Anvil Bases",
   "block.overgeared.smithing_anvil": "Smithing Anvil",
   "block.overgeared.tier_a_smithing_anvil": "Tier A Smithing Anvil (above Iron)",
   "block.overgeared.tier_b_smithing_anvil": "Tier B Smithing Anvil (above A)",
@@ -221,6 +223,7 @@
   "item.overgeared.arrow.effect.quark.resilience": "Stability",
   "tooltip.overgeared.grindable": "Can be grinded",
   "tooltip.overgeared.diamond_shard": "Sharpened diamond tip from grinding diamond",
-  "tooltip.overgeared.heated": "Needs quenching"
+  "tooltip.overgeared.heated": "Needs quenching",
+  "item.overgeared.wooden_tongs": "Wooden Tongs"
 }
 

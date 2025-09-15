@@ -24,22 +24,54 @@ public class ServerConfig {
 
     // --- Arrow Settings ---
     public static final ForgeConfigSpec.BooleanValue UPGRADE_ARROW_POTION_TOGGLE;
-    public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
-    public static final ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
-    public static final ForgeConfigSpec.DoubleValue MAX_ARROW_SPEED;
     public static final ForgeConfigSpec.IntValue MAX_POTION_TIPPING_USE;
 
     // --- Minigame Settings ---
     public static final ForgeConfigSpec.BooleanValue ENABLE_MINIGAME;
     public static final ForgeConfigSpec.DoubleValue MASTER_QUALITY_CHANCE;
     public static final ForgeConfigSpec.DoubleValue MASTER_FROM_INGREDIENT_CHANCE;
-    public static final ForgeConfigSpec.IntValue MINIGAME_TIMEOUT_TICKS;
-    public static final ForgeConfigSpec.IntValue ZONE_STARTING_SIZE;
-    public static final ForgeConfigSpec.IntValue MIN_PERFECT_ZONE;
-    public static final ForgeConfigSpec.DoubleValue ZONE_SHRINK_FACTOR;
+
+
     public static final ForgeConfigSpec.DoubleValue PERFECT_QUALITY_SCORE;
     public static final ForgeConfigSpec.DoubleValue EXPERT_QUALITY_SCORE;
     public static final ForgeConfigSpec.DoubleValue WELL_QUALITY_SCORE;
+
+
+    public static final ForgeConfigSpec.IntValue POOR_ZONE_STARTING_SIZE;
+    public static final ForgeConfigSpec.IntValue POOR_MIN_PERFECT_ZONE;
+    public static final ForgeConfigSpec.DoubleValue POOR_ZONE_SHRINK_FACTOR;
+    public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED;
+    public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED_INCREASE;
+    public static final ForgeConfigSpec.DoubleValue POOR_MAX_ARROW_SPEED;
+
+    public static ForgeConfigSpec.IntValue WELL_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue WELL_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue WELL_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue WELL_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue WELL_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue WELL_MAX_ARROW_SPEED;
+
+    public static ForgeConfigSpec.IntValue EXPERT_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue EXPERT_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue EXPERT_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue EXPERT_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue EXPERT_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue EXPERT_MAX_ARROW_SPEED;
+
+    public static ForgeConfigSpec.IntValue PERFECT_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue PERFECT_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue PERFECT_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue PERFECT_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue PERFECT_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue PERFECT_MAX_ARROW_SPEED;
+
+    public static ForgeConfigSpec.IntValue MASTER_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue MASTER_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue MASTER_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue MASTER_MAX_ARROW_SPEED;
+
 
     // --- Durability & Grinding ---
     public static final ForgeConfigSpec.DoubleValue BASE_DURABILITY_MULTIPLIER;
@@ -94,6 +126,17 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue ROCK_DROPPING_CHANCE;
     public static final ForgeConfigSpec.DoubleValue FLINT_BREAKING_CHANCE;
 
+    public static final ForgeConfigSpec.BooleanValue ENABLE_FLETCHING_RECIPES;
+
+    public static final ForgeConfigSpec.BooleanValue ENABLE_LOOT_QUALITY;
+
+    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_POOR;
+    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_WELL;
+    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_EXPERT;
+    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_PERFECT;
+    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_MASTER;
+
+
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
@@ -111,33 +154,85 @@ public class ServerConfig {
         HEATED_ITEM_COOLDOWN_TICKS = builder.comment("How many ticks before a heated item cools off in inventory (default: 1200 = 60s)").defineInRange("heatedItemCooldownTicks", 1200, 1, Integer.MAX_VALUE);
         builder.pop();
 
-        builder.push("Arrow Settings");
+        builder.push("Arrow Fletching Settings");
+        ENABLE_FLETCHING_RECIPES = builder
+                .comment("Enable or disable all Fletching recipes [true/false]")
+                .define("enableFletchingRecipes", true);
         UPGRADE_ARROW_POTION_TOGGLE = builder.comment("Toggle for the ability to tip iron, steel, diamond arrows.").define("enableUpgradeArrowTipping", true);
-        DEFAULT_ARROW_SPEED = builder.comment("Default arrow speed for the forging minigame").defineInRange("arrowSpeed", 2.0, -5.0, 5.0);
-        DEFAULT_ARROW_SPEED_INCREASE = builder.comment("Default arrow speed increase for the forging minigame").defineInRange("arrowSpeedIncrease", 0.75, -5.0, 5.0);
-        MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for the forging minigame").defineInRange("maxArrowSpeed", 5, 0, 10.0);
         MAX_POTION_TIPPING_USE = builder.comment("How many arrows can a bottle of potion tip before it's depleted").defineInRange("maxPotionTipping", 8, 0, Integer.MAX_VALUE);
         builder.pop();
 
-        builder.push("Minigame Settings");
+        builder.push("Minigame Common Settings");
         ENABLE_MINIGAME = builder.comment("Toggle for the forging minigame").define("enableMinigame", true);
-        MASTER_QUALITY_CHANCE = builder.comment("How likely it is for the player to get Masterfully Forged. Set to 0 to disable it.").defineInRange("masterQualityChance", 0.05, 0, 1);
-        MASTER_FROM_INGREDIENT_CHANCE = builder.comment("Chance that using a Master-quality ingredient upgrades a Perfect hit to Master").defineInRange("masterFromIngredientChance", 0.5, 0.0, 1.0);
+        MASTER_QUALITY_CHANCE = builder.comment("How likely it is for the player to get Masterwork when getting Perfectly Forged. Set to 0 to disable it.").defineInRange("masterQualityChance", 0.05, 0, 1);
+        MASTER_FROM_INGREDIENT_CHANCE = builder.comment("Chance that using a Master-quality ingredient results in Master-quality result").defineInRange("masterFromIngredientChance", 0.5, 0.0, 1.0);
         MAX_ANVIL_DISTANCE = builder.comment("Maximum distance you can go from your Smithing Anvil before minigame reset").defineInRange("maxAnvilDistance", 100, 0, 1000);
-        MINIGAME_TIMEOUT_TICKS = builder.comment("Minigame resets after a certain amount of seconds").defineInRange("minigameTimeout", 6000, 0, 36000);
-        ZONE_STARTING_SIZE = builder.comment("Zone starting size for the forging minigame, in chance").defineInRange("zoneStartingSize", 20, 0, 100);
-        ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for the forging minigame").defineInRange("zoneShrinkFactor", 0.7, 0, 1);
-        MIN_PERFECT_ZONE = builder.comment("Smallest perfect zone it can become").defineInRange("minPerfectZone", 10, 0, 100);
+
         PERFECT_QUALITY_SCORE = builder.comment("Lowest score required to get perfect quality").defineInRange("perfectQualityScore", 0.9, 0, 1.0);
         EXPERT_QUALITY_SCORE = builder.comment("Lowest score required to get expert quality").defineInRange("expertQualityScore", 0.6, 0, 1.0);
         WELL_QUALITY_SCORE = builder.comment("Lowest score required to get well quality").defineInRange("wellQualityScore", 0.3, 0, 1.0);
+
+        builder.pop();
+
+        builder.push("Poorly Forged");
+        POOR_ZONE_STARTING_SIZE = builder.comment("Zone starting size for POOR forging (in % chance)")
+                .defineInRange("zoneStartingSize", 30, 0, 100);
+        POOR_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for POOR forging")
+                .defineInRange("zoneShrinkFactor", 0.9, 0.0, 1.0);
+        POOR_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for POOR forging")
+                .defineInRange("minPerfectZone", 15, 0, 100);
+        POOR_ARROW_SPEED = builder.comment("Arrow speed for POOR forging")
+                .defineInRange("arrowSpeed", 1.5, -5.0, 5.0);
+        POOR_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for POOR forging")
+                .defineInRange("arrowSpeedIncrease", 0.5, -5.0, 5.0);
+        POOR_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for POOR forging")
+                .defineInRange("maxArrowSpeed", 3.0, 0.0, 10.0);
+        builder.pop();
+
+        builder.push("Well Forged");
+        WELL_ZONE_STARTING_SIZE = builder.comment("Zone starting size for WELL forging").defineInRange("zoneStartingSize", 20, 0, 100);
+        WELL_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for WELL forging").defineInRange("zoneShrinkFactor", 0.7, 0, 1);
+        WELL_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for WELL forging").defineInRange("minPerfectZone", 10, 0, 100);
+        WELL_ARROW_SPEED = builder.comment("Arrow speed for WELL forging").defineInRange("arrowSpeed", 2.0, -5.0, 5.0);
+        WELL_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for WELL forging").defineInRange("arrowSpeedIncrease", 0.75, -5.0, 5.0);
+        WELL_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for WELL forging").defineInRange("maxArrowSpeed", 5.0, 0.0, 10.0);
+        builder.pop();
+
+        // EXPERT
+        builder.push("Expertly Forged");
+        EXPERT_ZONE_STARTING_SIZE = builder.comment("Zone starting size for EXPERT forging").defineInRange("zoneStartingSize", 18, 0, 100);
+        EXPERT_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for EXPERT forging").defineInRange("zoneShrinkFactor", 0.65, 0, 1);
+        EXPERT_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for EXPERT forging").defineInRange("minPerfectZone", 8, 0, 100);
+        EXPERT_ARROW_SPEED = builder.comment("Arrow speed for EXPERT forging").defineInRange("arrowSpeed", 2.5, -5.0, 5.0);
+        EXPERT_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for EXPERT forging").defineInRange("arrowSpeedIncrease", 0.85, -5.0, 5.0);
+        EXPERT_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for EXPERT forging").defineInRange("maxArrowSpeed", 6.0, 0.0, 10.0);
+        builder.pop();
+
+        // PERFECT
+        builder.push("Perfectly Forged");
+        PERFECT_ZONE_STARTING_SIZE = builder.comment("Zone starting size for PERFECT forging").defineInRange("zoneStartingSize", 15, 0, 100);
+        PERFECT_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for PERFECT forging").defineInRange("zoneShrinkFactor", 0.6, 0, 1);
+        PERFECT_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for PERFECT forging").defineInRange("minPerfectZone", 6, 0, 100);
+        PERFECT_ARROW_SPEED = builder.comment("Arrow speed for PERFECT forging").defineInRange("arrowSpeed", 3.0, -5.0, 5.0);
+        PERFECT_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for PERFECT forging").defineInRange("arrowSpeedIncrease", 1.0, -5.0, 5.0);
+        PERFECT_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for PERFECT forging").defineInRange("maxArrowSpeed", 7.0, 0.0, 10.0);
+        builder.pop();
+
+        // MASTER
+        builder.push("Masterwork");
+        MASTER_ZONE_STARTING_SIZE = builder.comment("Zone starting size for MASTER forging").defineInRange("zoneStartingSize", 12, 0, 100);
+        MASTER_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for MASTER forging").defineInRange("zoneShrinkFactor", 0.55, 0, 1);
+        MASTER_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for MASTER forging").defineInRange("minPerfectZone", 4, 0, 100);
+        MASTER_ARROW_SPEED = builder.comment("Arrow speed for MASTER forging").defineInRange("arrowSpeed", 3.5, -5.0, 5.0);
+        MASTER_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for MASTER forging").defineInRange("arrowSpeedIncrease", 1.2, -5.0, 5.0);
+        MASTER_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for MASTER forging").defineInRange("maxArrowSpeed", 8.0, 0.0, 10.0);
         builder.pop();
 
         builder.push("Durability & Grinding");
         BASE_DURABILITY_MULTIPLIER = builder.comment("Defines the base durability multiplier of all items that has durability.").defineInRange("durability", 1f, 0, 10000);
         BASE_DURABILITY_BLACKLIST = builder.comment("Items that will NOT receive base durability multiplier").defineListAllowEmpty("base_durability_blacklist", List.of("minecraft:flint_and_steel"), o -> o instanceof String);
         GRINDING_RESTORE_DURABILITY = builder.comment("Can the grindstone be used for restoring durability or not").define("grindingToggle", true);
-        GRINDING_BLACKLIST = builder.comment("Items that cannot be repaired or affected by grinding").defineList("grindingBlacklist", List.of("minecraft:elytra"), obj -> obj instanceof String);
+        GRINDING_BLACKLIST = builder.comment("Items that cannot be repaired or affected by grinding").defineList("grindingBlacklist", List.of("minecraft:elytra", "overgeared:wooden_tongs"), obj -> obj instanceof String);
         DURABILITY_REDUCE_PER_GRIND = builder.comment("How much the item durability reduce per grindstone use").defineInRange("durabilityReduce", 0.05, 0, 1);
         DAMAGE_RESTORE_PER_GRIND = builder.comment("How much the item's durability restore per grindstone use").defineInRange("damageRestore", 0.1, 0, 1);
         builder.pop();
@@ -148,9 +243,32 @@ public class ServerConfig {
         builder.pop();
 
         builder.push("Blueprint & Tool Types");
-        AVAILABLE_TOOL_TYPES = builder.comment("List of available tool types for blueprints").defineList("availableToolTypes", Arrays.asList("SWORD", "AXE", "PICKAXE", "SHOVEL", "HOE", "HAMMER"), entry -> entry instanceof String);
-        CUSTOM_TOOL_TYPES = builder.comment("Add custom tool types as key-value pairs").defineList("customToolTypes", Arrays.asList(), entry -> entry instanceof String);
-        HIDDEN_TOOL_TYPES = builder.comment("Add hidden custom tool types as key-value pairs").defineList("hiddenToolTypes", Arrays.asList(), entry -> entry instanceof String);
+        AVAILABLE_TOOL_TYPES = builder.comment(
+                        "List of available tool types for blueprints",
+                        "Default options: SWORD, AXE, PICKAXE, SHOVEL, HOE",
+                        "Remove any types you don't want to be available",
+                        "Add custom types below in customToolTypes")
+                .defineList("availableToolTypes",
+                        Arrays.asList("SWORD", "AXE", "PICKAXE", "SHOVEL", "HOE", "HAMMER"),
+                        entry -> entry instanceof String);
+
+        CUSTOM_TOOL_TYPES = builder.comment("Add custom tool types as key-value pairs",
+                        "Format: [\"TYPE_ID\",\"Display Name\", \"TYPE_ID2\",\"Display Name 2\"]",
+                        "Example: [\"SPEAR\",\"Spear\", \"BROADSWORD\",\"Broadsword\"]")
+                .defineList("customToolTypes", Arrays.asList(), entry -> {
+                    if (!(entry instanceof String)) return false;
+                    // Validation will happen in ToolTypeRegistry
+                    return true;
+                });
+
+        HIDDEN_TOOL_TYPES = builder.comment("Add hidden custom tool types as key-value pairs. Does not appear in the Drafting Table",
+                        "Format: [\"TYPE_ID\",\"Display Name\", \"TYPE_ID2\",\"Display Name 2\"]",
+                        "Example: [\"SPEAR\",\"Spear\", \"BROADSWORD\",\"Broadsword\"]")
+                .defineList("hiddenToolTypes", Arrays.asList(), entry -> {
+                    if (!(entry instanceof String)) return false;
+                    // Validation will happen in ToolTypeRegistry
+                    return true;
+                });
         MASTER_MAX_USE = builder.comment("Uses required to reach the next quality after Master").defineInRange("masterMaxUse", 0, 0, Integer.MAX_VALUE);
         PERFECT_MAX_USE = builder.comment("Uses required to reach the next quality after Perfect").defineInRange("perfectMaxUse", 50, 0, 1000);
         EXPERT_MAX_USE = builder.comment("Uses required to reach the next quality after Expert").defineInRange("expertMaxUse", 20, 0, 1000);
@@ -192,7 +310,25 @@ public class ServerConfig {
         ROCK_DROPPING_CHANCE = builder.defineInRange("rockDroppingChance", 0.1, 0, 1);
         FLINT_BREAKING_CHANCE = builder.defineInRange("flintBreakingChance", 0.1, 0, 1);
         builder.pop();
+        builder.push("Loot Quality");
+        ENABLE_LOOT_QUALITY = builder.comment("Toggle for loot quality").define("enableLootQuality", true);
 
+        QUALITY_WEIGHT_POOR = builder
+                .comment("Weight for Poor quality for loot-tools/weapons. Set to 0 to disable.")
+                .defineInRange("weightPoorQuality", 50, 0, Integer.MAX_VALUE);
+        QUALITY_WEIGHT_WELL = builder
+                .comment("Weight for Well quality for loot-tools/weapons. Set to 0 to disable.")
+                .defineInRange("weightWellQuality", 30, 0, Integer.MAX_VALUE);
+        QUALITY_WEIGHT_EXPERT = builder
+                .comment("Weight for Expert quality for loot-tools/weapons. Set to 0 to disable.")
+                .defineInRange("weightExpertQuality", 10, 0, Integer.MAX_VALUE);
+        QUALITY_WEIGHT_PERFECT = builder
+                .comment("Weight for Perfect quality for loot-tools/weapons. Set to 0 to disable.")
+                .defineInRange("weightPerfectQuality", 5, 0, Integer.MAX_VALUE);
+        QUALITY_WEIGHT_MASTER = builder
+                .comment("Weight for Master quality for loot-tools/weapons. Set to 0 to disable.")
+                .defineInRange("weightMasterQuality", 1, 0, Integer.MAX_VALUE);
+        builder.pop();
         SERVER_CONFIG = builder.build();
     }
 

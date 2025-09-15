@@ -77,6 +77,7 @@ public class ModItemModelProvider extends ItemModelProvider {
 
         simpleHandheld(ModItems.IRON_TONGS);
         simpleHandheld(ModItems.STEEL_TONGS);
+        simpleHandheld(ModItems.WOODEN_TONGS);
         simpleHandheld(ModItems.SMITHING_HAMMER);
         simpleHandheld(ModItems.COPPER_SMITHING_HAMMER);
         simpleHandheld(ModItems.STEEL_SWORD);

@@ -141,7 +141,7 @@ public class OvergearedMod {
     }
 
     // Add the example block item to the building blocks tab
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+    private void addCreative(final BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             var entries = event.getEntries();
             entries.putAfter(
@@ -196,29 +196,8 @@ public class OvergearedMod {
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
 
-            // Copper tools after Stone tools
-            entries.putAfter(
-                    new ItemStack(Items.STONE_HOE),
-                    new ItemStack(ModItems.COPPER_SHOVEL.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            entries.putAfter(
-                    new ItemStack(ModItems.COPPER_SHOVEL.get()),
-                    new ItemStack(ModItems.COPPER_PICKAXE.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            entries.putAfter(
-                    new ItemStack(ModItems.COPPER_PICKAXE.get()),
-                    new ItemStack(ModItems.COPPER_AXE.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            entries.putAfter(
-                    new ItemStack(ModItems.COPPER_AXE.get()),
-                    new ItemStack(ModItems.COPPER_HOE.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-
             // Steel tools after Iron tools
+
             entries.putAfter(
                     new ItemStack(Items.GOLDEN_HOE),
                     new ItemStack(ModItems.COPPER_SHOVEL.get()),
@@ -239,6 +218,49 @@ public class OvergearedMod {
                     new ItemStack(ModItems.COPPER_HOE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
+            entries.putBefore(
+                    new ItemStack(Items.IRON_SHOVEL),
+                    new ItemStack(ModItems.COPPER_HOE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putBefore(
+                    new ItemStack(ModItems.COPPER_HOE.get()),
+                    new ItemStack(ModItems.COPPER_AXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putBefore(
+                    new ItemStack(ModItems.COPPER_AXE.get()),
+                    new ItemStack(ModItems.COPPER_PICKAXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putBefore(
+                    new ItemStack(ModItems.COPPER_PICKAXE.get()),
+                    new ItemStack(ModItems.COPPER_SHOVEL.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+
+            entries.putBefore(
+                    new ItemStack(Items.DIAMOND_SHOVEL),
+                    new ItemStack(ModItems.STEEL_HOE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putBefore(
+                    new ItemStack(ModItems.STEEL_HOE.get()),
+                    new ItemStack(ModItems.STEEL_AXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putBefore(
+                    new ItemStack(ModItems.STEEL_AXE.get()),
+                    new ItemStack(ModItems.STEEL_PICKAXE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            entries.putBefore(
+                    new ItemStack(ModItems.STEEL_PICKAXE.get()),
+                    new ItemStack(ModItems.STEEL_SHOVEL.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+
+
         }
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             for (Potion potion : ForgeRegistries.POTIONS) {
@@ -290,8 +312,8 @@ public class OvergearedMod {
                 arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
                 event.accept(arrow);
             }
-            event.getEntries().putAfter(
-                    new ItemStack(Items.STONE_SWORD),           // anchor: Stone Sword
+            event.getEntries().putBefore(
+                    new ItemStack(Items.IRON_SWORD),           // anchor: Stone Sword
                     new ItemStack(ModItems.COPPER_SWORD.get()), // item to insert
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
@@ -300,8 +322,8 @@ public class OvergearedMod {
                     new ItemStack(ModItems.STEEL_SWORD.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            event.getEntries().putAfter(
-                    new ItemStack(Items.STONE_AXE),
+            event.getEntries().putBefore(
+                    new ItemStack(Items.IRON_AXE),
                     new ItemStack(ModItems.COPPER_AXE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );

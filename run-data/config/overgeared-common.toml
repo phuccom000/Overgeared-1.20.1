@@ -16,22 +16,6 @@
 	#Range: -5.0 ~ 5.0
 	poorArmorBonus = -1.0
 
-["Arrow Settings"]
-	#Toggle for the ability to tip iron, steel, diamond arrows.
-	enableUpgradeArrowTipping = true
-	#Default arrow speed for the forging minigame
-	#Range: -5.0 ~ 5.0
-	arrowSpeed = 2.0
-	#Default arrow speed increase for the forging minigame
-	#Range: -5.0 ~ 5.0
-	arrowSpeedIncrease = 0.75
-	#Maximum arrow speed for the forging minigame
-	#Range: 0.0 ~ 10.0
-	maxArrowSpeed = 5.0
-	#How many arrows can a bottle of potion tip before it's depleted
-	#Range: > 0
-	maxPotionTipping = 8
-
 ["Durability Bonuses"]
 	#Range: -5.0 ~ 5.0
 	masterDurabilityBonus = 1.6
@@ -54,40 +38,6 @@
 	#How many ticks before a heated item cools off in inventory (default: 1200 = 60s)
 	#Range: > 1
 	heatedItemCooldownTicks = 1200
-
-["Minigame Settings"]
-	#Toggle for the forging minigame
-	enableMinigame = true
-	#How likely it is for the player to get Masterfully Forged. Set to 0 to disable it.
-	#Range: 0.0 ~ 1.0
-	masterQualityChance = 0.05
-	#Chance that using a Master-quality ingredient upgrades a Perfect hit to Master
-	#Range: 0.0 ~ 1.0
-	masterFromIngredientChance = 0.5
-	#Maximum distance you can go from your Smithing Anvil before minigame reset
-	#Range: 0 ~ 1000
-	maxAnvilDistance = 100
-	#Minigame resets after a certain amount of seconds
-	#Range: 0 ~ 36000
-	minigameTimeout = 6000
-	#Zone starting size for the forging minigame, in chance
-	#Range: 0 ~ 100
-	zoneStartingSize = 20
-	#Zone shrink factor for the forging minigame
-	#Range: 0.0 ~ 1.0
-	zoneShrinkFactor = 0.7
-	#Smallest perfect zone it can become
-	#Range: 0 ~ 100
-	minPerfectZone = 10
-	#Lowest score required to get perfect quality
-	#Range: 0.0 ~ 1.0
-	perfectQualityScore = 0.9
-	#Lowest score required to get expert quality
-	#Range: 0.0 ~ 1.0
-	expertQualityScore = 0.6
-	#Lowest score required to get well quality
-	#Range: 0.0 ~ 1.0
-	wellQualityScore = 0.3
 
 ["Durability & Grinding"]
 	#Defines the base durability multiplier of all items that has durability.
@@ -116,10 +66,17 @@
 
 ["Blueprint & Tool Types"]
 	#List of available tool types for blueprints
+	#Default options: SWORD, AXE, PICKAXE, SHOVEL, HOE
+	#Remove any types you don't want to be available
+	#Add custom types below in customToolTypes
 	availableToolTypes = ["SWORD", "AXE", "PICKAXE", "SHOVEL", "HOE", "HAMMER"]
 	#Add custom tool types as key-value pairs
+	#Format: ["TYPE_ID","Display Name", "TYPE_ID2","Display Name 2"]
+	#Example: ["SPEAR","Spear", "BROADSWORD","Broadsword"]
 	customToolTypes = []
-	#Add hidden custom tool types as key-value pairs
+	#Add hidden custom tool types as key-value pairs. Does not appear in the Drafting Table
+	#Format: ["TYPE_ID","Display Name", "TYPE_ID2","Display Name 2"]
+	#Example: ["SPEAR","Spear", "BROADSWORD","Broadsword"]
 	hiddenToolTypes = []
 	#Uses required to reach the next quality after Master
 	#Range: > 0
@@ -166,4 +123,135 @@
 	flintBreakingChance = 0.1
 	#Toggle for obtaining rock using flint
 	useFlintGetRock = true
+
+["Minigame Common Settings"]
+	#Toggle for the forging minigame
+	enableMinigame = true
+	#How likely it is for the player to get Masterwork when getting Perfectly Forged. Set to 0 to disable it.
+	#Range: 0.0 ~ 1.0
+	masterQualityChance = 0.05
+	#Chance that using a Master-quality ingredient results in Master-quality result
+	#Range: 0.0 ~ 1.0
+	masterFromIngredientChance = 0.5
+	#Maximum distance you can go from your Smithing Anvil before minigame reset
+	#Range: 0 ~ 1000
+	maxAnvilDistance = 100
+	#Lowest score required to get perfect quality
+	#Range: 0.0 ~ 1.0
+	perfectQualityScore = 0.9
+	#Lowest score required to get expert quality
+	#Range: 0.0 ~ 1.0
+	expertQualityScore = 0.6
+	#Lowest score required to get well quality
+	#Range: 0.0 ~ 1.0
+	wellQualityScore = 0.3
+
+["Poorly Forged"]
+	#Zone starting size for POOR forging (in % chance)
+	#Range: 0 ~ 100
+	zoneStartingSize = 30
+	#Zone shrink factor for POOR forging
+	#Range: 0.0 ~ 1.0
+	zoneShrinkFactor = 0.9
+	#Minimum perfect zone size for POOR forging
+	#Range: 0 ~ 100
+	minPerfectZone = 15
+	#Arrow speed for POOR forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeed = 1.5
+	#Arrow speed increase per hit for POOR forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeedIncrease = 0.5
+	#Maximum arrow speed for POOR forging
+	#Range: 0.0 ~ 10.0
+	maxArrowSpeed = 3.0
+
+["Well Forged"]
+	#Zone starting size for WELL forging
+	#Range: 0 ~ 100
+	zoneStartingSize = 20
+	#Zone shrink factor for WELL forging
+	#Range: 0.0 ~ 1.0
+	zoneShrinkFactor = 0.7
+	#Minimum perfect zone size for WELL forging
+	#Range: 0 ~ 100
+	minPerfectZone = 10
+	#Arrow speed for WELL forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeed = 2.0
+	#Arrow speed increase per hit for WELL forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeedIncrease = 0.75
+	#Maximum arrow speed for WELL forging
+	#Range: 0.0 ~ 10.0
+	maxArrowSpeed = 5.0
+
+["Expertly Forged"]
+	#Zone starting size for EXPERT forging
+	#Range: 0 ~ 100
+	zoneStartingSize = 18
+	#Zone shrink factor for EXPERT forging
+	#Range: 0.0 ~ 1.0
+	zoneShrinkFactor = 0.65
+	#Minimum perfect zone size for EXPERT forging
+	#Range: 0 ~ 100
+	minPerfectZone = 8
+	#Arrow speed for EXPERT forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeed = 2.5
+	#Arrow speed increase per hit for EXPERT forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeedIncrease = 0.85
+	#Maximum arrow speed for EXPERT forging
+	#Range: 0.0 ~ 10.0
+	maxArrowSpeed = 6.0
+
+["Perfectly Forged"]
+	#Zone starting size for PERFECT forging
+	#Range: 0 ~ 100
+	zoneStartingSize = 15
+	#Zone shrink factor for PERFECT forging
+	#Range: 0.0 ~ 1.0
+	zoneShrinkFactor = 0.6
+	#Minimum perfect zone size for PERFECT forging
+	#Range: 0 ~ 100
+	minPerfectZone = 6
+	#Arrow speed for PERFECT forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeed = 3.0
+	#Arrow speed increase per hit for PERFECT forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeedIncrease = 1.0
+	#Maximum arrow speed for PERFECT forging
+	#Range: 0.0 ~ 10.0
+	maxArrowSpeed = 7.0
+
+[Masterwork]
+	#Zone starting size for MASTER forging
+	#Range: 0 ~ 100
+	zoneStartingSize = 12
+	#Zone shrink factor for MASTER forging
+	#Range: 0.0 ~ 1.0
+	zoneShrinkFactor = 0.55
+	#Minimum perfect zone size for MASTER forging
+	#Range: 0 ~ 100
+	minPerfectZone = 4
+	#Arrow speed for MASTER forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeed = 3.5
+	#Arrow speed increase per hit for MASTER forging
+	#Range: -5.0 ~ 5.0
+	arrowSpeedIncrease = 1.2
+	#Maximum arrow speed for MASTER forging
+	#Range: 0.0 ~ 10.0
+	maxArrowSpeed = 8.0
+
+["Arrow Fletching Settings"]
+	#Enable or disable all Fletching recipes [true/false]
+	enableFletchingRecipes = true
+	#Toggle for the ability to tip iron, steel, diamond arrows.
+	enableUpgradeArrowTipping = true
+	#How many arrows can a bottle of potion tip before it's depleted
+	#Range: > 0
+	maxPotionTipping = 8
 

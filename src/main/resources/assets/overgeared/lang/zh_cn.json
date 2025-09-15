@@ -122,6 +122,7 @@
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line1": "§7潜行右键点击§f§l锻造砧§7以在拥有有效配方时开始锻造。",
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line2": "再次潜行右键点击以停止锻造。",
   "tooltip.overgeared.smithing_hammer.advanced_tooltip.line3": "§7潜行右键点击石头方块可将其转换为§f§l石制锻造砧§7。",
+  "tooltip.overgeared.smithing_hammer.advanced_tooltip.line4": "§7潜行右键点击原版铁砧可将其转换为§f§l锻造砧§7。",
   "tooltip.overgeared.smithing_hammer.hold_shift": "§7按住§f§lSHIFT§7获取更多信息",
   "tooltip.overgeared.tongs.tooltip": "手持时防止玩家在处理热金属时烫伤自己。",
   "upgrade.overgeared.diamond_upgrade": "钻石升级",
@@ -179,7 +180,7 @@
   "jei.overgeared.category.stone_anvil": "如何制作石砧",
   "jei.overgeared.stone_anvil.description1": "潜行右键点击石头方块并使用锻造锤可将其转换为石制锻造砧。",
   "tooltip.overgeared.failedResult": "失败时获得",
-  "tooltip.overgeared.hotitems.tooltip": "永恒炽热！使用钳子安全操作。",
+  "tooltip.overgeared.hotitems.tooltip": "非常烫且无法冷却！使用钳子安全操作。",
   "tooltip.overgeared.potion_uses": "剩余浸渍次数：%s/%s",
   "jei.overgeared.category.steel_anvil": "如何制作锻造砧",
   "jei.overgeared.steel_anvil.description": "潜行右键点击原版铁砧并使用锻造锤可将其转换为锻造砧。",
@@ -219,5 +220,7 @@
   "item.overgeared.arrow.effect.turtle_master": "神龟",
   "item.overgeared.arrow.effect.quark.resilience": "稳固",
   "tooltip.overgeared.grindable": "可被研磨",
-  "tooltip.overgeared.diamond_shard": "研磨钻石得到的锋利钻石尖端"
+  "tooltip.overgeared.diamond_shard": "研磨钻石得到的锋利钻石尖端",
+  "tooltip.overgeared.heated": "需要淬火",
+  "item.overgeared.wooden_tongs": "木钳"
 }

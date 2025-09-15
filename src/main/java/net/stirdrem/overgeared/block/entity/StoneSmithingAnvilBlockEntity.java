@@ -56,6 +56,11 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     }
 
     @Override
+    public String blueprintQuality() {
+        return "well";
+    }
+
+    @Override
     protected void craftItem() {
         super.craftItem(); // Perform regular crafting logic
         if (ServerConfig.STONE_ANVIL_MAX_USES.get() == 0) return;

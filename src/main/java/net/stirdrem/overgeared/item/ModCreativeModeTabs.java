@@ -43,6 +43,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.STEEL_PLATE.get());
                         pOutput.accept(ModItems.IRON_TONG.get());
                         pOutput.accept(ModItems.STEEL_TONG.get());
+                        pOutput.accept(ModItems.WOODEN_TONGS.get());
                         pOutput.accept(ModItems.IRON_TONGS.get());
                         pOutput.accept(ModItems.STEEL_TONGS.get());
                         pOutput.accept(ModItems.COPPER_SMITHING_HAMMER.get());

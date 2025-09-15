@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.ForgingQuality;
+import net.stirdrem.overgeared.block.custom.SteelSmithingAnvil;
 import net.stirdrem.overgeared.block.custom.TierASmithingAnvil;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
@@ -228,5 +229,43 @@ public class TierASmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
                 && canInsertAmountIntoOutputSlot(resultStack.getCount());
     }
 
+    @Override
+    public String blueprintQuality() {
+        String quality = TierASmithingAnvil.getQuality();
+        if (quality == null) {
+            return "no_quality"; // fallback when global quality is missing
+        }
 
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isEmpty()) {
+            return "poor"; // no recipe = base fallback
+        }
+
+        ForgingRecipe recipe = recipeOptional.get();
+        if (!recipe.getBlueprintTypes().isEmpty()) {
+            ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
+
+            // Quality tiers in order
+            List<String> qualityTiers = List.of("poor", "well", "expert", "perfect", "master");
+
+            // Missing or invalid blueprint → cap quality
+            String poor = quality.equalsIgnoreCase("poor")
+                    ? ForgingQuality.POOR.getDisplayName()
+                    : "well";
+            if (blueprint.isEmpty() || !blueprint.hasTag()) {
+                return poor;
+            }
+
+            CompoundTag nbt = blueprint.getTag();
+            if (nbt == null || !nbt.contains("Quality")) {
+                return poor;
+            }
+
+            String bpQuality = nbt.getString("Quality").toLowerCase();
+            // ensure it’s in our tier list, otherwise default
+            return qualityTiers.contains(bpQuality) ? bpQuality : "well";
+        }
+
+        return "well"; // fallback if no blueprint types
+    }
 }

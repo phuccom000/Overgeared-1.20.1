@@ -33,6 +33,8 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import net.stirdrem.overgeared.BlueprintQuality;
+import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.item.ModItems;
@@ -231,7 +233,7 @@ public class ModEvents {
         if (player == null) return;
         UUID playerId = player.getUUID();
         ModMessages.sendToPlayer(new OnlyResetMinigameS2CPacket(), player);
-
+        String blueprintQuality = BlueprintQuality.PERFECT.getDisplayName();
         if (ModItemInteractEvents.playerAnvilPositions.containsKey(player.getUUID())) {
             BlockPos anvilPos = ModItemInteractEvents.playerAnvilPositions.get(player.getUUID());
             BlockEntity be = player.level().getBlockEntity(anvilPos);
@@ -248,6 +250,7 @@ public class ModEvents {
                 ModItemInteractEvents.playerAnvilPositions.remove(playerId);
                 ModItemInteractEvents.playerMinigameVisibility.remove(playerId);
                 Block block = player.level().getBlockState(anvilPos).getBlock();
+                blueprintQuality = anvil.blueprintQuality();
                 /*if (block instanceof AbstractSmithingAnvilNew anvilNew) {
                     anvilNew.setMinigameOn(false);
                 }*/
@@ -256,8 +259,7 @@ public class ModEvents {
 
         }
 
-
-        AnvilMinigameEvents.reset();
+        AnvilMinigameEvents.reset(blueprintQuality);
         //playerTimeoutCounters.remove(player.getUUID());
     }
 
@@ -266,12 +268,14 @@ public class ModEvents {
         if (player == null) return;
         ModMessages.sendToPlayer(new OnlyResetMinigameS2CPacket(), player);
         BlockEntity be = player.level().getBlockEntity(anvilPos);
+        String quality = "perfect";
         if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
             anvil.setProgress(0);
             anvil.setChanged();
             anvil.setMinigameOn(false);
+            quality = anvil.blueprintQuality();
         }
-        AnvilMinigameEvents.reset();
+        AnvilMinigameEvents.reset(quality);
         Block block = player.level().getBlockState(anvilPos).getBlock();
 
         // Send reset packet to the specific player
@@ -284,7 +288,7 @@ public class ModEvents {
     // In ModEvents.java
     public static void resetMinigameForAnvil(Level level, BlockPos anvilPos) {
         // Only execute on server side
-
+        String quality = "perfect";
         // Reset the anvil block entity
         BlockEntity be = level.getBlockEntity(anvilPos);
         if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
@@ -292,9 +296,10 @@ public class ModEvents {
             anvil.setChanged();
             anvil.setMinigameOn(false);
             anvil.clearOwner(); // Clear ownership from the anvil itself
+            quality = anvil.blueprintQuality();
         }
 
-        AnvilMinigameEvents.reset();
+        AnvilMinigameEvents.reset(quality);
         // Find the specific player using this anvil and reset only them
         if (level instanceof ServerLevel serverLevel) {
 

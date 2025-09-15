@@ -72,7 +72,8 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_TONG = ITEMS.register("iron_tong",
             () -> new Item(new Item.Properties()));
-
+    public static final RegistryObject<Item> WOODEN_TONGS = ITEMS.register("wooden_tongs",
+            () -> new Tongs(Tiers.WOOD, -1, -2f, new Item.Properties().durability(120)));
     public static final RegistryObject<Item> IRON_TONGS = ITEMS.register("iron_tongs",
             () -> new Tongs(Tiers.IRON, -1, -2f, new Item.Properties().durability(512)));
 

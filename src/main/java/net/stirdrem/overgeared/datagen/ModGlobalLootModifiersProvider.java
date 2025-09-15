@@ -11,6 +11,7 @@ import net.minecraftforge.common.loot.LootTableIdCondition;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.loot.AddItemModifier;
+import net.stirdrem.overgeared.loot.QualityLootModifier;
 
 public class ModGlobalLootModifiersProvider extends GlobalLootModifierProvider {
     public ModGlobalLootModifiersProvider(PackOutput output) {
@@ -29,22 +30,8 @@ public class ModGlobalLootModifiersProvider extends GlobalLootModifierProvider {
 
     @Override
     protected void start() {
-        /*add("pine_cone_from_grass", new AddItemModifier(new LootItemCondition[] {
-                LootItemBlockStatePropertyCondition.hasBlockStateProperties(Blocks.GRASS).build(),
-                LootItemRandomChanceCondition.randomChance(0.35f).build()}, ModItems.PINE_CONE.get()));
+        add("all_tools_poor_quality", new QualityLootModifier(new LootItemCondition[]{}));
 
-        add("pine_cone_from_creeper", new AddItemModifier(new LootItemCondition[] {
-                new LootTableIdCondition.Builder(ResourceLocation.parse("entities/creeper")).build() }, ModItems.PINE_CONE.get()));*/
-
-       /* add("steel_ingot_from_jungle_temples", new AddItemModifier(new LootItemCondition[]{
-                new LootTableIdCondition.Builder(ResourceLocation.parse("chests/jungle_temple")).build(),
-                LootItemRandomChanceCondition.randomChance(0.50f).build()
-        }, ModItems.STEEL_INGOT.get()));
-        add("diamond_upgrade_from_jungle_temples", new AddItemModifier(new LootItemCondition[]{
-                new LootTableIdCondition.Builder(ResourceLocation.parse("chests/jungle_temple")).build(),
-                LootItemRandomChanceCondition.randomChance(0.30f).build()
-        }, ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get()));*/
-// Other Dungeons
         ResourceLocation[] otherDungeons = new ResourceLocation[]{
                 STRONGHOLD_CORRIDOR,
                 STRONGHOLD_CROSSING,
