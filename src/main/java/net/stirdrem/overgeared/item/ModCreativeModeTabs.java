@@ -167,7 +167,8 @@ public class ModCreativeModeTabs {
                             if (potion == Potions.EMPTY) continue;
 
                             ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                            arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                            arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                            arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
                             output.accept(arrow);
                         }
                         for (Potion potion : ForgeRegistries.POTIONS) {
@@ -181,7 +182,8 @@ public class ModCreativeModeTabs {
                             if (potion == Potions.EMPTY) continue;
 
                             ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                            arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                            arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                            arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
                             output.accept(arrow);
                         }
                         for (Potion potion : ForgeRegistries.POTIONS) {
@@ -195,7 +197,8 @@ public class ModCreativeModeTabs {
                             if (potion == Potions.EMPTY) continue;
 
                             ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                            arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                            arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                            arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
                             output.accept(arrow);
                         }
 

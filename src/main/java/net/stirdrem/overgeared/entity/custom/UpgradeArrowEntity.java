@@ -132,7 +132,7 @@ public class UpgradeArrowEntity extends AbstractArrow {
             CompoundTag tag = this.referenceStack.getTag();
 
             // Only lingering type creates cloud
-            if (tag != null && (tag.contains("LingeringPotion", 8) || getArrowTier() == ArrowTier.FLINT && tag.contains("Potion", 8))) {
+            if (tag != null && (tag.contains("LingeringPotion") || getArrowTier() == ArrowTier.FLINT && tag.contains("Potion", 8))) {
                 Potion potion = getPotion(tag);
                 List<MobEffectInstance> effects = getAllEffects(tag);
                 if (!effects.isEmpty()) {
@@ -255,11 +255,13 @@ public class UpgradeArrowEntity extends AbstractArrow {
         if (tag == null) return Potions.EMPTY;
 
         // Prioritize "LingeringPotion" if present
-        if (tag.contains("LingeringPotion")) { // 8 = string type
+        if (tag.contains("LingeringPotion", 8)) { // 8 = string type
             return Potion.byName(tag.getString("LingeringPotion"));
         }
-
-        if (tag.contains("Potion")) {
+        if (tag.contains("LingeringPotion") && tag.getBoolean("LingeringPotion")) { // 8 = string type
+            return Potion.byName(tag.getString("Potion"));
+        }
+        if (tag.contains("Potion", 8)) {
             return Potion.byName(tag.getString("Potion"));
         }
 

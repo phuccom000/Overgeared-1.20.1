@@ -1,15 +1,20 @@
 package net.stirdrem.overgeared.screen;
 
+import com.google.common.collect.Lists;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -18,6 +23,8 @@ import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.FletchingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 
 public class FletchingStationMenu extends AbstractContainerMenu {
@@ -200,13 +207,15 @@ public class FletchingStationMenu extends AbstractContainerMenu {
                     ItemStack lingeringArrows;
                     if (isUpgradeableArrow(input.getItem(slotNumber))) {
                         lingeringArrows = input.getItem(slotNumber).copy();
-                        lingeringArrows.getOrCreateTag().putString("LingeringPotion", PotionUtils.getPotion(potion).getName(""));
                     } else {
                         lingeringArrows = new ItemStack(ModItems.LINGERING_ARROW.get(), arrowCount);
-                        PotionUtils.setPotion(lingeringArrows, PotionUtils.getPotion(potion));
-                        if (potion.hasTag()) {
-                            lingeringArrows.setTag(potion.getTag().copy());
-                        }
+                    }
+                    PotionUtils.setPotion(lingeringArrows, PotionUtils.getPotion(potion));
+                    if (potion.hasTag()) {
+                        lingeringArrows.setTag(potion.getTag().copy());
+                    }
+                    if (isUpgradeableArrow(input.getItem(slotNumber))) {
+                        lingeringArrows.getOrCreateTag().putBoolean("LingeringPotion", true);
                     }
                     resultStack = lingeringArrows;
                 }
@@ -234,21 +243,25 @@ public class FletchingStationMenu extends AbstractContainerMenu {
 
                 if ((potion.is(Items.POTION) || potion.is(Items.SPLASH_POTION)) && !recipe.getTippedResult().isEmpty()) {
                     resultStack = recipe.getTippedResult().copy();
-
-                    // Set the exact NBT tag structure from recipe
-                    if (recipe.getTippedTag() != null) {
-                        CompoundTag tag = new CompoundTag();
-                        tag.putString(recipe.getTippedTag(), potionEffect);
-                        resultStack.setTag(tag);
+                    PotionUtils.setPotion(resultStack, PotionUtils.getPotion(potion));
+                    if (potion.hasTag()) {
+                        resultStack.setTag(potion.getTag().copy());
                     }
                 } else if (potion.is(Items.LINGERING_POTION) && !recipe.getLingeringResult().isEmpty()) {
                     resultStack = recipe.getLingeringResult().copy();
-
+                    if (isUpgradeableArrow(resultStack)) {
+                        resultStack.getOrCreateTag().putBoolean("LingeringPotion", true);
+                        //tag.putBoolean("LingeringPotion", true);
+                    }
                     // Set the exact NBT tag structure from recipe
-                    if (recipe.getLingeringTag() != null) {
+                    else if (recipe.getLingeringTag() != null) {
                         CompoundTag tag = new CompoundTag();
                         tag.putString(recipe.getLingeringTag(), potionEffect);
                         resultStack.setTag(tag);
+                    }
+                    PotionUtils.setPotion(resultStack, PotionUtils.getPotion(potion));
+                    if (potion.hasTag()) {
+                        resultStack.setTag(potion.getTag().copy());
                     }
                 }
             } else {
@@ -424,4 +437,35 @@ public class FletchingStationMenu extends AbstractContainerMenu {
         }
     }
 
+    public static Potion getPotion(@Nullable CompoundTag tag) {
+        if (tag == null) return Potions.EMPTY;
+
+        if (tag.contains("Potion", 8)) {
+            return Potion.byName(tag.getString("Potion"));
+        }
+
+        return Potions.EMPTY;
+    }
+
+    public static List<MobEffectInstance> getAllEffects(@Nullable CompoundTag pCompoundTag) {
+        List<MobEffectInstance> list = Lists.newArrayList();
+        list.addAll(getPotion(pCompoundTag).getEffects());
+        getCustomEffects(pCompoundTag, list);
+        return list;
+    }
+
+    public static void getCustomEffects(@Nullable CompoundTag pCompoundTag, List<MobEffectInstance> pEffectList) {
+        if (pCompoundTag != null && pCompoundTag.contains("CustomPotionEffects", 9)) {
+            ListTag listtag = pCompoundTag.getList("CustomPotionEffects", 10);
+
+            for (int i = 0; i < listtag.size(); ++i) {
+                CompoundTag compoundtag = listtag.getCompound(i);
+                MobEffectInstance mobeffectinstance = MobEffectInstance.load(compoundtag);
+                if (mobeffectinstance != null) {
+                    pEffectList.add(mobeffectinstance);
+                }
+            }
+        }
+
+    }
 }

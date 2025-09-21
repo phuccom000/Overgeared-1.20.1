@@ -281,7 +281,8 @@ public class OvergearedMod {
                 if (potion == Potions.EMPTY) continue;
 
                 ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
                 event.accept(arrow);
             }
             for (Potion potion : ForgeRegistries.POTIONS) {
@@ -295,7 +296,8 @@ public class OvergearedMod {
                 if (potion == Potions.EMPTY) continue;
 
                 ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
                 event.accept(arrow);
             }
             for (Potion potion : ForgeRegistries.POTIONS) {
@@ -309,7 +311,8 @@ public class OvergearedMod {
                 if (potion == Potions.EMPTY) continue;
 
                 ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                arrow.getOrCreateTag().putString("LingeringPotion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
                 event.accept(arrow);
             }
             event.getEntries().putBefore(
@@ -553,7 +556,9 @@ public class OvergearedMod {
             if (tag.contains("LingeringPotion", 8)) { // 8 = string type
                 return Potion.byName(tag.getString("LingeringPotion"));
             }
-
+            if (tag.contains("LingeringPotion") && tag.getBoolean("LingeringPotion")) { // 8 = string type
+                return Potion.byName(tag.getString("Potion"));
+            }
             if (tag.contains("Potion", 8)) {
                 return Potion.byName(tag.getString("Potion"));
             }

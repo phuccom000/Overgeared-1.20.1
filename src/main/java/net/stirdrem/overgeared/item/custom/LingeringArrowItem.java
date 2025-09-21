@@ -62,11 +62,6 @@ public class LingeringArrowItem extends ArrowItem {
     public static Potion getPotion(@Nullable CompoundTag tag) {
         if (tag == null) return Potions.EMPTY;
 
-        // Prioritize "LingeringPotion" if present
-        if (tag.contains("LingeringPotion", 8)) { // 8 = string type
-            return Potion.byName(tag.getString("LingeringPotion"));
-        }
-
         if (tag.contains("Potion", 8)) {
             return Potion.byName(tag.getString("Potion"));
         }
@@ -118,18 +113,25 @@ public class LingeringArrowItem extends ArrowItem {
     public Component getName(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         if (tag != null) {
-            Potion potion = getPotion(tag);
-            if (potion != Potions.EMPTY) {
-                String potionId = potion.getName("").replace("effect.minecraft.", "");
+            // Use getAllEffects to check for both regular potions and custom effects
+            List<MobEffectInstance> effects = getAllEffects(tag);
+            boolean hasEffects = !effects.isEmpty();
 
-                boolean isNoEffectPotion = potionId.equals("mundane") || potionId.equals("awkward") || potionId.equals("thick");
+            if (hasEffects) {
+                Potion potion = getPotion(tag);
 
-                if (!isNoEffectPotion) {
-                    String effectKey = "item.overgeared.arrow.effect." + potionId;
-                    Component effectComponent = Component.translatable(effectKey);
+                if (potion != Potions.EMPTY) {
+                    String potionId = potion.getName("").replace("effect.minecraft.", "");
 
-                    // Determine if it's a Lingering or regular tipped arrow
-                    return Component.translatable(getDescriptionId(stack), effectComponent);
+                    boolean isNoEffectPotion = potionId.equals("mundane") || potionId.equals("awkward") || potionId.equals("thick");
+
+                    if (!isNoEffectPotion) {
+                        String effectKey = "item.overgeared.arrow.effect." + potionId;
+                        Component effectComponent = Component.translatable(effectKey);
+
+                        // Determine if it's a Lingering or regular tipped arrow
+                        return Component.translatable(getDescriptionId(stack), effectComponent);
+                    }
                 }
             }
             return Component.translatable(getDescriptionId(stack) + ".no_effect");

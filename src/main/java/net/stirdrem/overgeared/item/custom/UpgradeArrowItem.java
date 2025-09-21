@@ -47,11 +47,14 @@ public class UpgradeArrowItem extends ArrowItem {
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltip, TooltipFlag pFlag) {
         CompoundTag tag = pStack.getTag();
         if (tag != null && (tag.contains("Potion") || tag.contains("CustomPotionEffects"))) {
-            addPotionTooltip(pStack, pTooltip, 0.125F);
+            PotionUtils.addPotionTooltip(pStack, pTooltip, 0.125F);
+
+
         }
-        if (tag != null && tag.contains("LingeringPotion")) {
-            addPotionTooltip(pStack, pTooltip, 0.125F);
+        if (tag != null && (tag.contains("LingeringPotion", 8))) {
+            PotionUtils.addPotionTooltip(getMobEffects(pStack), pTooltip, 0.125F);
         }
+
     }
 
     public static void addPotionTooltip(ItemStack pStack, List<Component> pTooltips, float pDurationFactor) {
@@ -62,27 +65,29 @@ public class UpgradeArrowItem extends ArrowItem {
     public String getDescriptionId(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         if (tag != null) {
-            Potion potion = getPotion(tag);
-            String effectName = potion.getName(""); // empty root, we’ll translate manually later
+            // Use getAllEffects to check for both regular potions and custom effects
+            List<MobEffectInstance> effects = getMobEffects(stack);
 
-            if (potion != Potions.EMPTY) {
-                String potionTranslationKey = potion.getName(""); // e.g., "effect.minecraft.swiftness"
-                String tierName = switch (this.tier) {
-                    case IRON -> "item.overgeared.iron_arrow";
-                    case STEEL -> "item.overgeared.steel_arrow";
-                    case DIAMOND -> "item.overgeared.diamond_arrow";
-                    default -> "item.overgeared.arrow";
-                };
+            String tierName = switch (this.tier) {
+                case IRON -> "item.overgeared.iron_arrow";
+                case STEEL -> "item.overgeared.steel_arrow";
+                case DIAMOND -> "item.overgeared.diamond_arrow";
+                default -> "item.overgeared.arrow";
+            };
 
-                if (tag.contains("LingeringPotion", 8)) {
-                    return tierName + ".lingering_named"; // Translatable: "Iron-Tipped Lingering Arrow of %s"
-                } else if (tag.contains("Potion", 8) || tag.contains("CustomPotionEffects", 9)) {
-                    return tierName + ".tipped_named"; // Translatable: "Iron-Tipped Arrow of %s"
-                }
+            if (tag.contains("LingeringPotion", 1) && tag.getBoolean("LingeringPotion")) {
+                return tierName + ".lingering_named";
+            } else if (tag.contains("LingeringPotion", 8)) {
+                return tierName + ".lingering_named";
+            } else if (tag.contains("Potion", 8) || tag.contains("CustomPotionEffects", 9)) {
+                return tierName + ".tipped_named";
             }
         }
 
-        return super.getDescriptionId(stack);
+
+        return super.
+
+                getDescriptionId(stack);
     }
 
 
@@ -97,7 +102,9 @@ public class UpgradeArrowItem extends ArrowItem {
         if (tag.contains("LingeringPotion", 8)) { // 8 = string type
             return Potion.byName(tag.getString("LingeringPotion"));
         }
-
+        if (tag.contains("LingeringPotion") && tag.getBoolean("LingeringPotion")) { // 8 = string type
+            return Potion.byName(tag.getString("Potion"));
+        }
         if (tag.contains("Potion", 8)) {
             return Potion.byName(tag.getString("Potion"));
         }
@@ -108,7 +115,7 @@ public class UpgradeArrowItem extends ArrowItem {
     public static List<MobEffectInstance> getAllEffects(@Nullable CompoundTag pCompoundTag) {
         List<MobEffectInstance> list = Lists.newArrayList();
         list.addAll(getPotion(pCompoundTag).getEffects());
-        getCustomEffects(pCompoundTag, list);
+        PotionUtils.getCustomEffects(pCompoundTag, list);
         return list;
     }
 
