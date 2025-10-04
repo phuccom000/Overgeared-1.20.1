@@ -74,7 +74,7 @@ public class LingeringArrowEntity extends Arrow {
             List<MobEffectInstance> effects = PotionUtils.getAllEffects(stack.getTag());
 
             if (!effects.isEmpty()) {
-                makeAreaOfEffectCloud(stack, potion, result);
+                makeAreaOfEffectCloud(stack, effects, result);
             }
 
             int eventId = potion.hasInstantEffects() ? 2007 : 2002;
@@ -92,7 +92,7 @@ public class LingeringArrowEntity extends Arrow {
             List<MobEffectInstance> effects = PotionUtils.getMobEffects(stack);
 
             if (!effects.isEmpty()) {
-                makeAreaOfEffectCloud(stack, potion, pResult);
+                makeAreaOfEffectCloud(stack, effects, pResult);
             }
 
             int eventId = potion.hasInstantEffects() ? 2007 : 2002;
@@ -101,7 +101,7 @@ public class LingeringArrowEntity extends Arrow {
         }
     }
 
-    private void makeAreaOfEffectCloud(ItemStack stack, Potion potion, HitResult result) {
+    private void makeAreaOfEffectCloud(ItemStack stack, List<MobEffectInstance> effects, HitResult result) {
         Vec3 hit = result.getLocation();
 
         // Compute vertical motion ratio
@@ -127,7 +127,7 @@ public class LingeringArrowEntity extends Arrow {
         cloud.setRadiusPerTick(-cloud.getRadius() / cloud.getDuration());
         cloud.setPotion(potion);
 
-        for (MobEffectInstance inst : PotionUtils.getCustomEffects(stack)) {
+        for (MobEffectInstance inst : effects) {
             MobEffectInstance reducedEffect = new MobEffectInstance(
                     inst.getEffect(),
                     Math.max(inst.getDuration() / 8, 1), // 1/4 duration

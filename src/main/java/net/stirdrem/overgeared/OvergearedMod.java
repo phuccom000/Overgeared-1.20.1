@@ -131,13 +131,14 @@ public class OvergearedMod {
         LOGGER.info("Tool types initialized: {}",
                 ToolTypeRegistry.getRegisteredTypes().size());
         //}
-        BrewingRecipeRegistry.addRecipe(
-                new BetterBrewingRecipe(
-                        Potions.THICK,
-                        Items.CHORUS_FRUIT,
-                        new ItemStack(Items.DRAGON_BREATH)
-                )
-        );
+        if (ServerConfig.ENABLE_DRAGON_BREATH_RECIPE.get())
+            BrewingRecipeRegistry.addRecipe(
+                    new BetterBrewingRecipe(
+                            Potions.THICK,
+                            Items.CHORUS_FRUIT,
+                            new ItemStack(Items.DRAGON_BREATH)
+                    )
+            );
     }
 
     // Add the example block item to the building blocks tab
@@ -263,57 +264,59 @@ public class OvergearedMod {
 
         }
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-            for (Potion potion : ForgeRegistries.POTIONS) {
-                if (potion == Potions.EMPTY) continue;
+            if (ServerConfig.ENABLE_FLETCHING_RECIPES.get()) {
+                for (Potion potion : ForgeRegistries.POTIONS) {
+                    if (potion == Potions.EMPTY) continue;
 
-                ItemStack arrow = new ItemStack(ModItems.LINGERING_ARROW.get());
-                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                event.accept(arrow);
-            }
-            for (Potion potion : ForgeRegistries.POTIONS) {
-                if (potion == Potions.EMPTY) continue;
+                    ItemStack arrow = new ItemStack(ModItems.LINGERING_ARROW.get());
+                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                    event.accept(arrow);
+                }
+                for (Potion potion : ForgeRegistries.POTIONS) {
+                    if (potion == Potions.EMPTY) continue;
 
-                ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                event.accept(arrow);
-            }
-            for (Potion potion : ForgeRegistries.POTIONS) {
-                if (potion == Potions.EMPTY) continue;
+                    ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
+                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                    event.accept(arrow);
+                }
+                for (Potion potion : ForgeRegistries.POTIONS) {
+                    if (potion == Potions.EMPTY) continue;
 
-                ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
-                event.accept(arrow);
-            }
-            for (Potion potion : ForgeRegistries.POTIONS) {
-                if (potion == Potions.EMPTY) continue;
+                    ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
+                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                    arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
+                    event.accept(arrow);
+                }
+                for (Potion potion : ForgeRegistries.POTIONS) {
+                    if (potion == Potions.EMPTY) continue;
 
-                ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                event.accept(arrow);
-            }
-            for (Potion potion : ForgeRegistries.POTIONS) {
-                if (potion == Potions.EMPTY) continue;
+                    ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
+                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                    event.accept(arrow);
+                }
+                for (Potion potion : ForgeRegistries.POTIONS) {
+                    if (potion == Potions.EMPTY) continue;
 
-                ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
-                event.accept(arrow);
-            }
-            for (Potion potion : ForgeRegistries.POTIONS) {
-                if (potion == Potions.EMPTY) continue;
+                    ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
+                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                    arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
+                    event.accept(arrow);
+                }
+                for (Potion potion : ForgeRegistries.POTIONS) {
+                    if (potion == Potions.EMPTY) continue;
 
-                ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                event.accept(arrow);
-            }
-            for (Potion potion : ForgeRegistries.POTIONS) {
-                if (potion == Potions.EMPTY) continue;
+                    ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
+                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                    event.accept(arrow);
+                }
+                for (Potion potion : ForgeRegistries.POTIONS) {
+                    if (potion == Potions.EMPTY) continue;
 
-                ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
-                event.accept(arrow);
+                    ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
+                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                    arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
+                    event.accept(arrow);
+                }
             }
             event.getEntries().putBefore(
                     new ItemStack(Items.IRON_SWORD),           // anchor: Stone Sword

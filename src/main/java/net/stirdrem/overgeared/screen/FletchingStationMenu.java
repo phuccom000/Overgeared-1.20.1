@@ -229,12 +229,12 @@ public class FletchingStationMenu extends AbstractContainerMenu {
             int shaftCount = input.getItem(INPUT_SLOT_SHAFT).getCount();
             int featherCount = input.getItem(INPUT_SLOT_FEATHER).getCount();
 
-            int craftCount = Math.min(Math.min(tipCount, shaftCount), featherCount);
+            int craftCount = Math.max(Math.min(Math.min(tipCount, shaftCount), featherCount), 1);
             ItemStack baseResult = recipe.assemble(input, level.registryAccess());
 
             if (!potion.isEmpty()) {
                 boolean isUpgradeable = isUpgradeableArrow(baseResult);
-                if (isUpgradeable && !allowUpgradeableArrowConversion) {
+                if ((isUpgradeable && !allowUpgradeableArrowConversion)) {
                     result.setItem(OUTPUT_SLOT, ItemStack.EMPTY);
                     broadcastChanges();
                     return;
@@ -243,26 +243,41 @@ public class FletchingStationMenu extends AbstractContainerMenu {
 
                 if ((potion.is(Items.POTION) || potion.is(Items.SPLASH_POTION)) && !recipe.getTippedResult().isEmpty()) {
                     resultStack = recipe.getTippedResult().copy();
-                    PotionUtils.setPotion(resultStack, PotionUtils.getPotion(potion));
+                    CompoundTag resultTag = resultStack.getOrCreateTag();
+                    /*if (recipe.getTippedTag() != null) {
+                        // Add recipe-defined tipped tag without replacing everything
+                        resultTag.putString(recipe.getTippedTag(), potionEffect);
+                    }*/
                     if (potion.hasTag()) {
-                        resultStack.setTag(potion.getTag().copy());
+                        resultTag.merge(potion.getTag().copy());
                     }
+                    resultStack.setTag(potion.getTag().copy());
+
                 } else if (potion.is(Items.LINGERING_POTION) && !recipe.getLingeringResult().isEmpty()) {
                     resultStack = recipe.getLingeringResult().copy();
+
+                    CompoundTag resultTag = resultStack.getOrCreateTag();
+
                     if (isUpgradeableArrow(resultStack)) {
-                        resultStack.getOrCreateTag().putBoolean("LingeringPotion", true);
-                        //tag.putBoolean("LingeringPotion", true);
+                        resultTag.putBoolean("LingeringPotion", true);
+                    } else if (recipe.getLingeringTag() != null) {
+                        // Add recipe-defined lingering tag without replacing everything
+                        resultTag.putString(recipe.getLingeringTag(), potionEffect);
                     }
-                    // Set the exact NBT tag structure from recipe
-                    else if (recipe.getLingeringTag() != null) {
-                        CompoundTag tag = new CompoundTag();
-                        tag.putString(recipe.getLingeringTag(), potionEffect);
-                        resultStack.setTag(tag);
-                    }
-                    PotionUtils.setPotion(resultStack, PotionUtils.getPotion(potion));
+
+                    // Always set potion effect onto the stack
+                    //PotionUtils.setPotion(resultStack, PotionUtils.getPotion(potion));
+
+                    // Merge potion’s tag (if present) instead of overwriting
                     if (potion.hasTag()) {
-                        resultStack.setTag(potion.getTag().copy());
+                        resultTag.merge(potion.getTag().copy());
                     }
+
+                    resultStack.setTag(resultTag);
+                } else {
+                    result.setItem(OUTPUT_SLOT, ItemStack.EMPTY);
+                    broadcastChanges();
+                    return;
                 }
             } else {
                 resultStack = baseResult.copy();

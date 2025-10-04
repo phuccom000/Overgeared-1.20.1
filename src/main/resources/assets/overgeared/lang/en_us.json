@@ -93,6 +93,8 @@
   "item.overgeared.iron_arrow_head": "Iron Arrow Head",
   "item.overgeared.steel_arrow_head": "Steel Arrow Head",
   "item.overgeared.diamond_shard": "Diamond Shard",
+  "item.minecraft.tipped_arrow.effect.empty": "Tipped Arrow",
+  "item.minecraft.tipped_arrow.effect.mixed": "Tipped Arrow",
   "item.overgeared.iron_arrow": "Iron Arrow",
   "item.overgeared.iron_arrow.no_effect": "Uncraftable Iron Arrow",
   "item.overgeared.steel_arrow": "Steel Arrow",

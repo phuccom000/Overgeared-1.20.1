@@ -325,28 +325,6 @@ public class ModEvents {
         List<Component> tooltip = event.getToolTip();
         int insertOffset = 1;
 
-        if (stack.is(Items.FLINT) && ServerConfig.GET_ROCK_USING_FLINT.get()) {
-            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.flint_flavor")
-                    .withStyle(ChatFormatting.GRAY));
-        }
-        if (stack.is(ModItems.DIAMOND_SHARD.get())) {
-            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.diamond_shard")
-                    .withStyle(ChatFormatting.GRAY));
-        }
-        if (stack.is(ModTags.Items.HEATED_METALS)) {
-            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatedingots.tooltip")
-                    .withStyle(ChatFormatting.RED));
-        }
-
-        if (stack.is(ModTags.Items.HEATABLE_METALS)) {
-            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatablemetals.tooltip")
-                    .withStyle(ChatFormatting.GRAY));
-        }
-
-        if (stack.is(ModTags.Items.HOT_ITEMS)) {
-            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.hotitems.tooltip")
-                    .withStyle(ChatFormatting.RED));
-        }
 
         // Add Forging Quality
         if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
@@ -381,10 +359,6 @@ public class ModEvents {
                     .withStyle(ChatFormatting.RED));
         }
 
-        if (stack.is(ModTags.Items.GRINDABLE)) {
-            tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.grindable")
-                    .withStyle(ChatFormatting.GRAY));
-        }
 
         // Smithing Hammer special tooltip
         if (stack.is(ModTags.Items.SMITHING_HAMMERS)) {
@@ -420,7 +394,34 @@ public class ModEvents {
             tooltip.add(Component.translatable("tooltip.overgeared.potion_uses", left, maxUses).withStyle(ChatFormatting.GRAY));
 
         }
+        if (!ServerConfig.ENABLE_MOD_TOOLTIPS.get()) return;
 
+        if (stack.is(Items.FLINT) && ServerConfig.GET_ROCK_USING_FLINT.get()) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.flint_flavor")
+                    .withStyle(ChatFormatting.GRAY));
+        }
+        if (stack.is(ModItems.DIAMOND_SHARD.get())) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.diamond_shard")
+                    .withStyle(ChatFormatting.GRAY));
+        }
+        if (stack.is(ModTags.Items.HEATED_METALS)) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatedingots.tooltip")
+                    .withStyle(ChatFormatting.RED));
+        }
+
+        if (stack.is(ModTags.Items.HEATABLE_METALS)) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatablemetals.tooltip")
+                    .withStyle(ChatFormatting.GRAY));
+        }
+
+        if (stack.is(ModTags.Items.HOT_ITEMS)) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.hotitems.tooltip")
+                    .withStyle(ChatFormatting.RED));
+        }
+        if (stack.is(ModTags.Items.GRINDABLE)) {
+            tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.grindable")
+                    .withStyle(ChatFormatting.GRAY));
+        }
     }
 
     @SubscribeEvent

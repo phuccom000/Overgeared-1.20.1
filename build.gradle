@@ -122,9 +122,9 @@ repositories {
 
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
-    // flatDir {
-    //     dir 'libs'
-    // }
+    flatDir {
+        dir 'libs'
+    }
     maven {
         // location of the maven that hosts JEI files before January 2023
         name = "Progwml6's maven"
@@ -226,7 +226,7 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:lionfish-api-1001614:5922047")
     runtimeOnly fg.deobf("curse.maven:lendercataclysm-551586:6906993")
     runtimeOnly fg.deobf("curse.maven:item-nbt-viewer-514135:4578522")
-    implementation fg.deobf("curse.maven:no-tree-punching-289043:4599926")
+    //implementation fg.deobf("curse.maven:no-tree-punching-289043:4599926")
     implementation fg.deobf("curse.maven:ytech-917366:6616815")
     //implementation fg.deobf("curse.maven:max-health-fix-492246:5378283")
     //implementation fg.deobf("curse.maven:insanelib-465109:6927148")
@@ -236,8 +236,20 @@ dependencies {
     //runtimeOnly fg.deobf("maven.modrinth:kap_lib:v1.26.3-mc1.20.1-FML47.3.0")
     runtimeOnly fg.deobf("curse.maven:zeta-968868:6432578")
     runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")
-    runtimeOnly fg.deobf("curse.maven:modernfix-790626:6837713")
-    implementation fg.deobf("curse.maven:amendments-896746:6913537")
+    //runtimeOnly fg.deobf("curse.maven:modernfix-790626:6837713")
+
+    /* implementation fg.deobf("curse.maven:amendments-896746:6913537")
+     implementation fg.deobf("curse.maven:accessories-938917:6201361")
+     implementation fg.deobf("curse.maven:playeranimator-658587:4587214")
+     //implementation fg.deobf("curse.maven:geckolib-388172:7025129")
+     implementation fg.deobf("curse.maven:forgified-fabric-api-889079:6885853")
+     implementation fg.deobf("curse.maven:better-combat-by-daedelus-639842:5625757")
+     runtimeOnly fg.deobf("curse.maven:connector-extras-913445:5490637")
+     runtimeOnly fg.deobf("curse.maven:sinytra-connector-890127:5761411")
+     runtimeOnly fg.deobf("blank:KnightsHeraldry:0.6.1")
+     runtimeOnly fg.deobf("blank:stoneycore:0.5.3")
+     runtimeOnly fg.deobf("blank:owo-lib:0.11.2+1.20")
+     runtimeOnly fg.deobf("blank:geckolib-fabric-1.20.1:4.8.2")*/
     //implementation fg.deobf("curse.maven:xtra-arrows-566441:6434918")
     //runtimeOnly fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6826548")
     //implementation fg.deobf("curse.maven:blueprint-382216:6408581")
@@ -246,8 +258,8 @@ dependencies {
     //runtimeOnly fg.deobf("curse.maven:epic-knights-armor-and-weapons-509041:6373737")
     //runtimeOnly fg.deobf("curse.maven:epic-knights-addon-925866:6036869")
     //runtimeOnly fg.deobf("curse.maven:epic-knights-slavic-armory-942000:5458480")
-    //runtimeOnly fg.deobf("curse.maven:cloth-config-348521:5729105")
-    //runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137938")
+    runtimeOnly fg.deobf("curse.maven:cloth-config-348521:5729105")
+    runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137938")
     //runtimeOnly fg.deobf("curse.maven:archery-expansion-1164945:6424928")
     //runtimeOnly fg.deobf("curse.maven:archery-expansion-squared-1217171:6425344")
     // Example mod dependency using a mod jar from ./libs with a flat dir repository

@@ -105,7 +105,8 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipes(KnappingRecipeCategory.KNAPPING_RECIPE_TYPE, knappingRecipes);
 
         registration.addRecipes(RecipeTypes.CRAFTING, BlueprintCloningRecipeMaker.createRecipes(registration.getJeiHelpers()));
-        registration.addRecipes(RecipeTypes.BREWING, dragonBreathRecipe());
+        if (ServerConfig.ENABLE_DRAGON_BREATH_RECIPE.get())
+            registration.addRecipes(RecipeTypes.BREWING, dragonBreathRecipe());
 
         List<ExplanationRecipe> recipes = List.of(
                 new ExplanationRecipe(new ItemStack(ModItems.ROCK.get()))

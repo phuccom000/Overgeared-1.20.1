@@ -136,7 +136,7 @@ public class UpgradeArrowEntity extends AbstractArrow {
                 Potion potion = getPotion(tag);
                 List<MobEffectInstance> effects = getAllEffects(tag);
                 if (!effects.isEmpty()) {
-                    makeAreaOfEffectCloud(this.referenceStack, potion, result);
+                    makeAreaOfEffectCloud(this.referenceStack, effects, result);
                 }
             }
         }
@@ -207,15 +207,21 @@ public class UpgradeArrowEntity extends AbstractArrow {
         this.getEntityData().set(DATA_POTION_COLOR, PotionUtils.getColor(PotionUtils.getAllEffects(potion, this.effects)));
     }
 
-    private void makeAreaOfEffectCloud(ItemStack stack, Potion potion, HitResult result) {
+    private void makeAreaOfEffectCloud(ItemStack stack, List<MobEffectInstance> effects, HitResult result) {
         Vec3 hit = result.getLocation();
+
+        // Compute vertical motion ratio
         Vec3 motion = this.getDeltaMovement();
-        double verticalRatio = motion.y / motion.length();
+        double verticalRatio = motion.y / motion.length(); // -1 to 1
+
+        // Map verticalRatio to offset: more vertical ➜ larger downward offset
         double offset = verticalRatio > 0 ? -verticalRatio * 0.5 : -0.2;
 
         double cloudY = hit.y + offset + 0.25;
-        AreaEffectCloud cloud = new AreaEffectCloud(level(), hit.x, cloudY, hit.z);
+        double cloudX = hit.x;
+        double cloudZ = hit.z;
 
+        AreaEffectCloud cloud = new AreaEffectCloud(level(), cloudX, cloudY, cloudZ);
         Entity owner = getOwner();
         if (owner instanceof LivingEntity le) {
             cloud.setOwner(le);
@@ -225,12 +231,12 @@ public class UpgradeArrowEntity extends AbstractArrow {
         cloud.setRadiusOnUse(-0.5F);
         cloud.setWaitTime(10);
         cloud.setRadiusPerTick(-cloud.getRadius() / cloud.getDuration());
-        //cloud.setPotion(potion);
+        cloud.setPotion(potion);
 
-        for (MobEffectInstance inst : potion.getEffects()) {
+        for (MobEffectInstance inst : effects) {
             MobEffectInstance reducedEffect = new MobEffectInstance(
                     inst.getEffect(),
-                    Math.max(inst.getDuration() / 8, 1),
+                    Math.max(inst.getDuration() / 8, 1), // 1/4 duration
                     inst.getAmplifier(),
                     inst.isAmbient(),
                     inst.isVisible(),
@@ -239,9 +245,9 @@ public class UpgradeArrowEntity extends AbstractArrow {
             cloud.addEffect(reducedEffect);
         }
 
-        CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains("CustomPotionColor", 99)) {
-            cloud.setFixedColor(tag.getInt("CustomPotionColor"));
+        CompoundTag compoundtag = stack.getTag();
+        if (compoundtag != null && compoundtag.contains("CustomPotionColor", 99)) {
+            cloud.setFixedColor(compoundtag.getInt("CustomPotionColor"));
         }
 
         level().addFreshEntity(cloud);
@@ -271,7 +277,7 @@ public class UpgradeArrowEntity extends AbstractArrow {
     public static List<MobEffectInstance> getAllEffects(@Nullable CompoundTag pCompoundTag) {
         List<MobEffectInstance> list = Lists.newArrayList();
         list.addAll(getPotion(pCompoundTag).getEffects());
-        getCustomEffects(pCompoundTag, list);
+        PotionUtils.getCustomEffects(pCompoundTag, list);
         return list;
     }
 

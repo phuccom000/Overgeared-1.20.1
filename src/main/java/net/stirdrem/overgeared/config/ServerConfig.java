@@ -12,6 +12,8 @@ public class ServerConfig {
 
     public static final int DEFAULT_WOODEN_BUCKET_BREAK_TEMPERATURE = 1000;
     public static final ForgeConfigSpec SERVER_CONFIG;
+    public static final ForgeConfigSpec.BooleanValue ENABLE_MOD_TOOLTIPS;
+
 
     // --- Core Anvil Configs ---
     public static final ForgeConfigSpec.IntValue MAX_ANVIL_DISTANCE;
@@ -23,6 +25,7 @@ public class ServerConfig {
     public static final ForgeConfigSpec.IntValue HEATED_ITEM_COOLDOWN_TICKS;
 
     // --- Arrow Settings ---
+    public static final ForgeConfigSpec.BooleanValue ENABLE_DRAGON_BREATH_RECIPE;
     public static final ForgeConfigSpec.BooleanValue UPGRADE_ARROW_POTION_TOGGLE;
     public static final ForgeConfigSpec.IntValue MAX_POTION_TIPPING_USE;
 
@@ -139,7 +142,9 @@ public class ServerConfig {
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-
+        builder.push("General Configs");
+        ENABLE_MOD_TOOLTIPS = builder.comment("Toggle for mod's custom tooltips").define("enableModTooltips", true);
+        builder.pop();
         // --- Anvil Conversion ---
         builder.push("Anvil Conversion");
         ENABLE_STONE_TO_ANVIL = builder.comment("Allow shift-right-clicking stone to convert into Stone Smithing Anvil").define("enableStoneToAnvil", true);
@@ -156,8 +161,11 @@ public class ServerConfig {
 
         builder.push("Arrow Fletching Settings");
         ENABLE_FLETCHING_RECIPES = builder
-                .comment("Enable or disable all Fletching recipes [true/false]")
+                .comment("Enable or disable all Fletching recipes and related tab")
                 .define("enableFletchingRecipes", true);
+        ENABLE_DRAGON_BREATH_RECIPE = builder
+                .comment("Enable or disable Dragon Breath's brewing recipe")
+                .define("enableDragonBreathRecipe", true);
         UPGRADE_ARROW_POTION_TOGGLE = builder.comment("Toggle for the ability to tip iron, steel, diamond arrows.").define("enableUpgradeArrowTipping", true);
         MAX_POTION_TIPPING_USE = builder.comment("How many arrows can a bottle of potion tip before it's depleted").defineInRange("maxPotionTipping", 8, 0, Integer.MAX_VALUE);
         builder.pop();

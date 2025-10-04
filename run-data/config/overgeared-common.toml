@@ -247,11 +247,36 @@
 	maxArrowSpeed = 8.0
 
 ["Arrow Fletching Settings"]
-	#Enable or disable all Fletching recipes [true/false]
+	#Enable or disable all Fletching recipes and related tab
 	enableFletchingRecipes = true
 	#Toggle for the ability to tip iron, steel, diamond arrows.
 	enableUpgradeArrowTipping = true
 	#How many arrows can a bottle of potion tip before it's depleted
 	#Range: > 0
 	maxPotionTipping = 8
+	#Enable or disable Dragon Breath's brewing recipe
+	enableDragonBreathRecipe = true
+
+["General Configs"]
+	#Toggle for mod's custom tooltips
+	enableModTooltips = true
+
+["Loot Quality"]
+	#Toggle for loot quality
+	enableLootQuality = true
+	#Weight for Poor quality for loot-tools/weapons. Set to 0 to disable.
+	#Range: > 0
+	weightPoorQuality = 50
+	#Weight for Well quality for loot-tools/weapons. Set to 0 to disable.
+	#Range: > 0
+	weightWellQuality = 30
+	#Weight for Expert quality for loot-tools/weapons. Set to 0 to disable.
+	#Range: > 0
+	weightExpertQuality = 10
+	#Weight for Perfect quality for loot-tools/weapons. Set to 0 to disable.
+	#Range: > 0
+	weightPerfectQuality = 5
+	#Weight for Master quality for loot-tools/weapons. Set to 0 to disable.
+	#Range: > 0
+	weightMasterQuality = 1
 
