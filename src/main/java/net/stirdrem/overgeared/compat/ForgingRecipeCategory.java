@@ -114,22 +114,36 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ForgingRecipe recipe, IFocusGroup focuses) {
-        int width = recipe.width;
-        int height = recipe.height;
+        int gridWidth = 3; // Always 3x3 grid
+        int gridHeight = 3;
+        int recipeWidth = recipe.width;
+        int recipeHeight = recipe.height;
 
         NonNullList<Ingredient> ingredients = recipe.getIngredients();
         Set<String> type = recipe.getBlueprintTypes();
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int index = y * width + x;
-                Ingredient ingredient = ingredients.get(index);
-                builder.addSlot(RecipeIngredientRole.INPUT, 23 + x * 18, 1 + y * 18)
-                        .addIngredients(ingredient);
+        // Create ALL 9 slots of the 3x3 grid
+        for (int gridY = 0; gridY < gridHeight; gridY++) {
+            for (int gridX = 0; gridX < gridWidth; gridX++) {
+                int recipeIndex = gridY * recipeWidth + gridX;
+
+                // Check if this grid position has an ingredient in the recipe
+                if (gridX < recipeWidth && gridY < recipeHeight && recipeIndex < ingredients.size()) {
+                    // This position has an ingredient - add it
+                    Ingredient ingredient = ingredients.get(recipeIndex);
+                    builder.addSlot(RecipeIngredientRole.INPUT, 23 + gridX * 18, 1 + gridY * 18)
+                            .addIngredients(ingredient);
+                } else {
+                    // This position is empty in the recipe - add empty ingredient
+                    builder.addSlot(RecipeIngredientRole.INPUT, 23 + gridX * 18, 1 + gridY * 18)
+                            .addIngredients(Ingredient.EMPTY);
+                }
             }
         }
+
+        // Rest of your code (blueprint and output slots) remains the same...
         //BLUEPRINT SLOT
-        builder.addSlot(RecipeIngredientRole.INPUT, 1, 19)
+        builder.addSlot(RecipeIngredientRole.CATALYST, 1, 19)
                 .addItemStacks(createBlueprintStacksForRecipe(recipe));
 
         if (recipe.hasQuality() || !recipe.needsMinigame()) {
@@ -145,10 +159,7 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
 
             builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 28)
                     .addItemStack(failedStack);
-
         }
-
-
     }
 
     private List<ItemStack> createBlueprintStacksForRecipe(ForgingRecipe recipe) {

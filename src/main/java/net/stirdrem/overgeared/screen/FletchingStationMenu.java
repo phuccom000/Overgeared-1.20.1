@@ -76,12 +76,22 @@ public class FletchingStationMenu extends AbstractContainerMenu {
                 updateResultSlot();
                 super.onTake(pPlayer, pStack);
             }
+
+            @Override
+            public boolean mayPickup(Player player) {
+                return true; // This is crucial for JEI transfers
+            }
         });
         addSlot(new Slot(input, INPUT_SLOT_SHAFT, 48, 35) {
             @Override
             public void onTake(Player pPlayer, ItemStack pStack) {
                 updateResultSlot();
                 super.onTake(pPlayer, pStack);
+            }
+
+            @Override
+            public boolean mayPickup(Player player) {
+                return true; // This is crucial for JEI transfers
             }
         });
         addSlot(new Slot(input, INPUT_SLOT_FEATHER, 30, 53) {
@@ -90,12 +100,22 @@ public class FletchingStationMenu extends AbstractContainerMenu {
                 updateResultSlot();
                 super.onTake(pPlayer, pStack);
             }
+
+            @Override
+            public boolean mayPickup(Player player) {
+                return true; // This is crucial for JEI transfers
+            }
         });
 
         addSlot(new Slot(input, INPUT_SLOT_POTION, 92, 53) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return isPotion(stack);
+            }
+
+            @Override
+            public boolean mayPickup(Player player) {
+                return true; // This is crucial for JEI transfers
             }
 
             @Override
@@ -114,6 +134,11 @@ public class FletchingStationMenu extends AbstractContainerMenu {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
+            }
+
+            @Override
+            public boolean mayPickup(Player player) {
+                return true;
             }
 
             @Override
@@ -161,8 +186,21 @@ public class FletchingStationMenu extends AbstractContainerMenu {
 
 
     private void updateResultSlot() {
+        // If all input slots are empty, clear the output slot
         if (level.isClientSide()) return;
 
+        boolean hasInput = false;
+        for (int i = 0; i < 3; i++) {
+            if (!input.getItem(i).isEmpty()) {
+                hasInput = true;
+                break;
+            }
+        }
+        if (!hasInput) {
+            result.setItem(OUTPUT_SLOT, ItemStack.EMPTY);
+            broadcastChanges();
+            return;
+        }
         Optional<FletchingRecipe> opt = recipeManager.getRecipeFor(ModRecipeTypes.FLETCHING.get(), input, level);
         ItemStack resultStack = ItemStack.EMPTY;
         ItemStack potion = input.getItem(INPUT_SLOT_POTION);
@@ -442,15 +480,17 @@ public class FletchingStationMenu extends AbstractContainerMenu {
     @Override
     public void removed(Player player) {
         super.removed(player);
-        for (int i = 0; i < input.getContainerSize(); i++) {
-            ItemStack stack = input.getItem(i);
-            if (!stack.isEmpty()) {
-                if (!player.getInventory().add(stack)) {
-                    player.drop(stack, false);
+        if (this.access != ContainerLevelAccess.NULL)
+            for (int i = 0; i < input.getContainerSize(); i++) {
+                ItemStack stack = input.removeItemNoUpdate(i);
+                if (!stack.isEmpty()) {
+                    if (!player.getInventory().add(stack)) {
+                        player.drop(stack, false);
+                    }
                 }
             }
-        }
     }
+
 
     public static Potion getPotion(@Nullable CompoundTag tag) {
         if (tag == null) return Potions.EMPTY;

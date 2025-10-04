@@ -24,6 +24,7 @@ import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
     private Slot resultSlot;
     private final Player player;
     private final boolean hasBlueprint;
+    private final List<Integer> craftingSlotIndices = new ArrayList<>();
 
     public AbstractSmithingAnvilMenu(MenuType<?> pMenuType, int pContainerId, Inventory inv, AbstractSmithingAnvilBlockEntity entity, ContainerData data, boolean hasBlueprint) {
         super(pMenuType, pContainerId);
@@ -56,6 +58,11 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
                         return true;
                     } else return false;
                 }
+
+                @Override
+                public boolean mayPickup(Player player) {
+                    return true; // This is crucial for JEI transfers
+                }
             }); //hammer
 
             if (hasBlueprint)
@@ -65,6 +72,11 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
                         if (stack.is(ModItems.BLUEPRINT.get()) || stack.getItem() instanceof SmithingTemplateItem) {
                             return true;
                         } else return false;
+                    }
+
+                    @Override
+                    public boolean mayPickup(Player player) {
+                        return true; // This is crucial for JEI transfers
                     }
 
                     @Override
@@ -87,9 +99,17 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
             //crafting slot
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 3; ++j) {
-                    this.addSlot(new SlotItemHandler(iItemHandler, j + i * 3, 30 + j * 18, 17 + i * 18));
+                    Slot slotIndex = this.addSlot(new SlotItemHandler(iItemHandler, j + i * 3, 30 + j * 18, 17 + i * 18) {
+                        @Override
+                        public boolean mayPickup(Player player) {
+                            return true; // This is crucial for JEI transfers
+                        }
+                    });
+                    craftingSlotIndices.add(slotIndex.index); // Store the index, not the Slot object
                 }
             }
+            System.out.println("Crafting slots: " + craftingSlotIndices);
+
             /*this.addSlot(new SlotItemHandler(iItemHandler, 9, 124, 35) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
@@ -103,6 +123,11 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return false;
+                }
+
+                @Override
+                public boolean mayPickup(Player player) {
+                    return true; // This is crucial for JEI transfers
                 }
 
                 @Override
@@ -163,6 +188,11 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
 
         addDataSlots(data);
     }
+
+    public List<Integer> getInputSlots() {
+        return new ArrayList<>(craftingSlotIndices);
+    }
+
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
     // must assign a slot number to each of the slots used by the GUI.

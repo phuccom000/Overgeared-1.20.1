@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "a": {
-      "tag": "forge:ingots/steel"
+      "item": "minecraft:diamond"
     },
     "b": {
-      "item": "minecraft:diamond"
+      "tag": "forge:ingots/steel"
     },
     "x": {
       "item": "overgeared:diamond_upgrade_smithing_template"

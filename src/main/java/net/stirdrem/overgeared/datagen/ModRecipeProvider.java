@@ -942,7 +942,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 ).unlocks("has_diamond", has(Items.DIAMOND))
                 .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_boots_to_diamond_boots"));
 
-        FletchingRecipeBuilder.fletching(
+        /*FletchingRecipeBuilder.fletching(
                         Ingredient.of(Items.FLINT),
                         Ingredient.of(Items.STICK),
                         Ingredient.of(Items.FEATHER),
@@ -951,7 +951,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 ).withTippedResult(Items.TIPPED_ARROW)
                 .withLingeringResult("Potion", ModItems.LINGERING_ARROW.get())
                 .unlockedBy("has_flint", has(Items.FLINT))  // Add this unlock condition
-                .save(pWriter);
+                .save(pWriter);*/
 
         FletchingRecipeBuilder.fletching(
                         Ingredient.of(ModItems.IRON_ARROW_HEAD.get()),

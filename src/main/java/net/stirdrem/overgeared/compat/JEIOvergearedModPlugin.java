@@ -3,8 +3,11 @@ package net.stirdrem.overgeared.compat;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
+import mezz.jei.api.recipe.transfer.IRecipeTransferManager;
 import mezz.jei.api.recipe.vanilla.IJeiBrewingRecipe;
 import mezz.jei.api.registration.*;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -293,6 +296,17 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.useNbtForSubtypes(ModItems.STEEL_UPGRADE_ARROW.get());
         registration.useNbtForSubtypes(ModItems.DIAMOND_UPGRADE_ARROW.get());
     }
+
+    @Override
+    public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
+
+        registration.addRecipeTransferHandler(SteelSmithingAnvilMenu.class, ModMenuTypes.STEEL_SMITHING_ANVIL_MENU.get(), ForgingRecipeCategory.FORGING_RECIPE_TYPE, 38, 9, 0, 36);
+        registration.addRecipeTransferHandler(StoneSmithingAnvilMenu.class, ModMenuTypes.STONE_SMITHING_ANVIL_MENU.get(), ForgingRecipeCategory.FORGING_RECIPE_TYPE, 37, 9, 0, 36);
+        registration.addRecipeTransferHandler(TierASmithingAnvilMenu.class, ModMenuTypes.TIER_A_SMITHING_ANVIL_MENU.get(), ForgingRecipeCategory.FORGING_RECIPE_TYPE, 38, 9, 0, 36);
+        registration.addRecipeTransferHandler(TierBSmithingAnvilMenu.class, ModMenuTypes.TIER_B_SMITHING_ANVIL_MENU.get(), ForgingRecipeCategory.FORGING_RECIPE_TYPE, 38, 9, 0, 36);
+        registration.addRecipeTransferHandler(FletchingStationMenu.class, ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingCategory.FLETCHING_RECIPE_TYPE, 0, 4, 5, 36);
+    }
+
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {

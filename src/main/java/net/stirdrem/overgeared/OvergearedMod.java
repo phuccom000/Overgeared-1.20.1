@@ -359,8 +359,24 @@ public class OvergearedMod {
                     new ItemStack(ModItems.STEEL_BOOTS.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
+
             event.getEntries().putAfter(
-                    new ItemStack(Items.LEATHER_BOOTS),
+                    new ItemStack(Items.ARROW),
+                    new ItemStack(ModItems.IRON_UPGRADE_ARROW.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.IRON_UPGRADE_ARROW.get()),
+                    new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get()),
+                    new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            /*event.getEntries().putAfter(
+                    new ItemStack(Items.IRON_BOOTS),
                     new ItemStack(ModItems.STEEL_HELMET.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
@@ -378,7 +394,7 @@ public class OvergearedMod {
                     new ItemStack(ModItems.STEEL_LEGGINGS.get()),
                     new ItemStack(ModItems.STEEL_BOOTS.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
+            );*/
 
         }
 

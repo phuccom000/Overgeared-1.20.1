@@ -36,6 +36,9 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.IRON_ARROW_HEAD.get());
                         pOutput.accept(ModItems.STEEL_ARROW_HEAD.get());
                         pOutput.accept(ModItems.DIAMOND_SHARD.get());
+                        pOutput.accept(ModItems.IRON_UPGRADE_ARROW.get());
+                        pOutput.accept(ModItems.STEEL_UPGRADE_ARROW.get());
+                        pOutput.accept(ModItems.DIAMOND_UPGRADE_ARROW.get());
                         pOutput.accept(ModItems.HEATED_COPPER_INGOT.get());
                         pOutput.accept(ModItems.HEATED_IRON_INGOT.get());
                         pOutput.accept(ModItems.HEATED_STEEL_INGOT.get());
