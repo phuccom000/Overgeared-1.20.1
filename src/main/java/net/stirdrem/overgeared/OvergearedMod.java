@@ -359,6 +359,26 @@ public class OvergearedMod {
                     new ItemStack(ModItems.STEEL_BOOTS.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
+            event.getEntries().putAfter(
+                    new ItemStack(Items.LEATHER_BOOTS),
+                    new ItemStack(ModItems.COPPER_HELMET.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.COPPER_HELMET.get()),
+                    new ItemStack(ModItems.COPPER_CHESTPLATE.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.COPPER_CHESTPLATE.get()),
+                    new ItemStack(ModItems.COPPER_LEGGINGS.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
+            event.getEntries().putAfter(
+                    new ItemStack(ModItems.COPPER_LEGGINGS.get()),
+                    new ItemStack(ModItems.COPPER_BOOTS.get()),
+                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+            );
 
             event.getEntries().putAfter(
                     new ItemStack(Items.ARROW),
