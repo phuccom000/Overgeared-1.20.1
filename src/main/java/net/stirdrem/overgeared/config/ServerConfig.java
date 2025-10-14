@@ -31,6 +31,7 @@ public class ServerConfig {
 
     // --- Minigame Settings ---
     public static final ForgeConfigSpec.BooleanValue ENABLE_MINIGAME;
+    public static final ForgeConfigSpec.BooleanValue INGREDIENTS_DEFINE_MAX_QUALITY;
     public static final ForgeConfigSpec.DoubleValue MASTER_QUALITY_CHANCE;
     public static final ForgeConfigSpec.DoubleValue MASTER_FROM_INGREDIENT_CHANCE;
 
@@ -172,6 +173,7 @@ public class ServerConfig {
 
         builder.push("Minigame Common Settings");
         ENABLE_MINIGAME = builder.comment("Toggle for the forging minigame").define("enableMinigame", true);
+        INGREDIENTS_DEFINE_MAX_QUALITY = builder.comment("Toggle for if ingredients' quality define the result's").define("ingredientsDefineQuality", true);
         MASTER_QUALITY_CHANCE = builder.comment("How likely it is for the player to get Masterwork when getting Perfectly Forged. Set to 0 to disable it.").defineInRange("masterQualityChance", 0.05, 0, 1);
         MASTER_FROM_INGREDIENT_CHANCE = builder.comment("Chance that using a Master-quality ingredient results in Master-quality result").defineInRange("masterFromIngredientChance", 0.5, 0.0, 1.0);
         MAX_ANVIL_DISTANCE = builder.comment("Maximum distance you can go from your Smithing Anvil before minigame reset").defineInRange("maxAnvilDistance", 100, 0, 1000);

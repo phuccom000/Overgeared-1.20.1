@@ -238,6 +238,8 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")
     //runtimeOnly fg.deobf("curse.maven:modernfix-790626:6837713")
 
+    implementation fg.deobf("curse.maven:spartan-weaponry-278141:6842571")
+    
     /* implementation fg.deobf("curse.maven:amendments-896746:6913537")
      implementation fg.deobf("curse.maven:accessories-938917:6201361")
      implementation fg.deobf("curse.maven:playeranimator-658587:4587214")

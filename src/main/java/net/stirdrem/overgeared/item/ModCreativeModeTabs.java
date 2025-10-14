@@ -135,21 +135,20 @@ public class ModCreativeModeTabs {
 
                     })
                     .build());
-    public static final RegistryObject<CreativeModeTab> LINGERING_ARROWS_TAB;
-
-    static {
-        // Register the tab ONLY if config is enabled
-        if (ServerConfig.ENABLE_FLETCHING_RECIPES.get()) {
-            LINGERING_ARROWS_TAB = CREATIVE_MODE_TABS.register("lingering_arrows_tab",
+    public static final RegistryObject<CreativeModeTab> LINGERING_ARROWS_TAB =
+            CREATIVE_MODE_TABS.register("lingering_arrows_tab",
                     () -> CreativeModeTab.builder()
                             .icon(() -> new ItemStack(Blocks.FLETCHING_TABLE))
                             .title(Component.translatable("creativetab.overgeared.lingering_arrows_tab"))
                             .displayItems((parameters, output) -> {
-                                // First add all vanilla potion variants
+                                // Only add items if the config allows it
+                                if (!ServerConfig.ENABLE_FLETCHING_RECIPES.get()) return;
+
                                 output.accept(Items.ARROW);
                                 output.accept(ModItems.IRON_UPGRADE_ARROW.get());
                                 output.accept(ModItems.STEEL_UPGRADE_ARROW.get());
                                 output.accept(ModItems.DIAMOND_UPGRADE_ARROW.get());
+
                                 for (Potion potion : ForgeRegistries.POTIONS) {
                                     if (potion == Potions.EMPTY) continue;
 
@@ -157,6 +156,7 @@ public class ModCreativeModeTabs {
                                     arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
                                     output.accept(arrow);
                                 }
+
                                 for (Potion potion : ForgeRegistries.POTIONS) {
                                     if (potion == Potions.EMPTY) continue;
 
@@ -168,101 +168,40 @@ public class ModCreativeModeTabs {
                                 for (Potion potion : ForgeRegistries.POTIONS) {
                                     if (potion == Potions.EMPTY) continue;
 
-                                    ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                                    output.accept(arrow);
+                                    ItemStack iron = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
+                                    iron.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    output.accept(iron);
+
+                                    ItemStack ironLingering = iron.copy();
+                                    ironLingering.getOrCreateTag().putBoolean("LingeringPotion", true);
+                                    output.accept(ironLingering);
                                 }
+
                                 for (Potion potion : ForgeRegistries.POTIONS) {
                                     if (potion == Potions.EMPTY) continue;
 
-                                    ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                                    arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
-                                    output.accept(arrow);
+                                    ItemStack steel = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
+                                    steel.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    output.accept(steel);
+
+                                    ItemStack steelLingering = steel.copy();
+                                    steelLingering.getOrCreateTag().putBoolean("LingeringPotion", true);
+                                    output.accept(steelLingering);
                                 }
+
                                 for (Potion potion : ForgeRegistries.POTIONS) {
                                     if (potion == Potions.EMPTY) continue;
 
-                                    ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                                    output.accept(arrow);
+                                    ItemStack diamond = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
+                                    diamond.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    output.accept(diamond);
+
+                                    ItemStack diamondLingering = diamond.copy();
+                                    diamondLingering.getOrCreateTag().putBoolean("LingeringPotion", true);
+                                    output.accept(diamondLingering);
                                 }
-                                for (Potion potion : ForgeRegistries.POTIONS) {
-                                    if (potion == Potions.EMPTY) continue;
-
-                                    ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                                    arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
-                                    output.accept(arrow);
-                                }
-                                for (Potion potion : ForgeRegistries.POTIONS) {
-                                    if (potion == Potions.EMPTY) continue;
-
-                                    ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                                    output.accept(arrow);
-                                }
-                                for (Potion potion : ForgeRegistries.POTIONS) {
-                                    if (potion == Potions.EMPTY) continue;
-
-                                    ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                                    arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
-                                    output.accept(arrow);
-                                }
-
-                        /*// Now add modular arrows with all combinations
-                        String[] tips = {"ender_pearl", "chorus_fruit", "amethyst_shard", "fire_charge", "glow_ink", "iron_nugget", "steel_nugget", "diamond_shard"};
-                        String[] shafts = {"blaze_rod", "breeze_rod", "end_rod", "bamboo"};
-                        String[] feathers = {"prismarine", "slime_ball"};
-
-                        // Create all possible combinations
-                        for (String tip : tips) {
-                            for (String shaft : shafts) {
-                                for (String feather : feathers) {
-                                    ItemStack modularArrow = new ItemStack(ModItems.MODULAR_ARROW.get());
-                                    CompoundTag tag = modularArrow.getOrCreateTag();
-                                    tag.putString("Tip", tip);
-                                    tag.putString("Shaft", shaft);
-                                    tag.putString("Feather", feather);
-
-                                    output.accept(modularArrow);
-                                }
-                            }
-                        }*/
-
-                        /*// Also add potion variants of modular arrows
-                        for (Potion potion : ForgeRegistries.POTIONS) {
-                            if (potion == Potions.EMPTY) continue;
-
-                            for (String tip : tips) {
-                                for (String shaft : shafts) {
-                                    for (String feather : feathers) {
-                                        ItemStack potionModularArrow = new ItemStack(ModItems.MODULAR_ARROW.get());
-                                        CompoundTag tag = potionModularArrow.getOrCreateTag();
-                                        tag.putString("Tip", tip);
-                                        tag.putString("Shaft", shaft);
-                                        tag.putString("Feather", feather);
-                                        tag.putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-
-                                        String arrowName = String.format("%s %s %s %s Arrow",
-                                                potion.getName("item.minecraft.lingering_potion.effect."),
-                                                tip.replace("_", " "),
-                                                shaft.replace("_", " "),
-                                                feather.replace("_", " "));
-                                        potionModularArrow.setHoverName(Component.literal(arrowName));
-
-                                        output.accept(potionModularArrow);
-                                    }
-                                }
-                            }
-                        }*/
                             })
                             .build());
-        } else {
-            LINGERING_ARROWS_TAB = null;  // not registered
-        }
-    }
 
     public static final RegistryObject<CreativeModeTab> BLUEPRINT_TAB = CREATIVE_MODE_TABS.register("blueprint_tab",
             () -> CreativeModeTab.builder()

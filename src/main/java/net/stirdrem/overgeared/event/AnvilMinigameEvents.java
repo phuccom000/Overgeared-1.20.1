@@ -25,34 +25,37 @@ public class AnvilMinigameEvents {
     public static ItemStack resultItem = null;
     public static int hitsRemaining = 0;
     public static float arrowPosition = 1;
-    public static float arrowSpeed = ServerConfig.POOR_ARROW_SPEED.get().floatValue();
-    public static float maxArrowSpeed = ServerConfig.POOR_MAX_ARROW_SPEED.get().floatValue();
-    public static float speedIncreasePerHit = ServerConfig.POOR_ARROW_SPEED_INCREASE.get().floatValue();
+
+    // Initialize with placeholder defaults (will be overridden later)
+    public static float arrowSpeed = 0;
+    public static float maxArrowSpeed = 0;
+    public static float speedIncreasePerHit = 0;
     public static boolean movingRight = true;
     public static int perfectHits = 0;
     public static int goodHits = 0;
     public static int missedHits = 0;
-    public static int perfectZoneStart = (100 - ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
-    public static int perfectZoneEnd = (100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
-    public static int goodZoneStart = Math.max((100 - ServerConfig.POOR_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
-    public static int goodZoneEnd = Math.min((100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
-    public static float zoneShrinkFactor = ServerConfig.POOR_ZONE_SHRINK_FACTOR.get().floatValue();
+
+    public static int perfectZoneStart = 45;
+    public static int perfectZoneEnd = 55;
+    public static int goodZoneStart = 35;
+    public static int goodZoneEnd = 65;
+    public static float zoneShrinkFactor = 0.95f;
     public static float zoneShiftAmount = 15.0f;
     public static float perfectZoneSize = perfectZoneEnd - perfectZoneStart;
+
     public static Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
     public static int skillLevel = 0;
-    //public static BlockPos anvilPos;
 
     private static int TICKS_PER_PRINT = 1;
-
-    // Current internal tick accumulator
     private static int tickAccumulator = 0;
-
-    // Current arrowPosition value
-
-    // Direction 1 = counting up, -1 = counting down
     private static boolean movingDown = false;
 
+    public static void ensureInitialized() {
+        // Only run if defaults haven't been set yet
+        if (arrowSpeed == 0) {
+            setupForQuality("poor"); // or whichever quality you want as baseline
+        }
+    }
 
     public static void setupForQuality(String quality) {
         switch (quality.toLowerCase()) {
@@ -118,6 +121,7 @@ public class AnvilMinigameEvents {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
+        ensureInitialized();
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         if (mc.isPaused() || !isIsVisible()) return;

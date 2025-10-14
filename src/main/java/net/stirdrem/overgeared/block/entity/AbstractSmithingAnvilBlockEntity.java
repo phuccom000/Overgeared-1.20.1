@@ -242,6 +242,18 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         failedResult = recipe.getFailedResultItem(getLevel().registryAccess());
         ForgingQuality minimumQuality = recipe.getMinimumQuality();
         // Only set quality if recipe supports it
+
+        ForgingQuality maxIngredientQuality = ForgingQuality.POOR; // default lowest
+        for (int i = 0; i < 9; i++) {
+            ItemStack ingredient = itemHandler.getStackInSlot(i);
+            if (ingredient.hasTag() && ingredient.getTag().contains("ForgingQuality")) {
+                ForgingQuality q = ForgingQuality.fromString(ingredient.getTag().getString("ForgingQuality"));
+                if (q != null && q.ordinal() > maxIngredientQuality.ordinal()) {
+                    maxIngredientQuality = q;
+                }
+            }
+        }
+
         if (recipe.hasQuality()) {
             if (ServerConfig.ENABLE_MINIGAME.get()) {
                 String qualityStr = determineForgingQuality();
@@ -251,6 +263,10 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                         // Clamp to minimum quality if needed
                         if (minimumQuality != null && quality.ordinal() < minimumQuality.ordinal()) {
                             quality = minimumQuality;
+                        }
+
+                        if (quality.ordinal() > maxIngredientQuality.ordinal() && ServerConfig.INGREDIENTS_DEFINE_MAX_QUALITY.get()) {
+                            quality = maxIngredientQuality;
                         }
 
                         CompoundTag tag = result.getOrCreateTag();

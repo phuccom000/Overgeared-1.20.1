@@ -86,9 +86,6 @@ public class OvergearedMod {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         //IEventBus modEventBus = context.getModEventBus();
 
-        ServerConfig.loadConfig(ServerConfig.SERVER_CONFIG, FMLPaths.GAMEDIR.get().resolve(FMLPaths.CONFIGDIR.get()).resolve(MOD_ID + "-common.toml"));
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
-
         ModCreativeModeTabs.register(modEventBus);
 
         ModItems.register(modEventBus);
@@ -120,7 +117,8 @@ public class OvergearedMod {
         modEventBus.addListener(this::addCreative);
 
         polymorph = ModList.get().isLoaded("polymorph");
-
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         //context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }

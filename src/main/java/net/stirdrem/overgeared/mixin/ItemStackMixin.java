@@ -65,10 +65,6 @@ public abstract class ItemStackMixin {
 
         int originalDurability = cir.getReturnValue();
 
-        if (originalDurability != stack.getItem().getMaxDamage()) {
-            return;
-        }
-
         boolean blacklisted = OvergearedMod.isDurabilityMultiplierBlacklisted(stack);
 
         float baseMultiplier = ServerConfig.BASE_DURABILITY_MULTIPLIER.get().floatValue();
