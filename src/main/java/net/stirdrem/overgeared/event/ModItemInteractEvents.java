@@ -42,7 +42,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
-//import net.stirdrem.overgeared.block.custom.LayeredWaterBarrel;
 import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
@@ -54,9 +53,12 @@ import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.FletchingStationMenu;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.QualityHelper;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static net.stirdrem.overgeared.OvergearedMod.getCooledIngot;
@@ -64,9 +66,15 @@ import static net.stirdrem.overgeared.OvergearedMod.getCooledIngot;
 
 @Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
 public class ModItemInteractEvents {
-    private static final Set<ItemEntity> trackedEntities = ConcurrentHashMap.newKeySet();
     public static final Map<UUID, BlockPos> playerAnvilPositions = new HashMap<>();
     public static final Map<UUID, Boolean> playerMinigameVisibility = new HashMap<>();
+    private static final Set<ItemEntity> trackedEntities = ConcurrentHashMap.newKeySet();
+
+    private static final ConcurrentMap<ItemEntity, Long> trackedSinceMs = new ConcurrentHashMap<>();
+    // timeout for pruning tracked entities that never went to water (milliseconds).
+// 2 minutes chosen as safe default (adjust as needed).
+    private static final long TRACKED_PRUNE_MS = 2 * 60 * 1000L;
+    private static final Random RANDOM = new Random();
 
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
@@ -94,7 +102,6 @@ public class ModItemInteractEvents {
             event.setCanceled(true);
         }
     }
-
 
     @SubscribeEvent
     public static void onUseSmithingHammer(PlayerInteractEvent.RightClickBlock event) {
@@ -287,7 +294,6 @@ public class ModItemInteractEvents {
         }
     }
 
-
     public static void releaseAnvil(ServerPlayer player, BlockPos pos) {
         UUID playerId = player.getUUID();
 
@@ -313,7 +319,6 @@ public class ModItemInteractEvents {
         syncData.putUUID("anvilOwner", new UUID(0, 0)); // special "no owner" UUID
         ModMessages.sendToAll(new MinigameSyncS2CPacket(syncData));
     }
-
 
     public static ServerPlayer getUsingPlayer(BlockPos pos) {
         // Get the server instance
@@ -515,7 +520,6 @@ public class ModItemInteractEvents {
         }
     }
 
-
     private static void handleCauldronInteraction(Level level, BlockPos pos, Player player,
                                                   ItemStack heldStack, BlockState state) {
         IntegerProperty levelProperty = LayeredCauldronBlock.LEVEL;
@@ -572,7 +576,6 @@ public class ModItemInteractEvents {
         player.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
     }
 
-
     private static void grindItem(Player player, ItemStack heldStack) {
         Item cooledItem = getGrindable(heldStack.getItem());
         if (cooledItem != null) {
@@ -625,9 +628,18 @@ public class ModItemInteractEvents {
                     || (stack.hasTag() && stack.getTag().getBoolean("Heated"));
             if (isHeatedItem) {
                 trackedEntities.add(itemEntity);
+                trackedSinceMs.put(itemEntity, System.currentTimeMillis());
             }
         }
     }
+
+    @SubscribeEvent
+    public static void onEntityPickupItem(EntityItemPickupEvent event) {
+        // remove the item entity from our tracking set when a player picks it up
+        trackedEntities.remove(event.getItem());
+        trackedSinceMs.remove(event.getItem());
+    }
+
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.LevelTickEvent event) {
@@ -636,65 +648,62 @@ public class ModItemInteractEvents {
 
         List<ItemEntity> toRemove = new ArrayList<>();
 
+        long now = System.currentTimeMillis();
+
         for (ItemEntity entity : new ArrayList<>(trackedEntities)) {
             if (!entity.isAlive()) {
                 toRemove.add(entity);
                 continue;
             }
+
+            // If the underlying ItemStack stopped being a heated metal (cooled elsewhere, transformed, etc),
+            // stop tracking it.
+            ItemStack stack = entity.getItem();
+            boolean isHeatedItem = stack.is(ModTags.Items.HEATED_METALS)
+                    || (stack.hasTag() && stack.getTag().getBoolean("Heated"));
+            if (!isHeatedItem) {
+                toRemove.add(entity);
+                continue;
+            }
+
+            // prune old tracked items that never entered water
+            Long started = trackedSinceMs.get(entity);
+
             BlockState state = event.level.getBlockState(entity.blockPosition());
-            if (state.is(Blocks.WATER) || state.is(Blocks.WATER_CAULDRON)) {
-                ItemStack stack = entity.getItem();
+            if (state.is(Blocks.WATER) || state.is(Blocks.WATER_CAULDRON) || (started != null && (now - started) > ServerConfig.HEATED_ITEM_COOLDOWN_TICKS.get() * 50L)) {
                 Item cooled = getCooledIngot(stack.getItem());
 
                 if (cooled != null && stack.getCount() > 0) {
                     // Cool only 1 item
                     CompoundTag oldTag = stack.hasTag() ? stack.getTag().copy() : null;
-                    stack.shrink(1);
-                    entity.setItem(stack); // update remaining stack
-
-                   /* // Handle cauldron water level
-                    if (state.is(Blocks.WATER_CAULDRON)) {
-                        IntegerProperty levelProperty = LayeredCauldronBlock.LEVEL;
-                        int waterLevel = state.getValue(levelProperty);
-
-                        if (waterLevel > 0) {
-                            if (waterLevel == 1) {
-                                event.level.setBlockAndUpdate(entity.blockPosition(), Blocks.CAULDRON.defaultBlockState());
-                            } else {
-                                event.level.setBlockAndUpdate(entity.blockPosition(), state.setValue(levelProperty, waterLevel - 1));
-                            }
-                            event.level.gameEvent(entity, GameEvent.BLOCK_CHANGE, entity.blockPosition());
-                        }
-                    }*/
 
                     // Spawn the cooled ingot
-                    ItemStack cooledStack = new ItemStack(cooled, 1);
+                    ItemStack cooledStack = new ItemStack(cooled, stack.getCount());
                     if (oldTag != null) {
                         oldTag.remove("HeatedSince"); // clean heat marker
                         oldTag.remove("Heated");
                         cooledStack.setTag(oldTag);
                     }
-                    ItemEntity cooledEntity = new ItemEntity(
-                            event.level, entity.getX(), entity.getY(), entity.getZ(), cooledStack
-                    );
-                    event.level.addFreshEntity(cooledEntity);
-
+                    entity.setItem(cooledStack);
                     entity.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
 
                     // Remove if stack is empty
-                    if (stack.isEmpty()) {
-                        entity.discard();
-                        toRemove.add(entity);
-                    }
+                    trackedSinceMs.remove(entity);
+
                 } else {
-                    toRemove.add(entity); // Not a valid heated item
+                    toRemove.add(entity); // Not a valid heated item -> remove
                 }
             }
+            // else: item not in water — keep it for now (but it may get pruned by age)
         }
-        trackedEntities.removeAll(toRemove);
+
+        // cleanup sets/map
+        for (ItemEntity e : toRemove) {
+            trackedEntities.remove(e);
+            trackedSinceMs.remove(e);
+        }
     }
 
-    private static final Random RANDOM = new Random();
 
     @SubscribeEvent
     public static void onFlintUsedOnStone(PlayerInteractEvent.RightClickBlock event) {

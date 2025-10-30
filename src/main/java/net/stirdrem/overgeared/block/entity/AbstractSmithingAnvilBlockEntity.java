@@ -44,6 +44,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
+    protected static final int INPUT_SLOT = 0;
+    protected static final int OUTPUT_SLOT = 10;
     protected final ItemStackHandler itemHandler = new ItemStackHandler(12) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -53,14 +55,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             }
         }
     };
-
-    protected static final int INPUT_SLOT = 0;
-    protected static final int OUTPUT_SLOT = 10;
-
-
-    protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
-
     protected final ContainerData data;
+    protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
     protected int progress = 0;
     protected int maxProgress = 0;
     protected int hitRemains;
@@ -71,8 +67,9 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     protected long sessionStartTime = 0L; // optional, for timeout logic
     protected ItemStack failedResult;
     protected Player player;
+    protected ForgingRecipe lastRecipe = null;
+    protected ItemStack lastBlueprint = ItemStack.EMPTY;
     private boolean minigameOn = false;
-
 
     public AbstractSmithingAnvilBlockEntity(AnvilTier tier, BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
         super(type, pPos, pBlockState);
@@ -101,6 +98,11 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                 return 3;
             }
         };
+    }
+
+    public static void applyForgingQuality(ItemStack stack, ForgingQuality quality) {
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.putString("ForgingQuality", quality.getDisplayName());
     }
 
     public ItemStack getRenderStack(int index) {
@@ -166,7 +168,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         tag.put("occupiedAnvils", occupiedList);
     }
 
-
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
@@ -198,12 +199,12 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         }
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
     public Player getPlayer() {
         return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public void increaseForgingProgress(Level pLevel, BlockPos pPos, BlockState pState) {
@@ -243,12 +244,12 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         ForgingQuality minimumQuality = recipe.getMinimumQuality();
         // Only set quality if recipe supports it
 
-        ForgingQuality maxIngredientQuality = ForgingQuality.POOR; // default lowest
+        ForgingQuality maxIngredientQuality = null;
         for (int i = 0; i < 9; i++) {
             ItemStack ingredient = itemHandler.getStackInSlot(i);
             if (ingredient.hasTag() && ingredient.getTag().contains("ForgingQuality")) {
                 ForgingQuality q = ForgingQuality.fromString(ingredient.getTag().getString("ForgingQuality"));
-                if (q != null && q.ordinal() > maxIngredientQuality.ordinal()) {
+                if (q != null && (maxIngredientQuality == null || q.ordinal() > maxIngredientQuality.ordinal())) {
                     maxIngredientQuality = q;
                 }
             }
@@ -265,7 +266,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                             quality = minimumQuality;
                         }
 
-                        if (quality.ordinal() > maxIngredientQuality.ordinal() && ServerConfig.INGREDIENTS_DEFINE_MAX_QUALITY.get()) {
+                        if (maxIngredientQuality != null && quality.ordinal() > maxIngredientQuality.ordinal() && ServerConfig.INGREDIENTS_DEFINE_MAX_QUALITY.get()) {
                             quality = maxIngredientQuality;
                         }
 
@@ -357,7 +358,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         return ItemStack.isSameItem(result, failedResult);
     }
 
-
     public boolean hasRecipe() {
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
         if (recipeOptional.isEmpty()) return false;
@@ -374,7 +374,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         return canInsertItemIntoOutputSlot(resultStack)
                 && canInsertAmountIntoOutputSlot(resultStack.getCount());
     }
-
 
     protected boolean hasEnoughIngredients(ForgingRecipe recipe) {
         NonNullList<Ingredient> ingredients = recipe.getIngredients();
@@ -425,11 +424,9 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         return (existing.isEmpty() || ItemStack.isSameItemSameTags(existing, stackToInsert));
     }
 
-
     protected boolean canInsertAmountIntoOutputSlot(int count) {
         return this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.itemHandler.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();
     }
-
 
     public boolean hasProgressFinished() {
         return progress >= maxProgress;
@@ -439,7 +436,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         progress++;
     }
 
-
     public boolean isBusy(long currentGameTime) {
         return currentGameTime < busyUntilGameTime;
     }
@@ -448,11 +444,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         this.busyUntilGameTime = time;
         setChanged(level, worldPosition, getBlockState());
     }
-
-
-    protected ForgingRecipe lastRecipe = null;
-
-    protected ItemStack lastBlueprint = ItemStack.EMPTY;
 
     public void tick(Level lvl, BlockPos pos, BlockState st) {
         if (!pos.equals(this.worldPosition)) return; // sanity check
@@ -513,7 +504,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         }
     }
 
-
     public int getHitsRemaining() {
         return hitRemains;
     }
@@ -528,11 +518,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         CompoundTag tag = super.getUpdateTag();
         tag.put("inventory", itemHandler.serializeNBT());
         return tag;
-    }
-
-    public static void applyForgingQuality(ItemStack stack, ForgingQuality quality) {
-        CompoundTag tag = stack.getOrCreateTag();
-        tag.putString("ForgingQuality", quality.getDisplayName());
     }
 
     protected boolean matchesRecipeExactly(ForgingRecipe recipe) {
@@ -648,12 +633,12 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         return ownerUUID;
     }
 
+    public boolean isMinigameOn() {
+        return minigameOn;
+    }
+
     public void setMinigameOn(boolean value) {
         this.minigameOn = value;
         setChanged(); // mark dirty for save
-    }
-
-    public boolean isMinigameOn() {
-        return minigameOn;
     }
 }

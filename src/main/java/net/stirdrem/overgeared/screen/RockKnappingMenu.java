@@ -28,16 +28,6 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     private boolean rockConsumed = false; // Track if rock has been consumed
 
 
-    public boolean isResultCollected() {
-        return resultCollected;
-    }
-
-    // Call this when result is taken
-    public void markResultCollected() {
-        this.resultCollected = true;
-        //clearGrid(); // Optional: clear grid when result is taken
-    }
-
     public RockKnappingMenu(int id, Inventory playerInv, FriendlyByteBuf extraData) {
         this(id, playerInv, playerInv.player.level().getRecipeManager(),
                 playerInv.player.getMainHandItem(), playerInv.player.getOffhandItem()); // Use held item by default
@@ -98,6 +88,16 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         // Add player inventory slots
         addPlayerHotbar(playerInv);
         addPlayerInventory(playerInv);
+    }
+
+    public boolean isResultCollected() {
+        return resultCollected;
+    }
+
+    // Call this when result is taken
+    public void markResultCollected() {
+        this.resultCollected = true;
+        //clearGrid(); // Optional: clear grid when result is taken
     }
 
     private void addPlayerInventory(Inventory playerInv) {
@@ -286,7 +286,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         }
 
         // Optionally: clear the grid
-        this.markResultCollected();
+        //this.markResultCollected();
     }
 
 }

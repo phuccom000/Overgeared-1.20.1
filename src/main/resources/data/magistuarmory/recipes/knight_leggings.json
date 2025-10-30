@@ -13,13 +13,16 @@
         "hammering": 5,
         "has_quality": true,
         "pattern": [
-          "ppp",
+          "apa",
           "p p",
-          "p p"
+          "a a"
         ],
         "key": {
           "p": {
             "item": "overgeared:steel_plate"
+          },
+          "a": {
+            "item": "overgeared:steel_ingot"
           }
         },
         "result": {

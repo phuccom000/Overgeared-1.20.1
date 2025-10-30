@@ -22,6 +22,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ForgingRecipe implements Recipe<Container> {
+    private static int BLUEPRINT_SLOT = 11;
+    public final int width;
+    public final int height;
     private final ResourceLocation id;
     private final String group;
     private final Set<String> blueprintTypes;
@@ -37,9 +40,6 @@ public class ForgingRecipe implements Recipe<Container> {
     private final boolean needQuenching;
     private final boolean showNotification;
     private final ForgingQuality minimumQuality;
-    public final int width;
-    public final int height;
-    private static int BLUEPRINT_SLOT = 11;
 
     public ForgingRecipe(ResourceLocation id, String group, boolean requireBlueprint, Set<String> blueprintTypes, String tier, NonNullList<Ingredient> ingredients,
                          ItemStack result, ItemStack failedResult, int hammering, boolean hasQuality, boolean needsMinigame, boolean hasPolishing, boolean needQuenching, boolean showNotification, ForgingQuality minimumQuality, int width, int height) {
@@ -62,6 +62,13 @@ public class ForgingRecipe implements Recipe<Container> {
         this.height = height;
     }
 
+    public static Optional<ForgingRecipe> findBestMatch(Level world, Container inv) {
+        return world.getRecipeManager().getAllRecipesFor(ModRecipeTypes.FORGING.get())
+                .stream()
+                .filter(recipe -> recipe.matches(inv, world))
+                .max(Comparator.comparingInt(ForgingRecipe::getRecipeSize));
+    }
+
     private boolean checkBlueprint(Container inv) {
         ItemStack blueprintStack = inv.getItem(BLUEPRINT_SLOT);
 
@@ -79,7 +86,6 @@ public class ForgingRecipe implements Recipe<Container> {
         String toolType = nbt.getString("ToolType");
         return blueprintTypes.contains(toolType);
     }
-
 
     @Override
     public boolean matches(Container inv, Level world) {
@@ -207,7 +213,6 @@ public class ForgingRecipe implements Recipe<Container> {
         return Objects.hash(getId());
     }
 
-
     public int getHammeringRequired() {
         return hammering;
     }
@@ -258,6 +263,10 @@ public class ForgingRecipe implements Recipe<Container> {
         return needQuenching;
     }
 
+    private int getRecipeSize() {
+        return width * height;
+    }
+
     public static class Type implements RecipeType<ForgingRecipe> {
         public static final Type INSTANCE = new Type();
         public static final String ID = "forging";
@@ -266,6 +275,38 @@ public class ForgingRecipe implements Recipe<Container> {
     public static class Serializer implements RecipeSerializer<ForgingRecipe> {
         public static final Serializer INSTANCE = new Serializer();
         public static final ResourceLocation ID = ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "forging");
+
+        private static Map<Character, Ingredient> parseKey(JsonObject keyJson) {
+            Map<Character, Ingredient> keyMap = new HashMap<>();
+            for (Map.Entry<String, JsonElement> entry : keyJson.entrySet()) {
+                if (entry.getKey().length() != 1) {
+                    throw new JsonSyntaxException("Invalid key entry: '" + entry.getKey() + "' is not a single character");
+                }
+                keyMap.put(entry.getKey().charAt(0), Ingredient.fromJson(entry.getValue()));
+            }
+            return keyMap;
+        }
+
+        private static NonNullList<Ingredient> dissolvePattern(JsonArray pattern, Map<Character, Ingredient> keys, int width, int height) {
+            NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
+            for (int y = 0; y < height; y++) {
+                String row = GsonHelper.convertToString(pattern.get(y), "pattern[" + y + "]");
+                if (row.length() != width) {
+                    throw new JsonSyntaxException("Pattern row width mismatch");
+                }
+                for (int x = 0; x < width; x++) {
+                    char c = row.charAt(x);
+                    Ingredient ingredient = keys.getOrDefault(c, c == ' ' ? Ingredient.EMPTY : null);
+
+                    if (ingredient == null) {
+                        throw new JsonSyntaxException("Pattern references undefined symbol: '" + c + "'");
+                    }
+
+                    ingredients.set(y * width + x, ingredient);
+                }
+            }
+            return ingredients;
+        }
 
         @Override
         public ForgingRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
@@ -312,39 +353,6 @@ public class ForgingRecipe implements Recipe<Container> {
             return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult,
                     hammering, hasQuality, needsMinigame, hasPolishing, needQuenching, showNotification, minimumQuality, width, height);
         }
-
-        private static Map<Character, Ingredient> parseKey(JsonObject keyJson) {
-            Map<Character, Ingredient> keyMap = new HashMap<>();
-            for (Map.Entry<String, JsonElement> entry : keyJson.entrySet()) {
-                if (entry.getKey().length() != 1) {
-                    throw new JsonSyntaxException("Invalid key entry: '" + entry.getKey() + "' is not a single character");
-                }
-                keyMap.put(entry.getKey().charAt(0), Ingredient.fromJson(entry.getValue()));
-            }
-            return keyMap;
-        }
-
-        private static NonNullList<Ingredient> dissolvePattern(JsonArray pattern, Map<Character, Ingredient> keys, int width, int height) {
-            NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
-            for (int y = 0; y < height; y++) {
-                String row = GsonHelper.convertToString(pattern.get(y), "pattern[" + y + "]");
-                if (row.length() != width) {
-                    throw new JsonSyntaxException("Pattern row width mismatch");
-                }
-                for (int x = 0; x < width; x++) {
-                    char c = row.charAt(x);
-                    Ingredient ingredient = keys.getOrDefault(c, c == ' ' ? Ingredient.EMPTY : null);
-
-                    if (ingredient == null) {
-                        throw new JsonSyntaxException("Pattern references undefined symbol: '" + c + "'");
-                    }
-
-                    ingredients.set(y * width + x, ingredient);
-                }
-            }
-            return ingredients;
-        }
-
 
         @Override
         public ForgingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
@@ -402,52 +410,5 @@ public class ForgingRecipe implements Recipe<Container> {
             buffer.writeItem(recipe.failedResult);
         }
     }
-
-    public static Optional<ForgingRecipe> findBestMatch(Level world, Container inv) {
-        return world.getRecipeManager().getAllRecipesFor(ModRecipeTypes.FORGING.get())
-                .stream()
-                .filter(recipe -> recipe.matches(inv, world))
-                .max(Comparator.comparingInt(ForgingRecipe::getRecipeSize));
-    }
-
-    private int getRecipeSize() {
-        return width * height;
-    }
-
-    /*public record Ingredients(String group, List<String> pattern, Map<String, Ingredient> recipe, ItemStack result) {
-        private static final Function<String, DataResult<String>> VERIFY_LENGTH_1 =
-                s -> s.length() == 1 ? DataResult.success(s) : DataResult.error(() -> "Key must be a single character!");
-
-        private static final Function<String, DataResult<String>> VERIFY_LENGTH_2 =
-                s -> s.length() == 2 ? DataResult.success(s) : DataResult.error(() -> "Key row length must be of 2!");
-
-        private static final Function<List<String>, DataResult<List<String>>> VERIFY_SIZE = l -> {
-            if (l.size() <= 4 && l.size() >= 1) {
-                List<String> temp = new ArrayList<>(l);
-                Collections.reverse(temp); //reverse so the first row is at the bottom in the json.
-                return DataResult.success(ImmutableList.copyOf(temp));
-            }
-            return DataResult.error(() -> "Pattern must have between 1 and 4 rows of keys");
-        };
-
-        public static final Codec<Ingredient> INGREDIENT_CODEC = Codec.PASSTHROUGH.comapFlatMap(obj -> {
-            JsonElement json = obj.convert(JsonOps.INSTANCE).getValue();
-            try {
-                return DataResult.success(Ingredient.fromJson(json));
-            } catch (Exception e) {
-                return DataResult.error(() -> "Failed to parse ingredient: " + e.getMessage());
-            }
-        }, ingredient -> new Dynamic<>(JsonOps.INSTANCE, ingredient.toJson()));
-
-        public static final Codec<Ingredients> CODEC = RecordCodecBuilder.create(inst ->
-                inst.group(
-                        Codec.STRING.fieldOf("group").forGetter(Ingredients::group),
-                        Codec.STRING.flatXmap(VERIFY_LENGTH_2, VERIFY_LENGTH_2).listOf().flatXmap(VERIFY_SIZE, VERIFY_SIZE).fieldOf("pattern").forGetter(Ingredients::pattern),
-                        Codec.unboundedMap(Codec.STRING.flatXmap(VERIFY_LENGTH_1, VERIFY_LENGTH_1), INGREDIENT_CODEC).fieldOf("key").forGetter(Ingredients::recipe),
-                        ItemStack.CODEC.fieldOf("result").forGetter(Ingredients::result)
-                ).apply(inst, Ingredients::new)
-        );
-    }
-*/
 
 }
