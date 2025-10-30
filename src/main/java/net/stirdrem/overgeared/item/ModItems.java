@@ -9,18 +9,12 @@ import net.minecraft.world.item.*;
 //import net.minecraftforge.registries.ForgeRegistries;
 //import net.minecraftforge.registries.DeferredItem;
 
-import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.entity.ArrowTier;
-import net.stirdrem.overgeared.item.armor.CopperHelmet;
-import net.stirdrem.overgeared.item.armor.CopperLeggings;
 import net.stirdrem.overgeared.item.custom.*;
-
-import java.util.function.Supplier;
 
 public class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(OvergearedMod.MOD_ID);
@@ -213,19 +207,19 @@ public class ModItems {
 
     public static final DeferredItem<Item> STEEL_HELMET = ITEMS.register("steel_helmet",
             () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.HELMET,
-                    new Item.Properties()));
+                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(13))));
 
     public static final DeferredItem<Item> STEEL_CHESTPLATE = ITEMS.register("steel_chestplate",
             () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.CHESTPLATE,
-                    new Item.Properties()));
+                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(16))));
 
     public static final DeferredItem<Item> STEEL_LEGGINGS = ITEMS.register("steel_leggings",
             () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.LEGGINGS,
-                    new Item.Properties()));
+                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(15))));
 
     public static final DeferredItem<Item> STEEL_BOOTS = ITEMS.register("steel_boots",
             () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.BOOTS,
-                    new Item.Properties()));
+                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(11))));
 
     // === TOOLS (COPPER) ===
     public static final DeferredItem<Item> COPPER_SWORD = ITEMS.register("copper_sword",
@@ -256,21 +250,19 @@ public class ModItems {
     // === ARMOR (COPPER) ===
     public static final DeferredItem<Item> COPPER_HELMET = ITEMS.register("copper_helmet",
             () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.HELMET,
-                    new Item.Properties()));
-
-
+                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(13))));
 
     public static final DeferredItem<Item> COPPER_CHESTPLATE = ITEMS.register("copper_chestplate",
             () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.CHESTPLATE,
-                    new Item.Properties()));
+                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(16))));
 
     public static final DeferredItem<Item> COPPER_LEGGINGS = ITEMS.register("copper_leggings",
             () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.LEGGINGS,
-                    new Item.Properties()));
+                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(15))));
 
     public static final DeferredItem<Item> COPPER_BOOTS = ITEMS.register("copper_boots",
             () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.BOOTS,
-                    new Item.Properties()));
+                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(11))));
 
 //    public static final DeferredItem<Item> STEEL_AXE = ITEMS.register("steel_axe",
 //            () -> new AxeItem(ModToolTiers.STEEL, 5, -3f, new Item.Properties()));
