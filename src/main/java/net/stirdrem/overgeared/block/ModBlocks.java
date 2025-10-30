@@ -29,10 +29,6 @@ public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(OvergearedMod.MOD_ID);
 
-    public static final DeferredBlock<Block> BISMUTH_BLOCK = registerBlock("bismuth_block",
-            () -> new Block(BlockBehaviour.Properties.of()
-                    .strength(4f).requiresCorrectToolForDrops().sound(SoundType.AMETHYST)));
-
     public static final DeferredBlock<Block> SMITHING_ANVIL = registerBlock("smithing_anvil",
             () -> new SteelSmithingAnvil(AnvilTier.IRON, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
     public static final DeferredBlock<Block> TIER_A_SMITHING_ANVIL = registerBlock("tier_a_smithing_anvil",
