@@ -20,7 +20,7 @@ public class ModTags {
         public static final TagKey<Block> GRINDSTONES = tag("grindstones");
 
         private static TagKey<Block> tag(String name) {
-            return BlockTags.create(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, name));
+            return BlockTags.create(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, name));
         }
     }
 
@@ -36,7 +36,7 @@ public class ModTags {
 
 
         private static TagKey<Item> tag(String name) {
-            return ItemTags.create(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, name));
+            return ItemTags.create(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, name));
         }
 
 
