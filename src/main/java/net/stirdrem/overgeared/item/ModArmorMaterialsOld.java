@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
+@Deprecated
 public enum ModArmorMaterialsOld implements Holder<ArmorMaterial> {
 
 
