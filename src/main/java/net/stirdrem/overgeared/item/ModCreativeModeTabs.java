@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.item;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -9,20 +10,21 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.config.ServerConfig;
 
+import java.util.function.Supplier;
+
 public class ModCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, OvergearedMod.MOD_ID);
 
-    public static final RegistryObject<CreativeModeTab> OVERGEARED_TAB = CREATIVE_MODE_TABS.register("overgeared_tab",
+    public static final Supplier<CreativeModeTab> OVERGEARED_TAB = CREATIVE_MODE_TABS.register("overgeared_tab",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.IRON_TONGS.get()))
                     .title(Component.translatable("creativetab.overgeared_tab"))
                     .displayItems((pParameters, pOutput) -> {
@@ -135,7 +137,8 @@ public class ModCreativeModeTabs {
 
                     })
                     .build());
-    public static final RegistryObject<CreativeModeTab> LINGERING_ARROWS_TAB =
+
+    public static final Supplier<CreativeModeTab> LINGERING_ARROWS_TAB =
             CREATIVE_MODE_TABS.register("lingering_arrows_tab",
                     () -> CreativeModeTab.builder()
                             .icon(() -> new ItemStack(Blocks.FLETCHING_TABLE))
@@ -149,27 +152,36 @@ public class ModCreativeModeTabs {
                                 output.accept(ModItems.STEEL_UPGRADE_ARROW.get());
                                 output.accept(ModItems.DIAMOND_UPGRADE_ARROW.get());
 
-                                for (Potion potion : ForgeRegistries.POTIONS) {
-                                    if (potion == Potions.EMPTY) continue;
+//                                for (Potion potion : BuiltInRegistries.POTION) {
+//                                    if (potion.getEffects().isEmpty()) continue;  // Skips all no-effect potions (universal check)
+//
+//                                    ItemStack arrow = new ItemStack(Items.TIPPED_ARROW);
+//                                    arrow.set(DataComponents.POTION_CONTENTS, new PotionContents((Holder<Potion>)  potion)); /*what is this ???*/
+//
+//                                    output.accept(arrow);
+//                                }
 
+                                for (Potion potion : BuiltInRegistries.POTION) {
+                                    if (potion.getEffects().isEmpty()) continue;
+    // ~ need fix change getOrCreateTag to new method (idk)
                                     ItemStack arrow = new ItemStack(Items.TIPPED_ARROW);
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    arrow.getOrCreateTag().putString("Potion", BuiltInRegistries.POTION.getKey(potion).toString());
                                     output.accept(arrow);
                                 }
 
-                                for (Potion potion : ForgeRegistries.POTIONS) {
+                                for (Potion potion : BuiltInRegistries.POTION) {
                                     if (potion == Potions.EMPTY) continue;
 
                                     ItemStack arrow = new ItemStack(ModItems.LINGERING_ARROW.get());
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    arrow.getOrCreateTag().putString("Potion", BuiltInRegistries.POTION.getKey(potion).toString());
                                     output.accept(arrow);
                                 }
 
-                                for (Potion potion : ForgeRegistries.POTIONS) {
+                                for (Potion potion : BuiltInRegistries.POTION) {
                                     if (potion == Potions.EMPTY) continue;
 
                                     ItemStack iron = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                                    iron.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    iron.getOrCreateTag().putString("Potion", BuiltInRegistries.POTION.getKey(potion).toString());
                                     output.accept(iron);
 
                                     ItemStack ironLingering = iron.copy();
@@ -177,11 +189,11 @@ public class ModCreativeModeTabs {
                                     output.accept(ironLingering);
                                 }
 
-                                for (Potion potion : ForgeRegistries.POTIONS) {
+                                for (Potion potion : BuiltInRegistries.POTION) {
                                     if (potion == Potions.EMPTY) continue;
 
                                     ItemStack steel = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                                    steel.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    steel.getOrCreateTag().putString("Potion", BuiltInRegistries.POTION.getKey(potion).toString());
                                     output.accept(steel);
 
                                     ItemStack steelLingering = steel.copy();
@@ -189,11 +201,11 @@ public class ModCreativeModeTabs {
                                     output.accept(steelLingering);
                                 }
 
-                                for (Potion potion : ForgeRegistries.POTIONS) {
+                                for (Potion potion : BuiltInRegistries.POTION) {
                                     if (potion == Potions.EMPTY) continue;
 
                                     ItemStack diamond = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                                    diamond.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    diamond.getOrCreateTag().putString("Potion", BuiltInRegistries.POTION.getKey(potion).toString());
                                     output.accept(diamond);
 
                                     ItemStack diamondLingering = diamond.copy();
@@ -203,7 +215,7 @@ public class ModCreativeModeTabs {
                             })
                             .build());
 
-    public static final RegistryObject<CreativeModeTab> BLUEPRINT_TAB = CREATIVE_MODE_TABS.register("blueprint_tab",
+    public static final Supplier<CreativeModeTab> BLUEPRINT_TAB = CREATIVE_MODE_TABS.register("blueprint_tab",
             () -> CreativeModeTab.builder()
                     .icon(() -> new ItemStack(ModItems.BLUEPRINT.get()))
                     .title(Component.translatable("creativetab.overgeared.blueprint_tab"))
@@ -219,7 +231,7 @@ public class ModCreativeModeTabs {
                                 tag.putString("Quality", quality.name());
                                 tag.putInt("Uses", 0);
                                 tag.putInt("UsesToLevel", quality.getUse());
-
+// ~ setTag(tag); cant  resolve need change
                                 blueprint.setTag(tag);
                                 output.accept(blueprint);
                             }
