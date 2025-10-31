@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared.loot;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.CompoundTag;
@@ -9,20 +10,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraftforge.common.loot.IGlobalLootModifier;
-import net.minecraftforge.common.loot.LootModifier;
+
+import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
+import net.neoforged.neoforge.common.loot.LootModifier;
 import net.stirdrem.overgeared.ForgingQuality;
+import net.stirdrem.overgeared.compoment.ForgingQualityComponents;
+import net.stirdrem.overgeared.compoment.ForgingQualityValue;
 import net.stirdrem.overgeared.config.ServerConfig;
 import org.jetbrains.annotations.NotNull;
 
 public class QualityLootModifier extends LootModifier {
-    public static final Codec<QualityLootModifier> CODEC = RecordCodecBuilder.create(inst ->
-            codecStart(inst).apply(inst, QualityLootModifier::new));
+    public static final MapCodec<QualityLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst -> codecStart(inst).apply(inst, QualityLootModifier::new));
 
     public QualityLootModifier(LootItemCondition[] conditionsIn) {
         super(conditionsIn);
     }
-
+    // ~ IDK what i'm doing
     @NotNull
     @Override
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
@@ -46,7 +49,7 @@ public class QualityLootModifier extends LootModifier {
             // no qualities enabled -> default behavior: force "Poor"
             for (ItemStack stack : generatedLoot) {
                 if (stack.getItem() instanceof TieredItem || stack.getItem() instanceof ArmorItem) {
-                    stack.getOrCreateTag().putString("ForgingQuality", ForgingQuality.POOR.getDisplayName());
+                    ForgingQualityComponents.applyPoorQuality(stack); // Use helper for consistency
                 }
             }
             return generatedLoot;
@@ -79,7 +82,9 @@ public class QualityLootModifier extends LootModifier {
                         }
                     }
                 }
-                stack.getOrCreateTag().putString("ForgingQuality", chosen.getDisplayName());
+                stack.set(ForgingQualityComponents.FORGING_QUALITY.get(),
+                        new ForgingQualityComponents.ForgingQualityValue(chosen.getDisplayName()));
+
             }
         }
 
@@ -87,7 +92,7 @@ public class QualityLootModifier extends LootModifier {
     }
 
     @Override
-    public Codec<? extends LootModifier> codec() {
+    public MapCodec<? extends IGlobalLootModifier> codec() {
         return CODEC;
     }
 }
