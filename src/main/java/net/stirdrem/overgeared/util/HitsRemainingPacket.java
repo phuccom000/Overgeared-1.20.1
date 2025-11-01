@@ -1,30 +1,21 @@
 package net.stirdrem.overgeared.util;
 
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
 
-import java.util.function.Supplier;
+public record HitsRemainingPacket(int hitsRemaining) implements CustomPacketPayload {
+    public static final Type<HitsRemainingPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath("overgeared", "hits_remaining"));
 
-public class HitsRemainingPacket {
-    private final int hitsRemaining;
-
-    public HitsRemainingPacket(int hitsRemaining) {
-        this.hitsRemaining = hitsRemaining;
-    }
-
-    public static void encode(HitsRemainingPacket msg, FriendlyByteBuf buf) {
-        buf.writeInt(msg.hitsRemaining);
-    }
-
-    public static HitsRemainingPacket decode(FriendlyByteBuf buf) {
-        return new HitsRemainingPacket(buf.readInt());
-    }
-
-    public static void handle(HitsRemainingPacket msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            // Update client-side data here
-        });
-        ctx.get().setPacketHandled(true);
+    public static final StreamCodec<FriendlyByteBuf, HitsRemainingPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
+            HitsRemainingPacket::hitsRemaining,
+            HitsRemainingPacket::new
+    );
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }
-
