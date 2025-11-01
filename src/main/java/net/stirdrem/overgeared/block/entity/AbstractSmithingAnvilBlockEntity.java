@@ -101,8 +101,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     }
 
     public static void applyForgingQuality(ItemStack stack, ForgingQuality quality) {
-        CompoundTag tag = stack.getOrCreateTag();
-        tag.putString("ForgingQuality", quality.getDisplayName());
+        stack.set(OvergearedMod.FORGING_QUALITY.get(), quality);
     }
 
     public ItemStack getRenderStack(int index) {
