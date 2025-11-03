@@ -1,0 +1,15 @@
+{
+  "type": "overgeared:cast_blasting",
+  "category": "misc",
+  "cookingtime": 75,
+  "experience": 0.5,
+  "group": "misc",
+  "input": {
+    "copper": 9
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:copper_shovel_head"
+  },
+  "tool_type": "SHOVEL"
+}

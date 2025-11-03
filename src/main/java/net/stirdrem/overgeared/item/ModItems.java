@@ -35,6 +35,13 @@ public class ModItems {
     public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register("steel_ingot",
             () -> new Item(new Item.Properties()));
 
+    public static final RegistryObject<Item> UNFIRED_TOOL_CAST = ITEMS.register("unfired_tool_cast",
+            () -> new ToolCastItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> FIRED_TOOL_CAST = ITEMS.register("fired_tool_cast",
+            () -> new ToolCastItem(() -> ServerConfig.FIRED_CAST_DURABILITY.get(),
+                    new Item.Properties().stacksTo(1)));
+
     public static final RegistryObject<Item> STEEL_NUGGET = ITEMS.register("steel_nugget",
             () -> new Item(new Item.Properties()));
 

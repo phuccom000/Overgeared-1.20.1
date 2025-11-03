@@ -111,6 +111,53 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         super(pOutput);
     }
 
+    protected static void oreSmelting(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTIme, @Nullable String pGroup) {
+        oreCooking(pFinishedRecipeConsumer, RecipeSerializer.SMELTING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTIme, pGroup, "_from_smelting");
+    }
+
+    /*protected static void oreSmelting(Consumer<FinishedRecipe> consumer, List<ItemLike> ingredients, @Nullable CompoundTag nbt,
+                                      RecipeCategory category, ItemLike result, float experience,
+                                      int cookingTime, String group) {
+        oreCooking(consumer, RecipeSerializer.SMELTING_RECIPE, ingredients, category, result, nbt, experience, cookingTime, group, "_from_smelting");
+
+    }
+
+    protected static void oreBlasting(Consumer<FinishedRecipe> consumer, List<ItemLike> ingredients, @Nullable CompoundTag nbt,
+                                      RecipeCategory category, ItemLike result, float experience,
+                                      int cookingTime, String group) {
+        oreCooking(consumer, RecipeSerializer.BLASTING_RECIPE, ingredients, category, result, nbt, experience, cookingTime, group, "_from_blasting");
+    }
+
+
+    protected static void oreCooking(Consumer<FinishedRecipe> consumer, RecipeSerializer<? extends AbstractCookingRecipe> serializer,
+                                     List<ItemLike> ingredients, RecipeCategory category, ItemLike result,
+                                     @Nullable CompoundTag resultNbt, float experience, int cookingTime,
+                                     String group, String recipeName) {
+        for (ItemLike itemlike : ingredients) {
+            CustomCookingRecipeBuilder.generic(Ingredient.of(itemlike), category, resultNbt, result,
+                            experience, cookingTime, serializer)
+                    .group(group).unlockedBy(getHasName(itemlike), has(itemlike))
+                    .save(consumer, OvergearedMod.MOD_ID + ":" + getItemName(result) + recipeName + "_" + getItemName(itemlike));
+        }
+    }*/
+
+    protected static void oreCampfire(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, @Nullable String pGroup) {
+        oreCooking(pFinishedRecipeConsumer, RecipeSerializer.CAMPFIRE_COOKING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_campfire");
+    }
+
+    protected static void oreBlasting(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup) {
+        oreCooking(pFinishedRecipeConsumer, RecipeSerializer.BLASTING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_blasting");
+    }
+
+    protected static void oreCooking(Consumer<FinishedRecipe> pFinishedRecipeConsumer, RecipeSerializer<? extends AbstractCookingRecipe> pCookingSerializer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, @Nullable String pGroup, String pRecipeName) {
+        for (ItemLike itemlike : pIngredients) {
+            SimpleCookingRecipeBuilder.generic(Ingredient.of(itemlike), pCategory, pResult,
+                            pExperience, pCookingTime, pCookingSerializer)
+                    .group(pGroup).unlockedBy(getHasName(itemlike), has(itemlike))
+                    .save(pFinishedRecipeConsumer, OvergearedMod.MOD_ID + ":" + getItemName(pResult) + pRecipeName + "_" + getItemName(itemlike));
+        }
+    }
+
     @Override
     protected void buildRecipes(Consumer<FinishedRecipe> pWriter) {
         CompoundTag nbtTag = new CompoundTag();
@@ -994,53 +1041,227 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 )
                 .unlockedBy("has_arrow", has(Items.ARROW))  // Add this unlock condition
                 .save(pWriter);
+
+        // ===== CAST SMELTING =====
+
+// COPPER
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.COPPER_SWORD_BLADE.get(), 0.5F, 150)
+                .toolType("SWORD").material("copper", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_sword_blade"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.COPPER_PICKAXE_HEAD.get(), 0.5F, 150)
+                .toolType("PICKAXE").material("copper", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_pickaxe_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.COPPER_AXE_HEAD.get(), 0.5F, 150)
+                .toolType("AXE").material("copper", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_axe_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.COPPER_SHOVEL_HEAD.get(), 0.5F, 150)
+                .toolType("SHOVEL").material("copper", 9).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_shovel_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.COPPER_HOE_HEAD.get(), 0.5F, 150)
+                .toolType("HOE").material("copper", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_hoe_head"));
+
+// IRON
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.IRON_SWORD_BLADE.get(), 0.7F, 150)
+                .toolType("SWORD").material("iron", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_sword_blade"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.IRON_PICKAXE_HEAD.get(), 0.7F, 150)
+                .toolType("PICKAXE").material("iron", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_pickaxe_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.IRON_AXE_HEAD.get(), 0.7F, 150)
+                .toolType("AXE").material("iron", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_axe_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.IRON_SHOVEL_HEAD.get(), 0.7F, 150)
+                .toolType("SHOVEL").material("iron", 9).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_shovel_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.IRON_HOE_HEAD.get(), 0.7F, 150)
+                .toolType("HOE").material("iron", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_hoe_head"));
+
+// GOLDEN
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.GOLDEN_SWORD_BLADE.get(), 1.0F, 150)
+                .toolType("SWORD").material("golden", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_sword_blade"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.GOLDEN_PICKAXE_HEAD.get(), 1.0F, 150)
+                .toolType("PICKAXE").material("golden", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_pickaxe_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.GOLDEN_AXE_HEAD.get(), 1.0F, 150)
+                .toolType("AXE").material("golden", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_axe_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.GOLDEN_SHOVEL_HEAD.get(), 1.0F, 150)
+                .toolType("SHOVEL").material("golden", 9).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_shovel_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.GOLDEN_HOE_HEAD.get(), 1.0F, 150)
+                .toolType("HOE").material("golden", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_hoe_head"));
+
+// STEEL
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.STEEL_SWORD_BLADE.get(), 0.9F, 150)
+                .toolType("SWORD").material("steel", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_sword_blade"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.STEEL_PICKAXE_HEAD.get(), 0.9F, 150)
+                .toolType("PICKAXE").material("steel", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_pickaxe_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.STEEL_AXE_HEAD.get(), 0.9F, 150)
+                .toolType("AXE").material("steel", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_axe_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.STEEL_SHOVEL_HEAD.get(), 0.9F, 150)
+                .toolType("SHOVEL").material("steel", 9).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_shovel_head"));
+
+        ToolCastSmeltingRecipeBuilder.cast(ModItems.STEEL_HOE_HEAD.get(), 0.9F, 150)
+                .toolType("HOE").material("steel", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_hoe_head"));
+
+
+// ===== CAST BLASTING =====
+
+// COPPER
+        ToolCastBlastingRecipeBuilder.cast(ModItems.COPPER_SWORD_BLADE.get(), 0.5F, 75)
+                .toolType("SWORD").material("copper", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_sword_blade"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.COPPER_PICKAXE_HEAD.get(), 0.5F, 75)
+                .toolType("PICKAXE").material("copper", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_pickaxe_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.COPPER_AXE_HEAD.get(), 0.5F, 75)
+                .toolType("AXE").material("copper", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_axe_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.COPPER_SHOVEL_HEAD.get(), 0.5F, 75)
+                .toolType("SHOVEL").material("copper", 9).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_shovel_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.COPPER_HOE_HEAD.get(), 0.5F, 75)
+                .toolType("HOE").material("copper", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("copper_hoe_head"));
+
+
+// IRON
+        ToolCastBlastingRecipeBuilder.cast(ModItems.IRON_SWORD_BLADE.get(), 0.7F, 75)
+                .toolType("SWORD").material("iron", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_sword_blade"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.IRON_PICKAXE_HEAD.get(), 0.7F, 75)
+                .toolType("PICKAXE").material("iron", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_pickaxe_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.IRON_AXE_HEAD.get(), 0.7F, 75)
+                .toolType("AXE").material("iron", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_axe_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.IRON_SHOVEL_HEAD.get(), 0.7F, 75)
+                .toolType("SHOVEL").material("iron", 9).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_shovel_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.IRON_HOE_HEAD.get(), 0.7F, 75)
+                .toolType("HOE").material("iron", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("iron_hoe_head"));
+
+
+// GOLDEN
+        ToolCastBlastingRecipeBuilder.cast(ModItems.GOLDEN_SWORD_BLADE.get(), 1.0F, 75)
+                .toolType("SWORD").material("golden", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_sword_blade"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.GOLDEN_PICKAXE_HEAD.get(), 1.0F, 75)
+                .toolType("PICKAXE").material("golden", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_pickaxe_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.GOLDEN_AXE_HEAD.get(), 1.0F, 75)
+                .toolType("AXE").material("golden", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_axe_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.GOLDEN_SHOVEL_HEAD.get(), 1.0F, 75)
+                .toolType("SHOVEL").material("golden", 9).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_shovel_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.GOLDEN_HOE_HEAD.get(), 1.0F, 75)
+                .toolType("HOE").material("golden", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("golden_hoe_head"));
+
+
+// STEEL
+        ToolCastBlastingRecipeBuilder.cast(ModItems.STEEL_SWORD_BLADE.get(), 0.9F, 75)
+                .toolType("SWORD").material("steel", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_sword_blade"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.STEEL_PICKAXE_HEAD.get(), 0.9F, 75)
+                .toolType("PICKAXE").material("steel", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_pickaxe_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.STEEL_AXE_HEAD.get(), 0.9F, 75)
+                .toolType("AXE").material("steel", 27).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_axe_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.STEEL_SHOVEL_HEAD.get(), 0.9F, 75)
+                .toolType("SHOVEL").material("steel", 9).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_shovel_head"));
+
+        ToolCastBlastingRecipeBuilder.cast(ModItems.STEEL_HOE_HEAD.get(), 0.9F, 75)
+                .toolType("HOE").material("steel", 18).needsPolishing(true)
+                .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
+                .save(pWriter, rl("steel_hoe_head"));
+
     }
 
-    /*protected static void oreSmelting(Consumer<FinishedRecipe> consumer, List<ItemLike> ingredients, @Nullable CompoundTag nbt,
-                                      RecipeCategory category, ItemLike result, float experience,
-                                      int cookingTime, String group) {
-        oreCooking(consumer, RecipeSerializer.SMELTING_RECIPE, ingredients, category, result, nbt, experience, cookingTime, group, "_from_smelting");
-
-    }
-
-    protected static void oreBlasting(Consumer<FinishedRecipe> consumer, List<ItemLike> ingredients, @Nullable CompoundTag nbt,
-                                      RecipeCategory category, ItemLike result, float experience,
-                                      int cookingTime, String group) {
-        oreCooking(consumer, RecipeSerializer.BLASTING_RECIPE, ingredients, category, result, nbt, experience, cookingTime, group, "_from_blasting");
-    }
-
-
-    protected static void oreCooking(Consumer<FinishedRecipe> consumer, RecipeSerializer<? extends AbstractCookingRecipe> serializer,
-                                     List<ItemLike> ingredients, RecipeCategory category, ItemLike result,
-                                     @Nullable CompoundTag resultNbt, float experience, int cookingTime,
-                                     String group, String recipeName) {
-        for (ItemLike itemlike : ingredients) {
-            CustomCookingRecipeBuilder.generic(Ingredient.of(itemlike), category, resultNbt, result,
-                            experience, cookingTime, serializer)
-                    .group(group).unlockedBy(getHasName(itemlike), has(itemlike))
-                    .save(consumer, OvergearedMod.MOD_ID + ":" + getItemName(result) + recipeName + "_" + getItemName(itemlike));
-        }
-    }*/
-
-    protected static void oreSmelting(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTIme, @Nullable String pGroup) {
-        oreCooking(pFinishedRecipeConsumer, RecipeSerializer.SMELTING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTIme, pGroup, "_from_smelting");
-    }
-
-    protected static void oreCampfire(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, @Nullable String pGroup) {
-        oreCooking(pFinishedRecipeConsumer, RecipeSerializer.CAMPFIRE_COOKING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_campfire");
-    }
-
-    protected static void oreBlasting(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup) {
-        oreCooking(pFinishedRecipeConsumer, RecipeSerializer.BLASTING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_blasting");
-    }
-
-    protected static void oreCooking(Consumer<FinishedRecipe> pFinishedRecipeConsumer, RecipeSerializer<? extends AbstractCookingRecipe> pCookingSerializer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, @Nullable String pGroup, String pRecipeName) {
-        for (ItemLike itemlike : pIngredients) {
-            SimpleCookingRecipeBuilder.generic(Ingredient.of(itemlike), pCategory, pResult,
-                            pExperience, pCookingTime, pCookingSerializer)
-                    .group(pGroup).unlockedBy(getHasName(itemlike), has(itemlike))
-                    .save(pFinishedRecipeConsumer, OvergearedMod.MOD_ID + ":" + getItemName(pResult) + pRecipeName + "_" + getItemName(itemlike));
-        }
+    private ResourceLocation rl(String path) {
+        return new ResourceLocation(OvergearedMod.MOD_ID, path);
     }
 
 

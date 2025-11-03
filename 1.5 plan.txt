@@ -1,0 +1,15 @@
+recipe insertion from jei menu
+new diamond smithing template recipe
+
+new block idea
+
+something like high flame from hot iron that act like a primitive furnace that can smelt early game ores but it will produce ash as it burns
+its made by putting a campfire on top of a charcoal or coal block and will continue to burn if you keep feeding it fuel but once it burns out it leaves a pile of ash
+you can use that ash to make gray dye or mix with clay to make smeltery brick to make the brick alloy smeltery
+furnace will now require iron to make as well
+
+you can make permanent high flame by putting campfire on top of netherrack
+
+surround clay with a tool head to make a mold (will break after certain uses)
+
+melt steel inside the nether alloy furnace with a tool head in the mold slot to make steel mold that last permanently (the original tool head will be destroyed)

@@ -47,36 +47,6 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED;
     public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED_INCREASE;
     public static final ForgeConfigSpec.DoubleValue POOR_MAX_ARROW_SPEED;
-
-    public static ForgeConfigSpec.IntValue WELL_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue WELL_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue WELL_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue WELL_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue WELL_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue WELL_MAX_ARROW_SPEED;
-
-    public static ForgeConfigSpec.IntValue EXPERT_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue EXPERT_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue EXPERT_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue EXPERT_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue EXPERT_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue EXPERT_MAX_ARROW_SPEED;
-
-    public static ForgeConfigSpec.IntValue PERFECT_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue PERFECT_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue PERFECT_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue PERFECT_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue PERFECT_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue PERFECT_MAX_ARROW_SPEED;
-
-    public static ForgeConfigSpec.IntValue MASTER_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue MASTER_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue MASTER_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue MASTER_MAX_ARROW_SPEED;
-
-
     // --- Durability & Grinding ---
     public static final ForgeConfigSpec.DoubleValue BASE_DURABILITY_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> BASE_DURABILITY_BLACKLIST;
@@ -84,21 +54,17 @@ public class ServerConfig {
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GRINDING_BLACKLIST;
     public static final ForgeConfigSpec.DoubleValue DURABILITY_REDUCE_PER_GRIND;
     public static final ForgeConfigSpec.DoubleValue DAMAGE_RESTORE_PER_GRIND;
-
     // --- Quality & Failure Chances ---
     public static final ForgeConfigSpec.DoubleValue FAIL_ON_WELL_QUALITY_CHANCE;
     public static final ForgeConfigSpec.DoubleValue FAIL_ON_EXPERT_QUALITY_CHANCE;
-
     // --- Tool/Blueprint Settings ---
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> AVAILABLE_TOOL_TYPES;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> CUSTOM_TOOL_TYPES;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HIDDEN_TOOL_TYPES;
     public static final ForgeConfigSpec.IntValue MASTER_MAX_USE;
     public static final ForgeConfigSpec.IntValue PERFECT_MAX_USE;
     public static final ForgeConfigSpec.IntValue EXPERT_MAX_USE;
     public static final ForgeConfigSpec.IntValue WELL_MAX_USE;
     public static final ForgeConfigSpec.IntValue POOR_MAX_USE;
-
     // --- Weapon Bonuses ---
     public static final ForgeConfigSpec.DoubleValue MASTER_WEAPON_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue PERFECT_WEAPON_DAMAGE;
@@ -110,36 +76,58 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue EXPERT_WEAPON_SPEED;
     public static final ForgeConfigSpec.DoubleValue WELL_WEAPON_SPEED;
     public static final ForgeConfigSpec.DoubleValue POOR_WEAPON_SPEED;
-
     // --- Armor Bonuses ---
     public static final ForgeConfigSpec.DoubleValue MASTER_ARMOR_BONUS;
     public static final ForgeConfigSpec.DoubleValue PERFECT_ARMOR_BONUS;
     public static final ForgeConfigSpec.DoubleValue EXPERT_ARMOR_BONUS;
     public static final ForgeConfigSpec.DoubleValue WELL_ARMOR_BONUS;
     public static final ForgeConfigSpec.DoubleValue POOR_ARMOR_BONUS;
-
     // --- Durability Bonuses ---
     public static final ForgeConfigSpec.DoubleValue MASTER_DURABILITY_BONUS;
     public static final ForgeConfigSpec.DoubleValue PERFECT_DURABILITY_BONUS;
     public static final ForgeConfigSpec.DoubleValue EXPERT_DURABILITY_BONUS;
     public static final ForgeConfigSpec.DoubleValue WELL_DURABILITY_BONUS;
     public static final ForgeConfigSpec.DoubleValue POOR_DURABILITY_BONUS;
-
     // --- Knapping Settings ---
     public static final ForgeConfigSpec.BooleanValue GET_ROCK_USING_FLINT;
     public static final ForgeConfigSpec.DoubleValue ROCK_DROPPING_CHANCE;
     public static final ForgeConfigSpec.DoubleValue FLINT_BREAKING_CHANCE;
-
     public static final ForgeConfigSpec.BooleanValue ENABLE_FLETCHING_RECIPES;
-
     public static final ForgeConfigSpec.BooleanValue ENABLE_LOOT_QUALITY;
-
     public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_POOR;
     public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_WELL;
     public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_EXPERT;
     public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_PERFECT;
     public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_MASTER;
-
+    public static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> CASTING_TOOL_TYPES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MATERIAL_TYPES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> TOOL_HEAD_SETTING;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> MATERIAL_SETTING;
+    public static ForgeConfigSpec.IntValue WELL_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue WELL_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue WELL_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue WELL_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue WELL_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue WELL_MAX_ARROW_SPEED;
+    public static ForgeConfigSpec.IntValue EXPERT_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue EXPERT_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue EXPERT_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue EXPERT_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue EXPERT_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue EXPERT_MAX_ARROW_SPEED;
+    public static ForgeConfigSpec.IntValue PERFECT_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue PERFECT_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue PERFECT_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue PERFECT_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue PERFECT_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue PERFECT_MAX_ARROW_SPEED;
+    public static ForgeConfigSpec.IntValue MASTER_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue MASTER_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue MASTER_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue MASTER_MAX_ARROW_SPEED;
+    public static ForgeConfigSpec.IntValue FIRED_CAST_DURABILITY;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -240,9 +228,9 @@ public class ServerConfig {
 
         builder.push("Durability & Grinding");
         BASE_DURABILITY_MULTIPLIER = builder.comment("Defines the base durability multiplier of all items that has durability.").defineInRange("durability", 1f, 0, 10000);
-        BASE_DURABILITY_BLACKLIST = builder.comment("Items that will NOT receive base durability multiplier").defineListAllowEmpty("base_durability_blacklist", List.of("minecraft:flint_and_steel"), o -> o instanceof String);
+        BASE_DURABILITY_BLACKLIST = builder.comment("Items that will NOT receive base durability multiplier").defineListAllowEmpty("base_durability_blacklist", List.of("minecraft:flint_and_steel", "overgeared:fired_tool_cast"), o -> o instanceof String);
         GRINDING_RESTORE_DURABILITY = builder.comment("Can the grindstone be used for restoring durability or not").define("grindingToggle", true);
-        GRINDING_BLACKLIST = builder.comment("Items that cannot be repaired or affected by grinding").defineList("grindingBlacklist", List.of("minecraft:elytra", "overgeared:wooden_tongs"), obj -> obj instanceof String);
+        GRINDING_BLACKLIST = builder.comment("Items that cannot be repaired or affected by grinding").defineList("grindingBlacklist", List.of("minecraft:elytra", "overgeared:wooden_tongs", "overgeared:fired_tool_cast"), obj -> obj instanceof String);
         DURABILITY_REDUCE_PER_GRIND = builder.comment("How much the item durability reduce per grindstone use").defineInRange("durabilityReduce", 0.05, 0, 1);
         DAMAGE_RESTORE_PER_GRIND = builder.comment("How much the item's durability restore per grindstone use").defineInRange("damageRestore", 0.1, 0, 1);
         builder.pop();
@@ -255,25 +243,14 @@ public class ServerConfig {
         builder.push("Blueprint & Tool Types");
         AVAILABLE_TOOL_TYPES = builder.comment(
                         "List of available tool types for blueprints",
-                        "Default options: SWORD, AXE, PICKAXE, SHOVEL, HOE",
-                        "Remove any types you don't want to be available",
-                        "Add custom types below in customToolTypes")
+                        "Default options: sword, axe, pickaxe, shovel, hoe",
+                        "Remove or add any types as you see fit"
+                )
                 .defineList("availableToolTypes",
-                        Arrays.asList("SWORD", "AXE", "PICKAXE", "SHOVEL", "HOE", "HAMMER"),
+                        Arrays.asList("sword", "axe", "pickaxe", "shovel", "hoe", "HAMMER"),
                         entry -> entry instanceof String);
 
-        CUSTOM_TOOL_TYPES = builder.comment("Add custom tool types as key-value pairs",
-                        "Format: [\"TYPE_ID\",\"Display Name\", \"TYPE_ID2\",\"Display Name 2\"]",
-                        "Example: [\"SPEAR\",\"Spear\", \"BROADSWORD\",\"Broadsword\"]")
-                .defineList("customToolTypes", Arrays.asList(), entry -> {
-                    if (!(entry instanceof String)) return false;
-                    // Validation will happen in ToolTypeRegistry
-                    return true;
-                });
-
-        HIDDEN_TOOL_TYPES = builder.comment("Add hidden custom tool types as key-value pairs. Does not appear in the Drafting Table",
-                        "Format: [\"TYPE_ID\",\"Display Name\", \"TYPE_ID2\",\"Display Name 2\"]",
-                        "Example: [\"SPEAR\",\"Spear\", \"BROADSWORD\",\"Broadsword\"]")
+        HIDDEN_TOOL_TYPES = builder.comment("Add hidden custom tool types. Does not appear in the Drafting Table. Format same as above")
                 .defineList("hiddenToolTypes", Arrays.asList(), entry -> {
                     if (!(entry instanceof String)) return false;
                     // Validation will happen in ToolTypeRegistry
@@ -338,6 +315,126 @@ public class ServerConfig {
         QUALITY_WEIGHT_MASTER = builder
                 .comment("Weight for Master quality for loot-tools/weapons. Set to 0 to disable.")
                 .defineInRange("weightMasterQuality", 1, 0, Integer.MAX_VALUE);
+        builder.pop();
+        builder.push("Casting");
+
+        FIRED_CAST_DURABILITY = builder
+                .comment("Durability of the Fired Tool Cast.")
+                .defineInRange("firedCastDurability", 5, 0, Integer.MAX_VALUE);
+        // [toolTypeID, maxMaterialValue]
+        CASTING_TOOL_TYPES = builder
+                .comment("""
+                        Tool Types for casting: [tool_id, max_material_amount]
+                        Amount is in "nugget units" (9 nuggets = 1 ingot).
+                        Adjust these for balancing your mod.
+                        
+                        Example: ["sword", 18] = 2 ingots
+                        """)
+                .defineListAllowEmpty(
+                        List.of("castingToolTypes"),
+                        () -> List.of(
+                                List.of("sword", 18),
+                                List.of("pickaxe", 27),
+                                List.of("axe", 27),
+                                List.of("shovel", 9),
+                                List.of("hoe", 18)
+                        ),
+                        entry -> entry instanceof List<?> list &&
+                                list.size() == 2 &&
+                                list.get(0) instanceof String &&
+                                list.get(1) instanceof Number
+                );
+
+
+        TOOL_HEAD_SETTING = builder
+                .comment("Item to ToolType mapping: [item_id, tool_id]")
+                .defineListAllowEmpty(
+                        List.of("toolHeadSetting"),
+                        () -> List.of(
+                                // ===== sword BLADES =====
+                                List.of("overgeared:iron_sword_blade", "sword"),
+                                List.of("overgeared:golden_sword_blade", "sword"),
+                                List.of("overgeared:copper_sword_blade", "sword"),
+                                List.of("overgeared:steel_sword_blade", "sword"),
+
+                                // ===== pickaxe HEADS =====
+                                List.of("overgeared:iron_pickaxe_head", "pickaxe"),
+                                List.of("overgeared:golden_pickaxe_head", "pickaxe"),
+                                List.of("overgeared:copper_pickaxe_head", "pickaxe"),
+                                List.of("overgeared:steel_pickaxe_head", "pickaxe"),
+
+                                // ===== axe HEADS =====
+                                List.of("overgeared:iron_axe_head", "axe"),
+                                List.of("overgeared:golden_axe_head", "axe"),
+                                List.of("overgeared:copper_axe_head", "axe"),
+                                List.of("overgeared:steel_axe_head", "axe"),
+
+                                // ===== shovel HEADS =====
+                                List.of("overgeared:iron_shovel_head", "shovel"),
+                                List.of("overgeared:golden_shovel_head", "shovel"),
+                                List.of("overgeared:copper_shovel_head", "shovel"),
+                                List.of("overgeared:steel_shovel_head", "shovel"),
+
+                                // ===== hoe HEADS =====
+                                List.of("overgeared:iron_hoe_head", "hoe"),
+                                List.of("overgeared:golden_hoe_head", "hoe"),
+                                List.of("overgeared:copper_hoe_head", "hoe"),
+                                List.of("overgeared:steel_hoe_head", "hoe")
+                        ),
+                        entry -> entry instanceof List<?> list &&
+                                list.size() == 2 &&
+                                list.get(0) instanceof String &&
+                                list.get(1) instanceof String
+                );
+
+
+        MATERIAL_TYPES = builder
+                .comment("Material Types: [material_id]")
+                .defineListAllowEmpty(
+                        List.of("materialTypes"),
+                        () -> List.of(
+                                "iron",
+                                "gold",
+                                "copper",
+                                "steel"
+                        ),
+                        entry -> entry instanceof String
+                );
+
+
+        MATERIAL_SETTING = builder
+                .comment("Material Source Items: [item_id, material_id, material_value]")
+                .defineListAllowEmpty(
+                        List.of("materialSetting"),
+                        () -> List.of(
+                                // iron
+                                List.of("minecraft:iron_nugget", "iron", 1),
+                                List.of("minecraft:iron_ingot", "iron", 9),
+                                List.of("minecraft:iron_block", "iron", 81),
+
+                                // gold
+                                List.of("minecraft:gold_nugget", "gold", 1),
+                                List.of("minecraft:gold_ingot", "gold", 9),
+                                List.of("minecraft:gold_block", "gold", 81),
+
+                                // copper
+                                List.of("minecraft:copper_ingot", "copper", 9),
+                                List.of("overgeared:copper_nugget", "copper", 1),
+                                List.of("minecraft:copper_block", "copper", 81),
+
+                                // steel
+                                List.of("overgeared:steel_ingot", "steel", 9),
+                                List.of("overgeared:steel_nugget", "steel", 1),
+                                List.of("overgeared:steel_block", "steel", 81)
+                        ),
+                        entry -> entry instanceof List<?> list &&
+                                list.size() == 3 &&
+                                list.get(0) instanceof String &&
+                                list.get(1) instanceof String &&
+                                list.get(2) instanceof Number
+                );
+
+
         builder.pop();
         SERVER_CONFIG = builder.build();
     }

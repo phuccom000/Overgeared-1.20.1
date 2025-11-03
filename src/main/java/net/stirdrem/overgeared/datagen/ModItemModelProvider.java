@@ -52,6 +52,8 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.DIAMOND_SHARD);
         simpleItem(ModItems.IRON_ARROW_HEAD);
         simpleItem(ModItems.STEEL_ARROW_HEAD);
+        simpleItem(ModItems.UNFIRED_TOOL_CAST);
+        simpleItem(ModItems.FIRED_TOOL_CAST);
         upgradeArrowModel(ModItems.IRON_UPGRADE_ARROW);
         upgradeArrowModel(ModItems.STEEL_UPGRADE_ARROW);
         upgradeArrowModel(ModItems.DIAMOND_UPGRADE_ARROW);

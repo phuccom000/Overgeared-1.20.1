@@ -1,9 +1,7 @@
 package net.stirdrem.overgeared.recipe;
 
 
-import net.minecraft.world.item.crafting.MapCloningRecipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -22,8 +20,21 @@ public class ModRecipes {
             SERIALIZERS.register("crafting_shapeless", () -> OvergearedShapelessRecipe.Serializer.INSTANCE);
     public static final RegistryObject<RecipeSerializer<BlueprintCloningRecipe>> CRAFTING_BLUEPRINTCLONING =
             SERIALIZERS.register("crafting_cloning", () -> new SimpleCraftingRecipeSerializer<>(BlueprintCloningRecipe::new));
+    public static final RegistryObject<RecipeSerializer<DynamicToolCastRecipe>> CRAFTING_DYNAMIC_TOOL_CAST =
+            SERIALIZERS.register("crafting_cast", () -> new SimpleCraftingRecipeSerializer<>(DynamicToolCastRecipe::new));
+    public static final RegistryObject<RecipeSerializer<ClayToolCastRecipe>> CLAY_TOOL_CAST =
+            SERIALIZERS.register("crafting_initial_cast", () -> new SimpleCraftingRecipeSerializer<>(ClayToolCastRecipe::new));
     public static final RegistryObject<RecipeSerializer<FletchingRecipe>> FLETCHING_SERIALIZER =
             SERIALIZERS.register("fletching", () -> FletchingRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<NBTKeepingSmeltingRecipe>> NBT_SMELTING =
+            SERIALIZERS.register("nbt_smelting", () -> NBTKeepingSmeltingRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<NBTKeepingBlastingRecipe>> NBT_BLASTING =
+            SERIALIZERS.register("nbt_blasting", () -> NBTKeepingBlastingRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<CastSmeltingRecipe>> CAST_SMELTING =
+            SERIALIZERS.register("cast_smelting", () -> CastSmeltingRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<CastBlastingRecipe>> CAST_BLASTING =
+            SERIALIZERS.register("cast_blasting", () -> CastBlastingRecipe.Serializer.INSTANCE);
+
 
     public static void register(IEventBus eventBus) {
         SERIALIZERS.register(eventBus);

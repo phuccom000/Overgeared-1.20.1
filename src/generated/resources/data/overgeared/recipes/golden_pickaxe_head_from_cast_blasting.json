@@ -1,0 +1,15 @@
+{
+  "type": "overgeared:cast_blasting",
+  "category": "misc",
+  "cookingtime": 75,
+  "experience": 1.0,
+  "group": "misc",
+  "input": {
+    "golden": 27
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:golden_pickaxe_head"
+  },
+  "tool_type": "PICKAXE"
+}

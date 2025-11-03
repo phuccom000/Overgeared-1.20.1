@@ -1,0 +1,15 @@
+{
+  "type": "overgeared:cast_smelting",
+  "category": "misc",
+  "cookingtime": 150,
+  "experience": 0.9,
+  "group": "misc",
+  "input": {
+    "steel": 27
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:steel_axe_head"
+  },
+  "tool_type": "AXE"
+}

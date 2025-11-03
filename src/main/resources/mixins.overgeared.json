@@ -6,6 +6,7 @@
   "refmap": "mixins.overgeared.refmap.json",
   "mixins": [
     "AbstractContainerMenuMixin",
+    "AbstractFurnaceBlockEntityMixin",
     "BrewingStandBlockEntityMixin",
     "ItemStackMixin",
     "PotionItemMixin"

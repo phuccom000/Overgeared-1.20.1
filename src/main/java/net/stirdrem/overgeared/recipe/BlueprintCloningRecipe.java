@@ -58,47 +58,34 @@ public class BlueprintCloningRecipe extends CustomRecipe {
 
     @Override
     public ItemStack assemble(CraftingContainer pContainer, RegistryAccess pRegistryAccess) {
-        int i = 0;
-        ItemStack itemstack = ItemStack.EMPTY;
+        ItemStack source = ItemStack.EMPTY;
 
         for (int j = 0; j < pContainer.getContainerSize(); ++j) {
-            ItemStack itemstack1 = pContainer.getItem(j);
-            if (!itemstack1.isEmpty()) {
-                if (itemstack1.is(ModItems.BLUEPRINT.get())) {
-                    if (!itemstack.isEmpty()) {
-                        return ItemStack.EMPTY;
-                    }
-
-                    itemstack = itemstack1;
-                } else {
-                    if (!itemstack1.is(ModItems.EMPTY_BLUEPRINT.get())) {
-                        return ItemStack.EMPTY;
-                    }
-
-                    ++i;
-                }
+            ItemStack stack = pContainer.getItem(j);
+            if (!stack.isEmpty() && stack.is(ModItems.BLUEPRINT.get())) {
+                if (!source.isEmpty()) return ItemStack.EMPTY; // only 1 blueprint source allowed
+                source = stack;
             }
         }
 
-        if (!itemstack.isEmpty() && i >= 1) {
-            ItemStack result = itemstack.copyWithCount(i);
+        if (source.isEmpty()) return ItemStack.EMPTY;
+        
+        ItemStack result = source.copyWithCount(2);
 
-            // Reduce quality
-            if (itemstack.hasTag() && itemstack.getTag().contains("Quality")) {
-                String currentId = itemstack.getTag().getString("Quality");
-                BlueprintQuality currentQuality = BlueprintQuality.fromString(currentId);
-                BlueprintQuality downgraded = BlueprintQuality.getPrevious(currentQuality);
+        // Reduce quality
+        if (source.hasTag() && source.getTag().contains("Quality")) {
+            String currentId = source.getTag().getString("Quality");
+            BlueprintQuality current = BlueprintQuality.fromString(currentId);
+            BlueprintQuality downgraded = BlueprintQuality.getPrevious(current);
 
-                if (downgraded != null) {
-                    result.getOrCreateTag().putString("Quality", downgraded.getId());
-                }
+            if (downgraded != null) {
+                result.getOrCreateTag().putString("Quality", downgraded.getId());
             }
-
-            return result;
         }
 
-        return ItemStack.EMPTY;
+        return result;
     }
+
 
     @Override
     public boolean canCraftInDimensions(int pWidth, int pHeight) {

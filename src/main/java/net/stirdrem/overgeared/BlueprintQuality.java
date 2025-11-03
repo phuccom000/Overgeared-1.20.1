@@ -26,22 +26,6 @@ public enum BlueprintQuality {
         return Integer.compare(a.ordinal(), b.ordinal());
     }
 
-    public String getDisplayName() {
-        return id;
-    }
-
-    public int getUse() {
-        return use;
-    }
-
-    public ChatFormatting getColor() {
-        return color;
-    }
-
-    public String getTranslationKey() {
-        return "tooltip.overgeared.blueprint.quality." + name().toLowerCase();
-    }
-
     /**
      * Match a quality string safely.
      */
@@ -74,7 +58,33 @@ public enum BlueprintQuality {
         return null; // Already at lowest
     }
 
+    public static ChatFormatting getColor(String qualityName) {
+        for (BlueprintQuality q : values()) {
+            if (q.name().equalsIgnoreCase(qualityName)) {
+                return q.color; // assuming the color field exists in your enum
+            }
+        }
+        return ChatFormatting.GRAY;
+    }
+
+    public String getDisplayName() {
+        return id;
+    }
+
+    public int getUse() {
+        return use;
+    }
+
+    public ChatFormatting getColor() {
+        return color;
+    }
+
+    public String getTranslationKey() {
+        return "tooltip.overgeared.blueprint.quality." + name().toLowerCase();
+    }
+
     public String getId() {
         return id;
     }
+
 }

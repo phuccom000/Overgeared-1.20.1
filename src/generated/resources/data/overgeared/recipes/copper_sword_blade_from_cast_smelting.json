@@ -1,0 +1,15 @@
+{
+  "type": "overgeared:cast_smelting",
+  "category": "misc",
+  "cookingtime": 150,
+  "experience": 0.5,
+  "group": "misc",
+  "input": {
+    "copper": 18
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:copper_sword_blade"
+  },
+  "tool_type": "SWORD"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "overgeared:cast_blasting",
+  "category": "misc",
+  "cookingtime": 75,
+  "experience": 0.9,
+  "group": "misc",
+  "input": {
+    "steel": 9
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:steel_shovel_head"
+  },
+  "tool_type": "SHOVEL"
+}
