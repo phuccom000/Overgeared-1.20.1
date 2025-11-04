@@ -1,14 +1,13 @@
 package net.stirdrem.overgeared.util;
 
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class TickScheduler {
-    // An entry that holds an action and delay counter
+//     An entry that holds an action and delay counter
     private static class ScheduledTask {
         int remainingTicks;
         Runnable action;
@@ -34,7 +33,7 @@ public class TickScheduler {
     }
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
+    public static void onClientTick(ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
 
         int size = taskQueue.size();

@@ -1,8 +1,9 @@
 package net.stirdrem.overgeared.block;
 
-import net.minecraft.core.BlockSource;
+//import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
+import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
@@ -16,9 +17,9 @@ import net.stirdrem.overgeared.item.custom.UpgradeArrowItem;
 public class UpgradeArrowDispenseBehavior extends DefaultDispenseItemBehavior {
     @Override
     protected ItemStack execute(BlockSource source, ItemStack stack) {
-        Level level = source.getLevel();
+        Level level = source.level();
         Position position = DispenserBlock.getDispensePosition(source);
-        Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
+        Direction direction = source.blockEntity().getBlockState().getValue(DispenserBlock.FACING);
 
         if (stack.getItem() instanceof UpgradeArrowItem arrowItem) {
             createAndShootArrow(arrowItem.getTier(), level, position, direction, stack);
@@ -53,6 +54,6 @@ public class UpgradeArrowDispenseBehavior extends DefaultDispenseItemBehavior {
 
     @Override
     protected void playSound(BlockSource source) {
-        source.getLevel().levelEvent(1002, source.getPos(), 0);
+        source.level().levelEvent(1002, source.pos(), 0);
     }
 }

@@ -17,21 +17,21 @@ import java.util.List;
 
 public class ModToolTiers {
 
-    public static final Tier STEEL = new SimpleTier(
-            ModTags.Blocks.NEEDS_STEEL_TOOL,
-            500,
-            7f,
-            3f,
-            12,
-            () -> Ingredient.of(ModItems.STEEL_INGOT));
-    public static final Tier COPPER = new SimpleTier(
-            ModTags.Blocks.NEEDS_STEEL_TOOL,
-            500,
-            7f,
-            3f,
-            12,
-            () -> Ingredient.of(ModItems.STEEL_INGOT));
+        public static final Tier STEEL = new SimpleTier(
+                ModTags.Blocks.NEEDS_STEEL_TOOL,
+                500,
+                7f,
+                3f,
+                12,
+                () -> Ingredient.of(ModItems.STEEL_INGOT));
+        public static final Tier COPPER = new SimpleTier(
+                ModTags.Blocks.NEEDS_STEEL_TOOL,
+                500,
+                7f,
+                3f,
+                12,
+                () -> Ingredient.of(ModItems.STEEL_INGOT));
 
 
 
-}
+    }
