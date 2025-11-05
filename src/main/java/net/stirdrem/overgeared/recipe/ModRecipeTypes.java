@@ -19,6 +19,10 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register(RockKnappingRecipe.Type.ID, () -> RockKnappingRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeType<FletchingRecipe>> FLETCHING =
             RECIPE_TYPES.register(FletchingRecipe.Type.ID, () -> FletchingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<CastSmeltingRecipe>> CAST_SMELTING =
+            RECIPE_TYPES.register(CastSmeltingRecipe.Type.ID, () -> CastSmeltingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<CastBlastingRecipe>> CAST_BLASTING =
+            RECIPE_TYPES.register(CastBlastingRecipe.Type.ID, () -> CastBlastingRecipe.Type.INSTANCE);
 
     public static void register(IEventBus eventBus) {
         RECIPE_TYPES.register(eventBus);

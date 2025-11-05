@@ -82,4 +82,36 @@ public class CastingConfigHelper {
         return 0;
     }
 
+    public static boolean isValidMaterial(String itemId) {
+        // Check if this item exists in MATERIAL_SETTING table
+        for (var entry : ServerConfig.MATERIAL_SETTING.get()) {
+            List<?> row = (List<?>) entry;
+
+            // Row format: [item_id, material_name, value]
+            if (row.size() >= 3 && row.get(0).equals(itemId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get all item IDs that belong to a given tool type.
+     * Example: "SWORD" -> ["minecraft:iron_sword_head", "minecraft:diamond_sword_head"]
+     */
+    public static List<String> getAllItemsWithToolType(String toolType) {
+        List<String> items = new java.util.ArrayList<>();
+
+        for (var e : ServerConfig.TOOL_HEAD_SETTING.get()) {
+            List<?> row = (List<?>) e;
+
+            // Row format: [itemId, toolType]
+            if (row.size() >= 2 && row.get(1).equals(toolType)) {
+                items.add((String) row.get(0));
+            }
+        }
+
+        return items;
+    }
+
 }

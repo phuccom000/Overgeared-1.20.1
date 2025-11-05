@@ -10,6 +10,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.util.CastingConfigHelper;
 
@@ -28,17 +29,22 @@ public class ClayToolCastRecipe extends CustomRecipe {
         ItemStack center = inv.getItem(4);
         if (center.isEmpty()) return false;
 
-        String itemId = center.getItem().toString();
-
         // Must be mapped to a tool type in config
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(center.getItem());
         String toolType = CastingConfigHelper.getToolTypeForItem(id.toString().toLowerCase());
         if ("none".equals(toolType)) return false;
 
-        // Check 4 clay at N/E/S/W
+        boolean clayPattern = true;
+        boolean netherPattern = true;
+
         for (int slot : CLAY_SLOTS) {
-            if (!inv.getItem(slot).is(Items.CLAY_BALL)) return false;
+            ItemStack stack = inv.getItem(slot);
+            clayPattern &= stack.is(Items.CLAY_BALL);
+            netherPattern &= stack.is(Items.NETHER_BRICK);
         }
+
+        // must be exclusively clay or exclusively nether bricks
+        if (!clayPattern && !netherPattern) return false;
 
         // Other slots must be empty
         for (int i = 0; i < 9; i++) {
@@ -49,6 +55,7 @@ public class ClayToolCastRecipe extends CustomRecipe {
         return true;
     }
 
+
     @Override
     public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
         ItemStack center = inv.getItem(4);
@@ -56,14 +63,22 @@ public class ClayToolCastRecipe extends CustomRecipe {
 
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(center.getItem());
 
-        // Get tool type & max molten amount from config
         String toolType = CastingConfigHelper.getToolTypeForItem(id.toString().toLowerCase());
         if ("none".equals(toolType)) return ItemStack.EMPTY;
 
-        int maxAmount = CastingConfigHelper.getMaxMaterialAmount(toolType);
-        if (maxAmount <= 0) maxAmount = 9; // fallback if config broken
-        // ✅ Extract forging quality from item NBT
+        // detect if nether bricks were used
+        boolean netherPattern = true;
+        for (int slot : CLAY_SLOTS) {
+            ItemStack stack = inv.getItem(slot);
+            netherPattern &= stack.is(Items.NETHER_BRICK);
+        }
 
+        // Determine which cast item to create
+        ItemStack result = netherPattern
+                ? new ItemStack(ModItems.NETHER_TOOL_CAST.get())   // ✅ Nether version
+                : new ItemStack(ModItems.UNFIRED_TOOL_CAST.get()); // ✅ Clay version
+
+        // Extract forging quality
         CompoundTag centerTag = center.getTag();
         String quality = "none";
         if (centerTag != null && centerTag.contains("ForgingQuality")) {
@@ -71,20 +86,19 @@ public class ClayToolCastRecipe extends CustomRecipe {
             if (quality.isEmpty()) quality = "none";
         }
 
-        // Create new tool cast item
-        ItemStack result = new ItemStack(ModItems.UNFIRED_TOOL_CAST.get());
+        int maxAmount = CastingConfigHelper.getMaxMaterialAmount(toolType);
+        if (maxAmount <= 0) maxAmount = 9;
+        quality = BlueprintQuality.getPrevious(BlueprintQuality.fromString(quality)).getId();
         CompoundTag tag = result.getOrCreateTag();
-
         tag.putString("ToolType", toolType);
         tag.putString("Quality", quality);
         tag.putInt("Amount", 0);
         tag.putInt("MaxAmount", maxAmount);
-
-        // Empty material map -> stored as CompoundTag
         tag.put("Materials", new CompoundTag());
 
         return result;
     }
+
 
     @Override
     public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {

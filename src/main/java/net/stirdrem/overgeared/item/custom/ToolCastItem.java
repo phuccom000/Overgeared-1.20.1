@@ -7,9 +7,14 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -35,6 +40,21 @@ public class ToolCastItem extends Item {
     public ToolCastItem(Properties props) {
         super(props);
         this.durabilitySupplier = null;
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return false; // No enchanting table
+    }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return false; // No enchanted books
+    }
+
+    @Override
+    public int getEnchantmentValue(ItemStack stack) {
+        return 0; // Enchantability level for fishing/looting
     }
 
     @Override
@@ -87,6 +107,111 @@ public class ToolCastItem extends Item {
             player.displayClientMessage(Component.translatable("message.overgeared.no_materials"), true);
             return InteractionResultHolder.fail(castStack);
         }
+    }
+
+    @Override
+    public boolean overrideStackedOnOther(ItemStack castStack, Slot slot, ClickAction action, Player player) {
+        if (action != ClickAction.SECONDARY) return false;
+        if (!slot.allowModification(player)) return false;
+
+        ItemStack slotStack = slot.getItem();
+        if (slotStack.isEmpty()) return false;
+
+        // Try insert material into cast
+        if (insertMaterial(castStack, slotStack, player)) {
+            slot.remove(1); // remove one item from slot
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean overrideOtherStackedOnMe(ItemStack castStack, ItemStack otherStack, Slot slot, ClickAction action, Player player, SlotAccess slotAccess) {
+        if (action != ClickAction.SECONDARY) return false;
+
+        // Try insert the held item (cursor stack) into the cast
+        if (insertMaterial(castStack, otherStack, player)) {
+            otherStack.shrink(1); // remove from cursor
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean insertMaterial(ItemStack cast, ItemStack material, Player player) {
+        if (material.isEmpty()) return false;
+
+        CompoundTag tag = cast.getOrCreateTag();
+        ListTag list = tag.getList("input", Tag.TAG_COMPOUND);
+
+        String itemId = BuiltInRegistries.ITEM.getKey(material.getItem()).toString();
+
+        // Validate material type
+        if (!CastingConfigHelper.isValidMaterial(itemId)) {
+            player.displayClientMessage(Component.translatable("message.overgeared.invalid_material"), true);
+            return false;
+        }
+
+        int value = CastingConfigHelper.getMaterialValue(itemId);
+        if (value <= 0) return false;
+
+        int amount = tag.getInt("Amount");
+        int maxAmount = tag.contains("MaxAmount") ? tag.getInt("MaxAmount") : Integer.MAX_VALUE;
+
+        // Block overfilling
+        if (amount + value > maxAmount) {
+            //player.displayClientMessage(Component.translatable("message.overgeared.cast_full"), true);
+            return false;
+        }
+
+        // === Update Materials NBT correctly ===
+        String mat = CastingConfigHelper.getMaterialForItem(itemId);
+        CompoundTag mats = tag.contains("Materials") ? tag.getCompound("Materials") : new CompoundTag();
+
+        int prev = mats.getInt(mat); // ✅ read using material key (mat)
+        mats.putInt(mat, prev + value); // ✅ store using material key
+        tag.put("Materials", mats);
+
+
+        // === Try merge into existing input entry ===
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag entry = list.getCompound(i);
+            ItemStack entryStack = ItemStack.of(entry);
+
+            if (ItemStack.isSameItemSameTags(entryStack, material)) {
+                entryStack.grow(1);
+                entryStack.save(entry);
+                list.set(i, entry);
+
+                tag.put("input", list);
+                tag.putInt("Amount", amount + value);
+                playInsertSound(player);
+                return true;
+            }
+        }
+
+        // === No merge found, add new entry ===
+        ItemStack stored = material.copy();
+        stored.setCount(1);
+        list.add(stored.save(new CompoundTag()));
+
+        tag.put("input", list);
+        tag.putInt("Amount", amount + value);
+
+        playInsertSound(player);
+        return true;
+    }
+
+
+    private void playInsertSound(Player player) {
+        player.level().playSound(
+                null,
+                player.blockPosition(),
+                net.minecraft.sounds.SoundEvents.BUNDLE_INSERT,
+                net.minecraft.sounds.SoundSource.PLAYERS,
+                0.7F, 1.1F
+        );
     }
 
     /**

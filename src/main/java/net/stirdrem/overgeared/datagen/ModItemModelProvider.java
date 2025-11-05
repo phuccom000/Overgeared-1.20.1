@@ -54,6 +54,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.STEEL_ARROW_HEAD);
         simpleItem(ModItems.UNFIRED_TOOL_CAST);
         simpleItem(ModItems.FIRED_TOOL_CAST);
+        simpleItem(ModItems.NETHER_TOOL_CAST);
         upgradeArrowModel(ModItems.IRON_UPGRADE_ARROW);
         upgradeArrowModel(ModItems.STEEL_UPGRADE_ARROW);
         upgradeArrowModel(ModItems.DIAMOND_UPGRADE_ARROW);
@@ -80,6 +81,9 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleHandheld(ModItems.IRON_TONGS);
         simpleHandheld(ModItems.STEEL_TONGS);
         simpleHandheld(ModItems.WOODEN_TONGS);
+        simpleHandheld(ModItems.STONE_HAMMER_HEAD);
+        simpleHandheld(ModItems.COPPER_HAMMER_HEAD);
+        simpleHandheld(ModItems.STEEL_HAMMER_HEAD);
         simpleHandheld(ModItems.SMITHING_HAMMER);
         simpleHandheld(ModItems.COPPER_SMITHING_HAMMER);
         simpleHandheld(ModItems.STEEL_SWORD);

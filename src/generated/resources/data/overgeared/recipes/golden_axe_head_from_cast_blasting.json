@@ -5,11 +5,11 @@
   "experience": 1.0,
   "group": "misc",
   "input": {
-    "golden": 27
+    "gold": 27
   },
   "need_polishing": true,
   "result": {
     "item": "overgeared:golden_axe_head"
   },
-  "tool_type": "AXE"
+  "tool_type": "axe"
 }

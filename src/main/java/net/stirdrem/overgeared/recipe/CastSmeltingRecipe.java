@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CastSmeltingRecipe extends SmeltingRecipe {
+public class CastSmeltingRecipe extends AbstractCookingRecipe {
 
     private final Map<String, Double> requiredMaterials;
     private final String toolType;
@@ -32,7 +32,7 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
     public CastSmeltingRecipe(ResourceLocation id, String group, CookingBookCategory category,
                               ItemStack result, float xp, int time,
                               Map<String, Double> reqMaterials, String toolType, boolean needPolishing) {
-        super(id, group, category, Ingredient.EMPTY, result, xp, time);
+        super(RecipeType.SMELTING, id, group, category, Ingredient.EMPTY, result, xp, time);
         this.requiredMaterials = reqMaterials;
         this.toolType = toolType;
         this.needPolishing = needPolishing;
@@ -81,7 +81,7 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
             output.getOrCreateTag().put("ForgingQuality", input.getTag().get("Quality"));
         }
         // Only mark unpolished if recipe says so
-        if (needPolishing && output.is(ModTags.Items.TOOL_PARTS)) {
+        if (needPolishing) {
             output.getOrCreateTag().putBoolean("Polished", false);
         }
 
@@ -164,10 +164,35 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
         return tag;
     }
 
+    public Map<String, Double> getMaterialInputs() {
+        return requiredMaterials;
+    }
+
+    public Map<String, Double> getRequiredMaterials() {
+        return requiredMaterials;
+    }
+
+    public String getToolType() {
+        return toolType;
+    }
+
+    public boolean requiresPolishing() {
+        return needPolishing;
+    }
+
+    /*@Override
+    public RecipeType<?> getType() {
+        return ModRecipeTypes.CAST_SMELTING.get();
+    }*/
 
     @Override
     public RecipeSerializer<?> getSerializer() {
         return ModRecipes.CAST_SMELTING.get();
+    }
+
+    public static class Type implements RecipeType<CastSmeltingRecipe> {
+        public static final CastSmeltingRecipe.Type INSTANCE = new Type();
+        public static final String ID = "cast_smelting";
     }
 
     public static class Serializer implements RecipeSerializer<CastSmeltingRecipe> {

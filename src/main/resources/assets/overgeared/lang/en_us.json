@@ -50,7 +50,10 @@
   "item.overgeared.iron_sword_blade": "Iron Sword Blade",
   "item.overgeared.iron_tongs": "Iron Tongs",
   "item.overgeared.smithing_hammer": "Smithing Hammer",
+  "item.overgeared.steel_hammer_head": "Steel Smithing Hammer Head",
   "item.overgeared.copper_smithing_hammer": "Copper Smithing Hammer",
+  "item.overgeared.copper_hammer_head": "Copper Smithing Hammer Head",
+  "item.overgeared.stone_hammer_head": "Stone Smithing Hammer Head",
   "item.overgeared.steel_axe": "Steel Axe",
   "item.overgeared.steel_axe_head": "Steel Axe Head",
   "item.overgeared.steel_boots": "Steel Boots",
@@ -250,6 +253,9 @@
   "message.overgeared.cast_empty": "Cast contains no materials",
   "message.overgeared.materials_returned": "Materials returned from cast",
   "message.overgeared.no_materials": "No materials could be returned",
-  "tooltip.overgeared.cast_right_click": "Crouch + Right-click to return materials"
+  "tooltip.overgeared.cast_right_click": "Crouch + Right-click to return materials",
+  "message.overgeared.invalid_material": "Not a valid material",
+  "gui.overgeared.jei.category.cast_smelting": "Cast Smelting",
+  "gui.overgeared.jei.category.cast_blasting": "Cast Blasting"
 }
 

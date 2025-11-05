@@ -1,21 +1,15 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "minecraft:crafting_shapeless",
   "category": "equipment",
-  "key": {
-    "#": {
-      "item": "minecraft:stick"
+  "ingredients": [
+    {
+      "item": "overgeared:copper_hammer_head"
     },
-    "x": {
-      "item": "minecraft:copper_ingot"
+    {
+      "item": "minecraft:stick"
     }
-  },
-  "pattern": [
-    " x ",
-    " #x",
-    "#  "
   ],
   "result": {
     "item": "overgeared:copper_smithing_hammer"
-  },
-  "show_notification": true
+  }
 }

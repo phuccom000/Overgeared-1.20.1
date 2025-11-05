@@ -5,11 +5,11 @@
   "experience": 1.0,
   "group": "misc",
   "input": {
-    "golden": 18
+    "gold": 18
   },
   "need_polishing": true,
   "result": {
     "item": "overgeared:golden_hoe_head"
   },
-  "tool_type": "HOE"
+  "tool_type": "hoe"
 }

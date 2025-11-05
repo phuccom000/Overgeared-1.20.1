@@ -5,11 +5,11 @@
   "experience": 1.0,
   "group": "misc",
   "input": {
-    "golden": 9
+    "gold": 9
   },
   "need_polishing": true,
   "result": {
     "item": "overgeared:golden_shovel_head"
   },
-  "tool_type": "SHOVEL"
+  "tool_type": "shovel"
 }

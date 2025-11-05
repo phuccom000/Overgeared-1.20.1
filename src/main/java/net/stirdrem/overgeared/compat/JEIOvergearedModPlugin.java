@@ -3,26 +3,27 @@ package net.stirdrem.overgeared.compat;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
-import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
-import mezz.jei.api.recipe.transfer.IRecipeTransferManager;
+import mezz.jei.api.helpers.IJeiHelpers;
+import mezz.jei.api.helpers.IStackHelper;
 import mezz.jei.api.recipe.vanilla.IJeiBrewingRecipe;
+import mezz.jei.api.recipe.vanilla.IVanillaRecipeFactory;
 import mezz.jei.api.registration.*;
-import mezz.jei.api.runtime.IJeiRuntime;
+import mezz.jei.api.runtime.IIngredientManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.brewing.BrewingRecipe;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.OvergearedMod;
@@ -33,12 +34,65 @@ import net.stirdrem.overgeared.recipe.*;
 import net.stirdrem.overgeared.screen.*;
 import net.stirdrem.overgeared.util.ModTags;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @JeiPlugin
 public class JEIOvergearedModPlugin implements IModPlugin {
+    Map<String, Integer> categoryPriority = Map.of(
+            "tool_head", 0,
+            "tools", 1,
+            "armor", 2,
+            "plate", 3,
+            "misc", 4
+    );
+
+    public static ItemStack setLingeringPotion(ItemStack pStack, Potion pPotion) {
+        ResourceLocation resourcelocation = BuiltInRegistries.POTION.getKey(pPotion);
+        if (pPotion == Potions.EMPTY) {
+            pStack.removeTagKey("LingeringPotion");
+        } else {
+            pStack.getOrCreateTag().putString("LingeringPotion", resourcelocation.toString());
+        }
+
+        return pStack;
+    }
+
+    private static String categorizeRecipe(ForgingRecipe recipe) {
+        ItemStack output = recipe.getResultItem(null);
+        if (output.is(Tags.Items.ARMORS)) return "armor";
+        if (output.is(ModTags.Items.TOOL_PARTS)) return "tool_head";
+        if (output.is(Tags.Items.TOOLS)) return "tools";
+        if (output.is(ModItems.IRON_PLATE.get()) || output.is(ModItems.STEEL_PLATE.get()) || output.is(ModItems.COPPER_PLATE.get()))
+            return "plate";
+        return "misc";
+    }
+
+    private static List<CraftingRecipe> replaceSpecialCraftingRecipes(List<CraftingRecipe> unhandledCraftingRecipes, IStackHelper stackHelper) {
+        Map<Class<? extends CraftingRecipe>, Supplier<List<CraftingRecipe>>> replacers = new IdentityHashMap<>();
+        replacers.put(ClayToolCastRecipe.class, ClayToolCastRecipeMaker::createRecipes);
+        replacers.put(BlueprintCloningRecipe.class, BlueprintCloningRecipeMaker::createRecipes);
+
+        return unhandledCraftingRecipes.stream()
+                .map(CraftingRecipe::getClass)
+                .distinct()
+                .filter(replacers::containsKey)
+                // distinct + this limit will ensure we stop iterating early if we find all the recipes we're looking for.
+                .limit(replacers.size())
+                .flatMap(recipeClass -> {
+                    var supplier = replacers.get(recipeClass);
+                    try {
+                        return supplier.get()
+                                .stream();
+                    } catch (RuntimeException e) {
+                        OvergearedMod.LOGGER.error("Failed to create JEI recipes for {}", recipeClass, e);
+                        return Stream.of();
+                    }
+                })
+                .toList();
+    }
+
     @Override
     public ResourceLocation getPluginUid() {
         return ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "jei_plugin");
@@ -53,6 +107,8 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipeCategories(new StoneAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
         registration.addRecipeCategories(new SteelAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
         registration.addRecipeCategories(new FletchingCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new CastSmeltingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new CastBlastingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -107,7 +163,34 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         List<RockKnappingRecipe> knappingRecipes = recipeManager.getAllRecipesFor(RockKnappingRecipe.Type.INSTANCE);
         registration.addRecipes(KnappingRecipeCategory.KNAPPING_RECIPE_TYPE, knappingRecipes);
 
-        registration.addRecipes(RecipeTypes.CRAFTING, BlueprintCloningRecipeMaker.createRecipes(registration.getJeiHelpers()));
+        IIngredientManager ingredientManager = registration.getIngredientManager();
+        IVanillaRecipeFactory vanillaRecipeFactory = registration.getVanillaRecipeFactory();
+        IJeiHelpers jeiHelpers = registration.getJeiHelpers();
+        IStackHelper stackHelper = jeiHelpers.getStackHelper();
+
+
+        List<CraftingRecipe> craftingRecipes = recipeManager.getAllRecipesFor(RecipeType.CRAFTING);
+
+        // Replace vanilla tipped arrow recipe with custom tool cast recipes
+        List<CraftingRecipe> replacedCrafting = replaceSpecialCraftingRecipes(
+                craftingRecipes,
+                registration.getJeiHelpers().getStackHelper()
+        );
+
+        //registration.addRecipes(RecipeTypes.CRAFTING, BlueprintCloningRecipeMaker.createRecipes());
+        registration.addRecipes(RecipeTypes.CRAFTING, replacedCrafting);
+        RecipeManager rm = Minecraft.getInstance().level.getRecipeManager();
+
+        List<CastSmeltingRecipe> list = new ArrayList<>(rm.getAllRecipesFor(CastSmeltingRecipe.Type.INSTANCE));
+        list.sort(Comparator.comparing(r -> r.getResultItem(null).getHoverName().getString()
+        ));
+        registration.addRecipes(CastSmeltingRecipeCategory.CAST_SMELTING_TYPE, list);
+
+        List<CastBlastingRecipe> list2 = new ArrayList<>(rm.getAllRecipesFor(CastBlastingRecipe.Type.INSTANCE));
+        list2.sort(Comparator.comparing(r -> r.getResultItem(null).getHoverName().getString()
+        ));
+        registration.addRecipes(CastBlastingRecipeCategory.CAST_BLASTING_TYPE, list2);
+
         if (ServerConfig.ENABLE_DRAGON_BREATH_RECIPE.get())
             registration.addRecipes(RecipeTypes.BREWING, dragonBreathRecipe());
 
@@ -203,7 +286,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                     PotionUtils.setPotion(output, potion);
 
                     list.add(new FletchingRecipe(
-                            new ResourceLocation(OvergearedMod.MOD_ID, "lingering_conv_" + (idCounter++)),
+                            ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "lingering_conv_" + (idCounter++)),
                             Ingredient.EMPTY,             // shaft
                             Ingredient.of(arrow),        // tip
                             Ingredient.EMPTY,             // feather
@@ -237,7 +320,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                     }
 
                     list.add(new FletchingRecipe(
-                            new ResourceLocation(OvergearedMod.MOD_ID, "lingering_conv_" + (idCounter++)),
+                            ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "lingering_conv_" + (idCounter++)),
                             Ingredient.EMPTY,             // shaft
                             Ingredient.of(arrow),        // tip
                             Ingredient.EMPTY,             // feather
@@ -253,17 +336,6 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         }
 
         return list;
-    }
-
-    public static ItemStack setLingeringPotion(ItemStack pStack, Potion pPotion) {
-        ResourceLocation resourcelocation = BuiltInRegistries.POTION.getKey(pPotion);
-        if (pPotion == Potions.EMPTY) {
-            pStack.removeTagKey("LingeringPotion");
-        } else {
-            pStack.getOrCreateTag().putString("LingeringPotion", resourcelocation.toString());
-        }
-
-        return pStack;
     }
 
     @Override
@@ -307,9 +379,16 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipeTransferHandler(FletchingStationMenu.class, ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingCategory.FLETCHING_RECIPE_TYPE, 0, 4, 5, 36);
     }
 
-
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        registration.addRecipeCatalyst(
+                new ItemStack(Blocks.FURNACE), // or your custom source block
+                CastSmeltingRecipeCategory.CAST_SMELTING_TYPE
+        );
+        registration.addRecipeCatalyst(
+                new ItemStack(Blocks.BLAST_FURNACE), // or your custom source block
+                CastBlastingRecipeCategory.CAST_BLASTING_TYPE
+        );
         registration.addRecipeCatalyst(
                 new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()), // or your custom source block
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE
@@ -335,24 +414,6 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 new ItemStack(Blocks.FLETCHING_TABLE), // or your custom source block
                 FletchingCategory.FLETCHING_RECIPE_TYPE
         );
-    }
-
-    Map<String, Integer> categoryPriority = Map.of(
-            "tool_head", 0,
-            "tools", 1,
-            "armor", 2,
-            "plate", 3,
-            "misc", 4
-    );
-
-    private static String categorizeRecipe(ForgingRecipe recipe) {
-        ItemStack output = recipe.getResultItem(null);
-        if (output.is(Tags.Items.ARMORS)) return "armor";
-        if (output.is(ModTags.Items.TOOL_PARTS)) return "tool_head";
-        if (output.is(Tags.Items.TOOLS)) return "tools";
-        if (output.is(ModItems.IRON_PLATE.get()) || output.is(ModItems.STEEL_PLATE.get()) || output.is(ModItems.COPPER_PLATE.get()))
-            return "plate";
-        return "misc";
     }
 
     private List<ItemStack> getTippedArrowPotions() {

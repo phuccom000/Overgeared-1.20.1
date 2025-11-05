@@ -40,6 +40,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.TOOL_PARTS)
                 .add(
                         // Stone
+                        ModItems.STONE_HAMMER_HEAD.get(),
                         ModItems.STONE_SWORD_BLADE.get(),
                         ModItems.STONE_PICKAXE_HEAD.get(),
                         ModItems.STONE_AXE_HEAD.get(),
@@ -47,6 +48,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.STONE_HOE_HEAD.get(),
 
                         // Copper
+                        ModItems.COPPER_HAMMER_HEAD.get(),
                         ModItems.COPPER_SWORD_BLADE.get(),
                         ModItems.COPPER_PICKAXE_HEAD.get(),
                         ModItems.COPPER_AXE_HEAD.get(),
@@ -68,6 +70,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.GOLDEN_HOE_HEAD.get(),
 
                         // Steel
+                        ModItems.STEEL_HAMMER_HEAD.get(),
                         ModItems.STEEL_SWORD_BLADE.get(),
                         ModItems.STEEL_PICKAXE_HEAD.get(),
                         ModItems.STEEL_AXE_HEAD.get(),

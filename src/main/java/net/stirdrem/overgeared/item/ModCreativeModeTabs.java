@@ -50,13 +50,16 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.WOODEN_TONGS.get());
                         pOutput.accept(ModItems.IRON_TONGS.get());
                         pOutput.accept(ModItems.STEEL_TONGS.get());
-                        pOutput.accept(ModItems.COPPER_SMITHING_HAMMER.get());
+                        pOutput.accept(ModItems.STONE_HAMMER_HEAD.get());
+                        pOutput.accept(ModItems.COPPER_HAMMER_HEAD.get());
+                        pOutput.accept(ModItems.STEEL_HAMMER_HEAD.get());
                         pOutput.accept(ModItems.SMITHING_HAMMER.get());
                         pOutput.accept(ModItems.EMPTY_BLUEPRINT.get());
                         pOutput.accept(ModItems.BLUEPRINT.get());
                         pOutput.accept(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get());
                         pOutput.accept(ModItems.UNFIRED_TOOL_CAST.get());
                         pOutput.accept(ModItems.FIRED_TOOL_CAST.get());
+                        pOutput.accept(ModItems.NETHER_TOOL_CAST.get());
                         //pOutput.accept(ModItems.WOODEN_BUCKET.get());
                         pOutput.accept(ModItems.COPPER_HELMET.get());
                         pOutput.accept(ModItems.COPPER_CHESTPLATE.get());

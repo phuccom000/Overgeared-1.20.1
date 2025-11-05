@@ -351,31 +351,39 @@ public class ServerConfig {
                 .defineListAllowEmpty(
                         List.of("toolHeadSetting"),
                         () -> List.of(
+                                List.of("overgeared:stone_hammer_head", "hammer"),
+                                List.of("overgeared:copper_hammer_head", "hammer"),
+                                List.of("overgeared:steel_hammer_head", "hammer"),
                                 // ===== sword BLADES =====
+                                List.of("overgeared:stone_sword_blade", "sword"),
                                 List.of("overgeared:iron_sword_blade", "sword"),
                                 List.of("overgeared:golden_sword_blade", "sword"),
                                 List.of("overgeared:copper_sword_blade", "sword"),
                                 List.of("overgeared:steel_sword_blade", "sword"),
 
-                                // ===== pickaxe HEADS =====
+// ===== pickaxe HEADS =====
+                                List.of("overgeared:stone_pickaxe_head", "pickaxe"),
                                 List.of("overgeared:iron_pickaxe_head", "pickaxe"),
                                 List.of("overgeared:golden_pickaxe_head", "pickaxe"),
                                 List.of("overgeared:copper_pickaxe_head", "pickaxe"),
                                 List.of("overgeared:steel_pickaxe_head", "pickaxe"),
 
-                                // ===== axe HEADS =====
+// ===== axe HEADS =====
+                                List.of("overgeared:stone_axe_head", "axe"),
                                 List.of("overgeared:iron_axe_head", "axe"),
                                 List.of("overgeared:golden_axe_head", "axe"),
                                 List.of("overgeared:copper_axe_head", "axe"),
                                 List.of("overgeared:steel_axe_head", "axe"),
 
-                                // ===== shovel HEADS =====
+// ===== shovel HEADS =====
+                                List.of("overgeared:stone_shovel_head", "shovel"),
                                 List.of("overgeared:iron_shovel_head", "shovel"),
                                 List.of("overgeared:golden_shovel_head", "shovel"),
                                 List.of("overgeared:copper_shovel_head", "shovel"),
                                 List.of("overgeared:steel_shovel_head", "shovel"),
 
-                                // ===== hoe HEADS =====
+// ===== hoe HEADS =====
+                                List.of("overgeared:stone_hoe_head", "hoe"),
                                 List.of("overgeared:iron_hoe_head", "hoe"),
                                 List.of("overgeared:golden_hoe_head", "hoe"),
                                 List.of("overgeared:copper_hoe_head", "hoe"),

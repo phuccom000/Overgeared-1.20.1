@@ -220,7 +220,7 @@ dependencies {
     //runtimeOnly fg.deobf("curse.maven:tmrv-1194921:6717421")
 
     compileOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1:api")
-    //runtimeOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1")
+    runtimeOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1")
 
     runtimeOnly fg.deobf("curse.maven:curios-309927:6418456")
     runtimeOnly fg.deobf("curse.maven:lionfish-api-1001614:5922047")

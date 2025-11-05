@@ -1,8 +1,6 @@
 package net.stirdrem.overgeared.compat;
 
-import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.helpers.IStackHelper;
-import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -19,9 +17,8 @@ import java.util.List;
 
 public class BlueprintCloningRecipeMaker {
 
-    public static List<CraftingRecipe> createRecipes(IJeiHelpers jeiHelpers) {
+    public static List<CraftingRecipe> createRecipes() {
         List<CraftingRecipe> recipes = new ArrayList<>();
-        IStackHelper stackHelper = jeiHelpers.getStackHelper();
 
         List<BlueprintQuality> qualities = new ArrayList<>(List.of(BlueprintQuality.values()));
         qualities.sort((a, b) -> Integer.compare(b.ordinal(), a.ordinal())); // descending order

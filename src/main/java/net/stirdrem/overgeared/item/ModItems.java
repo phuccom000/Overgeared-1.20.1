@@ -41,6 +41,9 @@ public class ModItems {
     public static final RegistryObject<Item> FIRED_TOOL_CAST = ITEMS.register("fired_tool_cast",
             () -> new ToolCastItem(() -> ServerConfig.FIRED_CAST_DURABILITY.get(),
                     new Item.Properties().stacksTo(1)));
+    
+    public static final RegistryObject<Item> NETHER_TOOL_CAST = ITEMS.register("nether_tool_cast",
+            () -> new ToolCastItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> STEEL_NUGGET = ITEMS.register("steel_nugget",
             () -> new Item(new Item.Properties()));
@@ -86,6 +89,15 @@ public class ModItems {
 
     public static final RegistryObject<Item> STEEL_TONGS = ITEMS.register("steel_tongs",
             () -> new Tongs(ModToolTiers.STEEL, -1, -2f, new Item.Properties().durability(1024)));
+
+    public static final RegistryObject<Item> STONE_HAMMER_HEAD = ITEMS.register("stone_hammer_head",
+            () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> COPPER_HAMMER_HEAD = ITEMS.register("copper_hammer_head",
+            () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> STEEL_HAMMER_HEAD = ITEMS.register("steel_hammer_head",
+            () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> SMITHING_HAMMER = ITEMS.register("smithing_hammer",
             () -> new SmithingHammer(ModToolTiers.STEEL, -1, -2.8f, new Item.Properties().durability(512)));

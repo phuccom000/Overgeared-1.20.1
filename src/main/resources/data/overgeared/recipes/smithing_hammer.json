@@ -1,21 +1,15 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "minecraft:crafting_shapeless",
   "category": "equipment",
-  "key": {
-    "#": {
-      "item": "minecraft:stick"
+  "ingredients": [
+    {
+      "item": "overgeared:steel_hammer_head"
     },
-    "x": {
-      "tag": "forge:ingots/steel"
+    {
+      "item": "minecraft:stick"
     }
-  },
-  "pattern": [
-    " x ",
-    " #x",
-    "#  "
   ],
   "result": {
     "item": "overgeared:smithing_hammer"
-  },
-  "show_notification": true
+  }
 }
