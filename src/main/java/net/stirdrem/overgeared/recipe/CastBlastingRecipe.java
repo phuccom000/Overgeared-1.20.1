@@ -12,10 +12,8 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.custom.ToolCastItem;
-import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CastBlastingRecipe extends AbstractCookingRecipe {
+public class CastBlastingRecipe extends BlastingRecipe {
 
     private final Map<String, Double> requiredMaterials;
     private final String toolType;
@@ -32,12 +30,11 @@ public class CastBlastingRecipe extends AbstractCookingRecipe {
     public CastBlastingRecipe(ResourceLocation id, String group, CookingBookCategory category,
                               ItemStack result, float xp, int time,
                               Map<String, Double> reqMaterials, String toolType, boolean needPolishing) {
-        super(RecipeType.BLASTING, id, group, category, Ingredient.EMPTY, result, xp, time);
+        super(id, group, category, Ingredient.EMPTY, result, xp, time);
         this.requiredMaterials = reqMaterials;
         this.toolType = toolType;
         this.needPolishing = needPolishing;
     }
-
 
     public static Map<String, Double> readMaterials(CompoundTag tag) {
         Map<String, Double> map = new HashMap<>();
@@ -49,6 +46,40 @@ public class CastBlastingRecipe extends AbstractCookingRecipe {
             }
         }
         return map;
+    }
+
+    @Override
+    public @NotNull NonNullList<Ingredient> getIngredients() {
+        NonNullList<Ingredient> list = NonNullList.create();
+
+        // Build the same NBT tag JEI uses
+        CompoundTag tag = new CompoundTag();
+        tag.putString("ToolType", toolType);
+
+        CompoundTag mats = new CompoundTag();
+        double total = 0;
+        for (var entry : requiredMaterials.entrySet()) {
+            String mat = entry.getKey();
+            double amt = entry.getValue();
+            total += amt;
+            mats.putDouble(mat, amt);
+        }
+
+        tag.put("Materials", mats);
+        tag.putDouble("Amount", total);
+        tag.putDouble("MaxAmount", total);
+
+        // Create cast stacks with NBT
+        ItemStack firedCast = new ItemStack(ModItems.CLAY_TOOL_CAST.get());
+        firedCast.setTag(tag.copy());
+
+        ItemStack netherCast = new ItemStack(ModItems.NETHER_TOOL_CAST.get());
+        netherCast.setTag(tag.copy());
+
+        // Report them as the recipe input
+        list.add(Ingredient.of(firedCast, netherCast));
+
+        return list;
     }
 
     @Override
@@ -180,11 +211,11 @@ public class CastBlastingRecipe extends AbstractCookingRecipe {
         return needPolishing;
     }
 
-    @Override
+    /*@Override
     public RecipeType<?> getType() {
         return ModRecipeTypes.CAST_BLASTING.get();
     }
-
+*/
     @Override
     public RecipeSerializer<?> getSerializer() {
         return ModRecipes.CAST_BLASTING.get();

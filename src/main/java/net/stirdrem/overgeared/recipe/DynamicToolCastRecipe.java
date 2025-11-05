@@ -40,7 +40,7 @@ public class DynamicToolCastRecipe extends CustomRecipe {
 
             if (stack.isEmpty()) continue;
 
-            if (stack.is(ModItems.FIRED_TOOL_CAST.get()) || stack.is(ModItems.NETHER_TOOL_CAST.get())) {
+            if (stack.is(ModItems.CLAY_TOOL_CAST.get()) || stack.is(ModItems.NETHER_TOOL_CAST.get())) {
                 if (!cast.isEmpty()) {
                     return false;
                 }
@@ -76,7 +76,7 @@ public class DynamicToolCastRecipe extends CustomRecipe {
             ItemStack stack = inv.getItem(i);
 
             // Find cast
-            if (stack.is(ModItems.FIRED_TOOL_CAST.get()) || stack.is(ModItems.NETHER_TOOL_CAST.get())) {
+            if (stack.is(ModItems.CLAY_TOOL_CAST.get()) || stack.is(ModItems.NETHER_TOOL_CAST.get())) {
                 cast = stack.copy();
                 CompoundTag tag = cast.getOrCreateTag();
                 toolType = tag.getString("ToolType");

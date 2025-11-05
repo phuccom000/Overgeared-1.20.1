@@ -69,9 +69,10 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         return "misc";
     }
 
-    private static List<CraftingRecipe> replaceSpecialCraftingRecipes(List<CraftingRecipe> unhandledCraftingRecipes, IStackHelper stackHelper) {
+    /*private static List<CraftingRecipe> replaceSpecialCraftingRecipes(List<CraftingRecipe> unhandledCraftingRecipes, IStackHelper stackHelper) {
         Map<Class<? extends CraftingRecipe>, Supplier<List<CraftingRecipe>>> replacers = new IdentityHashMap<>();
         replacers.put(ClayToolCastRecipe.class, ClayToolCastRecipeMaker::createRecipes);
+        replacers.put(ClayToolCastRecipe.class, NetherToolCastRecipeMaker::createRecipes);
         replacers.put(BlueprintCloningRecipe.class, BlueprintCloningRecipeMaker::createRecipes);
 
         return unhandledCraftingRecipes.stream()
@@ -91,7 +92,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                     }
                 })
                 .toList();
-    }
+    }*/
 
     @Override
     public ResourceLocation getPluginUid() {
@@ -107,8 +108,6 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipeCategories(new StoneAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
         registration.addRecipeCategories(new SteelAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
         registration.addRecipeCategories(new FletchingCategory(registration.getJeiHelpers().getGuiHelper()));
-        registration.addRecipeCategories(new CastSmeltingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
-        registration.addRecipeCategories(new CastBlastingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -172,24 +171,15 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         List<CraftingRecipe> craftingRecipes = recipeManager.getAllRecipesFor(RecipeType.CRAFTING);
 
         // Replace vanilla tipped arrow recipe with custom tool cast recipes
-        List<CraftingRecipe> replacedCrafting = replaceSpecialCraftingRecipes(
+       /* List<CraftingRecipe> replacedCrafting = replaceSpecialCraftingRecipes(
                 craftingRecipes,
                 registration.getJeiHelpers().getStackHelper()
-        );
+        );*/
 
-        //registration.addRecipes(RecipeTypes.CRAFTING, BlueprintCloningRecipeMaker.createRecipes());
-        registration.addRecipes(RecipeTypes.CRAFTING, replacedCrafting);
-        RecipeManager rm = Minecraft.getInstance().level.getRecipeManager();
-
-        List<CastSmeltingRecipe> list = new ArrayList<>(rm.getAllRecipesFor(CastSmeltingRecipe.Type.INSTANCE));
-        list.sort(Comparator.comparing(r -> r.getResultItem(null).getHoverName().getString()
-        ));
-        registration.addRecipes(CastSmeltingRecipeCategory.CAST_SMELTING_TYPE, list);
-
-        List<CastBlastingRecipe> list2 = new ArrayList<>(rm.getAllRecipesFor(CastBlastingRecipe.Type.INSTANCE));
-        list2.sort(Comparator.comparing(r -> r.getResultItem(null).getHoverName().getString()
-        ));
-        registration.addRecipes(CastBlastingRecipeCategory.CAST_BLASTING_TYPE, list2);
+        registration.addRecipes(RecipeTypes.CRAFTING, ClayToolCastRecipeMaker.createRecipes());
+        registration.addRecipes(RecipeTypes.CRAFTING, NetherToolCastRecipeMaker.createRecipes());
+        registration.addRecipes(RecipeTypes.CRAFTING, BlueprintCloningRecipeMaker.createRecipes());
+        //registration.addRecipes(RecipeTypes.CRAFTING, replacedCrafting);
 
         if (ServerConfig.ENABLE_DRAGON_BREATH_RECIPE.get())
             registration.addRecipes(RecipeTypes.BREWING, dragonBreathRecipe());
@@ -381,14 +371,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(
-                new ItemStack(Blocks.FURNACE), // or your custom source block
-                CastSmeltingRecipeCategory.CAST_SMELTING_TYPE
-        );
-        registration.addRecipeCatalyst(
-                new ItemStack(Blocks.BLAST_FURNACE), // or your custom source block
-                CastBlastingRecipeCategory.CAST_BLASTING_TYPE
-        );
+
         registration.addRecipeCatalyst(
                 new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()), // or your custom source block
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE

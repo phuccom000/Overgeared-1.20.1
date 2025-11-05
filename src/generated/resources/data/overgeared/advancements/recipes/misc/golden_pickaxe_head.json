@@ -1,22 +1,35 @@
 {
+  "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_gold_ingot": {
+    "has_cast": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:gold_ingot"
+              "overgeared:unfired_tool_cast"
             ]
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "overgeared:golden_pickaxe_head"
+      },
+      "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_gold_ingot"
+      "has_cast",
+      "has_the_recipe"
     ]
   ],
+  "rewards": {
+    "recipes": [
+      "overgeared:golden_pickaxe_head"
+    ]
+  },
   "sends_telemetry_event": false
 }

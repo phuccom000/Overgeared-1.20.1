@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "overgeared:item/fired_tool_cast"
+    "layer0": "overgeared:item/clay_tool_cast"
   }
 }

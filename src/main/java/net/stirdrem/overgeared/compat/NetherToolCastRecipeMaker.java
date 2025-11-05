@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared.compat;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -10,21 +11,18 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.core.registries.BuiltInRegistries;
-
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.util.CastingConfigHelper;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public final class ClayToolCastRecipeMaker {
+public final class NetherToolCastRecipeMaker {
 
-    private ClayToolCastRecipeMaker() {
+    private NetherToolCastRecipeMaker() {
     }
 
     public static List<CraftingRecipe> createRecipes() {
@@ -62,9 +60,9 @@ public final class ClayToolCastRecipeMaker {
 
         NonNullList<Ingredient> inputs = NonNullList.of(
                 Ingredient.EMPTY,
-                Ingredient.EMPTY, Ingredient.of(Items.CLAY_BALL), Ingredient.EMPTY,
-                Ingredient.of(Items.CLAY_BALL), headIngredient, Ingredient.of(Items.CLAY_BALL),
-                Ingredient.EMPTY, Ingredient.of(Items.CLAY_BALL), Ingredient.EMPTY
+                Ingredient.EMPTY, Ingredient.of(Items.NETHER_BRICK), Ingredient.EMPTY,
+                Ingredient.of(Items.NETHER_BRICK), headIngredient, Ingredient.of(Items.NETHER_BRICK),
+                Ingredient.EMPTY, Ingredient.of(Items.NETHER_BRICK), Ingredient.EMPTY
         );
 
         ItemStack output = createOutput(toolType);
@@ -79,7 +77,7 @@ public final class ClayToolCastRecipeMaker {
 
 
     private static ItemStack createOutput(String toolType) {
-        ItemStack result = new ItemStack(ModItems.UNFIRED_TOOL_CAST.get());
+        ItemStack result = new ItemStack(ModItems.NETHER_TOOL_CAST.get());
         CompoundTag tag = result.getOrCreateTag();
 
         tag.putString("ToolType", toolType);

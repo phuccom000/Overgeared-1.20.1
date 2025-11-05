@@ -234,7 +234,8 @@
   "tooltip.overgeared.heated": "Needs quenching",
   "item.overgeared.wooden_tongs": "Wooden Tongs",
   "item.overgeared.unfired_tool_cast": "Unfired Tool Cast",
-  "item.overgeared.fired_tool_cast": "Fired Tool Cast",
+  "item.overgeared.clay_tool_cast": "Clay Tool Cast",
+  "item.overgeared.nether_tool_cast": "Nether Tool Cast",
   "tooltip.overgeared.tool_cast.quality": "Quality:",
   "tooltip.overgeared.tool_cast.type": "Type:",
   "tooltip.overgeared.tool_cast.materials": "Materials:",
@@ -254,8 +255,6 @@
   "message.overgeared.materials_returned": "Materials returned from cast",
   "message.overgeared.no_materials": "No materials could be returned",
   "tooltip.overgeared.cast_right_click": "Crouch + Right-click to return materials",
-  "message.overgeared.invalid_material": "Not a valid material",
-  "gui.overgeared.jei.category.cast_smelting": "Cast Smelting",
-  "gui.overgeared.jei.category.cast_blasting": "Cast Blasting"
+  "message.overgeared.invalid_material": "Not a valid material"
 }
 

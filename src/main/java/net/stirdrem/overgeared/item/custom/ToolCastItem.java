@@ -30,17 +30,22 @@ import java.util.function.Supplier;
 
 public class ToolCastItem extends Item {
     private final Supplier<Integer> durabilitySupplier;
+    private final boolean allowMaterialInsert;
 
-    public ToolCastItem(Supplier<Integer> durabilitySupplier, Properties props) {
+    // Fired/Nether cast (damageable) — can choose if it accepts materials
+    public ToolCastItem(Supplier<Integer> durabilitySupplier, boolean allowMaterialInsert, Properties props) {
         super(props);
         this.durabilitySupplier = durabilitySupplier;
+        this.allowMaterialInsert = allowMaterialInsert;
     }
 
-    // Unfired cast (non-damageable)
-    public ToolCastItem(Properties props) {
+    // Unfired cast (non-damageable) — usually should ALLOW insert
+    public ToolCastItem(boolean allowMaterialInsert, Properties props) {
         super(props);
         this.durabilitySupplier = null;
+        this.allowMaterialInsert = allowMaterialInsert;
     }
+
 
     @Override
     public boolean isEnchantable(ItemStack stack) {
@@ -111,6 +116,7 @@ public class ToolCastItem extends Item {
 
     @Override
     public boolean overrideStackedOnOther(ItemStack castStack, Slot slot, ClickAction action, Player player) {
+        if (!allowMaterialInsert) return false;
         if (action != ClickAction.SECONDARY) return false;
         if (!slot.allowModification(player)) return false;
 
@@ -128,6 +134,7 @@ public class ToolCastItem extends Item {
 
     @Override
     public boolean overrideOtherStackedOnMe(ItemStack castStack, ItemStack otherStack, Slot slot, ClickAction action, Player player, SlotAccess slotAccess) {
+        if (!allowMaterialInsert) return false;
         if (action != ClickAction.SECONDARY) return false;
 
         // Try insert the held item (cursor stack) into the cast

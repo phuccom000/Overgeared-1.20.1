@@ -1,20 +1,35 @@
 {
+  "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_steel_ingot": {
+    "has_cast": {
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/steel"
+            "items": [
+              "overgeared:unfired_tool_cast"
+            ]
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "overgeared:steel_axe_head"
+      },
+      "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_steel_ingot"
+      "has_cast",
+      "has_the_recipe"
     ]
   ],
+  "rewards": {
+    "recipes": [
+      "overgeared:steel_axe_head"
+    ]
+  },
   "sends_telemetry_event": false
 }
