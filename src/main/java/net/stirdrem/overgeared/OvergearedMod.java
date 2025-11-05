@@ -86,10 +86,11 @@ public class OvergearedMod {
 
     public static boolean polymorph;
 
-    public OvergearedMod(IEventBus modEventBus) {
-        //ServerConfig.registerConfig();
-//        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        //IEventBus modEventBus = context.getModEventBus();
+    public OvergearedMod(IEventBus modEventBus, ModContainer modContainer) {
+
+        // CONFIG REGISTER
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
+        modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SERVER_CONFIG);
 
         ModCreativeModeTabs.register(modEventBus);
 
