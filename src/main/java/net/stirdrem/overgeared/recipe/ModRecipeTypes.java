@@ -19,10 +19,12 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register(RockKnappingRecipe.Type.ID, () -> RockKnappingRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeType<FletchingRecipe>> FLETCHING =
             RECIPE_TYPES.register(FletchingRecipe.Type.ID, () -> FletchingRecipe.Type.INSTANCE);
-    public static final RegistryObject<RecipeType<CastSmeltingRecipe>> CAST_SMELTING =
-            RECIPE_TYPES.register(CastSmeltingRecipe.Type.ID, () -> CastSmeltingRecipe.Type.INSTANCE);
-    public static final RegistryObject<RecipeType<CastBlastingRecipe>> CAST_BLASTING =
-            RECIPE_TYPES.register(CastBlastingRecipe.Type.ID, () -> CastBlastingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<AlloySmeltingRecipe>> ALLOY_SMELTING =
+            RECIPE_TYPES.register(AlloySmeltingRecipe.Type.ID, () -> AlloySmeltingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
+            RECIPE_TYPES.register(NetherAlloySmeltingRecipe.Type.ID, () -> NetherAlloySmeltingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<ItemToToolTypeRecipe>> ITEM_TO_TOOLTYPE =
+            RECIPE_TYPES.register("item_to_tooltype", () -> RecipeType.simple(new ResourceLocation(OvergearedMod.MOD_ID, "item_to_tooltype")));
 
     public static void register(IEventBus eventBus) {
         RECIPE_TYPES.register(eventBus);

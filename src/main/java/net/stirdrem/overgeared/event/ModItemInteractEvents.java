@@ -5,6 +5,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -13,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
@@ -40,6 +43,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
+
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
@@ -54,7 +58,6 @@ import net.stirdrem.overgeared.screen.FletchingStationMenu;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.QualityHelper;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.entity.item.ItemTossEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -101,6 +104,24 @@ public class ModItemInteractEvents {
             event.setCancellationResult(InteractionResult.SUCCESS);
             event.setCanceled(true);
         }
+
+    }
+
+    private static void triggerAdvancement(ServerPlayer player, String path) {
+        // Use Minecraft's advancement system to grant the advancement
+        var advancement = player.server.getAdvancements().getAdvancement(
+                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, path)
+        );
+
+        if (advancement != null) {
+            var progress = player.getAdvancements().getOrStartProgress(advancement);
+            if (!progress.isDone()) {
+                // Grant all criteria to complete the advancement
+                for (String criterion : progress.getRemainingCriteria()) {
+                    player.getAdvancements().award(advancement, criterion);
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -124,6 +145,10 @@ public class ModItemInteractEvents {
                     .setValue(StoneSmithingAnvil.FACING, player.getDirection().getClockWise());
             level.setBlock(pos, newState, 3);
             level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.0f, 1.0f);
+            if (player instanceof ServerPlayer serverPlayer) {
+                triggerAdvancement(serverPlayer, "making_anvil");
+            }
+
             event.setCancellationResult(InteractionResult.SUCCESS);
             event.setCanceled(true);
             return;
@@ -136,6 +161,9 @@ public class ModItemInteractEvents {
                     .setValue(StoneSmithingAnvil.FACING, player.getDirection().getClockWise());
             level.setBlock(pos, newState, 3);
             level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1.0f, 1.0f);
+            if (player instanceof ServerPlayer serverPlayer) {
+                triggerAdvancement(serverPlayer, "making_anvil");
+            }
             event.setCancellationResult(InteractionResult.SUCCESS);
             event.setCanceled(true);
             return;
@@ -439,14 +467,30 @@ public class ModItemInteractEvents {
                         return;
                     }
                     Item item = stack.getItem();
-                    ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(item);
-
 // Check blacklist
-                    if (itemId != null && ServerConfig.GRINDING_BLACKLIST.get().contains(itemId.toString())) {
-                        event.setCancellationResult(InteractionResult.PASS); // Allow vanilla behavior, or SUCCESS if you want to eat the event
-                        event.setCanceled(true); // Prevent your custom grind logic
-                        return;
+                    ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
+                    List<? extends String> blacklist = ServerConfig.GRINDING_BLACKLIST.get();
+
+                    for (String entry : blacklist) {
+                        if (entry.startsWith("#")) {
+                            // Handle tag-based blacklist entries
+                            ResourceLocation tagId = new ResourceLocation(entry.substring(1));
+                            TagKey<Item> tag = TagKey.create(Registries.ITEM, tagId);
+                            if (stack.is(tag)) {
+                                event.setCancellationResult(InteractionResult.PASS);
+                                event.setCanceled(true);
+                                return;
+                            }
+                        } else {
+                            // Handle direct item blacklist entries
+                            if (itemId != null && itemId.equals(new ResourceLocation(entry))) {
+                                event.setCancellationResult(InteractionResult.PASS);
+                                event.setCanceled(true);
+                                return;
+                            }
+                        }
                     }
+
 
                     CompoundTag tag = stack.getOrCreateTag();
                     int reducedCount = tag.getInt("ReducedMaxDurability");

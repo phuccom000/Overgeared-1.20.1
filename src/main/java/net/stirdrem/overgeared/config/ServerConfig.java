@@ -101,8 +101,8 @@ public class ServerConfig {
     public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_MASTER;
     public static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> CASTING_TOOL_TYPES;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MATERIAL_TYPES;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> TOOL_HEAD_SETTING;
     public static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> MATERIAL_SETTING;
+    public static final ForgeConfigSpec.BooleanValue ENABLE_CASTING;
     public static ForgeConfigSpec.IntValue WELL_ZONE_STARTING_SIZE;
     public static ForgeConfigSpec.DoubleValue WELL_ZONE_SHRINK_FACTOR;
     public static ForgeConfigSpec.IntValue WELL_MIN_PERFECT_ZONE;
@@ -228,9 +228,12 @@ public class ServerConfig {
 
         builder.push("Durability & Grinding");
         BASE_DURABILITY_MULTIPLIER = builder.comment("Defines the base durability multiplier of all items that has durability.").defineInRange("durability", 1f, 0, 10000);
-        BASE_DURABILITY_BLACKLIST = builder.comment("Items that will NOT receive base durability multiplier").defineListAllowEmpty("base_durability_blacklist", List.of("minecraft:flint_and_steel", "overgeared:fired_tool_cast"), o -> o instanceof String);
+        BASE_DURABILITY_BLACKLIST = builder.comment("Items or tags that will NOT receive base durability multiplier").defineListAllowEmpty("base_durability_blacklist", List.of("minecraft:flint_and_steel", "overgeared:fired_tool_cast"), o -> o instanceof String);
         GRINDING_RESTORE_DURABILITY = builder.comment("Can the grindstone be used for restoring durability or not").define("grindingToggle", true);
-        GRINDING_BLACKLIST = builder.comment("Items that cannot be repaired or affected by grinding").defineList("grindingBlacklist", List.of("minecraft:elytra", "overgeared:wooden_tongs", "overgeared:fired_tool_cast"), obj -> obj instanceof String);
+        GRINDING_BLACKLIST = builder
+                .comment("Items or tags that cannot be repaired or affected by grinding. " +
+                        "Prefix with '#' to use a tag, e.g. '#forge:ingots/iron'")
+                .defineList("grindingBlacklist", List.of("minecraft:elytra", "overgeared:wooden_tongs", "overgeared:fired_tool_cast"), obj -> obj instanceof String);
         DURABILITY_REDUCE_PER_GRIND = builder.comment("How much the item durability reduce per grindstone use").defineInRange("durabilityReduce", 0.05, 0, 1);
         DAMAGE_RESTORE_PER_GRIND = builder.comment("How much the item's durability restore per grindstone use").defineInRange("damageRestore", 0.1, 0, 1);
         builder.pop();
@@ -317,6 +320,7 @@ public class ServerConfig {
                 .defineInRange("weightMasterQuality", 1, 0, Integer.MAX_VALUE);
         builder.pop();
         builder.push("Casting");
+        ENABLE_CASTING = builder.comment("Is casting enabled or not. Would affects normal progression due to your first smithing hammers require casting.").define("castingToggle", true);
 
         FIRED_CAST_DURABILITY = builder
                 .comment("Durability of the Fired Tool Cast.")
@@ -337,62 +341,13 @@ public class ServerConfig {
                                 List.of("pickaxe", 27),
                                 List.of("axe", 27),
                                 List.of("shovel", 9),
-                                List.of("hoe", 18)
+                                List.of("hoe", 18),
+                                List.of("hammer", 18)
                         ),
                         entry -> entry instanceof List<?> list &&
                                 list.size() == 2 &&
                                 list.get(0) instanceof String &&
                                 list.get(1) instanceof Number
-                );
-
-
-        TOOL_HEAD_SETTING = builder
-                .comment("Item to ToolType mapping: [item_id, tool_id]")
-                .defineListAllowEmpty(
-                        List.of("toolHeadSetting"),
-                        () -> List.of(
-                                List.of("overgeared:stone_hammer_head", "hammer"),
-                                List.of("overgeared:copper_hammer_head", "hammer"),
-                                List.of("overgeared:steel_hammer_head", "hammer"),
-                                // ===== sword BLADES =====
-                                List.of("overgeared:stone_sword_blade", "sword"),
-                                List.of("overgeared:iron_sword_blade", "sword"),
-                                List.of("overgeared:golden_sword_blade", "sword"),
-                                List.of("overgeared:copper_sword_blade", "sword"),
-                                List.of("overgeared:steel_sword_blade", "sword"),
-
-// ===== pickaxe HEADS =====
-                                List.of("overgeared:stone_pickaxe_head", "pickaxe"),
-                                List.of("overgeared:iron_pickaxe_head", "pickaxe"),
-                                List.of("overgeared:golden_pickaxe_head", "pickaxe"),
-                                List.of("overgeared:copper_pickaxe_head", "pickaxe"),
-                                List.of("overgeared:steel_pickaxe_head", "pickaxe"),
-
-// ===== axe HEADS =====
-                                List.of("overgeared:stone_axe_head", "axe"),
-                                List.of("overgeared:iron_axe_head", "axe"),
-                                List.of("overgeared:golden_axe_head", "axe"),
-                                List.of("overgeared:copper_axe_head", "axe"),
-                                List.of("overgeared:steel_axe_head", "axe"),
-
-// ===== shovel HEADS =====
-                                List.of("overgeared:stone_shovel_head", "shovel"),
-                                List.of("overgeared:iron_shovel_head", "shovel"),
-                                List.of("overgeared:golden_shovel_head", "shovel"),
-                                List.of("overgeared:copper_shovel_head", "shovel"),
-                                List.of("overgeared:steel_shovel_head", "shovel"),
-
-// ===== hoe HEADS =====
-                                List.of("overgeared:stone_hoe_head", "hoe"),
-                                List.of("overgeared:iron_hoe_head", "hoe"),
-                                List.of("overgeared:golden_hoe_head", "hoe"),
-                                List.of("overgeared:copper_hoe_head", "hoe"),
-                                List.of("overgeared:steel_hoe_head", "hoe")
-                        ),
-                        entry -> entry instanceof List<?> list &&
-                                list.size() == 2 &&
-                                list.get(0) instanceof String &&
-                                list.get(1) instanceof String
                 );
 
 

@@ -213,10 +213,10 @@ public class ToolCastItem extends Item {
 
     private void playInsertSound(Player player) {
         player.level().playSound(
-                null,
+                player,
                 player.blockPosition(),
-                net.minecraft.sounds.SoundEvents.BUNDLE_INSERT,
-                net.minecraft.sounds.SoundSource.PLAYERS,
+                SoundEvents.BUNDLE_INSERT,
+                SoundSource.PLAYERS,
                 0.7F, 1.1F
         );
     }
@@ -242,99 +242,6 @@ public class ToolCastItem extends Item {
         }
 
         return items;
-    }
-
-    /**
-     * Legacy support: Fallback to material-based return if no input list exists
-     */
-    private InteractionResultHolder<ItemStack> calculateAndReturnMaterialsLegacy(ItemStack castStack, Player player) {
-        CompoundTag tag = castStack.getTag();
-        if (tag == null || !tag.contains("Materials", Tag.TAG_COMPOUND)) {
-            player.displayClientMessage(Component.translatable("message.overgeared.cast_empty"), true);
-            return InteractionResultHolder.fail(castStack);
-        }
-
-        CompoundTag materials = tag.getCompound("Materials");
-        if (materials.isEmpty()) {
-            player.displayClientMessage(Component.translatable("message.overgeared.cast_empty"), true);
-            return InteractionResultHolder.fail(castStack);
-        }
-
-        boolean returnedAny = false;
-
-        for (String materialId : materials.getAllKeys()) {
-            int amount = materials.getInt(materialId);
-            if (amount <= 0) continue;
-
-            // Calculate how many items to return based on material value
-            ItemStack materialStack = createMaterialStack(materialId, amount);
-            if (!materialStack.isEmpty()) {
-                // Add to player inventory or drop if full
-                if (!player.getInventory().add(materialStack)) {
-                    player.drop(materialStack, false);
-                }
-                returnedAny = true;
-            }
-        }
-
-        if (returnedAny) {
-            // Clear the materials from the cast
-            tag.remove("Materials");
-            tag.remove("Amount");
-
-            player.displayClientMessage(Component.translatable("message.overgeared.materials_returned"), true);
-            return InteractionResultHolder.sidedSuccess(castStack, player.level().isClientSide());
-        } else {
-            player.displayClientMessage(Component.translatable("message.overgeared.no_materials"), true);
-            return InteractionResultHolder.fail(castStack);
-        }
-    }
-
-    private ItemStack createMaterialStack(String materialId, int totalValue) {
-        // Find which item corresponds to this material
-        String itemId = getItemIdForMaterial(materialId);
-        if (itemId.equals("none")) {
-            return ItemStack.EMPTY;
-        }
-
-        // Get the value per item of this material
-        int valuePerItem = CastingConfigHelper.getMaterialValue(itemId);
-        if (valuePerItem <= 0) {
-            return ItemStack.EMPTY;
-        }
-
-        // Calculate how many items to return
-        int itemCount = totalValue / valuePerItem;
-        if (itemCount <= 0) {
-            return ItemStack.EMPTY;
-        }
-
-        // Create the item stack
-        ItemStack result = getItemStackFromId(itemId);
-        if (!result.isEmpty()) {
-            result.setCount(itemCount);
-        }
-
-        return result;
-    }
-
-    private String getItemIdForMaterial(String materialId) {
-        // Find the first item that matches this material type
-        for (var entry : ServerConfig.MATERIAL_SETTING.get()) {
-            List<?> row = (List<?>) entry;
-            if (row.size() >= 3 && materialId.equals(row.get(1))) {
-                return (String) row.get(0);
-            }
-        }
-        return "none";
-    }
-
-    private ItemStack getItemStackFromId(String itemId) {
-        try {
-            return new ItemStack(BuiltInRegistries.ITEM.get(new ResourceLocation(itemId)));
-        } catch (Exception e) {
-            return ItemStack.EMPTY;
-        }
     }
 
     @Override

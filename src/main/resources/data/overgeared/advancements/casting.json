@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "item": "overgeared:clay_tool_cast"
+    },
+    "title": "Cast Off!",
+    "description": "Obtain a Clay Tool Cast",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "overgeared:rock_knapping",
+  "criteria": {
+    "knapped_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "overgeared:clay_tool_cast"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

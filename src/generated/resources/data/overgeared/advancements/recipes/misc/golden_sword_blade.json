@@ -1,35 +1,22 @@
 {
-  "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_cast": {
+    "has_gold_ingot": {
       "conditions": {
         "items": [
           {
             "items": [
-              "overgeared:unfired_tool_cast"
+              "minecraft:gold_ingot"
             ]
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
-    },
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "overgeared:golden_sword_blade"
-      },
-      "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_cast",
-      "has_the_recipe"
+      "has_gold_ingot"
     ]
   ],
-  "rewards": {
-    "recipes": [
-      "overgeared:golden_sword_blade"
-    ]
-  },
   "sends_telemetry_event": false
 }

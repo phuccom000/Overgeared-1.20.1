@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -234,6 +235,23 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         player = null;
     }
 
+    void triggerAdvancement(ServerPlayer player, String path) {
+        // Use Minecraft's advancement system to grant the advancement
+        var advancement = player.server.getAdvancements().getAdvancement(
+                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, path)
+        );
+
+        if (advancement != null) {
+            var progress = player.getAdvancements().getOrStartProgress(advancement);
+            if (!progress.isDone()) {
+                // Grant all criteria to complete the advancement
+                for (String criterion : progress.getRemainingCriteria()) {
+                    player.getAdvancements().award(advancement, criterion);
+                }
+            }
+        }
+    }
+
     protected void craftItem() {
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
         if (recipeOptional.isEmpty()) return;
@@ -278,7 +296,10 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                             if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 &&
                                     new Random().nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
                                 quality = ForgingQuality.MASTER;
+                                triggerAdvancement((ServerPlayer) player, "master_forging");
                             }
+                            if (quality.equals(ForgingQuality.PERFECT))
+                                triggerAdvancement((ServerPlayer) player, "perfect_forging");
                             tag.putString("ForgingQuality", quality.getDisplayName());
                         }
 

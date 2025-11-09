@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared.screen;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -26,7 +27,15 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     private boolean knappingFinished = false;
     private boolean resultCollected = false;
     private boolean rockConsumed = false; // Track if rock has been consumed
+    private boolean advancementTriggered = false; // Track if advancement has been triggered
 
+    // Slot indices constants
+    private static final int PLAYER_INVENTORY_SLOT_COUNT = 36; // 27 main + 9 hotbar
+    private static final int PLAYER_FIRST_SLOT_INDEX = 0;
+    private static final int PLAYER_LAST_SLOT_INDEX = PLAYER_FIRST_SLOT_INDEX + PLAYER_INVENTORY_SLOT_COUNT - 1;
+    private static final int GRID_FIRST_SLOT_INDEX = PLAYER_LAST_SLOT_INDEX + 1;
+    private static final int GRID_LAST_SLOT_INDEX = GRID_FIRST_SLOT_INDEX + 8;
+    private static final int RESULT_SLOT_INDEX = GRID_LAST_SLOT_INDEX + 1;
 
     public RockKnappingMenu(int id, Inventory playerInv, FriendlyByteBuf extraData) {
         this(id, playerInv, playerInv.player.level().getRecipeManager(),
@@ -44,6 +53,9 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         this.recipeManager = recipeManager;
         this.player = playerInv.player;
 // Determine which hand has the rock (main hand takes priority)
+        // Add player inventory slots
+        addPlayerHotbar(playerInv);
+        addPlayerInventory(playerInv);
 
         this.inputRock = mainHandItem.getItem() instanceof KnappableRockItem ? mainHandItem.copy() :
                 offHandItem.getItem() instanceof KnappableRockItem ? offHandItem.copy() :
@@ -76,6 +88,10 @@ public class RockKnappingMenu extends AbstractContainerMenu {
             public void onTake(Player player, ItemStack stack) {
                 knappingFinished = true;
                 markResultCollected();
+                if (!advancementTriggered && player instanceof ServerPlayer serverPlayer) {
+                    triggerKnappingAdvancement(serverPlayer);
+                    advancementTriggered = true;
+                }
                 super.onTake(player, stack);
             }
 
@@ -85,9 +101,25 @@ public class RockKnappingMenu extends AbstractContainerMenu {
             }
         });
 
-        // Add player inventory slots
-        addPlayerHotbar(playerInv);
-        addPlayerInventory(playerInv);
+
+    }
+
+    // Method to trigger the knapping advancement
+    private void triggerKnappingAdvancement(ServerPlayer player) {
+        // Use Minecraft's advancement system to grant the advancement
+        var advancement = player.server.getAdvancements().getAdvancement(
+                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "rock_knapping")
+        );
+
+        if (advancement != null) {
+            var progress = player.getAdvancements().getOrStartProgress(advancement);
+            if (!progress.isDone()) {
+                // Grant all criteria to complete the advancement
+                for (String criterion : progress.getRemainingCriteria()) {
+                    player.getAdvancements().award(advancement, criterion);
+                }
+            }
+        }
     }
 
     public boolean isResultCollected() {
@@ -155,11 +187,11 @@ public class RockKnappingMenu extends AbstractContainerMenu {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
 
-            // Result slot (slot 9)
-            if (index == 9) {
+            // Result slot (slot 45)
+            if (index == RESULT_SLOT_INDEX) {
                 knappingFinished = true;
-                // Try to move the result to player inventory
-                if (!this.moveItemStackTo(itemstack1, 10, 46, true)) {
+                // Try to move the result to player inventory (slots 0-35)
+                if (!this.moveItemStackTo(itemstack1, PLAYER_FIRST_SLOT_INDEX, PLAYER_LAST_SLOT_INDEX + 1, true)) {
                     return ItemStack.EMPTY;
                 }
 
@@ -172,22 +204,34 @@ public class RockKnappingMenu extends AbstractContainerMenu {
                     slot.setChanged();
                 }
 
+                // Trigger advancement when taking result via shift-click
+                if (!advancementTriggered && player instanceof ServerPlayer serverPlayer) {
+                    triggerKnappingAdvancement(serverPlayer);
+                    advancementTriggered = true;
+                }
+
                 // Update menu state
                 this.markResultCollected();
                 return itemstack;
             }
-            // Player inventory slots (10-46)
-            else if (index >= 10 && index < 46) {
-                // Try to move items from player inventory to hotbar first
-                if (index < 37) {
-                    if (!this.moveItemStackTo(itemstack1, 37, 46, false)) {
+            // Player inventory slots (0-35)
+            else if (index >= PLAYER_FIRST_SLOT_INDEX && index <= PLAYER_LAST_SLOT_INDEX) {
+                // Try to move items from player inventory to appropriate slots
+                // Since grid slots are virtual, we don't allow moving items into them
+                // Just reorganize within player inventory
+                if (index < 27) { // Main inventory to hotbar
+                    if (!this.moveItemStackTo(itemstack1, 27, 36, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else { // Hotbar to main inventory
+                    if (!this.moveItemStackTo(itemstack1, 0, 27, false)) {
                         return ItemStack.EMPTY;
                     }
                 }
-                // Try to move items from hotbar to inventory
-                else if (!this.moveItemStackTo(itemstack1, 10, 37, false)) {
-                    return ItemStack.EMPTY;
-                }
+            }
+            // Grid slots (36-44) - these are virtual, shouldn't be accessible for transfer
+            else if (index >= GRID_FIRST_SLOT_INDEX && index <= GRID_LAST_SLOT_INDEX) {
+                return ItemStack.EMPTY;
             }
 
             if (itemstack1.isEmpty()) {

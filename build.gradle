@@ -226,7 +226,7 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:lionfish-api-1001614:5922047")
 
     runtimeOnly fg.deobf("curse.maven:lendercataclysm-551586:6906993")
-    //runtimeOnly fg.deobf("curse.maven:item-nbt-viewer-514135:4578522")
+    runtimeOnly fg.deobf("curse.maven:item-nbt-viewer-514135:4578522")
     //implementation fg.deobf("curse.maven:no-tree-punching-289043:4599926")
     implementation fg.deobf("curse.maven:ytech-917366:6616815")
     //implementation fg.deobf("curse.maven:max-health-fix-492246:5378283")
@@ -235,8 +235,8 @@ dependencies {
     implementation fg.deobf("curse.maven:selene-499980:6983934")
     //implementation fg.deobf("curse.maven:spelunkery-790530:6122072")
     //runtimeOnly fg.deobf("maven.modrinth:kap_lib:v1.26.3-mc1.20.1-FML47.3.0")
-    //runtimeOnly fg.deobf("curse.maven:zeta-968868:6432578")
-    //runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")
+    runtimeOnly fg.deobf("curse.maven:zeta-968868:6432578")
+    runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")
     //runtimeOnly fg.deobf("curse.maven:modernfix-790626:6837713")
 
     implementation fg.deobf("curse.maven:spartan-weaponry-278141:6842571")
@@ -259,11 +259,13 @@ dependencies {
     //implementation fg.deobf("curse.maven:blueprint-382216:6408581")
     //implementation fg.deobf("curse.maven:savage-and-ravage-381736:6040963")
     //implementation fg.deobf("curse.maven:hold-my-items-reforged-1246920:6608415")
-    /* runtimeOnly fg.deobf("curse.maven:epic-knights-armor-and-weapons-509041:6373737")
-     runtimeOnly fg.deobf("curse.maven:epic-knights-addon-925866:6036869")
-     runtimeOnly fg.deobf("curse.maven:epic-knights-slavic-armory-942000:5458480")
-     runtimeOnly fg.deobf("curse.maven:cloth-config-348521:5729105")
-     runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137938")*/
+
+    /*runtimeOnly fg.deobf("curse.maven:epic-knights-armor-and-weapons-509041:6373737")
+    runtimeOnly fg.deobf("curse.maven:epic-knights-addon-925866:6036869")
+    runtimeOnly fg.deobf("curse.maven:epic-knights-slavic-armory-942000:5458480")
+    runtimeOnly fg.deobf("curse.maven:cloth-config-348521:5729105")
+    runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137938")
+    */
     //runtimeOnly fg.deobf("curse.maven:archery-expansion-1164945:6424928")
     //runtimeOnly fg.deobf("curse.maven:archery-expansion-squared-1217171:6425344")
     // Example mod dependency using a mod jar from ./libs with a flat dir repository

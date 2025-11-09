@@ -1,6 +1,10 @@
 package net.stirdrem.overgeared.util;
 
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.recipe.ItemToToolTypeRecipe;
+import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 
 import java.util.List;
 
@@ -47,15 +51,14 @@ public class CastingConfigHelper {
     // -----------------------
     // Tool Head → Tool Type
     // -----------------------
-
-    public static String getToolTypeForItem(String itemId) {
-        for (var e : ServerConfig.TOOL_HEAD_SETTING.get()) {
-            List<?> row = (List<?>) e;
-            if (row.get(0).equals(itemId)) {
-                return (String) row.get(1);
-            }
-        }
-        return "none";
+    public static String getToolTypeForItem(Level level, ItemStack stack) {
+        return level.getRecipeManager()
+                .getAllRecipesFor(ModRecipeTypes.ITEM_TO_TOOLTYPE.get())
+                .stream()
+                .filter(r -> r.getInput().test(stack))
+                .map(ItemToToolTypeRecipe::getToolType)
+                .findFirst()
+                .orElse("none");
     }
 
     // -----------------------
@@ -93,25 +96,6 @@ public class CastingConfigHelper {
             }
         }
         return false;
-    }
-
-    /**
-     * Get all item IDs that belong to a given tool type.
-     * Example: "SWORD" -> ["minecraft:iron_sword_head", "minecraft:diamond_sword_head"]
-     */
-    public static List<String> getAllItemsWithToolType(String toolType) {
-        List<String> items = new java.util.ArrayList<>();
-
-        for (var e : ServerConfig.TOOL_HEAD_SETTING.get()) {
-            List<?> row = (List<?>) e;
-
-            // Row format: [itemId, toolType]
-            if (row.size() >= 2 && row.get(1).equals(toolType)) {
-                items.add((String) row.get(0));
-            }
-        }
-
-        return items;
     }
 
 }

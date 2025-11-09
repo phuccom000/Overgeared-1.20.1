@@ -131,6 +131,8 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModBlocks.TIER_B_SMITHING_ANVIL.get());
                         pOutput.accept(ModBlocks.STEEL_BLOCK.get());
                         pOutput.accept(ModBlocks.DRAFTING_TABLE.get());
+                        pOutput.accept(ModBlocks.ALLOY_FURNACE.get());
+                        pOutput.accept(ModBlocks.NETHER_ALLOY_FURNACE.get());
                         //pOutput.accept(ModBlocks.SMITHING_ANVIL_TEST.get());
                         //pOutput.accept(ModBlocks.WATER_BARREL.get());
                         //pOutput.accept(ModBlocks.WATER_BARREL_FULL.get());

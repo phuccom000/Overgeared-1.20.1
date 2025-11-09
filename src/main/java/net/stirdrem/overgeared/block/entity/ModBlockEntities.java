@@ -12,6 +12,10 @@ public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, OvergearedMod.MOD_ID);
 
+    public static void register(IEventBus eventBus) {
+        BLOCK_ENTITIES.register(eventBus);
+    }
+
     public static final RegistryObject<BlockEntityType<SteelSmithingAnvilBlockEntity>> STEEL_SMITHING_ANVIL_BE =
             BLOCK_ENTITIES.register("smithing_table_be", () ->
                     BlockEntityType.Builder.of(SteelSmithingAnvilBlockEntity::new,
@@ -35,9 +39,15 @@ public class ModBlockEntities {
                     BlockEntityType.Builder.of(StoneSmithingAnvilBlockEntity::new,
                                     ModBlocks.STONE_SMITHING_ANVIL.get()).
                             build(null));
+    public static final RegistryObject<BlockEntityType<AlloySmelterBlockEntity>> ALLOY_FURNACE_BE =
+            BLOCK_ENTITIES.register("alloy_furnace_be", () ->
+                    BlockEntityType.Builder.of(AlloySmelterBlockEntity::new,
+                            ModBlocks.ALLOY_FURNACE.get()).build(null));
 
-    public static void register(IEventBus eventBus) {
-        BLOCK_ENTITIES.register(eventBus);
-    }
+    public static final RegistryObject<BlockEntityType<NetherAlloySmelterBlockEntity>> NETHER_ALLOY_FURNACE_BE =
+            BLOCK_ENTITIES.register("nether_alloy_furnace_be", () ->
+                    BlockEntityType.Builder.of(NetherAlloySmelterBlockEntity::new,
+                            ModBlocks.NETHER_ALLOY_FURNACE.get()).build(null));
+
 
 }

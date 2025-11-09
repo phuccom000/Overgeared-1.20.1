@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "item": "overgeared:blueprint"
+    },
+    "title": "Drafted To Forge",
+    "description": "Obtain your first smithing blueprint",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "overgeared:making_anvil",
+  "criteria": {
+    "smithing_hammer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "overgeared:blueprint"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

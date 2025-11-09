@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.util.CastingConfigHelper;
 
@@ -64,6 +65,8 @@ public class DynamicToolCastRecipe extends CustomRecipe {
 
     @Override
     public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
+        if (!ServerConfig.ENABLE_CASTING.get()) return ItemStack.EMPTY;
+
         ItemStack cast = ItemStack.EMPTY;
         HashMap<String, Integer> materialTotals = new HashMap<>();
         List<ItemStack> inputItems = new ArrayList<>(); // Store the actual ItemStacks for comparison

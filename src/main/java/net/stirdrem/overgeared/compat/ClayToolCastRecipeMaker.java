@@ -6,20 +6,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
+import net.stirdrem.overgeared.recipe.ItemToToolTypeRecipe;
+import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.util.CastingConfigHelper;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ClayToolCastRecipeMaker {
@@ -27,34 +24,35 @@ public final class ClayToolCastRecipeMaker {
     private ClayToolCastRecipeMaker() {
     }
 
-    public static List<CraftingRecipe> createRecipes() {
+    public static List<CraftingRecipe> createRecipes(RecipeManager recipeManager) {
+        // ✅ Get all registered item_to_tooltype recipes
+        List<ItemToToolTypeRecipe> itemToToolTypeRecipes =
+                recipeManager.getAllRecipesFor(ModRecipeTypes.ITEM_TO_TOOLTYPE.get());
 
-        // Group by tool type
-        var grouped = ServerConfig.TOOL_HEAD_SETTING.get().stream()
-                .filter(row -> row instanceof List<?> && row.size() >= 2)
-                .collect(Collectors.groupingBy(row -> (String) row.get(1))); // key = toolType
+        // ✅ Group recipes by tool type (key = tooltype string)
+        Map<String, List<ItemToToolTypeRecipe>> grouped =
+                itemToToolTypeRecipes.stream()
+                        .collect(Collectors.groupingBy(ItemToToolTypeRecipe::getToolType));
 
+        // ✅ Convert each tooltype group into a synthetic JEI recipe
         return grouped.entrySet().stream()
                 .map(entry -> {
                     String toolType = entry.getKey();
 
-                    // Collect all item heads for this tool type
+                    // Collect all input items from the recipes - FIXED
                     List<Item> toolHeads = entry.getValue().stream()
-                            .map(row -> (String) row.get(0))
-                            .map(ResourceLocation::tryParse)
-                            .map(BuiltInRegistries.ITEM::get)
+                            .flatMap(r -> r.getItems().stream()) // Now returns List<ItemStack>
+                            .map(ItemStack::getItem) // Get the Item from ItemStack
                             .filter(item -> item != Items.AIR)
+                            .distinct() // Remove duplicates
                             .toList();
 
                     if (toolHeads.isEmpty()) return null;
-
-                    // Create one multi-input recipe
                     return createRecipe(toolHeads, toolType);
                 })
                 .filter(Objects::nonNull)
                 .toList();
     }
-
 
     private static CraftingRecipe createRecipe(List<Item> toolHeads, String toolType) {
         // Center ingredient must accept ANY head item
@@ -76,7 +74,6 @@ public final class ClayToolCastRecipeMaker {
 
         return new ShapedRecipe(id, "jei.clay_cast", CraftingBookCategory.MISC, 3, 3, inputs, output);
     }
-
 
     private static ItemStack createOutput(String toolType) {
         ItemStack result = new ItemStack(ModItems.UNFIRED_TOOL_CAST.get());

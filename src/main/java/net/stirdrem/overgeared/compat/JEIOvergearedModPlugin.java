@@ -69,31 +69,6 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         return "misc";
     }
 
-    /*private static List<CraftingRecipe> replaceSpecialCraftingRecipes(List<CraftingRecipe> unhandledCraftingRecipes, IStackHelper stackHelper) {
-        Map<Class<? extends CraftingRecipe>, Supplier<List<CraftingRecipe>>> replacers = new IdentityHashMap<>();
-        replacers.put(ClayToolCastRecipe.class, ClayToolCastRecipeMaker::createRecipes);
-        replacers.put(ClayToolCastRecipe.class, NetherToolCastRecipeMaker::createRecipes);
-        replacers.put(BlueprintCloningRecipe.class, BlueprintCloningRecipeMaker::createRecipes);
-
-        return unhandledCraftingRecipes.stream()
-                .map(CraftingRecipe::getClass)
-                .distinct()
-                .filter(replacers::containsKey)
-                // distinct + this limit will ensure we stop iterating early if we find all the recipes we're looking for.
-                .limit(replacers.size())
-                .flatMap(recipeClass -> {
-                    var supplier = replacers.get(recipeClass);
-                    try {
-                        return supplier.get()
-                                .stream();
-                    } catch (RuntimeException e) {
-                        OvergearedMod.LOGGER.error("Failed to create JEI recipes for {}", recipeClass, e);
-                        return Stream.of();
-                    }
-                })
-                .toList();
-    }*/
-
     @Override
     public ResourceLocation getPluginUid() {
         return ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "jei_plugin");
@@ -108,6 +83,8 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipeCategories(new StoneAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
         registration.addRecipeCategories(new SteelAnvilCategory(registration.getJeiHelpers().getGuiHelper(), registryAccess));
         registration.addRecipeCategories(new FletchingCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new AlloySmeltingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new NetherAlloySmeltingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -161,25 +138,17 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         // Rock Knapping
         List<RockKnappingRecipe> knappingRecipes = recipeManager.getAllRecipesFor(RockKnappingRecipe.Type.INSTANCE);
         registration.addRecipes(KnappingRecipeCategory.KNAPPING_RECIPE_TYPE, knappingRecipes);
+        List<AlloySmeltingRecipe> alloyingRecipes = recipeManager.getAllRecipesFor(AlloySmeltingRecipe.Type.INSTANCE);
+        registration.addRecipes(AlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE, alloyingRecipes);
+        List<NetherAlloySmeltingRecipe> netherAlloySmeltingRecipes = recipeManager.getAllRecipesFor(NetherAlloySmeltingRecipe.Type.INSTANCE);
+        registration.addRecipes(NetherAlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE, netherAlloySmeltingRecipes);
+        List<ItemToToolTypeRecipe> itemToToolTypeRecipes = recipeManager.getAllRecipesFor(ModRecipeTypes.ITEM_TO_TOOLTYPE.get());
 
-        IIngredientManager ingredientManager = registration.getIngredientManager();
-        IVanillaRecipeFactory vanillaRecipeFactory = registration.getVanillaRecipeFactory();
-        IJeiHelpers jeiHelpers = registration.getJeiHelpers();
-        IStackHelper stackHelper = jeiHelpers.getStackHelper();
-
-
-        List<CraftingRecipe> craftingRecipes = recipeManager.getAllRecipesFor(RecipeType.CRAFTING);
-
-        // Replace vanilla tipped arrow recipe with custom tool cast recipes
-       /* List<CraftingRecipe> replacedCrafting = replaceSpecialCraftingRecipes(
-                craftingRecipes,
-                registration.getJeiHelpers().getStackHelper()
-        );*/
-
-        registration.addRecipes(RecipeTypes.CRAFTING, ClayToolCastRecipeMaker.createRecipes());
-        registration.addRecipes(RecipeTypes.CRAFTING, NetherToolCastRecipeMaker.createRecipes());
+        if (ServerConfig.ENABLE_CASTING.get()) {
+            registration.addRecipes(RecipeTypes.CRAFTING, ClayToolCastRecipeMaker.createRecipes(recipeManager));
+            registration.addRecipes(RecipeTypes.CRAFTING, NetherToolCastRecipeMaker.createRecipes(recipeManager));
+        }
         registration.addRecipes(RecipeTypes.CRAFTING, BlueprintCloningRecipeMaker.createRecipes());
-        //registration.addRecipes(RecipeTypes.CRAFTING, replacedCrafting);
 
         if (ServerConfig.ENABLE_DRAGON_BREATH_RECIPE.get())
             registration.addRecipes(RecipeTypes.BREWING, dragonBreathRecipe());
@@ -332,6 +301,11 @@ public class JEIOvergearedModPlugin implements IModPlugin {
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addRecipeClickArea(SteelSmithingAnvilScreen.class, 90, 35, 22, 15,
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE);
+        registration.addRecipeClickArea(NetherAlloySmelterScreen.class, 90, 35, 22, 15,
+                NetherAlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE);
+
+        registration.addRecipeClickArea(AlloySmelterScreen.class, 86, 35, 22, 15,
+                AlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE);
 
         registration.addRecipeClickArea(FletchingStationScreen.class, 90, 35, 22, 15,
                 FletchingCategory.FLETCHING_RECIPE_TYPE);
@@ -371,7 +345,14 @@ public class JEIOvergearedModPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-
+        registration.addRecipeCatalyst(
+                new ItemStack(ModBlocks.ALLOY_FURNACE.get()), // or your custom source block
+                AlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE
+        );
+        registration.addRecipeCatalyst(
+                new ItemStack(ModBlocks.NETHER_ALLOY_FURNACE.get()), // or your custom source block
+                NetherAlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE
+        );
         registration.addRecipeCatalyst(
                 new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()), // or your custom source block
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE

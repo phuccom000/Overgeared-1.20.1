@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "item": "overgeared:smithing_hammer"
+    },
+    "title": "Overgeared",
+    "description": "The beginning of a master blacksmith's journey",
+    "background": "minecraft:textures/block/stone.png",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "Trigger": {
+      "trigger": "minecraft:tick"
+    }
+  }
+}

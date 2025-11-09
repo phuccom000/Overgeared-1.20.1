@@ -19,6 +19,8 @@
   "block.overgeared.stone_anvil": "Stone Smithing Anvil",
   "block.overgeared.steel_block": "Block of Steel",
   "block.overgeared.drafting_table": "Drafting Table",
+  "block.overgeared.alloy_furnace": "Alloy Furnace",
+  "block.overgeared.nether_alloy_furnace": "Nether Alloy Furnace",
   "creativetab.overgeared_tab": "Overgeared",
   "gui.overgeared.remaining_hits": "Hits Left: %s",
   "gui.overgeared.smithing_anvil": "Forging",
@@ -255,6 +257,10 @@
   "message.overgeared.materials_returned": "Materials returned from cast",
   "message.overgeared.no_materials": "No materials could be returned",
   "tooltip.overgeared.cast_right_click": "Crouch + Right-click to return materials",
-  "message.overgeared.invalid_material": "Not a valid material"
+  "message.overgeared.invalid_material": "Not a valid material",
+  "container.overgeared.alloy_smelter": "Alloy Furnace",
+  "gui.overgeared.jei.category.alloy_smelting": "Alloying",
+  "container.overgeared.nether_alloy_smelter": "Nether Alloy Furnace",
+  "gui.overgeared.jei.category.nether_alloy_smelting": "Nether Alloying"
 }
 

@@ -15,11 +15,21 @@ public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(ForgeRegistries.MENU_TYPES, OvergearedMod.MOD_ID);
 
+    private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
+        return MENUS.register(name, () -> IForgeMenuType.create(factory));
+    }
+
+    public static void register(IEventBus eventBus) {
+        MENUS.register(eventBus);
+    }
+
     public static final RegistryObject<MenuType<SteelSmithingAnvilMenu>> STEEL_SMITHING_ANVIL_MENU =
             registerMenuType("smithing_anvil_menu", SteelSmithingAnvilMenu::new);
 
+
     public static final RegistryObject<MenuType<TierASmithingAnvilMenu>> TIER_A_SMITHING_ANVIL_MENU =
             registerMenuType("tier_a_smithing_anvil_menu", TierASmithingAnvilMenu::new);
+
 
     public static final RegistryObject<MenuType<TierBSmithingAnvilMenu>> TIER_B_SMITHING_ANVIL_MENU =
             registerMenuType("tier_b_smithing_anvil_menu", TierBSmithingAnvilMenu::new);
@@ -38,11 +48,10 @@ public class ModMenuTypes {
             MENUS.register("fletching_station",
                     () -> new MenuType<>(FletchingStationMenu::new, FeatureFlagSet.of()));
 
-    private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
-        return MENUS.register(name, () -> IForgeMenuType.create(factory));
-    }
+    public static final RegistryObject<MenuType<AlloySmelterMenu>> ALLOY_SMELTER_MENU =
+            registerMenuType("alloy_smelter_menu", AlloySmelterMenu::new);
 
-    public static void register(IEventBus eventBus) {
-        MENUS.register(eventBus);
-    }
+    public static final RegistryObject<MenuType<NetherAlloySmelterMenu>> NETHER_ALLOY_SMELTER_MENU =
+            registerMenuType("nether_alloy_smelter_menu", NetherAlloySmelterMenu::new);
+
 }

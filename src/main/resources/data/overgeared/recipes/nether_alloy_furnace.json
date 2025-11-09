@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "xxx",
+    "x x",
+    "xix"
+  ],
+  "key": {
+    "x": {
+      "item": "minecraft:nether_brick"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "overgeared:nether_alloy_furnace"
+  }
+}

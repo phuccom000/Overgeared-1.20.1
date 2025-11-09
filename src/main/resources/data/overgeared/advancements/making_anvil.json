@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "item": "overgeared:stone_anvil"
+    },
+    "title": "Anvil Acquired",
+    "description": "Convert a stone block or a vanilla anvil into your first smithing anvil",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "overgeared:hammer",
+  "criteria": {
+    "made_anvil": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

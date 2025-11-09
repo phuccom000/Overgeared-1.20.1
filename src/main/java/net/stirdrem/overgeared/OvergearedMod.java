@@ -6,9 +6,11 @@ import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
@@ -22,6 +24,7 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -37,6 +40,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.block.UpgradeArrowDispenseBehavior;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.command.ModCommands;
 import net.stirdrem.overgeared.entity.ModEntities;
 
 import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
@@ -108,19 +112,77 @@ public class OvergearedMod {
 
         ModAttributes.register(modEventBus);
 
-
         MinecraftForge.EVENT_BUS.register(TickScheduler.class);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::sendImc);
         MinecraftForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::addCreative);
+        MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
 
         polymorph = ModList.get().isLoaded("polymorph");
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         //context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+    }
+
+    @Unique
+    @Nullable
+    public static Item getCooledIngot(@Nullable Item heatedItem) {
+        if (heatedItem == null) return null;
+
+        var tagManager = ForgeRegistries.ITEMS.tags();
+        if (tagManager == null) return heatedItem;
+
+        var heatedTag = tagManager.getTag(ModTags.Items.HEATED_METALS);
+        var cooledTag = tagManager.getTag(ModTags.Items.HEATABLE_METALS);
+
+        if (heatedTag.isEmpty() || cooledTag.isEmpty()) {
+            return heatedItem;
+        }
+
+        int index = 0;
+        for (Item item : heatedTag) {
+            if (item == heatedItem) {
+                int i = 0;
+                for (Item cooledItem : cooledTag) {
+                    if (i == index) {
+                        return cooledItem;
+                    }
+                    i++;
+                }
+            }
+            index++;
+        }
+
+        return heatedItem;
+    }
+
+
+    @Unique
+    public static boolean isDurabilityMultiplierBlacklisted(ItemStack stack) {
+        ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        List<? extends String> blacklist = ServerConfig.BASE_DURABILITY_BLACKLIST.get();
+
+        for (String entry : blacklist) {
+            if (entry.startsWith("#")) {
+                // Handle tag entries like "#forge:tools/hammers"
+                ResourceLocation tagId = ResourceLocation.tryParse(entry.substring(1));
+                TagKey<Item> tag = TagKey.create(Registries.ITEM, tagId);
+                if (stack.is(tag)) return true;
+            } else {
+                // Handle direct item IDs
+                if (itemId != null && itemId.equals(ResourceLocation.tryParse(entry))) return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    private void registerCommands(RegisterCommandsEvent event) {
+        ModCommands.register(event.getDispatcher());
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -429,33 +491,6 @@ public class OvergearedMod {
 
     }
 
-    @Unique
-    public static Item getCooledIngot(Item heatedItem) {
-        var heatedTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATED_METALS);
-        var cooledTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATABLE_METALS);
-
-        int index = 0;
-        for (Item item : heatedTag) {
-            if (item == heatedItem) {
-                int i = 0;
-                for (Item cooledItem : cooledTag) {
-                    if (i == index) {
-                        return cooledItem;
-                    }
-                    i++;
-                }
-            }
-            index++;
-        }
-        return heatedItem;
-    }
-
-    @Unique
-    public static boolean isDurabilityMultiplierBlacklisted(ItemStack stack) {
-        ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
-        return ServerConfig.BASE_DURABILITY_BLACKLIST.get().contains(id.toString());
-    }
-
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class CommonModEvents {
         @SubscribeEvent
@@ -482,6 +517,8 @@ public class OvergearedMod {
             MenuScreens.register(ModMenuTypes.ROCK_KNAPPING_MENU.get(), RockKnappingScreen::new);
             MenuScreens.register(ModMenuTypes.BLUEPRINT_WORKBENCH_MENU.get(), BlueprintWorkbenchScreen::new);
             MenuScreens.register(ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingStationScreen::new);
+            MenuScreens.register(ModMenuTypes.ALLOY_SMELTER_MENU.get(), AlloySmelterScreen::new);
+            MenuScreens.register(ModMenuTypes.NETHER_ALLOY_SMELTER_MENU.get(), NetherAlloySmelterScreen::new);
 
             registerArrowProperties(ModItems.IRON_UPGRADE_ARROW.get());
             registerArrowProperties(ModItems.STEEL_UPGRADE_ARROW.get());

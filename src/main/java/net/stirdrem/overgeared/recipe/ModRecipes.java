@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared.recipe;
 
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -34,7 +35,12 @@ public class ModRecipes {
             SERIALIZERS.register("cast_smelting", () -> CastSmeltingRecipe.Serializer.INSTANCE);
     public static final RegistryObject<RecipeSerializer<CastBlastingRecipe>> CAST_BLASTING =
             SERIALIZERS.register("cast_blasting", () -> CastBlastingRecipe.Serializer.INSTANCE);
-
+    public static final RegistryObject<RecipeSerializer<AlloySmeltingRecipe>> ALLOY_SMELTING =
+            SERIALIZERS.register("alloy_smelting", () -> AlloySmeltingRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
+            SERIALIZERS.register("nether_alloy_smelting", () -> NetherAlloySmeltingRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<ItemToToolTypeRecipe>> ITEM_TO_TOOLTYPE =
+            SERIALIZERS.register("item_to_tooltype", ItemToToolTypeRecipe.Serializer::new);
 
     public static void register(IEventBus eventBus) {
         SERIALIZERS.register(eventBus);
