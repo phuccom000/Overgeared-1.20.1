@@ -1,0 +1,9 @@
+{
+  "type": "overgeared:cooling",
+  "input": {
+    "item": "overgeared:heated_silver_ingot"
+  },
+  "output": {
+    "item": "oreganized:silver_ingot"
+  }
+}

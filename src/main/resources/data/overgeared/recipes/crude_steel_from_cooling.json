@@ -1,0 +1,9 @@
+{
+  "type": "overgeared:cooling",
+  "input": {
+    "item": "overgeared:heated_crude_steel"
+  },
+  "output": {
+    "item": "overgeared:crude_steel"
+  }
+}

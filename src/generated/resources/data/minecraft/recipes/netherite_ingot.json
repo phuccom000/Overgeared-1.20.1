@@ -1,0 +1,26 @@
+{
+  "type": "overgeared:forging",
+  "category": "misc",
+  "hammering": 10,
+  "has_quality": false,
+  "key": {
+    "#": {
+      "item": "overgeared:heated_netherite_composite"
+    }
+  },
+  "need_quenching": false,
+  "needs_minigame": true,
+  "pattern": [
+    "#"
+  ],
+  "quality_difficulty": "master",
+  "result": {
+    "item": "minecraft:netherite_ingot"
+  },
+  "result_failed": {
+    "count": 4,
+    "item": "minecraft:netherite_scrap"
+  },
+  "show_notification": true,
+  "tier": "iron"
+}
