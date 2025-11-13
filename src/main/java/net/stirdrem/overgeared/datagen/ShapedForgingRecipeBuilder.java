@@ -64,6 +64,8 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
 
     @Nullable
     private ForgingQuality minimumQuality;
+    @Nullable
+    private ForgingQuality qualityDifficulty;
 
     private boolean showNotification = true;
 
@@ -189,6 +191,11 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
+    public ShapedForgingRecipeBuilder qualityDifficulty(@Nullable ForgingQuality qualityDifficulty) {
+        this.qualityDifficulty = qualityDifficulty;
+        return this;
+    }
+
     public ShapedForgingRecipeBuilder setPolishing(@Nullable boolean hasPolishing) {
         this.hasPolishing = hasPolishing;
         return this;
@@ -249,8 +256,9 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 this.hasQuality != null && !this.hasQuality ? null : (this.hasPolishing != null ? this.hasPolishing : true),
                 this.hasQuality != null && this.hasQuality ? null : (this.needsMinigame != null && this.needsMinigame),
                 this.hasQuality != null && !this.hasQuality ? "" : (this.minimumQuality != null ? this.minimumQuality.getDisplayName() : ForgingQuality.POOR.getDisplayName()),
+                this.qualityDifficulty != null ? this.qualityDifficulty.getDisplayName() : ForgingQuality.NONE.getDisplayName(),
                 this.tier == null ? "" : this.tier,
-                this.needQuenching == null ? true : this.needQuenching // default true if not set
+                this.needQuenching == null || this.needQuenching
         ));
     }
 
@@ -289,9 +297,9 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         private final String minimumQuality;
         private final String tier;
         private final Boolean needQuenching;
+        private final String qualityDifficulty;
 
-
-        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, ItemStack failedResult, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, List<String> blueprintTypes, Boolean requiresBlueprint, Boolean hasQuality, Boolean hasPolishing, Boolean needsMinigame, String minimumQuality, String tier, Boolean needQuenching) {
+        public Result(NonNullList<Ingredient> ingredients, int hammering, ItemStack result, ResourceLocation id, ItemStack failedResult, String group, ForgingBookCategory category, List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement, ResourceLocation advancementId, boolean showNotification, List<String> blueprintTypes, Boolean requiresBlueprint, Boolean hasQuality, Boolean hasPolishing, Boolean needsMinigame, String minimumQuality, String qualityDifficulty, String tier, Boolean needQuenching) {
             this.ingredients = ingredients;
             this.hammering = hammering;
             this.result = result;
@@ -310,6 +318,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             this.hasPolishing = hasPolishing;
             this.needsMinigame = needsMinigame;
             this.minimumQuality = minimumQuality;
+            this.qualityDifficulty = qualityDifficulty;
             this.tier = tier;
             this.needQuenching = needQuenching;
         }
@@ -351,6 +360,9 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             }
             if (!this.minimumQuality.isEmpty()) {
                 json.addProperty("minimum_quality", this.minimumQuality);
+            }
+            if (!this.qualityDifficulty.isEmpty()) {
+                json.addProperty("quality_difficulty", this.qualityDifficulty);
             }
             if (this.needsMinigame != null || !this.needsMinigame) {
                 json.addProperty("needs_minigame", this.needsMinigame);

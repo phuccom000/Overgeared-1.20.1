@@ -85,6 +85,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipeCategories(new FletchingCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new AlloySmeltingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new NetherAlloySmeltingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new CoolingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -139,10 +140,21 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         List<RockKnappingRecipe> knappingRecipes = recipeManager.getAllRecipesFor(RockKnappingRecipe.Type.INSTANCE);
         registration.addRecipes(KnappingRecipeCategory.KNAPPING_RECIPE_TYPE, knappingRecipes);
         List<AlloySmeltingRecipe> alloyingRecipes = recipeManager.getAllRecipesFor(AlloySmeltingRecipe.Type.INSTANCE);
-        registration.addRecipes(AlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE, alloyingRecipes);
-        List<NetherAlloySmeltingRecipe> netherAlloySmeltingRecipes = recipeManager.getAllRecipesFor(NetherAlloySmeltingRecipe.Type.INSTANCE);
-        registration.addRecipes(NetherAlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE, netherAlloySmeltingRecipes);
+        List<IAlloyRecipe> allRecipes = new ArrayList<>();
+
+        allRecipes.addAll(recipeManager.getAllRecipesFor(AlloySmeltingRecipe.Type.INSTANCE));
+        allRecipes.addAll(recipeManager.getAllRecipesFor(ShapedAlloySmeltingRecipe.Type.INSTANCE));
+        registration.addRecipes(AlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE, allRecipes);
+        
+        List<INetherAlloyRecipe> allRecipes2 = new ArrayList<>();
+
+        allRecipes2.addAll(recipeManager.getAllRecipesFor(NetherAlloySmeltingRecipe.Type.INSTANCE));
+        allRecipes2.addAll(recipeManager.getAllRecipesFor(ShapedNetherAlloySmeltingRecipe.Type.INSTANCE));
+        registration.addRecipes(NetherAlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE, allRecipes2);
+
         List<ItemToToolTypeRecipe> itemToToolTypeRecipes = recipeManager.getAllRecipesFor(ModRecipeTypes.ITEM_TO_TOOLTYPE.get());
+        List<CoolingRecipe> coolingRecipes = recipeManager.getAllRecipesFor(CoolingRecipe.Type.INSTANCE);
+        registration.addRecipes(CoolingRecipeCategory.TYPE, coolingRecipes);
 
         if (ServerConfig.ENABLE_CASTING.get()) {
             registration.addRecipes(RecipeTypes.CRAFTING, ClayToolCastRecipeMaker.createRecipes(recipeManager));
@@ -349,6 +361,16 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 new ItemStack(ModBlocks.ALLOY_FURNACE.get()), // or your custom source block
                 AlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE
         );
+        registration.addRecipeCatalyst(
+                new ItemStack(Items.WATER_BUCKET), // or your custom source block
+                CoolingRecipeCategory.TYPE
+        );
+
+        registration.addRecipeCatalyst(
+                new ItemStack(Blocks.WATER_CAULDRON), // or your custom source block
+                CoolingRecipeCategory.TYPE
+        );
+
         registration.addRecipeCatalyst(
                 new ItemStack(ModBlocks.NETHER_ALLOY_FURNACE.get()), // or your custom source block
                 NetherAlloySmeltingRecipeCategory.ALLOY_SMELTING_TYPE

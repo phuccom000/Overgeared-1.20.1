@@ -155,12 +155,12 @@ public class ToolCastItem extends Item {
         String itemId = BuiltInRegistries.ITEM.getKey(material.getItem()).toString();
 
         // Validate material type
-        if (!CastingConfigHelper.isValidMaterial(itemId)) {
+        if (!CastingConfigHelper.isValidMaterial(material)) {
             player.displayClientMessage(Component.translatable("message.overgeared.invalid_material"), true);
             return false;
         }
 
-        int value = CastingConfigHelper.getMaterialValue(itemId);
+        int value = CastingConfigHelper.getMaterialValue(material);
         if (value <= 0) return false;
 
         int amount = tag.getInt("Amount");
@@ -173,7 +173,7 @@ public class ToolCastItem extends Item {
         }
 
         // === Update Materials NBT correctly ===
-        String mat = CastingConfigHelper.getMaterialForItem(itemId);
+        String mat = CastingConfigHelper.getMaterialForItem(material);
         CompoundTag mats = tag.contains("Materials") ? tag.getCompound("Materials") : new CompoundTag();
 
         int prev = mats.getInt(mat); // ✅ read using material key (mat)

@@ -35,7 +35,7 @@ public class ResetMinigameS2CPacket {
                 if (player != null) {
                     BlockEntity be = player.level.getBlockEntity(anvilPos);
                     if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
-                        String quality = anvil.blueprintQuality(); // ✅ get directly from BE
+                        String quality = anvil.minigameQuality(); // ✅ get directly from BE
                         OvergearedMod.LOGGER.info(
                                 "Resetting minigame for {} at anvil {} with quality {}",
                                 player.getName().getString(), anvilPos, quality

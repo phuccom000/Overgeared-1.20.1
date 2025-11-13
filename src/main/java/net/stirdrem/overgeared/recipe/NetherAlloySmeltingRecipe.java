@@ -2,6 +2,7 @@ package net.stirdrem.overgeared.recipe;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
@@ -12,7 +13,7 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NetherAlloySmeltingRecipe implements Recipe<SimpleContainer> {
+public class NetherAlloySmeltingRecipe implements Recipe<SimpleContainer>, INetherAlloyRecipe {
     private final ResourceLocation id;
     private final String group;
     private final CraftingBookCategory category;
@@ -154,6 +155,9 @@ public class NetherAlloySmeltingRecipe implements Recipe<SimpleContainer> {
             List<Ingredient> inputList = new ArrayList<>();
             for (int i = 0; i < ingredients.size(); i++) {
                 inputList.add(Ingredient.fromJson(ingredients.get(i)));
+            }
+            if (ingredients.size() > 9) {
+                throw new JsonSyntaxException("Alloy smelting recipe cannot have more than 9 ingredients: found " + ingredients.size());
             }
 
             ItemStack result = ShapedRecipe.itemStackFromJson(json.getAsJsonObject("result"));

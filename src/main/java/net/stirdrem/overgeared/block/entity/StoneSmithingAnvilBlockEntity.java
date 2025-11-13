@@ -21,7 +21,7 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     private int craftCount = 0;
 
     public StoneSmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(AnvilTier.STONE, ModBlockEntities.STONE_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
+        super((StoneSmithingAnvil) pBlockState.getBlock(), AnvilTier.STONE, ModBlockEntities.STONE_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
     }
 
 
@@ -43,9 +43,9 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     @Override
     protected String determineForgingQuality() {
         // Get quality from anvil or use default if null
-        String quality = StoneSmithingAnvil.getQuality();
+        String quality = anvilBlock.getQuality();
         if (quality == null) {
-            return "no_quality"; // Default quality
+            return "poor"; // Default quality
         }
 
         // Use switch expression for better null safety

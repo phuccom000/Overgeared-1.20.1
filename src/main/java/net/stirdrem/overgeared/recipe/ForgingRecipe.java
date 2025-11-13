@@ -40,9 +40,10 @@ public class ForgingRecipe implements Recipe<Container> {
     private final boolean needQuenching;
     private final boolean showNotification;
     private final ForgingQuality minimumQuality;
+    private final ForgingQuality qualityDifficulty;
 
     public ForgingRecipe(ResourceLocation id, String group, boolean requireBlueprint, Set<String> blueprintTypes, String tier, NonNullList<Ingredient> ingredients,
-                         ItemStack result, ItemStack failedResult, int hammering, boolean hasQuality, boolean needsMinigame, boolean hasPolishing, boolean needQuenching, boolean showNotification, ForgingQuality minimumQuality, int width, int height) {
+                         ItemStack result, ItemStack failedResult, int hammering, boolean hasQuality, boolean needsMinigame, boolean hasPolishing, boolean needQuenching, boolean showNotification, ForgingQuality minimumQuality, ForgingQuality qualityDifficulty, int width, int height) {
         this.id = id;
         this.group = group;
         this.blueprintTypes = blueprintTypes;
@@ -60,6 +61,7 @@ public class ForgingRecipe implements Recipe<Container> {
         this.minimumQuality = minimumQuality;
         this.width = width;
         this.height = height;
+        this.qualityDifficulty = qualityDifficulty;
     }
 
     public static Optional<ForgingRecipe> findBestMatch(Level world, Container inv) {
@@ -237,6 +239,10 @@ public class ForgingRecipe implements Recipe<Container> {
         return minimumQuality;
     }
 
+    public ForgingQuality getQualityDifficulty() {
+        return qualityDifficulty;
+    }
+
     public boolean showNotification() {
         return showNotification;
     }
@@ -341,6 +347,8 @@ public class ForgingRecipe implements Recipe<Container> {
             boolean needQuenching = GsonHelper.getAsBoolean(json, "need_quenching", true);
             boolean showNotification = GsonHelper.getAsBoolean(json, "show_notification", true);
             ForgingQuality minimumQuality = ForgingQuality.fromString(GsonHelper.getAsString(json, "minimumQuality", ForgingQuality.POOR.getDisplayName()));
+            ForgingQuality qualityDifficulty = ForgingQuality.fromString(GsonHelper.getAsString(json, "quality_difficulty", ForgingQuality.NONE.getDisplayName()));
+
             Map<Character, Ingredient> keyMap = parseKey(GsonHelper.getAsJsonObject(json, "key"));
             JsonArray pattern = GsonHelper.getAsJsonArray(json, "pattern");
 
@@ -351,7 +359,7 @@ public class ForgingRecipe implements Recipe<Container> {
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
             ItemStack failedResult = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result_failed", GsonHelper.getAsJsonObject(json, "result")));
             return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult,
-                    hammering, hasQuality, needsMinigame, hasPolishing, needQuenching, showNotification, minimumQuality, width, height);
+                    hammering, hasQuality, needsMinigame, hasPolishing, needQuenching, showNotification, minimumQuality, qualityDifficulty, width, height);
         }
 
         @Override
@@ -377,10 +385,11 @@ public class ForgingRecipe implements Recipe<Container> {
             for (int i = 0; i < ingredients.size(); i++) {
                 ingredients.set(i, Ingredient.fromNetwork(buffer));
             }
+            ForgingQuality qualityDifficulty = ForgingQuality.fromString(buffer.readUtf());
 
             ItemStack result = buffer.readItem();
             ItemStack failedResult = buffer.readItem();
-            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, needQuenching, showNotification, minimumQuality, width, height);
+            return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing, needQuenching, showNotification, minimumQuality, qualityDifficulty, width, height);
         }
 
         @Override
@@ -405,6 +414,7 @@ public class ForgingRecipe implements Recipe<Container> {
             for (Ingredient ingredient : recipe.ingredients) {
                 ingredient.toNetwork(buffer);
             }
+            buffer.writeUtf(recipe.qualityDifficulty.toString());
 
             buffer.writeItem(recipe.result);
             buffer.writeItem(recipe.failedResult);

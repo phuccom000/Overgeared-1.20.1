@@ -127,7 +127,14 @@ public class ServerConfig {
     public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED;
     public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED_INCREASE;
     public static ForgeConfigSpec.DoubleValue MASTER_MAX_ARROW_SPEED;
+    public static ForgeConfigSpec.IntValue DEFAULT_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue DEFAULT_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue DEFAULT_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue DEFAULT_MAX_ARROW_SPEED;
     public static ForgeConfigSpec.IntValue FIRED_CAST_DURABILITY;
+    public static ForgeConfigSpec.BooleanValue EXPERT_ABOVE_INCREASE_BLUEPRINT;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -172,35 +179,38 @@ public class ServerConfig {
 
         builder.pop();
 
+        builder.push("Default (No Blueprint)");
+        DEFAULT_ZONE_STARTING_SIZE = builder.comment("Zone starting size for default forging (in % chance)").defineInRange("zoneStartingSize", 20, 0, 100);
+        DEFAULT_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for default forging").defineInRange("zoneShrinkFactor", 0.9, 0, 1);
+        DEFAULT_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for default forging").defineInRange("minPerfectZone", 8, 0, 100);
+        DEFAULT_ARROW_SPEED = builder.comment("Arrow speed for default forging").defineInRange("arrowSpeed", 2.0, -5.0, 5.0);
+        DEFAULT_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for default forging").defineInRange("arrowSpeedIncrease", 0.6, -5.0, 5.0);
+        DEFAULT_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for default forging").defineInRange("maxArrowSpeed", 8.0, 0.0, 10.0);
+        builder.pop();
+
         builder.push("Poorly Forged");
-        POOR_ZONE_STARTING_SIZE = builder.comment("Zone starting size for POOR forging (in % chance)")
-                .defineInRange("zoneStartingSize", 30, 0, 100);
-        POOR_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for POOR forging")
-                .defineInRange("zoneShrinkFactor", 0.9, 0.0, 1.0);
-        POOR_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for POOR forging")
-                .defineInRange("minPerfectZone", 15, 0, 100);
-        POOR_ARROW_SPEED = builder.comment("Arrow speed for POOR forging")
-                .defineInRange("arrowSpeed", 1.5, -5.0, 5.0);
-        POOR_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for POOR forging")
-                .defineInRange("arrowSpeedIncrease", 0.5, -5.0, 5.0);
-        POOR_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for POOR forging")
-                .defineInRange("maxArrowSpeed", 3.0, 0.0, 10.0);
+        POOR_ZONE_STARTING_SIZE = builder.comment("Zone starting size for POOR forging").defineInRange("zoneStartingSize", 30, 0, 100);
+        POOR_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for POOR forging").defineInRange("zoneShrinkFactor", 0.9, 0.0, 1.0);
+        POOR_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for POOR forging").defineInRange("minPerfectZone", 15, 0, 100);
+        POOR_ARROW_SPEED = builder.comment("Arrow speed for POOR forging").defineInRange("arrowSpeed", 1.5, -5.0, 5.0);
+        POOR_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for POOR forging").defineInRange("arrowSpeedIncrease", 0.5, -5.0, 5.0);
+        POOR_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for POOR forging").defineInRange("maxArrowSpeed", 4.0, 0.0, 10.0);
         builder.pop();
 
         builder.push("Well Forged");
         WELL_ZONE_STARTING_SIZE = builder.comment("Zone starting size for WELL forging").defineInRange("zoneStartingSize", 20, 0, 100);
-        WELL_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for WELL forging").defineInRange("zoneShrinkFactor", 0.7, 0, 1);
-        WELL_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for WELL forging").defineInRange("minPerfectZone", 10, 0, 100);
+        WELL_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for WELL forging").defineInRange("zoneShrinkFactor", 0.8, 0, 1);
+        WELL_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for WELL forging").defineInRange("minPerfectZone", 12, 0, 100);
         WELL_ARROW_SPEED = builder.comment("Arrow speed for WELL forging").defineInRange("arrowSpeed", 2.0, -5.0, 5.0);
-        WELL_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for WELL forging").defineInRange("arrowSpeedIncrease", 0.75, -5.0, 5.0);
+        WELL_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for WELL forging").defineInRange("arrowSpeedIncrease", 0.7, -5.0, 5.0);
         WELL_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for WELL forging").defineInRange("maxArrowSpeed", 5.0, 0.0, 10.0);
         builder.pop();
 
         // EXPERT
         builder.push("Expertly Forged");
         EXPERT_ZONE_STARTING_SIZE = builder.comment("Zone starting size for EXPERT forging").defineInRange("zoneStartingSize", 18, 0, 100);
-        EXPERT_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for EXPERT forging").defineInRange("zoneShrinkFactor", 0.65, 0, 1);
-        EXPERT_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for EXPERT forging").defineInRange("minPerfectZone", 8, 0, 100);
+        EXPERT_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for EXPERT forging").defineInRange("zoneShrinkFactor", 0.8, 0, 1);
+        EXPERT_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for EXPERT forging").defineInRange("minPerfectZone", 10, 0, 100);
         EXPERT_ARROW_SPEED = builder.comment("Arrow speed for EXPERT forging").defineInRange("arrowSpeed", 2.5, -5.0, 5.0);
         EXPERT_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for EXPERT forging").defineInRange("arrowSpeedIncrease", 0.85, -5.0, 5.0);
         EXPERT_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for EXPERT forging").defineInRange("maxArrowSpeed", 6.0, 0.0, 10.0);
@@ -209,8 +219,8 @@ public class ServerConfig {
         // PERFECT
         builder.push("Perfectly Forged");
         PERFECT_ZONE_STARTING_SIZE = builder.comment("Zone starting size for PERFECT forging").defineInRange("zoneStartingSize", 15, 0, 100);
-        PERFECT_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for PERFECT forging").defineInRange("zoneShrinkFactor", 0.6, 0, 1);
-        PERFECT_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for PERFECT forging").defineInRange("minPerfectZone", 6, 0, 100);
+        PERFECT_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for PERFECT forging").defineInRange("zoneShrinkFactor", 0.8, 0, 1);
+        PERFECT_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for PERFECT forging").defineInRange("minPerfectZone", 10, 0, 100);
         PERFECT_ARROW_SPEED = builder.comment("Arrow speed for PERFECT forging").defineInRange("arrowSpeed", 3.0, -5.0, 5.0);
         PERFECT_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for PERFECT forging").defineInRange("arrowSpeedIncrease", 1.0, -5.0, 5.0);
         PERFECT_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for PERFECT forging").defineInRange("maxArrowSpeed", 7.0, 0.0, 10.0);
@@ -219,8 +229,8 @@ public class ServerConfig {
         // MASTER
         builder.push("Masterwork");
         MASTER_ZONE_STARTING_SIZE = builder.comment("Zone starting size for MASTER forging").defineInRange("zoneStartingSize", 12, 0, 100);
-        MASTER_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for MASTER forging").defineInRange("zoneShrinkFactor", 0.55, 0, 1);
-        MASTER_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for MASTER forging").defineInRange("minPerfectZone", 4, 0, 100);
+        MASTER_ZONE_SHRINK_FACTOR = builder.comment("Zone shrink factor for MASTER forging").defineInRange("zoneShrinkFactor", 0.7, 0, 1);
+        MASTER_MIN_PERFECT_ZONE = builder.comment("Minimum perfect zone size for MASTER forging").defineInRange("minPerfectZone", 8, 0, 100);
         MASTER_ARROW_SPEED = builder.comment("Arrow speed for MASTER forging").defineInRange("arrowSpeed", 3.5, -5.0, 5.0);
         MASTER_ARROW_SPEED_INCREASE = builder.comment("Arrow speed increase per hit for MASTER forging").defineInRange("arrowSpeedIncrease", 1.2, -5.0, 5.0);
         MASTER_MAX_ARROW_SPEED = builder.comment("Maximum arrow speed for MASTER forging").defineInRange("maxArrowSpeed", 8.0, 0.0, 10.0);
@@ -259,6 +269,8 @@ public class ServerConfig {
                     // Validation will happen in ToolTypeRegistry
                     return true;
                 });
+        EXPERT_ABOVE_INCREASE_BLUEPRINT = builder.comment("Only increase blueprint's use if you get Expert or above in minigame.").define("expertAboveIncreaseBlueprintToggle", true);
+
         MASTER_MAX_USE = builder.comment("Uses required to reach the next quality after Master").defineInRange("masterMaxUse", 0, 0, Integer.MAX_VALUE);
         PERFECT_MAX_USE = builder.comment("Uses required to reach the next quality after Perfect").defineInRange("perfectMaxUse", 50, 0, 1000);
         EXPERT_MAX_USE = builder.comment("Uses required to reach the next quality after Expert").defineInRange("expertMaxUse", 20, 0, 1000);
@@ -366,7 +378,7 @@ public class ServerConfig {
 
 
         MATERIAL_SETTING = builder
-                .comment("Material Source Items: [item_id, material_id, material_value]")
+                .comment("Material Source Items: [item_id or item_tag, material_id, material_value]")
                 .defineListAllowEmpty(
                         List.of("materialSetting"),
                         () -> List.of(
@@ -382,13 +394,18 @@ public class ServerConfig {
 
                                 // copper
                                 List.of("minecraft:copper_ingot", "copper", 9),
-                                List.of("overgeared:copper_nugget", "copper", 1),
+                                List.of("#forge:nuggets/copper", "copper", 1),
                                 List.of("minecraft:copper_block", "copper", 81),
 
                                 // steel
-                                List.of("overgeared:steel_ingot", "steel", 9),
-                                List.of("overgeared:steel_nugget", "steel", 1),
-                                List.of("overgeared:steel_block", "steel", 81)
+                                List.of("#forge:ingots/steel", "steel", 9),
+                                List.of("#forge:nuggets/steel", "steel", 1),
+                                List.of("#forge:storage_blocks/steel", "steel", 81),
+
+                                //silver
+                                List.of("#forge:ingots/silver", "silver", 9),
+                                List.of("#forge:nuggets/silver", "silver", 1),
+                                List.of("#forge:storage_blocks/silver", "silver", 81)
                         ),
                         entry -> entry instanceof List<?> list &&
                                 list.size() == 3 &&

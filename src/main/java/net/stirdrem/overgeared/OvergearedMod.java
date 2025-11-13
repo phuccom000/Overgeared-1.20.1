@@ -11,10 +11,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
@@ -61,18 +63,21 @@ import net.stirdrem.overgeared.item.armor.model.CustomCopperLeggings;
 import net.stirdrem.overgeared.loot.ModLootModifiers;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.recipe.BetterBrewingRecipe;
+import net.stirdrem.overgeared.recipe.CoolingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.*;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.TickScheduler;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Unique;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(OvergearedMod.MOD_ID)
@@ -129,34 +134,27 @@ public class OvergearedMod {
 
     @Unique
     @Nullable
-    public static Item getCooledIngot(@Nullable Item heatedItem) {
-        if (heatedItem == null) return null;
+    public static Item getCooledIngot(@Nullable Item heatedItem, @NotNull Level level) {
+        if (heatedItem == null || level == null) return null;
 
-        var tagManager = ForgeRegistries.ITEMS.tags();
-        if (tagManager == null) return heatedItem;
+        // Wrap the single item in a container for recipe matching
+        SimpleContainer container = new SimpleContainer(new ItemStack(heatedItem));
 
-        var heatedTag = tagManager.getTag(ModTags.Items.HEATED_METALS);
-        var cooledTag = tagManager.getTag(ModTags.Items.HEATABLE_METALS);
+        // Find the first matching CoolingRecipe
+        Optional<CoolingRecipe> recipeOpt = level.getRecipeManager()
+                .getAllRecipesFor(ModRecipeTypes.COOLING_RECIPE.get())
+                .stream()
+                .filter(r -> r.matches(container, level))
+                .findFirst();
 
-        if (heatedTag.isEmpty() || cooledTag.isEmpty()) {
-            return heatedItem;
+        if (recipeOpt.isEmpty()) {
+            return heatedItem; // no cooling recipe found
         }
 
-        int index = 0;
-        for (Item item : heatedTag) {
-            if (item == heatedItem) {
-                int i = 0;
-                for (Item cooledItem : cooledTag) {
-                    if (i == index) {
-                        return cooledItem;
-                    }
-                    i++;
-                }
-            }
-            index++;
-        }
-
-        return heatedItem;
+        // Return the result item from the recipe
+        CoolingRecipe recipe = recipeOpt.get();
+        ItemStack result = recipe.getResultItem(level.registryAccess());
+        return result.isEmpty() ? heatedItem : result.getItem();
     }
 
 

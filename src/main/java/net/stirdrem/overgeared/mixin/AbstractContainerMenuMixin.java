@@ -42,7 +42,7 @@ public abstract class AbstractContainerMenuMixin {
 
                     long heatedAt = stack.getTag().getLong("HeatedSince");
                     if (now - heatedAt >= cooldown) {
-                        ItemStack cooled = getCooledIngot(stack.getItem()).getDefaultInstance();
+                        ItemStack cooled = getCooledIngot(stack.getItem(), player.level()).getDefaultInstance();
                         slot.set(cooled);
                         menu.broadcastChanges(); // sync change
                     }

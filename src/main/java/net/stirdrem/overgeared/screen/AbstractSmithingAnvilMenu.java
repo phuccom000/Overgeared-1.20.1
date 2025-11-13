@@ -108,7 +108,7 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
                     craftingSlotIndices.add(slotIndex.index); // Store the index, not the Slot object
                 }
             }
-            System.out.println("Crafting slots: " + craftingSlotIndices);
+            //System.out.println("Crafting slots: " + craftingSlotIndices);
 
             /*this.addSlot(new SlotItemHandler(iItemHandler, 9, 124, 35) {
                 @Override

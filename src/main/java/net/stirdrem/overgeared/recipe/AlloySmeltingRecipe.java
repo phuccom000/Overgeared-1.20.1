@@ -2,6 +2,7 @@ package net.stirdrem.overgeared.recipe;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
@@ -12,7 +13,7 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlloySmeltingRecipe implements Recipe<SimpleContainer> {
+public class AlloySmeltingRecipe implements Recipe<SimpleContainer>, IAlloyRecipe {
     private final ResourceLocation id;
     private final String group;
     private final CraftingBookCategory category;
@@ -151,6 +152,12 @@ public class AlloySmeltingRecipe implements Recipe<SimpleContainer> {
                     : CraftingBookCategory.MISC;
 
             JsonArray ingredients = json.getAsJsonArray("ingredients");
+
+            // ----- NEW: Check for too many ingredients -----
+            if (ingredients.size() > 4) {
+                throw new JsonSyntaxException("Alloy smelting recipe cannot have more than 4 ingredients: found " + ingredients.size());
+            }
+
             List<Ingredient> inputList = new ArrayList<>();
             for (int i = 0; i < ingredients.size(); i++) {
                 inputList.add(Ingredient.fromJson(ingredients.get(i)));
@@ -162,6 +169,7 @@ public class AlloySmeltingRecipe implements Recipe<SimpleContainer> {
 
             return new AlloySmeltingRecipe(id, group, category, inputList, result, experience, cookingTime);
         }
+
 
         @Override
         public AlloySmeltingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {

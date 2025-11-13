@@ -19,12 +19,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
-import net.stirdrem.overgeared.recipe.NetherAlloySmeltingRecipe;
+import net.stirdrem.overgeared.recipe.INetherAlloyRecipe;
+import net.stirdrem.overgeared.recipe.INetherAlloyRecipe;
 
 import java.util.List;
 
 
-public class NetherAlloySmeltingRecipeCategory implements IRecipeCategory<NetherAlloySmeltingRecipe> {
+public class NetherAlloySmeltingRecipeCategory implements IRecipeCategory<INetherAlloyRecipe> {
 
     public static final ResourceLocation UID =
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "nether_alloy_smelting");
@@ -32,8 +33,8 @@ public class NetherAlloySmeltingRecipeCategory implements IRecipeCategory<Nether
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/nether_furnace_jei.png");
 
     // JEI recipe type — placed under vanilla smelting tab
-    public static final RecipeType<NetherAlloySmeltingRecipe> ALLOY_SMELTING_TYPE =
-            new RecipeType<>(UID, NetherAlloySmeltingRecipe.class);
+    public static final RecipeType<INetherAlloyRecipe> ALLOY_SMELTING_TYPE =
+            new RecipeType<>(UID, INetherAlloyRecipe.class);
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -66,7 +67,7 @@ public class NetherAlloySmeltingRecipeCategory implements IRecipeCategory<Nether
     }
 
     @Override
-    public RecipeType<NetherAlloySmeltingRecipe> getRecipeType() {
+    public RecipeType<INetherAlloyRecipe> getRecipeType() {
         return ALLOY_SMELTING_TYPE;
     }
 
@@ -86,7 +87,7 @@ public class NetherAlloySmeltingRecipeCategory implements IRecipeCategory<Nether
     }
 
     @Override
-    public void draw(NetherAlloySmeltingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(INetherAlloyRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         Float exp = recipe.getExperience();
         arrowAnimated.draw(guiGraphics, 60, 19);
         flameAnimated.draw(guiGraphics, 64, 39);
@@ -107,7 +108,7 @@ public class NetherAlloySmeltingRecipeCategory implements IRecipeCategory<Nether
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, NetherAlloySmeltingRecipe recipe, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, INetherAlloyRecipe recipe, IFocusGroup focuses) {
         List<Ingredient> ingredients = recipe.getIngredientsList();
 
         // Add multiple input slots based on the recipe ingredients

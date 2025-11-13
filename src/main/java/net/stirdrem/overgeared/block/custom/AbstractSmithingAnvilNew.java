@@ -61,9 +61,9 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
     }
 
     // In your SmithingAnvil class, ensure getQuality() never returns null:
-    public static String getQuality() {
+    public String getQuality() {
         // Return current quality or default if null
-        return quality != null ? quality : "no_quality";
+        return quality != null ? quality : "none";
     }
 
     public static void setQuality(String quality) {

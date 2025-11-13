@@ -35,6 +35,9 @@ public class ModItems {
     public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register("steel_ingot",
             () -> new Item(new Item.Properties()));
 
+    public static final RegistryObject<Item> NETHERITE_COMPOSITE = ITEMS.register("netherite_composite",
+            () -> new Item(new Item.Properties()));
+
     public static final RegistryObject<Item> UNFIRED_TOOL_CAST = ITEMS.register("unfired_tool_cast",
             () -> new ToolCastItem(false, new Item.Properties()));
 
@@ -67,6 +70,12 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> HEATED_STEEL_INGOT = ITEMS.register("heated_steel_ingot",
+            () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> HEATED_SILVER_INGOT = ITEMS.register("heated_silver_ingot",
+            () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> HEATED_NETHERITE_COMPOSITE = ITEMS.register("heated_netherite_composite",
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> COPPER_PLATE = ITEMS.register("copper_plate",

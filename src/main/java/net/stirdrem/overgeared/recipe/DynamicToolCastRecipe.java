@@ -50,7 +50,7 @@ public class DynamicToolCastRecipe extends CustomRecipe {
             }
 
             String itemId = getItemIdStringSafe(stack);
-            String material = CastingConfigHelper.getMaterialForItem(itemId);
+            String material = CastingConfigHelper.getMaterialForItem(stack);
 
             if (!material.equals("NONE")) {
                 foundMaterial = true;
@@ -88,9 +88,9 @@ public class DynamicToolCastRecipe extends CustomRecipe {
             // Process materials
             else if (!stack.isEmpty()) {
                 String itemId = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
-                String material = CastingConfigHelper.getMaterialForItem(itemId);
+                String material = CastingConfigHelper.getMaterialForItem(stack);
                 if (!material.equals("NONE")) {
-                    int value = CastingConfigHelper.getMaterialValue(itemId);
+                    int value = CastingConfigHelper.getMaterialValue(stack);
                     materialTotals.put(material, materialTotals.getOrDefault(material, 0) + value);
                     newAmount += value;
 

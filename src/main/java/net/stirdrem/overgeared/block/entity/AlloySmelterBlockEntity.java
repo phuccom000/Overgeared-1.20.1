@@ -31,6 +31,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.recipe.AlloySmeltingRecipe;
+import net.stirdrem.overgeared.recipe.ShapedAlloySmeltingRecipe;
 import net.stirdrem.overgeared.screen.AlloySmelterMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -161,19 +162,28 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
         SimpleContainer inv = new SimpleContainer(4);
         for (int i = 0; i < 4; i++) inv.setItem(i, itemHandler.getStackInSlot(i));
 
-        Optional<AlloySmeltingRecipe> recipe =
+        // Try shapeless recipe first
+        Optional<AlloySmeltingRecipe> shapelessRecipe =
                 level.getRecipeManager().getRecipeFor(AlloySmeltingRecipe.Type.INSTANCE, inv, level);
-        if (recipe.isEmpty()) return false;
 
-        cookTimeTotal = recipe.get().getCookingTime();
+        // Try shaped recipe if shapeless not found
+        Optional<ShapedAlloySmeltingRecipe> shapedRecipe =
+                level.getRecipeManager().getRecipeFor(ShapedAlloySmeltingRecipe.Type.INSTANCE, inv, level);
 
-        ItemStack result = recipe.get().getResultItem(level.registryAccess());
+        if (shapelessRecipe.isEmpty() && shapedRecipe.isEmpty()) return false;
+
+        cookTimeTotal = shapelessRecipe.map(AlloySmeltingRecipe::getCookingTime)
+                .orElseGet(() -> shapedRecipe.get().getCookingTime());
+
+        ItemStack result = shapelessRecipe.map(r -> r.getResultItem(level.registryAccess()))
+                .orElseGet(() -> shapedRecipe.get().getResultItem(level.registryAccess()));
+
         ItemStack output = itemHandler.getStackInSlot(5);
-
         return !result.isEmpty() &&
                 (output.isEmpty() || (output.is(result.getItem()) &&
                         output.getCount() + result.getCount() <= output.getMaxStackSize()));
     }
+
 
     private void smelt() {
         if (!canSmelt()) return;
@@ -181,30 +191,41 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
         SimpleContainer inv = new SimpleContainer(4);
         for (int i = 0; i < 4; i++) inv.setItem(i, itemHandler.getStackInSlot(i));
 
-        Optional<AlloySmeltingRecipe> recipe =
+        Optional<AlloySmeltingRecipe> shapelessRecipe =
                 level.getRecipeManager().getRecipeFor(AlloySmeltingRecipe.Type.INSTANCE, inv, level);
+        Optional<ShapedAlloySmeltingRecipe> shapedRecipe =
+                level.getRecipeManager().getRecipeFor(ShapedAlloySmeltingRecipe.Type.INSTANCE, inv, level);
 
-        if (recipe.isPresent()) {
-            AlloySmeltingRecipe alloyRecipe = recipe.get();
-            ItemStack result = alloyRecipe.getResultItem(level.registryAccess());
-            ItemStack output = itemHandler.getStackInSlot(5);
+        ItemStack result;
+        float xp;
 
-            if (output.isEmpty()) {
-                itemHandler.setStackInSlot(5, result.copy());
-            } else if (output.is(result.getItem())) {
-                output.grow(result.getCount());
-            }
+        if (shapelessRecipe.isPresent()) {
+            AlloySmeltingRecipe recipe = shapelessRecipe.get();
+            result = recipe.getResultItem(level.registryAccess());
+            xp = recipe.getExperience();
+        } else if (shapedRecipe.isPresent()) {
+            ShapedAlloySmeltingRecipe recipe = shapedRecipe.get();
+            result = recipe.getResultItem(level.registryAccess());
+            xp = recipe.getExperience();
+        } else return;
 
-            for (int i = 0; i < 4; i++) {
-                ItemStack input = itemHandler.getStackInSlot(i);
-                if (!input.isEmpty()) input.shrink(1);
-            }
+        ItemStack output = itemHandler.getStackInSlot(5);
+        if (output.isEmpty()) {
+            itemHandler.setStackInSlot(5, result.copy());
+        } else if (output.is(result.getItem())) {
+            output.grow(result.getCount());
+        }
 
-            if (!level.isClientSide && alloyRecipe.getExperience() > 0.0F) {
-                storedExperience += alloyRecipe.getExperience();
-            }
+        for (int i = 0; i < 4; i++) {
+            ItemStack input = itemHandler.getStackInSlot(i);
+            if (!input.isEmpty()) input.shrink(1);
+        }
+
+        if (!level.isClientSide && xp > 0.0F) {
+            storedExperience += xp;
         }
     }
+
 
     // --------------------------------------------------
     // Experience logic (vanilla accurate)
@@ -313,6 +334,7 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
             inventory.setItem(i, itemHandler.getStackInSlot(i));
         }
         Containers.dropContents(this.level, this.worldPosition, inventory);
+        spawnExperience(storedExperience);
     }
 
     // --------------------------------------------------
@@ -396,4 +418,5 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
             itemHandler.setStackInSlot(i, ItemStack.EMPTY);
         }
     }
+
 }

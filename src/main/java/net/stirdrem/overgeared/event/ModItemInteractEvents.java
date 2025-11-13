@@ -18,6 +18,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +28,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
@@ -53,12 +55,16 @@ import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.*;
+import net.stirdrem.overgeared.recipe.CoolingRecipe;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
+import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.screen.FletchingStationMenu;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.QualityHelper;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -270,7 +276,7 @@ public class ModItemInteractEvents {
                             ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, !isVisible));
                             playerMinigameVisibility.put(player.getUUID(), !isVisible);
                         } else {
-                            quality.set(anvilBE.blueprintQuality());
+                            quality.set(anvilBE.minigameQuality());
                             AnvilMinigameEvents.reset(quality.get());
                             playerAnvilPositions.put(player.getUUID(), pos);
                             playerMinigameVisibility.put(player.getUUID(), true);
@@ -330,7 +336,7 @@ public class ModItemInteractEvents {
         String quality = "perfect";
         if (be instanceof AbstractSmithingAnvilBlockEntity anvilBE) {
             anvilBE.clearOwner();
-            quality = anvilBE.blueprintQuality();
+            quality = anvilBE.minigameQuality();
         }
 
         // 2. Clear server-side tracking - FIXED: use UUID instead of Player object
@@ -584,7 +590,7 @@ public class ModItemInteractEvents {
     }
 
     private static void coolIngot(Player player, ItemStack stack) {
-        Item cooled = getCooledIngot(stack.getItem());
+        Item cooled = getCooledIngot(stack.getItem(), player.level());
         if (cooled == null) return;
 
         if (stack.getCount() <= 0) return;
@@ -664,18 +670,41 @@ public class ModItemInteractEvents {
         return null;
     }
 
+    public static boolean hasCoolingRecipe(@Nullable Item heatedItem, @NotNull Level level) {
+        if (heatedItem == null) return false;
+
+        // Wrap the item in a container for recipe matching
+        SimpleContainer container = new SimpleContainer(new ItemStack(heatedItem));
+
+        // Find the first matching CoolingRecipe
+        Optional<CoolingRecipe> recipeOpt = level.getRecipeManager()
+                .getAllRecipesFor(ModRecipeTypes.COOLING_RECIPE.get())
+                .stream()
+                .filter(r -> r.matches(container, level))
+                .findFirst();
+
+        // Return true if a recipe exists and produces a non-empty result
+        return recipeOpt.map(recipe -> !recipe.getResultItem(level.registryAccess()).isEmpty())
+                .orElse(false);
+    }
+
     @SubscribeEvent
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof ItemEntity itemEntity) {
             ItemStack stack = itemEntity.getItem();
-            boolean isHeatedItem = stack.is(ModTags.Items.HEATED_METALS)
-                    || (stack.hasTag() && stack.getTag().getBoolean("Heated"));
-            if (isHeatedItem) {
+            boolean isHeatedItem = (stack.hasTag() && stack.getTag().getBoolean("Heated"));
+            Item cooled = getCooledIngot(stack.getItem(), event.getLevel());
+            if (hasCoolingRecipe(stack.getItem(), event.getLevel()) || isHeatedItem) {
                 trackedEntities.add(itemEntity);
-                trackedSinceMs.put(itemEntity, System.currentTimeMillis());
+                // Only track items that already have HeatedSince
+                if (stack.hasTag() && stack.getTag().contains("HeatedSince")) {
+                    long heatedSince = stack.getTag().getLong("HeatedSince");
+                    trackedSinceMs.put(itemEntity, heatedSince);
+                }
             }
         }
     }
+
 
     @SubscribeEvent
     public static void onEntityPickupItem(EntityItemPickupEvent event) {
@@ -691,8 +720,7 @@ public class ModItemInteractEvents {
         if (event.level.getGameTime() % 20 != 0) return; // Run every second
 
         List<ItemEntity> toRemove = new ArrayList<>();
-
-        long now = System.currentTimeMillis();
+        long now = event.level.getGameTime();
 
         for (ItemEntity entity : new ArrayList<>(trackedEntities)) {
             if (!entity.isAlive()) {
@@ -700,48 +728,57 @@ public class ModItemInteractEvents {
                 continue;
             }
 
-            // If the underlying ItemStack stopped being a heated metal (cooled elsewhere, transformed, etc),
-            // stop tracking it.
             ItemStack stack = entity.getItem();
-            boolean isHeatedItem = stack.is(ModTags.Items.HEATED_METALS)
+            boolean isHeatedItem = hasCoolingRecipe(stack.getItem(), event.level)
                     || (stack.hasTag() && stack.getTag().getBoolean("Heated"));
             if (!isHeatedItem) {
                 toRemove.add(entity);
                 continue;
             }
 
-            // prune old tracked items that never entered water
-            Long started = trackedSinceMs.get(entity);
+            // Ensure the chunk is loaded before accessing block states
+            BlockPos pos = entity.blockPosition();
+            ChunkPos chunkPos = new ChunkPos(pos);
+            if (!event.level.hasChunk(chunkPos.x, chunkPos.z)) continue;
 
-            BlockState state = event.level.getBlockState(entity.blockPosition());
-            if (state.is(Blocks.WATER) || state.is(Blocks.WATER_CAULDRON) || (started != null && (now - started) > ServerConfig.HEATED_ITEM_COOLDOWN_TICKS.get() * 50L)) {
-                Item cooled = getCooledIngot(stack.getItem());
+            // Check for cooling conditions
+            BlockState state = event.level.getBlockState(pos);
+            Long started = trackedSinceMs.get(entity);
+            boolean inWater = state.is(Blocks.WATER) || state.is(Blocks.WATER_CAULDRON);
+            boolean cooledByTime = started != null &&
+                    (now - started) > (ServerConfig.HEATED_ITEM_COOLDOWN_TICKS.get());
+
+            if (inWater || cooledByTime) {
+                Item cooled = getCooledIngot(stack.getItem(), event.level);
 
                 if (cooled != null && stack.getCount() > 0) {
-                    // Cool only 1 item
+                    // Copy NBT (minus heat tags)
                     CompoundTag oldTag = stack.hasTag() ? stack.getTag().copy() : null;
-
-                    // Spawn the cooled ingot
                     ItemStack cooledStack = new ItemStack(cooled, stack.getCount());
                     if (oldTag != null) {
-                        oldTag.remove("HeatedSince"); // clean heat marker
-                        oldTag.remove("Heated");
-                        cooledStack.setTag(oldTag);
+                        CompoundTag newTag = oldTag.copy();
+                        newTag.remove("Heated");
+                        newTag.remove("HeatedSince");
+                        if (newTag.isEmpty()) {
+                            cooledStack.setTag(null); // fully clear
+                        } else {
+                            cooledStack.setTag(newTag);
+                        }
                     }
+
+
+                    // Replace the stack and play extinguish sound
                     entity.setItem(cooledStack);
                     entity.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
 
-                    // Remove if stack is empty
                     trackedSinceMs.remove(entity);
-
                 } else {
-                    toRemove.add(entity); // Not a valid heated item -> remove
+                    toRemove.add(entity);
                 }
             }
-            // else: item not in water — keep it for now (but it may get pruned by age)
         }
 
-        // cleanup sets/map
+        // Cleanup stale entities
         for (ItemEntity e : toRemove) {
             trackedEntities.remove(e);
             trackedSinceMs.remove(e);

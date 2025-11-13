@@ -5,7 +5,8 @@ public enum ForgingQuality {
     WELL("well"),
     EXPERT("expert"),
     PERFECT("perfect"),
-    MASTER("master");
+    MASTER("master"),
+    NONE("none");
 
     private final String displayName;
 

@@ -112,7 +112,7 @@ public abstract class ItemStackMixin {
             if (heatedSince == 0L) {
                 tag.putLong(HEATED_TIME_TAG, tick); // Initialize the timestamp
             } else if (tick - heatedSince >= cooldownTicks) {
-                Item cooled = getCooledIngot(stack.getItem());
+                Item cooled = getCooledIngot(stack.getItem(), level);
                 if (cooled != null) {
                     ItemStack newStack = new ItemStack(cooled, stack.getCount());
 

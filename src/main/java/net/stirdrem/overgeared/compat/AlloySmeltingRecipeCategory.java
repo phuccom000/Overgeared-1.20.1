@@ -20,11 +20,12 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.recipe.AlloySmeltingRecipe;
+import net.stirdrem.overgeared.recipe.IAlloyRecipe;
 
 import java.util.List;
 
 
-public class AlloySmeltingRecipeCategory implements IRecipeCategory<AlloySmeltingRecipe> {
+public class AlloySmeltingRecipeCategory implements IRecipeCategory<IAlloyRecipe> {
 
     public static final ResourceLocation UID =
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "alloy_smelting");
@@ -32,8 +33,8 @@ public class AlloySmeltingRecipeCategory implements IRecipeCategory<AlloySmeltin
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/furnace_jei.png");
 
     // JEI recipe type — placed under vanilla smelting tab
-    public static final RecipeType<AlloySmeltingRecipe> ALLOY_SMELTING_TYPE =
-            new RecipeType<>(UID, AlloySmeltingRecipe.class);
+    public static final RecipeType<IAlloyRecipe> ALLOY_SMELTING_TYPE =
+            new RecipeType<>(UID, IAlloyRecipe.class);
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -64,7 +65,7 @@ public class AlloySmeltingRecipeCategory implements IRecipeCategory<AlloySmeltin
     }
 
     @Override
-    public RecipeType<AlloySmeltingRecipe> getRecipeType() {
+    public RecipeType<IAlloyRecipe> getRecipeType() {
         return ALLOY_SMELTING_TYPE;
     }
 
@@ -83,8 +84,9 @@ public class AlloySmeltingRecipeCategory implements IRecipeCategory<AlloySmeltin
         return this.icon;
     }
 
+
     @Override
-    public void draw(AlloySmeltingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(IAlloyRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         Float exp = recipe.getExperience();
         arrowAnimated.draw(guiGraphics, 47, 9);
         flameAnimated.draw(guiGraphics, 51, 29);
@@ -105,7 +107,7 @@ public class AlloySmeltingRecipeCategory implements IRecipeCategory<AlloySmeltin
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, AlloySmeltingRecipe recipe, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, IAlloyRecipe recipe, IFocusGroup focuses) {
         List<Ingredient> ingredients = recipe.getIngredientsList();
 
         // Add multiple input slots based on the recipe ingredients

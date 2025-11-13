@@ -250,7 +250,7 @@ public class ModEvents {
                 ModItemInteractEvents.playerAnvilPositions.remove(playerId);
                 ModItemInteractEvents.playerMinigameVisibility.remove(playerId);
                 Block block = player.level().getBlockState(anvilPos).getBlock();
-                blueprintQuality = anvil.blueprintQuality();
+                blueprintQuality = anvil.minigameQuality();
                 /*if (block instanceof AbstractSmithingAnvilNew anvilNew) {
                     anvilNew.setMinigameOn(false);
                 }*/
@@ -273,7 +273,7 @@ public class ModEvents {
             anvil.setProgress(0);
             anvil.setChanged();
             anvil.setMinigameOn(false);
-            quality = anvil.blueprintQuality();
+            quality = anvil.minigameQuality();
         }
         AnvilMinigameEvents.reset(quality);
         Block block = player.level().getBlockState(anvilPos).getBlock();
@@ -296,7 +296,7 @@ public class ModEvents {
             anvil.setChanged();
             anvil.setMinigameOn(false);
             anvil.clearOwner(); // Clear ownership from the anvil itself
-            quality = anvil.blueprintQuality();
+            quality = anvil.minigameQuality();
         }
 
         AnvilMinigameEvents.reset(quality);
@@ -409,10 +409,10 @@ public class ModEvents {
                     .withStyle(ChatFormatting.RED));
         }
 
-        if (stack.is(ModTags.Items.HEATABLE_METALS)) {
+      /*  if (stack.is(ModTags.Items.HEATABLE_METALS)) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatablemetals.tooltip")
                     .withStyle(ChatFormatting.GRAY));
-        }
+        }*/
 
         if (stack.is(ModTags.Items.HOT_ITEMS)) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.hotitems.tooltip")

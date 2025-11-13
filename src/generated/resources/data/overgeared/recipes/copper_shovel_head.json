@@ -18,6 +18,7 @@
   "pattern": [
     "#"
   ],
+  "quality_difficulty": "none",
   "requires_blueprint": false,
   "result": {
     "item": "overgeared:copper_shovel_head"

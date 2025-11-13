@@ -98,19 +98,21 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.SMITHING_HAMMER.get(),
                         ModItems.COPPER_SMITHING_HAMMER.get()
                 );
-        this.tag(ModTags.Items.HEATABLE_METALS)
+       /* this.tag(ModTags.Items.HEATABLE_METALS)
                 .add(
                         ModItems.STEEL_INGOT.get(),
                         Items.IRON_INGOT,
                         ModItems.CRUDE_STEEL.get(),
                         Items.COPPER_INGOT
-                );
+                );*/
         this.tag(ModTags.Items.HEATED_METALS)
                 .add(
                         ModItems.HEATED_STEEL_INGOT.get(),
                         ModItems.HEATED_IRON_INGOT.get(),
                         ModItems.HEATED_CRUDE_STEEL.get(),
-                        ModItems.HEATED_COPPER_INGOT.get()
+                        ModItems.HEATED_COPPER_INGOT.get(),
+                        ModItems.HEATED_SILVER_INGOT.get(),
+                        ModItems.HEATED_NETHERITE_COMPOSITE.get()
                 );
         this.tag(ModTags.Items.SMITHING_HAMMERS)
                 .add(

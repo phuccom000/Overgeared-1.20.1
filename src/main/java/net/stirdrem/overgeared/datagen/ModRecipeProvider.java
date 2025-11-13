@@ -19,6 +19,7 @@ import net.minecraftforge.common.brewing.BrewingRecipe;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.stirdrem.overgeared.AnvilTier;
+import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.item.ModItems;
@@ -720,6 +721,18 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("# ")
                 .define('#', Items.IRON_INGOT)
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .save(pWriter);
+
+        ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, Items.NETHERITE_INGOT, 10)
+                .tier(AnvilTier.IRON)
+                .needsMinigame(true)
+                .failedResult(Items.NETHERITE_SCRAP, 4)
+                .qualityDifficulty(ForgingQuality.MASTER)
+                .setQuality(false)
+                .setNeedQuenching(false)
+                .pattern("#")
+                .define('#', ModItems.HEATED_NETHERITE_COMPOSITE.get())
+                .unlockedBy(getHasName(Items.NETHERITE_SCRAP), has(Items.NETHERITE_SCRAP))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, Blocks.CAULDRON, 5)

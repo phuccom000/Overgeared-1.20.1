@@ -30,6 +30,8 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import net.stirdrem.overgeared.recipe.NetherAlloySmeltingRecipe;
+import net.stirdrem.overgeared.recipe.NetherAlloySmeltingRecipe;
+import net.stirdrem.overgeared.recipe.ShapedNetherAlloySmeltingRecipe;
 import net.stirdrem.overgeared.screen.NetherAlloySmelterMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -165,15 +167,23 @@ public class NetherAlloySmelterBlockEntity extends BaseContainerBlockEntity impl
         SimpleContainer inv = new SimpleContainer(INPUT_SLOTS);
         for (int i = 0; i < INPUT_SLOTS; i++) inv.setItem(i, itemHandler.getStackInSlot(i));
 
-        Optional<NetherAlloySmeltingRecipe> recipe =
+        // Try shapeless recipe first
+        Optional<NetherAlloySmeltingRecipe> shapelessRecipe =
                 level.getRecipeManager().getRecipeFor(NetherAlloySmeltingRecipe.Type.INSTANCE, inv, level);
-        if (recipe.isEmpty()) return false;
 
-        cookTimeTotal = recipe.get().getCookingTime();
+        // Try shaped recipe if shapeless not found
+        Optional<ShapedNetherAlloySmeltingRecipe> shapedRecipe =
+                level.getRecipeManager().getRecipeFor(ShapedNetherAlloySmeltingRecipe.Type.INSTANCE, inv, level);
 
-        ItemStack result = recipe.get().getResultItem(level.registryAccess());
+        if (shapelessRecipe.isEmpty() && shapedRecipe.isEmpty()) return false;
+
+        cookTimeTotal = shapelessRecipe.map(NetherAlloySmeltingRecipe::getCookingTime)
+                .orElseGet(() -> shapedRecipe.get().getCookingTime());
+
+        ItemStack result = shapelessRecipe.map(r -> r.getResultItem(level.registryAccess()))
+                .orElseGet(() -> shapedRecipe.get().getResultItem(level.registryAccess()));
+
         ItemStack output = itemHandler.getStackInSlot(OUTPUT_SLOT);
-
         return !result.isEmpty() &&
                 (output.isEmpty() || (output.is(result.getItem()) &&
                         output.getCount() + result.getCount() <= output.getMaxStackSize()));
@@ -185,29 +195,38 @@ public class NetherAlloySmelterBlockEntity extends BaseContainerBlockEntity impl
         SimpleContainer inv = new SimpleContainer(INPUT_SLOTS);
         for (int i = 0; i < INPUT_SLOTS; i++) inv.setItem(i, itemHandler.getStackInSlot(i));
 
-        Optional<NetherAlloySmeltingRecipe> recipe =
+        Optional<NetherAlloySmeltingRecipe> shapelessRecipe =
                 level.getRecipeManager().getRecipeFor(NetherAlloySmeltingRecipe.Type.INSTANCE, inv, level);
+        Optional<ShapedNetherAlloySmeltingRecipe> shapedRecipe =
+                level.getRecipeManager().getRecipeFor(ShapedNetherAlloySmeltingRecipe.Type.INSTANCE, inv, level);
 
-        if (recipe.isPresent()) {
-            NetherAlloySmeltingRecipe alloyRecipe = recipe.get();
-            ItemStack result = alloyRecipe.getResultItem(level.registryAccess());
-            ItemStack output = itemHandler.getStackInSlot(OUTPUT_SLOT);
+        ItemStack result;
+        float xp;
 
-            if (output.isEmpty()) {
-                itemHandler.setStackInSlot(OUTPUT_SLOT, result.copy());
-            } else if (output.is(result.getItem())) {
-                output.grow(result.getCount());
-            }
+        if (shapelessRecipe.isPresent()) {
+            NetherAlloySmeltingRecipe recipe = shapelessRecipe.get();
+            result = recipe.getResultItem(level.registryAccess());
+            xp = recipe.getExperience();
+        } else if (shapedRecipe.isPresent()) {
+            ShapedNetherAlloySmeltingRecipe recipe = shapedRecipe.get();
+            result = recipe.getResultItem(level.registryAccess());
+            xp = recipe.getExperience();
+        } else return;
 
-            // Consume one item from each input slot that has items
-            for (int i = 0; i < INPUT_SLOTS; i++) {
-                ItemStack input = itemHandler.getStackInSlot(i);
-                if (!input.isEmpty()) input.shrink(1);
-            }
+        ItemStack output = itemHandler.getStackInSlot(OUTPUT_SLOT);
+        if (output.isEmpty()) {
+            itemHandler.setStackInSlot(OUTPUT_SLOT, result.copy());
+        } else if (output.is(result.getItem())) {
+            output.grow(result.getCount());
+        }
 
-            if (!level.isClientSide && alloyRecipe.getExperience() > 0.0F) {
-                storedExperience += alloyRecipe.getExperience();
-            }
+        for (int i = 0; i < INPUT_SLOTS; i++) {
+            ItemStack input = itemHandler.getStackInSlot(i);
+            if (!input.isEmpty()) input.shrink(1);
+        }
+
+        if (!level.isClientSide && xp > 0.0F) {
+            storedExperience += xp;
         }
     }
 
@@ -316,6 +335,7 @@ public class NetherAlloySmelterBlockEntity extends BaseContainerBlockEntity impl
             inventory.setItem(i, itemHandler.getStackInSlot(i));
         }
         Containers.dropContents(this.level, this.worldPosition, inventory);
+        spawnExperience(storedExperience);
     }
 
     // --------------------------------------------------
@@ -419,4 +439,5 @@ public class NetherAlloySmelterBlockEntity extends BaseContainerBlockEntity impl
     public int getOutputSlot() {
         return OUTPUT_SLOT;
     }
+
 }

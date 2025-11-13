@@ -13,6 +13,7 @@
   "pattern": [
     "#"
   ],
+  "quality_difficulty": "none",
   "result": {
     "item": "overgeared:copper_plate"
   },

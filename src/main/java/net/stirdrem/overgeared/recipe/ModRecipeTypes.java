@@ -23,8 +23,14 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register(AlloySmeltingRecipe.Type.ID, () -> AlloySmeltingRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeType<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
             RECIPE_TYPES.register(NetherAlloySmeltingRecipe.Type.ID, () -> NetherAlloySmeltingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
+            RECIPE_TYPES.register(ShapedAlloySmeltingRecipe.Type.ID, () -> ShapedAlloySmeltingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<ShapedNetherAlloySmeltingRecipe>> SHAPED_NETHER_ALLOY_SMELTING =
+            RECIPE_TYPES.register(ShapedNetherAlloySmeltingRecipe.Type.ID, () -> ShapedNetherAlloySmeltingRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeType<ItemToToolTypeRecipe>> ITEM_TO_TOOLTYPE =
             RECIPE_TYPES.register("item_to_tooltype", () -> RecipeType.simple(new ResourceLocation(OvergearedMod.MOD_ID, "item_to_tooltype")));
+    public static final RegistryObject<RecipeType<CoolingRecipe>> COOLING_RECIPE =
+            RECIPE_TYPES.register("cooling", () -> CoolingRecipe.Type.INSTANCE);
 
     public static void register(IEventBus eventBus) {
         RECIPE_TYPES.register(eventBus);

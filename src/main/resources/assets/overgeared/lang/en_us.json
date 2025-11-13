@@ -45,6 +45,9 @@
   "item.overgeared.heated_copper_ingot": "Heated Copper Ingot",
   "item.overgeared.heated_iron_ingot": "Heated Iron Ingot",
   "item.overgeared.heated_steel_ingot": "Heated Steel Ingot",
+  "item.overgeared.heated_silver_ingot": "Heated Silver Ingot",
+  "item.overgeared.netherite_composite": "Netherite Composite",
+  "item.overgeared.heated_netherite_composite": "Heated Netherite Composite",
   "item.overgeared.iron_axe_head": "Iron Axe Head",
   "item.overgeared.iron_hoe_head": "Iron Hoe Head",
   "item.overgeared.iron_pickaxe_head": "Iron Pickaxe Head",
@@ -261,6 +264,7 @@
   "container.overgeared.alloy_smelter": "Alloy Furnace",
   "gui.overgeared.jei.category.alloy_smelting": "Alloying",
   "container.overgeared.nether_alloy_smelter": "Nether Alloy Furnace",
-  "gui.overgeared.jei.category.nether_alloy_smelting": "Nether Alloying"
+  "gui.overgeared.jei.category.nether_alloy_smelting": "Nether Alloying",
+  "gui.overgeared.jei.category.cooling": "Water Cooling"
 }
 

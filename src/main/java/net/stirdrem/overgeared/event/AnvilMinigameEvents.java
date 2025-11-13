@@ -42,7 +42,7 @@ public class AnvilMinigameEvents {
     public static float zoneShrinkFactor = 0.95f;
     public static float zoneShiftAmount = 15.0f;
     public static float perfectZoneSize = perfectZoneEnd - perfectZoneStart;
-
+    public static float minPerfectSize = 4;
     public static Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
     public static int skillLevel = 0;
 
@@ -53,12 +53,24 @@ public class AnvilMinigameEvents {
     public static void ensureInitialized() {
         // Only run if defaults haven't been set yet
         if (arrowSpeed == 0) {
-            setupForQuality("poor"); // or whichever quality you want as baseline
+            setupForQuality("none"); // or whichever quality you want as baseline
         }
     }
 
     public static void setupForQuality(String quality) {
         switch (quality.toLowerCase()) {
+            case "none" -> {
+                arrowSpeed = ServerConfig.DEFAULT_ARROW_SPEED.get().floatValue();
+                speedIncreasePerHit = ServerConfig.DEFAULT_ARROW_SPEED_INCREASE.get().floatValue();
+                maxArrowSpeed = ServerConfig.DEFAULT_MAX_ARROW_SPEED.get().floatValue();
+                zoneShrinkFactor = ServerConfig.DEFAULT_ZONE_SHRINK_FACTOR.get().floatValue();
+                perfectZoneStart = (100 - ServerConfig.DEFAULT_ZONE_STARTING_SIZE.get()) / 2;
+                perfectZoneEnd = (100 + ServerConfig.DEFAULT_ZONE_STARTING_SIZE.get()) / 2;
+                goodZoneStart = Math.max((100 - ServerConfig.DEFAULT_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
+                goodZoneEnd = Math.min((100 + ServerConfig.DEFAULT_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                minPerfectSize = ServerConfig.DEFAULT_MIN_PERFECT_ZONE.get();
+                perfectZoneSize = perfectZoneEnd - perfectZoneStart;
+            }
             case "master" -> {
                 arrowSpeed = ServerConfig.MASTER_ARROW_SPEED.get().floatValue();
                 speedIncreasePerHit = ServerConfig.MASTER_ARROW_SPEED_INCREASE.get().floatValue();
@@ -68,6 +80,7 @@ public class AnvilMinigameEvents {
                 perfectZoneEnd = (100 + ServerConfig.MASTER_ZONE_STARTING_SIZE.get()) / 2;
                 goodZoneStart = Math.max((100 - ServerConfig.MASTER_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
                 goodZoneEnd = Math.min((100 + ServerConfig.MASTER_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                minPerfectSize = ServerConfig.MASTER_MIN_PERFECT_ZONE.get();
                 perfectZoneSize = perfectZoneEnd - perfectZoneStart;
             }
             case "perfect" -> {
@@ -79,6 +92,7 @@ public class AnvilMinigameEvents {
                 perfectZoneEnd = (100 + ServerConfig.PERFECT_ZONE_STARTING_SIZE.get()) / 2;
                 goodZoneStart = Math.max((100 - ServerConfig.PERFECT_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
                 goodZoneEnd = Math.min((100 + ServerConfig.PERFECT_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                minPerfectSize = ServerConfig.PERFECT_MIN_PERFECT_ZONE.get();
                 perfectZoneSize = perfectZoneEnd - perfectZoneStart;
             }
             case "expert" -> {
@@ -90,6 +104,7 @@ public class AnvilMinigameEvents {
                 perfectZoneEnd = (100 + ServerConfig.EXPERT_ZONE_STARTING_SIZE.get()) / 2;
                 goodZoneStart = Math.max((100 - ServerConfig.EXPERT_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
                 goodZoneEnd = Math.min((100 + ServerConfig.EXPERT_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                minPerfectSize = ServerConfig.EXPERT_MIN_PERFECT_ZONE.get();
                 perfectZoneSize = perfectZoneEnd - perfectZoneStart;
             }
             case "well" -> {
@@ -101,6 +116,7 @@ public class AnvilMinigameEvents {
                 perfectZoneEnd = (100 + ServerConfig.WELL_ZONE_STARTING_SIZE.get()) / 2;
                 goodZoneStart = Math.max((100 - ServerConfig.WELL_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
                 goodZoneEnd = Math.min((100 + ServerConfig.WELL_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                minPerfectSize = ServerConfig.WELL_MIN_PERFECT_ZONE.get();
                 perfectZoneSize = perfectZoneEnd - perfectZoneStart;
             }
             default -> { // poor
@@ -112,6 +128,7 @@ public class AnvilMinigameEvents {
                 perfectZoneEnd = (100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get()) / 2;
                 goodZoneStart = Math.max((100 - ServerConfig.POOR_ZONE_STARTING_SIZE.get() * 3) / 2, 1);
                 goodZoneEnd = Math.min((100 + ServerConfig.POOR_ZONE_STARTING_SIZE.get() * 3) / 2, 100);
+                minPerfectSize = ServerConfig.POOR_MIN_PERFECT_ZONE.get();
                 perfectZoneSize = perfectZoneEnd - perfectZoneStart;
             }
         }
@@ -188,7 +205,7 @@ public class AnvilMinigameEvents {
         arrowPosition = 50;
         movingDown = false;
 
-        setupForQuality("poor"); // 🔥 initialize from blueprint
+        setupForQuality("none"); // 🔥 initialize from blueprint
 
         randomizeCenter();
     }
@@ -286,52 +303,77 @@ public class AnvilMinigameEvents {
     private static float currentGoodZoneSize = 0;
 
     public static void shrinkAndShiftZones() {
-        // Initialize once if not set
+        // Initialize once if not yet done
         if (currentPerfectZoneSize == 0 || currentGoodZoneSize == 0) {
             currentPerfectZoneSize = perfectZoneEnd - perfectZoneStart;
             currentGoodZoneSize = goodZoneEnd - goodZoneStart;
         }
 
-        // Shrink based on stored sizes, not clamped bounds
-        currentPerfectZoneSize *= zoneShrinkFactor;
-        currentGoodZoneSize *= zoneShrinkFactor;
+        // --- Step 1: Shrink zones based on stored sizes ---
+        currentPerfectZoneSize = Math.max(minPerfectSize, currentPerfectZoneSize * zoneShrinkFactor);
+        currentGoodZoneSize = Math.max(currentPerfectZoneSize * 3, currentGoodZoneSize * zoneShrinkFactor);
 
-        // Ensure minimum sizes
-        currentPerfectZoneSize = Math.max(currentPerfectZoneSize, AnvilMinigameEvents.perfectZoneSize);
-        currentGoodZoneSize = Math.max(currentGoodZoneSize, currentPerfectZoneSize * 3);
+        // --- Step 2: Get old data for comparison ---
+        float oldPerfectCenter = (perfectZoneStart + perfectZoneEnd) / 2f;
+        float oldGoodCenter = (goodZoneStart + goodZoneEnd) / 2f;
+        int oldPerfectStart = perfectZoneStart;
+        int oldPerfectEnd = perfectZoneEnd;
+        int oldGoodStart = goodZoneStart;
+        int oldGoodEnd = goodZoneEnd;
 
-        float originalCenter = (perfectZoneStart + perfectZoneEnd) / 2f;
-
-        boolean shifted = false;
+        // --- Step 3: Attempt to find a new valid zone placement ---
         int attempts = 0;
-
         int newPerfectStart = perfectZoneStart, newPerfectEnd = perfectZoneEnd;
         int newGoodStart = goodZoneStart, newGoodEnd = goodZoneEnd;
 
-        while (!shifted && attempts < 5) {
+        while (attempts < 30) {
             attempts++;
-            float zoneCenter = getWeightedRandomCenter(originalCenter);
 
-            int ps = (int) (zoneCenter - currentPerfectZoneSize / 2);
-            int pe = (int) (zoneCenter + currentPerfectZoneSize / 2);
-            int gs = (int) (zoneCenter - currentGoodZoneSize / 2);
-            int ge = (int) (zoneCenter + currentGoodZoneSize / 2);
+            // Weighted random center: bias near middle but allow full range
+            float newCenter = getWeightedRandomCenter(50f);
 
-            ps = clamp(ps, 0, 100);
-            pe = clamp(pe, 0, 100);
-            gs = clamp(gs, 0, 100);
-            ge = clamp(ge, 0, 100);
+            // Compute bounds
+            int pStart = Math.round(newCenter - currentPerfectZoneSize / 2);
+            int pEnd = Math.round(newCenter + currentPerfectZoneSize / 2);
+            int gStart = Math.round(newCenter - currentGoodZoneSize / 2);
+            int gEnd = Math.round(newCenter + currentGoodZoneSize / 2);
 
-            if (ps != perfectZoneStart || pe != perfectZoneEnd) {
-                newPerfectStart = ps;
-                newPerfectEnd = pe;
-                newGoodStart = gs;
-                newGoodEnd = ge;
-                shifted = true;
-            }
+            // Clamp to 0–100 range
+            pStart = clamp(pStart, 0, 100);
+            pEnd = clamp(pEnd, 0, 100);
+            gStart = clamp(gStart, 0, 100);
+            gEnd = clamp(gEnd, 0, 100);
+
+            float newPerfectCenter = (pStart + pEnd) / 2f;
+            float newGoodCenter = (gStart + gEnd) / 2f;
+
+            // --- Step 4: Check separation conditions ---
+            // Tolerances (in percent of bar width)
+            float minCenterDiff = 5f;   // must move at least this much from previous center
+            float minEdgeDiff = 3f;   // must move edges by at least this much
+
+            boolean perfectTooClose =
+                    Math.abs(newPerfectCenter - oldPerfectCenter) < minCenterDiff ||
+                            Math.abs(pStart - oldPerfectStart) < minEdgeDiff ||
+                            Math.abs(pEnd - oldPerfectEnd) < minEdgeDiff;
+
+            boolean goodTooClose =
+                    Math.abs(newGoodCenter - oldGoodCenter) < minCenterDiff ||
+                            Math.abs(gStart - oldGoodStart) < minEdgeDiff ||
+                            Math.abs(gEnd - oldGoodEnd) < minEdgeDiff;
+
+            // Regenerate if *either* zone is too close
+            if (perfectTooClose || goodTooClose) continue;
+
+            // --- Step 5: Accept the new zones ---
+            newPerfectStart = pStart;
+            newPerfectEnd = pEnd;
+            newGoodStart = gStart;
+            newGoodEnd = gEnd;
+            break;
         }
 
-        // Apply the shifts
+        // --- Step 6: Apply the new zones ---
         perfectZoneStart = newPerfectStart;
         perfectZoneEnd = newPerfectEnd;
         goodZoneStart = newGoodStart;
@@ -339,23 +381,35 @@ public class AnvilMinigameEvents {
     }
 
 
-    public static float getWeightedRandomCenter(float currentCenter) {
-        // 70% chance for small shift, 20% medium, 10% large
-        float rand = (float) Math.random();
-        float shiftMagnitude;
+    private static boolean edgesTooCloseOrOverlapping(
+            int newStart, int newEnd, int oldStart, int oldEnd, float overlapRatio,
+            boolean clampedLeft, boolean clampedRight
+    ) {
+        int newSize = Math.max(1, newEnd - newStart);
+        int tolerance = 1;
+        boolean startClose = Math.abs(newStart - oldStart) <= tolerance;
+        boolean endClose = Math.abs(newEnd - oldEnd) <= tolerance;
 
-        if (rand < 0.7) {
-            shiftMagnitude = 0.5f; // Small shift
-        } else if (rand < 0.9) {
-            shiftMagnitude = 1.5f; // Medium shift
-        } else {
-            shiftMagnitude = 3.0f; // Large shift
+        int overlap = Math.min(newEnd, oldEnd) - Math.max(newStart, oldStart);
+        float overlapFraction = overlap > 0 ? (float) overlap / newSize : 0f;
+
+        // Edge fix: allow shifts even if clamped edges stay constant
+        if ((clampedLeft && newStart == 0 && oldStart == 0) ||
+                (clampedRight && newEnd == 100 && oldEnd == 100)) {
+            // If one edge is pinned, only compare the *free* edge
+            return overlapFraction > overlapRatio &&
+                    ((clampedLeft && endClose) || (clampedRight && startClose));
         }
 
-        // Apply shift in random direction
-        float direction = Math.signum((float) Math.random() - 0.5f);
-        return Math.max(20, Math.min(80,
-                currentCenter + direction * zoneShiftAmount * shiftMagnitude));
+        return (startClose && endClose) || overlapFraction > overlapRatio;
+    }
+
+
+    private static float getWeightedRandomCenter(float bias) {
+        // bias toward middle but allow full 0–100 range
+        float rand = (float) Math.random();
+        float weighted = (float) Math.pow(rand, 1.5); // tweak exponent for more/less bias
+        return bias + (weighted - 0.5f) * 100f;
     }
 
     public static BlockPos getAnvilPos(UUID playerId) {

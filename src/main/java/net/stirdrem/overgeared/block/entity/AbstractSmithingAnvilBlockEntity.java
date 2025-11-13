@@ -11,12 +11,15 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -31,8 +34,10 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.AnvilTier;
+import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvilNew;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 import net.stirdrem.overgeared.event.ModEvents;
@@ -43,6 +48,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static net.stirdrem.overgeared.OvergearedMod.getCooledIngot;
 
 public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
     protected static final int INPUT_SLOT = 0;
@@ -71,10 +78,13 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     protected ForgingRecipe lastRecipe = null;
     protected ItemStack lastBlueprint = ItemStack.EMPTY;
     private boolean minigameOn = false;
+    protected AbstractSmithingAnvilNew anvilBlock;
+    protected static final int BLUEPRINT_SLOT = 11;
 
-    public AbstractSmithingAnvilBlockEntity(AnvilTier tier, BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
+    public AbstractSmithingAnvilBlockEntity(AbstractSmithingAnvilNew anvilBlock, AnvilTier tier, BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
         super(type, pPos, pBlockState);
         this.anvilTier = tier;
+        this.anvilBlock = anvilBlock;
         this.data = new ContainerData() {
             @Override
             public int get(int pIndex) {
@@ -276,7 +286,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         if (recipe.hasQuality()) {
             if (ServerConfig.ENABLE_MINIGAME.get()) {
                 String qualityStr = determineForgingQuality();
-                if (!Objects.equals(qualityStr, "no_quality")) {
+                if (!Objects.equals(qualityStr, ForgingQuality.NONE.getDisplayName())) {
                     ForgingQuality quality = ForgingQuality.fromString(qualityStr);
                     if (quality != null) {
                         // Clamp to minimum quality if needed
@@ -319,7 +329,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             // Handle minigame result without quality
             if (ServerConfig.ENABLE_MINIGAME.get()) {
                 String quality = determineForgingQuality();
-                if (!Objects.equals(quality, "no_quality")) {
+                if (!Objects.equals(quality, ForgingQuality.NONE.getDisplayName())) {
                     boolean fail = false;
 
                     if (quality.equals(ForgingQuality.POOR.getDisplayName())) {
@@ -373,6 +383,61 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         }
     }
 
+    protected void craftItemWithBlueprint() {
+
+        // Get the crafted output item
+        ItemStack result = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+
+        // Skip blueprint progression if crafting failed
+        if (result.isEmpty()) return;
+
+        // Handle blueprint progression (slot 11)
+        ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
+        if (!blueprint.isEmpty() && blueprint.hasTag()) {
+            CompoundTag tag = blueprint.getOrCreateTag();
+
+            if (tag.contains("Quality") && tag.contains("Uses") && tag.contains("UsesToLevel")) {
+                String currentQualityStr = tag.getString("Quality");
+                int uses = tag.getInt("Uses");
+                int usesToLevel = tag.getInt("UsesToLevel");
+
+                BlueprintQuality currentQuality = BlueprintQuality.fromString(currentQualityStr);
+
+                // Attempt to read the ForgingQuality from result
+                String forgingQualityStr = anvilBlock.getQuality();
+                ForgingQuality resultQuality = ForgingQuality.fromString(forgingQualityStr);
+
+                if (currentQuality != null && currentQuality != BlueprintQuality.PERFECT && currentQuality != BlueprintQuality.MASTER) {
+                    if (!ServerConfig.EXPERT_ABOVE_INCREASE_BLUEPRINT.get() || resultQuality.ordinal() >= ForgingQuality.EXPERT.ordinal()) {
+                        uses += switch (resultQuality) {
+                            case PERFECT -> 2;
+                            case MASTER -> 3;
+                            default -> 1;
+                        };
+                    }
+
+
+                    // Level up if threshold reached
+                    if (uses >= usesToLevel) {
+                        BlueprintQuality nextQuality = BlueprintQuality.getNext(currentQuality);
+                        if (nextQuality != null) {
+                            tag.putString("Quality", nextQuality.getDisplayName());
+                            tag.putInt("Uses", 0);
+                            tag.putInt("UsesToLevel", nextQuality.getUse());
+                        } else {
+                            tag.putInt("Uses", usesToLevel); // Clamp
+                        }
+                    } else {
+                        tag.putInt("Uses", uses); // Just increment
+                    }
+
+                    blueprint.setTag(tag);
+                    this.itemHandler.setStackInSlot(BLUEPRINT_SLOT, blueprint);
+                }
+            }
+        }
+    }
+
     public boolean isFailedResult() {
         ItemStack result = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
 
@@ -396,35 +461,43 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                 && canInsertAmountIntoOutputSlot(resultStack.getCount());
     }
 
-    protected boolean hasEnoughIngredients(ForgingRecipe recipe) {
-        NonNullList<Ingredient> ingredients = recipe.getIngredients();
-        SimpleContainer inventory = new SimpleContainer(9);
-        for (int i = 0; i < 9; i++) {
-            inventory.setItem(i, itemHandler.getStackInSlot(i));
+    public boolean hasRecipeWithBlueprint() {
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isEmpty()) return false;
+
+        ForgingRecipe recipe = recipeOptional.get();
+
+        // Tier check
+        AnvilTier requiredTier = AnvilTier.fromDisplayName(recipe.getAnvilTier());
+        if (requiredTier == null || !requiredTier.isEqualOrLowerThan(this.anvilTier)) {
+            return false;
         }
 
-        // Create a copy of the inventory to track consumed items
-        SimpleContainer inventoryCopy = new SimpleContainer(9);
-        for (int i = 0; i < 9; i++) {
-            inventoryCopy.setItem(i, inventory.getItem(i).copy());
-        }
+        ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
 
-        // Check each ingredient requirement
-        for (Ingredient ingredient : ingredients) {
-            boolean found = false;
-            for (int i = 0; i < 9; i++) {
-                ItemStack stack = inventoryCopy.getItem(i);
-                if (ingredient.test(stack) && stack.getCount() > 0) {
-                    stack.shrink(1);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
+        if (recipe.requiresBlueprint()) {
+            // Must have a valid matching blueprint
+            if (blueprint.isEmpty() || !blueprint.hasTag() || !blueprint.getTag().contains("ToolType")) {
                 return false;
             }
+
+            String blueprintToolType = blueprint.getTag().getString("ToolType").toLowerCase(Locale.ROOT);
+            if (!recipe.getBlueprintTypes().contains(blueprintToolType)) {
+                return false;
+            }
+        } else {
+            // Optional blueprint: if present, it must match
+            if (!blueprint.isEmpty() && blueprint.hasTag() && blueprint.getTag().contains("ToolType")) {
+                String blueprintToolType = blueprint.getTag().getString("ToolType").toLowerCase(Locale.ROOT);
+                if (!recipe.getBlueprintTypes().contains(blueprintToolType)) {
+                    return false;
+                }
+            }
         }
-        return true;
+
+        ItemStack resultStack = recipe.getResultItem(level.registryAccess());
+        return canInsertItemIntoOutputSlot(resultStack)
+                && canInsertAmountIntoOutputSlot(resultStack.getCount());
     }
 
     public Optional<ForgingRecipe> getCurrentRecipe() {
@@ -523,6 +596,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             OvergearedMod.LOGGER.error("Error ticking smithing anvil at {}", pos, e);
             resetProgress(pos);
         }
+        tickHeatedIngredients(lvl);
     }
 
     public int getHitsRemaining() {
@@ -551,9 +625,148 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         return recipe.matches(inventory, level);
     }
 
-    protected abstract String determineForgingQuality();
+    protected String determineForgingQuality() {
+        String quality = anvilBlock.getQuality();
+        if (quality == null) return "well";
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        ForgingRecipe recipe = recipeOptional.get();
+        if (!recipe.getBlueprintTypes().isEmpty()) {
 
-    public abstract String blueprintQuality();
+            ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
+
+            // Define tool quality tiers in order of strength
+            List<String> qualityTiers = List.of("poor", "well", "expert", "perfect", "master");
+
+            // If blueprint is missing or invalid, fallback logic
+            if (blueprint.isEmpty() || !blueprint.hasTag()) {
+                return switch (quality.toLowerCase()) {
+                    case "poor" -> ForgingQuality.POOR.getDisplayName();
+                    default -> "well"; // Cap quality at 'well' without blueprint
+                };
+            }
+
+            CompoundTag nbt = blueprint.getTag();
+            if (nbt == null || !nbt.contains("Quality")) {
+                return switch (quality.toLowerCase()) {
+                    case "poor" -> ForgingQuality.POOR.getDisplayName();
+                    default -> "well"; // Cap quality at 'well' without ToolType
+                };
+            }
+
+            String blueprintToolType = nbt.getString("Quality").toLowerCase();
+
+            // Determine capped quality
+            int anvilTierIndex = qualityTiers.indexOf(quality.toLowerCase());
+            int blueprintTierIndex = qualityTiers.indexOf(blueprintToolType);
+
+            // Default to lowest if any tier is missing
+            if (anvilTierIndex == -1 || blueprintTierIndex == -1) {
+                return ForgingQuality.NONE.getDisplayName();
+            }
+
+            int finalIndex = Math.min(anvilTierIndex, blueprintTierIndex);
+
+            switch (qualityTiers.get(finalIndex)) {
+                case "poor":
+                    return ForgingQuality.POOR.getDisplayName();
+                case "well":
+                    return ForgingQuality.WELL.getDisplayName();
+                case "expert":
+                    return ForgingQuality.EXPERT.getDisplayName();
+                case "perfect": {
+                    Random random = new Random();
+
+                    // 🔹 Check if any crafting slot contains a Master-quality ingredient
+                    boolean hasMasterIngredient = false;
+                    for (int i = 0; i < this.itemHandler.getSlots(); i++) {
+                        if (i == OUTPUT_SLOT || i == BLUEPRINT_SLOT) continue; // skip output + blueprint
+                        ItemStack stack = this.itemHandler.getStackInSlot(i);
+                        if (!stack.isEmpty() && stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
+                            String ingQuality = stack.getTag().getString("ForgingQuality").toLowerCase();
+                            if ("master".equals(ingQuality)) {
+                                hasMasterIngredient = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Normal Master roll from config
+                    boolean masterRoll = ServerConfig.MASTER_QUALITY_CHANCE.get() != 0
+                            && random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get();
+
+                    // Ingredient-based boost
+                    boolean ingredientMasterRoll = hasMasterIngredient
+                            && random.nextFloat() < ServerConfig.MASTER_FROM_INGREDIENT_CHANCE.get();
+
+                    if ("master".equals(blueprintToolType) || masterRoll || ingredientMasterRoll) {
+                        return ForgingQuality.MASTER.getDisplayName();
+                    } else {
+                        return ForgingQuality.PERFECT.getDisplayName();
+                    }
+                }
+                case "master":
+                    return ForgingQuality.MASTER.getDisplayName();
+                default:
+                    return ForgingQuality.WELL.getDisplayName();
+            }
+        }
+        return quality;
+    }
+
+    public String minigameQuality() {
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isEmpty()) {
+            return "none"; // no recipe = base fallback
+        }
+
+        ForgingRecipe recipe = recipeOptional.get();
+        if (!recipe.getBlueprintTypes().isEmpty()) {
+            if (!recipe.getQualityDifficulty().equals(ForgingQuality.NONE))
+                return recipe.getQualityDifficulty().getDisplayName();
+            else return blueprintQuality();
+        } else return recipe.getQualityDifficulty().getDisplayName();
+    }
+
+    public String blueprintQuality() {
+        String quality = anvilBlock.getQuality();
+        if (quality == null) {
+            return ForgingQuality.NONE.getDisplayName(); // fallback when global quality is missing
+        }
+
+        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
+        if (recipeOptional.isEmpty()) {
+            return "poor"; // no recipe = base fallback
+        }
+
+        ForgingRecipe recipe = recipeOptional.get();
+        if (!recipe.getBlueprintTypes().isEmpty()) {
+            if (!recipe.getQualityDifficulty().equals(ForgingQuality.NONE))
+                return recipe.getQualityDifficulty().getDisplayName();
+            ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
+
+            // Quality tiers in order
+            List<String> qualityTiers = List.of("poor", "well", "expert", "perfect", "master");
+
+            // Missing or invalid blueprint → cap quality
+            String poor = quality.equalsIgnoreCase("poor")
+                    ? ForgingQuality.POOR.getDisplayName()
+                    : ForgingQuality.NONE.getDisplayName();
+            if (blueprint.isEmpty() || !blueprint.hasTag()) {
+                return poor;
+            }
+
+            CompoundTag nbt = blueprint.getTag();
+            if (nbt == null || !nbt.contains("Quality")) {
+                return poor;
+            }
+
+            String bpQuality = nbt.getString("Quality").toLowerCase();
+            // ensure it’s in our tier list, otherwise default
+            return qualityTiers.contains(bpQuality) ? bpQuality : ForgingQuality.NONE.getDisplayName();
+        }
+
+        return ForgingQuality.NONE.getDisplayName(); // fallback if no blueprint types
+    }
 
     public void setProgress(int progress) {
         this.progress = progress;
@@ -661,5 +874,56 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     public void setMinigameOn(boolean value) {
         this.minigameOn = value;
         setChanged(); // mark dirty for save
+    }
+
+    private static final String HEATED_TIME_TAG = "HeatedSince";
+
+    public void tickHeatedIngredients(Level level) {
+        if (level.isClientSide) return;
+        long tick = level.getGameTime();
+        int cooldownTicks = ServerConfig.HEATED_ITEM_COOLDOWN_TICKS.get();
+
+        for (int slot = 0; slot < 9; slot++) {
+            ItemStack stack = itemHandler.getStackInSlot(slot);
+            if (stack.isEmpty()) continue;
+            if (!stack.is(ModTags.Items.HEATED_METALS)) continue;
+
+            CompoundTag tag = stack.getOrCreateTag();
+            long heatedSince = tag.getLong(HEATED_TIME_TAG);
+
+            // Initialize timestamp if not present
+            if (heatedSince == 0L) {
+                tag.putLong(HEATED_TIME_TAG, tick);
+                continue;
+            }
+
+            // Cooldown complete → convert to cooled version
+            if (tick - heatedSince >= cooldownTicks) {
+                Item cooled = getCooledIngot(stack.getItem(), level);
+                if (cooled != null) {
+                    ItemStack newStack = new ItemStack(cooled, stack.getCount());
+                    // Preserve quality or other metadata if needed
+                    if (stack.hasTag()) {
+                        CompoundTag oldTag = stack.getTag().copy();
+                        oldTag.remove(HEATED_TIME_TAG);
+                        if (oldTag.isEmpty()) {
+                            newStack.setTag(null); // fully clear
+                        } else {
+                            newStack.setTag(oldTag);
+                        }
+                    }
+                    level.playSound(
+                            null,                              // no player (broadcast to all nearby)
+                            worldPosition,                     // block position
+                            SoundEvents.FIRE_EXTINGUISH,       // extinguish sound
+                            SoundSource.BLOCKS,                // sound category
+                            1.0F,                              // volume
+                            1.0F                               // pitch
+                    );
+                    itemHandler.setStackInSlot(slot, newStack);
+                    level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+                }
+            }
+        }
     }
 }
