@@ -57,6 +57,7 @@ import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.*;
 import net.stirdrem.overgeared.recipe.CoolingRecipe;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
+import net.stirdrem.overgeared.recipe.GrindingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.screen.FletchingStationMenu;
 import net.stirdrem.overgeared.util.ModTags;
@@ -426,7 +427,7 @@ public class ModItemInteractEvents {
                     return;
                 }
 
-                if (stack.is(ModTags.Items.GRINDABLE)) {
+                if (hasGrindingRecipe(stack.getItem(), event.getLevel())) {
                     grindItem(player, stack);
                     world.playSound(null, player.blockPosition(),
                             SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS,
@@ -627,7 +628,7 @@ public class ModItemInteractEvents {
     }
 
     private static void grindItem(Player player, ItemStack heldStack) {
-        Item cooledItem = getGrindable(heldStack.getItem());
+        Item cooledItem = getGrindable(heldStack.getItem(), player.level());
         if (cooledItem != null) {
             ItemStack cooledIngot = new ItemStack(cooledItem);
             if (heldStack.hasTag()) {
@@ -650,24 +651,27 @@ public class ModItemInteractEvents {
         }
     }
 
-    private static Item getGrindable(Item heatedItem) {
-        var heatedTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.GRINDABLE);
-        var cooledTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.GRINDED);
+    private static Item getGrindable(@Nullable Item heatedItem, @NotNull Level level) {
+        if (heatedItem == null || level == null) return null;
 
-        int index = 0;
-        for (Item item : heatedTag) {
-            if (item == heatedItem) {
-                int i = 0;
-                for (Item cooledItem : cooledTag) {
-                    if (i == index) {
-                        return cooledItem;
-                    }
-                    i++;
-                }
-            }
-            index++;
+        // Wrap the single item in a container for recipe matching
+        SimpleContainer container = new SimpleContainer(new ItemStack(heatedItem));
+
+        // Find the first matching GrindingRecipe
+        Optional<GrindingRecipe> recipeOpt = level.getRecipeManager()
+                .getAllRecipesFor(ModRecipeTypes.GRINDING_RECIPE.get())
+                .stream()
+                .filter(r -> r.matches(container, level))
+                .findFirst();
+
+        if (recipeOpt.isEmpty()) {
+            return heatedItem; // no grinding recipe found
         }
-        return null;
+
+        // Return the result item from the recipe
+        GrindingRecipe recipe = recipeOpt.get();
+        ItemStack result = recipe.getResultItem(level.registryAccess());
+        return result.isEmpty() ? heatedItem : result.getItem();
     }
 
     public static boolean hasCoolingRecipe(@Nullable Item heatedItem, @NotNull Level level) {
@@ -679,6 +683,24 @@ public class ModItemInteractEvents {
         // Find the first matching CoolingRecipe
         Optional<CoolingRecipe> recipeOpt = level.getRecipeManager()
                 .getAllRecipesFor(ModRecipeTypes.COOLING_RECIPE.get())
+                .stream()
+                .filter(r -> r.matches(container, level))
+                .findFirst();
+
+        // Return true if a recipe exists and produces a non-empty result
+        return recipeOpt.map(recipe -> !recipe.getResultItem(level.registryAccess()).isEmpty())
+                .orElse(false);
+    }
+
+    public static boolean hasGrindingRecipe(@Nullable Item heatedItem, @NotNull Level level) {
+        if (heatedItem == null) return false;
+
+        // Wrap the item in a container for recipe matching
+        SimpleContainer container = new SimpleContainer(new ItemStack(heatedItem));
+
+        // Find the first matching GrindingRecipe
+        Optional<GrindingRecipe> recipeOpt = level.getRecipeManager()
+                .getAllRecipesFor(ModRecipeTypes.GRINDING_RECIPE.get())
                 .stream()
                 .filter(r -> r.matches(container, level))
                 .findFirst();

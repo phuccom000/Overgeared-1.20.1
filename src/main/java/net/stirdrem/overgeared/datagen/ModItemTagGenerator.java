@@ -225,14 +225,6 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.STEEL_UPGRADE_ARROW.get(),
                         ModItems.DIAMOND_UPGRADE_ARROW.get()
                 );
-        this.tag(ModTags.Items.GRINDABLE)
-                .add(
-                        Items.DIAMOND
-                );
-        this.tag(ModTags.Items.GRINDED)
-                .add(
-                        ModItems.DIAMOND_SHARD.get()
-                );
         this.tag(ModTags.Items.HOT_ITEMS)
                 .add(
                         Items.LAVA_BUCKET

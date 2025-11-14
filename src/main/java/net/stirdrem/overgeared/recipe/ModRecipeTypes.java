@@ -31,6 +31,8 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register("item_to_tooltype", () -> RecipeType.simple(new ResourceLocation(OvergearedMod.MOD_ID, "item_to_tooltype")));
     public static final RegistryObject<RecipeType<CoolingRecipe>> COOLING_RECIPE =
             RECIPE_TYPES.register("cooling", () -> CoolingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<GrindingRecipe>> GRINDING_RECIPE =
+            RECIPE_TYPES.register("grinding", () -> GrindingRecipe.Type.INSTANCE);
 
     public static void register(IEventBus eventBus) {
         RECIPE_TYPES.register(eventBus);

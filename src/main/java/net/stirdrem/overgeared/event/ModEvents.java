@@ -418,10 +418,10 @@ public class ModEvents {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.hotitems.tooltip")
                     .withStyle(ChatFormatting.RED));
         }
-        if (stack.is(ModTags.Items.GRINDABLE)) {
+        /*if (stack.is(ModTags.Items.GRINDABLE)) {
             tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.grindable")
                     .withStyle(ChatFormatting.GRAY));
-        }
+        }*/
     }
 
     @SubscribeEvent

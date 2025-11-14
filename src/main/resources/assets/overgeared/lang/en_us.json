@@ -265,6 +265,7 @@
   "gui.overgeared.jei.category.alloy_smelting": "Alloying",
   "container.overgeared.nether_alloy_smelter": "Nether Alloy Furnace",
   "gui.overgeared.jei.category.nether_alloy_smelting": "Nether Alloying",
-  "gui.overgeared.jei.category.cooling": "Water Cooling"
+  "gui.overgeared.jei.category.cooling": "Water Cooling",
+  "gui.overgeared.jei.category.grinding": "Grinding"
 }
 
