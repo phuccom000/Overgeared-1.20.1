@@ -1,9 +1,0 @@
-{
-  "type": "overgeared:cooling",
-  "input": {
-    "item": "overgeared:heated_netherite_composite"
-  },
-  "output": {
-    "item": "overgeared:netherite_composite"
-  }
-}

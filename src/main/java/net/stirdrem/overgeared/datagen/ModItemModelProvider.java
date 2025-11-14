@@ -48,7 +48,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.ROCK);
         simpleItem(ModItems.STEEL_INGOT);
         simpleItem(ModItems.STEEL_NUGGET);
-        simpleItem(ModItems.NETHERITE_COMPOSITE);
+        simpleItem(ModItems.NETHERITE_ALLOY);
         simpleItem(ModItems.COPPER_NUGGET);
         simpleItem(ModItems.DIAMOND_SHARD);
         simpleItem(ModItems.IRON_ARROW_HEAD);
@@ -63,7 +63,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.HEATED_IRON_INGOT);
         simpleItem(ModItems.HEATED_STEEL_INGOT);
         simpleItem(ModItems.HEATED_SILVER_INGOT);
-        simpleItem(ModItems.HEATED_NETHERITE_COMPOSITE);
+        simpleItem(ModItems.HEATED_NETHERITE_ALLOY);
         simpleItem(ModItems.COPPER_PLATE);
         simpleItem(ModItems.IRON_PLATE);
         simpleItem(ModItems.STEEL_PLATE);

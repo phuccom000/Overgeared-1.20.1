@@ -5,13 +5,11 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
@@ -112,7 +110,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.HEATED_CRUDE_STEEL.get(),
                         ModItems.HEATED_COPPER_INGOT.get(),
                         ModItems.HEATED_SILVER_INGOT.get(),
-                        ModItems.HEATED_NETHERITE_COMPOSITE.get()
+                        ModItems.HEATED_NETHERITE_ALLOY.get()
                 );
         this.tag(ModTags.Items.SMITHING_HAMMERS)
                 .add(

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "overgeared:item/heated_netherite_composite"
+    "layer0": "overgeared:item/netherite_alloy"
   }
 }

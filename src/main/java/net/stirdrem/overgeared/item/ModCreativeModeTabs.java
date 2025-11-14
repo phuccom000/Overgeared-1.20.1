@@ -43,8 +43,8 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.HEATED_IRON_INGOT.get());
                         pOutput.accept(ModItems.HEATED_SILVER_INGOT.get());
                         pOutput.accept(ModItems.HEATED_STEEL_INGOT.get());
-                        pOutput.accept(ModItems.NETHERITE_COMPOSITE.get());
-                        pOutput.accept(ModItems.HEATED_NETHERITE_COMPOSITE.get());
+                        pOutput.accept(ModItems.NETHERITE_ALLOY.get());
+                        pOutput.accept(ModItems.HEATED_NETHERITE_ALLOY.get());
                         pOutput.accept(ModItems.COPPER_PLATE.get());
                         pOutput.accept(ModItems.IRON_PLATE.get());
                         pOutput.accept(ModItems.STEEL_PLATE.get());
