@@ -96,7 +96,8 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                         break;
                     }
                     if (tag.contains("ForgingQuality")) {
-                        foundQuality = tag.getString("ForgingQuality");
+                        if (!tag.getString("ForgingQuality").equals("none"))
+                            foundQuality = tag.getString("ForgingQuality");
                     }
                 }
             }
@@ -122,7 +123,8 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
             if (ingredient.hasTag()) {
                 CompoundTag tag = ingredient.getTag();
                 if (tag.contains("ForgingQuality")) {
-                    foundQuality = tag.getString("ForgingQuality");
+                    if (!tag.getString("ForgingQuality").equals("none"))
+                        foundQuality = tag.getString("ForgingQuality");
                 }
                 if (tag.contains("Polished") && tag.getBoolean("Polished")) {
                     isPolished = true;
@@ -133,18 +135,35 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
             }
         }
 
-        if (foundQuality != null) {
+        if ((foundQuality == null || foundQuality.equals("none")) && (!isPolished || unquenched)) {
+            // If foundQuality is null AND (isPolished OR unquenched), set POOR
+            resultTag.putString("ForgingQuality", ForgingQuality.POOR.getDisplayName());
+            result.setTag(resultTag);
+            return result;
+        }
+
+        if (foundQuality != null && !foundQuality.equals("none")) {
             ForgingQuality quality = ForgingQuality.fromString(foundQuality);
+
             if (!isPolished) {
                 quality = quality.getLowerQuality();
             }
             if (unquenched) {
                 quality = quality.getLowerQuality();
             }
+
             resultTag.putString("ForgingQuality", quality.getDisplayName());
             result.setTag(resultTag);
-        } else if (unquenched) return ItemStack.EMPTY;
+            return result;
+        }
+
+        // If foundQuality is null AND only unquenched → empty item
+        if (foundQuality == null && unquenched) {
+            return ItemStack.EMPTY;
+        }
+
         return result;
+
     }
 
     @Override

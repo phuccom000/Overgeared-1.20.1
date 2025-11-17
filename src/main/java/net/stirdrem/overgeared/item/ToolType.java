@@ -43,12 +43,11 @@ public class ToolType {
 
     public MutableComponent getDisplayName() {
         Component trans = Component.translatable(translationKey);
-
-        // If untranslated, fallback to literal ID
+    /*    // If untranslated, fallback to literal ID
         if (trans.getString().equals(translationKey)) {
             return Component.literal(id);
         }
-
+*/
         return trans.copy();
     }
 

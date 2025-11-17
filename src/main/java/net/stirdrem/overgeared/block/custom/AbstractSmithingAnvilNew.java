@@ -129,7 +129,7 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
             return InteractionResult.CONSUME;
         }*/
 
-        if (anvil.hasRecipe() && isHammer) {
+        if (anvil.hasRecipe()) {
             UUID currentOwner = anvil.getOwnerUUID();
             if (currentOwner != null && !currentOwner.equals(player.getUUID()) && player instanceof ServerPlayer serverPlayer) {
                 // Get the player entity from the UUID
@@ -158,7 +158,7 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
                 return InteractionResult.FAIL;
             }
 
-            if (anvil.isMinigameOn() || !anvil.hasQuality() && !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get()) {
+            if (isHammer && (anvil.isMinigameOn() || !anvil.hasQuality() && !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get())) {
                 BlockPos pos1 = ModItemInteractEvents.playerAnvilPositions.get(player.getUUID());
                 if (pos1 != null && !pos.equals(ModItemInteractEvents.playerAnvilPositions.get(player.getUUID()))) {
                     ServerPlayer serverPlayer = (ServerPlayer) player;

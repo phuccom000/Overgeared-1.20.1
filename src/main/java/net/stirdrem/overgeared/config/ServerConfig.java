@@ -254,21 +254,26 @@ public class ServerConfig {
         builder.pop();
 
         builder.push("Blueprint & Tool Types");
+
         AVAILABLE_TOOL_TYPES = builder.comment(
-                        "List of available tool types for blueprints",
-                        "Default options: sword, axe, pickaxe, shovel, hoe",
-                        "Remove or add any types as you see fit"
+                        "List of available tool types for blueprints. Default options: sword, axe, pickaxe, shovel, hoe. You may freely add or remove types.",
+                        "To add a custom blueprint type: add it to availableToolTypes, then define its display name in your lang file.",
+                        "Template format: \"availableToolTypes\": [\"sword\", \"axe\", \"your_custom_type\"]",
+                        "Lang format: tooltype.overgeared.your_custom_type"
                 )
                 .defineList("availableToolTypes",
-                        Arrays.asList("sword", "axe", "pickaxe", "shovel", "hoe", "HAMMER"),
-                        entry -> entry instanceof String);
+                        Arrays.asList("sword", "axe", "pickaxe", "shovel", "hoe", "hammer"),
+                        entry -> entry instanceof String
+                );
 
-        HIDDEN_TOOL_TYPES = builder.comment("Add hidden custom tool types. Does not appear in the Drafting Table. Format same as above")
-                .defineList("hiddenToolTypes", Arrays.asList(), entry -> {
-                    if (!(entry instanceof String)) return false;
-                    // Validation will happen in ToolTypeRegistry
-                    return true;
-                });
+        HIDDEN_TOOL_TYPES = builder.comment(
+                        "List of hidden tool types for blueprints. These exist but do NOT appear in the Drafting Table."
+                )
+                .defineList("hiddenToolTypes",
+                        Arrays.asList(),
+                        entry -> entry instanceof String
+                );
+
         EXPERT_ABOVE_INCREASE_BLUEPRINT = builder.comment("Only increase blueprint's use if you get Expert or above in minigame.").define("expertAboveIncreaseBlueprintToggle", true);
 
         MASTER_MAX_USE = builder.comment("Uses required to reach the next quality after Master").defineInRange("masterMaxUse", 0, 0, Integer.MAX_VALUE);

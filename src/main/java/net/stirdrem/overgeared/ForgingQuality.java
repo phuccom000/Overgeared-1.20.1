@@ -26,6 +26,11 @@ public enum ForgingQuality {
     }
 
     public ForgingQuality getLowerQuality() {
+        // NONE should never downgrade to MASTER
+        if (this == NONE) {
+            return NONE;
+        }
+
         ForgingQuality[] values = values();
         int index = this.ordinal();
         return index > 0 ? values[index - 1] : this; // POOR stays POOR

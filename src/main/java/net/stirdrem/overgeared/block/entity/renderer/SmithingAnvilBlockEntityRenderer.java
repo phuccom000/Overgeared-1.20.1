@@ -30,6 +30,11 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
     public SmithingAnvilBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
+    private static final float BASE_Y = 1.01f;
+    private static final float ITEM_HEIGHT = 0.02f;
+    private static final float BLOCK_HEIGHT = 0.2f;
+    private static final float BLOCK_BASE_Y_OFFSET = 0.09f;
+
     @Override
     public void render(AbstractSmithingAnvilBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack,
                        MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
@@ -76,40 +81,62 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
 
     private int renderPass(PoseStack pPoseStack, MultiBufferSource pBuffer,
                            ItemRenderer itemRenderer, AbstractSmithingAnvilBlockEntity pBlockEntity,
-                           Set<Item> renderedItems, Set<Integer> renderedSlots, float zOffset,
-                           int renderedCount, boolean checkUniqueness) {
+                           Set<Item> renderedItems, Set<Integer> renderedSlots,
+                           float zOffset, int renderedCount, boolean checkUniqueness) {
+
+        // Use an accumulated Y offset instead of rendered index
+        float currentHeight = BASE_Y;
+
+        // Rebuild currentHeight based on previously rendered slots
+        for (int i : renderedSlots) {
+            ItemStack prev = pBlockEntity.getRenderStack(i);
+            currentHeight += isBlockItem(prev) ? BLOCK_HEIGHT : ITEM_HEIGHT;
+        }
+
         int rendered = renderedCount;
 
         for (int i = 0; i < 9 && rendered < 3; i++) {
-            // Skip slots that were already rendered
+
             if (renderedSlots.contains(i)) {
                 continue;
             }
 
             ItemStack stack = pBlockEntity.getRenderStack(i);
-            if (!stack.isEmpty()) {
-                Item item = stack.getItem();
+            if (stack.isEmpty()) continue;
 
-                // Skip if we're checking uniqueness and this item was already rendered
-                if (checkUniqueness && renderedItems.contains(item)) {
-                    continue;
-                }
+            Item item = stack.getItem();
 
-                float baseYOffset = 1.01f + (rendered * 0.02f);
-                float yOffset = isBlockItem(stack) ? baseYOffset + 0.05f : baseYOffset;
-                float rotation = 96f + (rendered * 14f);
-
-                renderStack(pPoseStack, pBuffer, itemRenderer, stack,
-                        pBlockEntity, 0.0f, yOffset, zOffset, rotation, 0.35f);
-
-                renderedItems.add(item);
-                renderedSlots.add(i);
-                rendered++;
+            if (checkUniqueness && renderedItems.contains(item)) {
+                continue;
             }
+
+            float scale = isBlockItem(stack) ? 0.4f : 0.35f;
+            float rotation = 96f + (rendered * 14f);
+
+            // Use accumulated height
+            float yOffset = currentHeight;
+
+            // If this is the first rendered item AND it's a block → raise it
+            if (isBlockItem(stack)) {
+                yOffset += BLOCK_BASE_Y_OFFSET;
+            }
+
+            renderStack(
+                    pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity,
+                    0.0f, yOffset, zOffset, rotation, scale
+            );
+
+            // Add height for next item
+            currentHeight += isBlockItem(stack) ? BLOCK_HEIGHT : ITEM_HEIGHT;
+
+            renderedItems.add(item);
+            renderedSlots.add(i);
+            rendered++;
         }
 
         return rendered;
     }
+
 
     // Helper method to determine if an ItemStack is a block item
     private boolean isBlockItem(ItemStack stack) {

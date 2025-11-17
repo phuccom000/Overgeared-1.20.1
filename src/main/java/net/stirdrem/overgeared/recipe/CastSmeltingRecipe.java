@@ -109,7 +109,8 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
 
         // Transfer quality only
         if (input.hasTag() && input.getTag().contains("Quality")) {
-            output.getOrCreateTag().put("ForgingQuality", input.getTag().get("Quality"));
+            if (!input.getTag().getString("Quality").equals("none"))
+                output.getOrCreateTag().put("ForgingQuality", input.getTag().get("Quality"));
         }
         // Only mark unpolished if recipe says so
         if (needPolishing) {

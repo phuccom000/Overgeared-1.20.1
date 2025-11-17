@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.Potions;
@@ -47,6 +48,7 @@ import net.stirdrem.overgeared.entity.ModEntities;
 
 import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
 import net.stirdrem.overgeared.entity.renderer.UpgradeArrowEntityRenderer;
+import net.stirdrem.overgeared.heatedtem.CapabilityRegistry;
 import net.stirdrem.overgeared.item.armor.model.CustomCopperHelmet;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
@@ -157,6 +159,18 @@ public class OvergearedMod {
         return result.isEmpty() ? heatedItem : result.getItem();
     }
 
+    public static void setItemHeated(ItemEntity entity) {
+        long now = entity.level().getGameTime();
+
+        entity.getCapability(CapabilityRegistry.HEATED_ITEM).ifPresent(cap -> {
+            cap.setHeated(now);
+
+            ItemStack stack = entity.getItem();
+            if (!stack.is(ModTags.Items.HEATED_METALS))
+                stack.getOrCreateTag().putBoolean("Heated", true);
+            stack.getTag().putLong("HeatedSince", now);
+        });
+    }
 
     @Unique
     public static boolean isDurabilityMultiplierBlacklisted(ItemStack stack) {

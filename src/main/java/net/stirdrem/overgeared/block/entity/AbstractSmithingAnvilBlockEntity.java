@@ -603,6 +603,11 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         return hitRemains;
     }
 
+    // Add this method to ensure data sync
+    public ContainerData getContainerData() {
+        return data;
+    }
+
     @Override
     public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
@@ -612,7 +617,26 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     public CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
         tag.put("inventory", itemHandler.serializeNBT());
+        // Add progress data for client sync
+        tag.putInt("progress", progress);
+        tag.putInt("maxProgress", maxProgress);
+        tag.putInt("hitRemains", hitRemains);
         return tag;
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag) {
+        super.handleUpdateTag(tag);
+        // Read the synced progress data on client side
+        if (tag.contains("progress")) {
+            this.progress = tag.getInt("progress");
+        }
+        if (tag.contains("maxProgress")) {
+            this.maxProgress = tag.getInt("maxProgress");
+        }
+        if (tag.contains("hitRemains")) {
+            this.hitRemains = tag.getInt("hitRemains");
+        }
     }
 
     protected boolean matchesRecipeExactly(ForgingRecipe recipe) {
@@ -772,16 +796,24 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         this.progress = progress;
         this.setChanged();
 
-        // If you're using ContainerData
+        // Force sync to client
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+
         if (this.data != null) {
-            this.data.set(0, progress); // Assuming progress is at index 0
+            this.data.set(0, progress);
         }
     }
 
     public int getRequiredProgress() {
-        Optional<ForgingRecipe> recipe = getCurrentRecipe();
-        ForgingRecipe currentRecipe = recipe.get();
-        return currentRecipe.getHammeringRequired();
+        return getCurrentRecipe()
+                .map(ForgingRecipe::getHammeringRequired)
+                .orElse(0); // default to 0 if recipe is empty
+    }
+
+    public int getProgress() {
+        return progress;
     }
 
     @Override
