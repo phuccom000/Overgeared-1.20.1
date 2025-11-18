@@ -337,6 +337,11 @@ public class ToolCastItem extends Item {
                             )
                             .withStyle(ChatFormatting.GRAY)
             );
+            
+            tooltip.add(
+                    Component.translatable("tooltip.overgeared.add_materials")
+                            .withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)
+            );
         }
 
         // Add usage hint (only if cast has materials)

@@ -110,6 +110,7 @@ public class ModEvents {
             Item item = stack.getItem();
 
             //if (isWeapon(item)) {
+            //if (!isArmor(item))
             applyWeaponAttributes(event, quality);
             //} else if (isArmor(item)) {
             applyArmorAttributes(event, quality);
@@ -127,22 +128,34 @@ public class ModEvents {
     private static void applyArmorAttributes(ItemAttributeModifierEvent event, String quality) {
         double armorBonus = getArmorBonusForQuality(quality);
         modifyAttribute(event, Attributes.ARMOR, armorBonus);
+        modifyAttribute(event, Attributes.ARMOR_TOUGHNESS, armorBonus);
     }
 
     private static void modifyAttribute(ItemAttributeModifierEvent event, Attribute attribute, double bonus) {
-        Multimap<Attribute, AttributeModifier> originalModifiers = LinkedHashMultimap.create();
-        originalModifiers.putAll(event.getOriginalModifiers());
+        Multimap<Attribute, AttributeModifier> originalModifiers = event.getOriginalModifiers();
 
-        originalModifiers.get(attribute).forEach(modifier -> {
+        // Check if this attribute exists at all
+        if (!originalModifiers.containsKey(attribute)) {
+            return;
+        }
+
+        for (AttributeModifier modifier : originalModifiers.get(attribute)) {
+
+            // Skip modifiers with zero value
+            if (modifier.getAmount() == 0) {
+                continue;
+            }
+
             event.removeModifier(attribute, modifier);
             event.addModifier(attribute, createModifiedAttribute(modifier, bonus));
-        });
+        }
     }
+
 
     private static AttributeModifier createModifiedAttribute(AttributeModifier original, double bonus) {
         return new AttributeModifier(
                 original.getId(),
-                original.getName() + "_forged",
+                original.getName(),
                 original.getAmount() + bonus,
                 original.getOperation()
         );
