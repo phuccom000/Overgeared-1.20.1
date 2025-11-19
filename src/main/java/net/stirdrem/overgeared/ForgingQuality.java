@@ -5,7 +5,8 @@ public enum ForgingQuality {
     WELL("well"),
     EXPERT("expert"),
     PERFECT("perfect"),
-    MASTER("master");
+    MASTER("master"),
+    NONE("none");
 
     private final String displayName;
 
@@ -25,6 +26,7 @@ public enum ForgingQuality {
     }
 
     public ForgingQuality getLowerQuality() {
+        if (this == NONE) return NONE;
         ForgingQuality[] values = values();
         int index = this.ordinal();
         return index > 0 ? values[index - 1] : this; // POOR stays POOR

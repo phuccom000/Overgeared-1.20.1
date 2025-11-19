@@ -4,10 +4,10 @@ package net.stirdrem.overgeared;
 
 import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -26,12 +26,16 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.block.UpgradeArrowDispenseBehavior;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
-import net.stirdrem.overgeared.compoment.ForgingQualityComponents;
+import net.stirdrem.overgeared.component.ForgingQualityComponents;
 import net.stirdrem.overgeared.entity.ModEntities;
 
 import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
@@ -75,16 +79,15 @@ public class OvergearedMod {
     //public static final AnvilMinigameHandler SERVER_HANDLER = new AnvilMinigameHandler();
 
     // UH THIS IS REGISTER THE COMPOMENT SO IT ACCESSABLE
-    public static final DeferredRegister.DataComponents REGISTRAR = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MOD_ID);
+    public static final DeferredRegister.DataComponents REGISTER = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MOD_ID);
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ForgingQuality>> FORGING_QUALITY = REGISTRAR.registerComponentType(
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ForgingQuality>> FORGING_QUALITY = REGISTER.registerComponentType(
             "forging_quality",
             builder -> builder
                     .persistent(ForgingQualityComponents.CODEC)
                     .networkSynchronized(ForgingQualityComponents.STREAM_CODEC)
     );
 
-    public static boolean polymorph;
 
     public OvergearedMod(IEventBus modEventBus, ModContainer modContainer) {
 
@@ -123,7 +126,6 @@ public class OvergearedMod {
         MinecraftForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::addCreative);
 
-        polymorph = ModList.get().isLoaded("polymorph");
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
@@ -149,54 +151,52 @@ public class OvergearedMod {
     // Add the example block item to the building blocks tab
     private void addCreative(final BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
-            var entries = event.getEntries();
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(Blocks.CRAFTING_TABLE),
                     new ItemStack(ModBlocks.DRAFTING_TABLE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
         }
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-            var entries = event.getEntries();
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(Blocks.GOLD_BLOCK),
                     new ItemStack(ModBlocks.STEEL_BLOCK.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
         }
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
-            var entries = event.getEntries();
-            entries.putAfter(
+
+            event.insertAfter(
                     new ItemStack(Items.GOLD_INGOT),
                     new ItemStack(ModItems.STEEL_INGOT.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(Items.RAW_GOLD),
                     new ItemStack(ModItems.CRUDE_STEEL.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
-            var entries = event.getEntries();
 
-            entries.putAfter(
+
+            event.insertAfter(
                     new ItemStack(Items.NETHERITE_HOE),
                     new ItemStack(ModItems.IRON_TONGS.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
 
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(ModItems.IRON_TONGS.get()),
                     new ItemStack(ModItems.STEEL_TONGS.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(ModItems.STEEL_TONGS.get()),
                     new ItemStack(ModItems.COPPER_SMITHING_HAMMER.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(ModItems.COPPER_SMITHING_HAMMER.get()),
                     new ItemStack(ModItems.SMITHING_HAMMER.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
@@ -204,222 +204,68 @@ public class OvergearedMod {
 
             // Steel tools after Iron tools
 
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(Items.GOLDEN_HOE),
                     new ItemStack(ModItems.COPPER_SHOVEL.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(ModItems.COPPER_SHOVEL.get()),
                     new ItemStack(ModItems.COPPER_PICKAXE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(ModItems.COPPER_PICKAXE.get()),
                     new ItemStack(ModItems.COPPER_AXE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putAfter(
+            event.insertAfter(
                     new ItemStack(ModItems.COPPER_AXE.get()),
                     new ItemStack(ModItems.COPPER_HOE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putBefore(
+            event.insertBefore(
                     new ItemStack(Items.IRON_SHOVEL),
                     new ItemStack(ModItems.COPPER_HOE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putBefore(
+            event.insertBefore(
                     new ItemStack(ModItems.COPPER_HOE.get()),
                     new ItemStack(ModItems.COPPER_AXE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putBefore(
+            event.insertBefore(
                     new ItemStack(ModItems.COPPER_AXE.get()),
                     new ItemStack(ModItems.COPPER_PICKAXE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putBefore(
+            event.insertBefore(
                     new ItemStack(ModItems.COPPER_PICKAXE.get()),
                     new ItemStack(ModItems.COPPER_SHOVEL.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
 
-            entries.putBefore(
+            event.insertBefore(
                     new ItemStack(Items.DIAMOND_SHOVEL),
                     new ItemStack(ModItems.STEEL_HOE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putBefore(
+            event.insertBefore(
                     new ItemStack(ModItems.STEEL_HOE.get()),
                     new ItemStack(ModItems.STEEL_AXE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putBefore(
+            event.insertBefore(
                     new ItemStack(ModItems.STEEL_AXE.get()),
                     new ItemStack(ModItems.STEEL_PICKAXE.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
-            entries.putBefore(
+            event.insertBefore(
                     new ItemStack(ModItems.STEEL_PICKAXE.get()),
                     new ItemStack(ModItems.STEEL_SHOVEL.get()),
                     CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
             );
 
-
-        }
-        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-            if (ServerConfig.ENABLE_FLETCHING_RECIPES.get()) {
-                for (Potion potion : ForgeRegistries.POTIONS) {
-                    if (potion == Potions.EMPTY) continue;
-
-                    ItemStack arrow = new ItemStack(ModItems.LINGERING_ARROW.get());
-                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                    event.accept(arrow);
-                }
-                for (Potion potion : ForgeRegistries.POTIONS) {
-                    if (potion == Potions.EMPTY) continue;
-
-                    ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                    event.accept(arrow);
-                }
-                for (Potion potion : ForgeRegistries.POTIONS) {
-                    if (potion == Potions.EMPTY) continue;
-
-                    ItemStack arrow = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                    arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
-                    event.accept(arrow);
-                }
-                for (Potion potion : ForgeRegistries.POTIONS) {
-                    if (potion == Potions.EMPTY) continue;
-
-                    ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                    event.accept(arrow);
-                }
-                for (Potion potion : ForgeRegistries.POTIONS) {
-                    if (potion == Potions.EMPTY) continue;
-
-                    ItemStack arrow = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                    arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
-                    event.accept(arrow);
-                }
-                for (Potion potion : ForgeRegistries.POTIONS) {
-                    if (potion == Potions.EMPTY) continue;
-
-                    ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                    event.accept(arrow);
-                }
-                for (Potion potion : ForgeRegistries.POTIONS) {
-                    if (potion == Potions.EMPTY) continue;
-
-                    ItemStack arrow = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                    arrow.getOrCreateTag().putBoolean("LingeringPotion", true);
-                    event.accept(arrow);
-                }
-            }
-            event.getEntries().putBefore(
-                    new ItemStack(Items.IRON_SWORD),           // anchor: Stone Sword
-                    new ItemStack(ModItems.COPPER_SWORD.get()), // item to insert
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(Items.GOLDEN_SWORD),
-                    new ItemStack(ModItems.STEEL_SWORD.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putBefore(
-                    new ItemStack(Items.IRON_AXE),
-                    new ItemStack(ModItems.COPPER_AXE.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(Items.GOLDEN_AXE),
-                    new ItemStack(ModItems.STEEL_AXE.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-
-            event.getEntries().putAfter(
-                    new ItemStack(Items.GOLDEN_BOOTS),
-                    new ItemStack(ModItems.STEEL_HELMET.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.STEEL_HELMET.get()),
-                    new ItemStack(ModItems.STEEL_CHESTPLATE.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.STEEL_CHESTPLATE.get()),
-                    new ItemStack(ModItems.STEEL_LEGGINGS.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.STEEL_LEGGINGS.get()),
-                    new ItemStack(ModItems.STEEL_BOOTS.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(Items.LEATHER_BOOTS),
-                    new ItemStack(ModItems.COPPER_HELMET.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.COPPER_HELMET.get()),
-                    new ItemStack(ModItems.COPPER_CHESTPLATE.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.COPPER_CHESTPLATE.get()),
-                    new ItemStack(ModItems.COPPER_LEGGINGS.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.COPPER_LEGGINGS.get()),
-                    new ItemStack(ModItems.COPPER_BOOTS.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-
-            event.getEntries().putAfter(
-                    new ItemStack(Items.ARROW),
-                    new ItemStack(ModItems.IRON_UPGRADE_ARROW.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.IRON_UPGRADE_ARROW.get()),
-                    new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get()),
-                    new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            /*event.getEntries().putAfter(
-                    new ItemStack(Items.IRON_BOOTS),
-                    new ItemStack(ModItems.STEEL_HELMET.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.STEEL_HELMET.get()),
-                    new ItemStack(ModItems.STEEL_CHESTPLATE.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.STEEL_CHESTPLATE.get()),
-                    new ItemStack(ModItems.STEEL_LEGGINGS.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );
-            event.getEntries().putAfter(
-                    new ItemStack(ModItems.STEEL_LEGGINGS.get()),
-                    new ItemStack(ModItems.STEEL_BOOTS.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
-            );*/
 
         }
 
@@ -438,8 +284,8 @@ public class OvergearedMod {
 
     @Unique
     public static Item getCooledIngot(Item heatedItem) {
-        var heatedTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATED_METALS);
-        var cooledTag = ForgeRegistries.ITEMS.tags().getTag(ModTags.Items.HEATABLE_METALS);
+        var heatedTag = BuiltInRegistries.ITEM.getTag(ModTags.Items.HEATED_METALS);
+        var cooledTag = BuiltInRegistries.ITEM.getTag(ModTags.Items.HEATABLE_METALS);
 
         int index = 0;
         for (Item item : heatedTag) {
@@ -459,7 +305,7 @@ public class OvergearedMod {
 
     @Unique
     public static boolean isDurabilityMultiplierBlacklisted(ItemStack stack) {
-        ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         return ServerConfig.BASE_DURABILITY_BLACKLIST.get().contains(id.toString());
     }
 
