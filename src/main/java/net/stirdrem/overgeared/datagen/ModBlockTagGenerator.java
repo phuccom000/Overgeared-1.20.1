@@ -31,7 +31,9 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(ModBlocks.STEEL_BLOCK.get(),
                         ModBlocks.SMITHING_ANVIL.get(),
-                        ModBlocks.STONE_SMITHING_ANVIL.get()
+                        ModBlocks.STONE_SMITHING_ANVIL.get(),
+                        ModBlocks.ALLOY_FURNACE.get(),
+                        ModBlocks.NETHER_ALLOY_FURNACE.get()
                 );
 
         this.tag(ModTags.Blocks.SMITHING_ANVIL)

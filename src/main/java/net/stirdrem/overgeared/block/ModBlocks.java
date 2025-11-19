@@ -39,9 +39,9 @@ public class ModBlocks {
     public static final RegistryObject<Block> DRAFTING_TABLE = registerBlock("drafting_table",
             () -> new BlueprintWorkbenchBlock(BlockBehaviour.Properties.copy(Blocks.CRAFTING_TABLE)));
     public static final RegistryObject<Block> ALLOY_FURNACE = registerBlock("alloy_furnace",
-            () -> new AlloySmelterBlock(BlockBehaviour.Properties.copy(Blocks.BRICKS).noOcclusion().requiresCorrectToolForDrops().strength(3.5F).lightLevel(litBlockEmission(13))));
+            () -> new AlloySmelterBlock(BlockBehaviour.Properties.copy(Blocks.BRICKS).noOcclusion().requiresCorrectToolForDrops().strength(3.5F, 6.0F).lightLevel(litBlockEmission(13))));
     public static final RegistryObject<Block> NETHER_ALLOY_FURNACE = registerBlock("nether_alloy_furnace",
-            () -> new NetherAlloySmelterBlock(BlockBehaviour.Properties.copy(Blocks.BRICKS).noOcclusion().requiresCorrectToolForDrops().strength(3.5F).lightLevel(litBlockEmission(13))));
+            () -> new NetherAlloySmelterBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_BRICKS).noOcclusion().requiresCorrectToolForDrops().strength(3.5F, 6.0F).lightLevel(litBlockEmission(13))));
 
     private static ToIntFunction<BlockState> litBlockEmission(int pLightValue) {
         return (p_50763_) -> {

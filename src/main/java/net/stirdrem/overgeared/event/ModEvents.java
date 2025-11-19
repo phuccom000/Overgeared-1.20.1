@@ -110,8 +110,8 @@ public class ModEvents {
             Item item = stack.getItem();
 
             //if (isWeapon(item)) {
-            //if (!isArmor(item))
-            applyWeaponAttributes(event, quality);
+            if (!isArmor(item))
+                applyWeaponAttributes(event, quality);
             //} else if (isArmor(item)) {
             applyArmorAttributes(event, quality);
             //}

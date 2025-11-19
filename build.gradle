@@ -265,6 +265,7 @@ dependencies {
     implementation fg.deobf("curse.maven:caverns-and-chasms-438005:6040957")
     implementation fg.deobf("curse.maven:gsoc-compat-1144022:6955143")*/
     implementation fg.deobf("curse.maven:immersive-armors-580681:6851704")
+    implementation fg.deobf("curse.maven:jade-324717:6855440")
     //implementation fg.deobf("curse.maven:savage-and-ravage-381736:6040963")
     //implementation fg.deobf("curse.maven:hold-my-items-reforged-1246920:6608415")
 

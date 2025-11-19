@@ -89,9 +89,9 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             @Override
             public int get(int pIndex) {
                 return switch (pIndex) {
-                    case 0 -> progress;
-                    case 1 -> maxProgress;
-                    case 2 -> hitRemains;
+                    case 0 -> AbstractSmithingAnvilBlockEntity.this.progress;
+                    case 1 -> AbstractSmithingAnvilBlockEntity.this.maxProgress;
+                    case 2 -> AbstractSmithingAnvilBlockEntity.this.hitRemains;
                     default -> 0;
                 };
             }
@@ -99,8 +99,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             @Override
             public void set(int pIndex, int pValue) {
                 switch (pIndex) {
-                    case 0 -> progress = pValue;
-                    case 1 -> maxProgress = pValue;
+                    case 0 -> AbstractSmithingAnvilBlockEntity.this.progress = pValue;
+                    case 1 -> AbstractSmithingAnvilBlockEntity.this.maxProgress = pValue;
                 }
             }
 
