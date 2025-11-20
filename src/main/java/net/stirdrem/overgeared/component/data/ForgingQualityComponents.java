@@ -1,4 +1,4 @@
-package net.stirdrem.overgeared.component;
+package net.stirdrem.overgeared.component.data;
 
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;

@@ -1,3 +1,4 @@
+/*
 package net.stirdrem.overgeared.block;
 
 //import net.minecraft.core.BlockSource;
@@ -56,4 +57,4 @@ public class UpgradeArrowDispenseBehavior extends DefaultDispenseItemBehavior {
     protected void playSound(BlockSource source) {
         source.level().levelEvent(1002, source.pos(), 0);
     }
-}
+}*/

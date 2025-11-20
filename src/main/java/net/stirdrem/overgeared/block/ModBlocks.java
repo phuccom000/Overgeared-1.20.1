@@ -29,21 +29,21 @@ public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(OvergearedMod.MOD_ID);
 
-    public static final DeferredBlock<Block> SMITHING_ANVIL = registerBlock("smithing_anvil",
-            () -> new SteelSmithingAnvil(AnvilTier.IRON, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
-    public static final DeferredBlock<Block> TIER_A_SMITHING_ANVIL = registerBlock("tier_a_smithing_anvil",
-            () -> new TierASmithingAnvil(AnvilTier.ABOVE_A, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
-    public static final DeferredBlock<Block> TIER_B_SMITHING_ANVIL = registerBlock("tier_b_smithing_anvil",
-            () -> new TierBSmithingAnvil(AnvilTier.ABOVE_B, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
+    /* public static final DeferredBlock<Block> SMITHING_ANVIL = registerBlock("smithing_anvil",
+             () -> new SteelSmithingAnvil(AnvilTier.IRON, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
+     public static final DeferredBlock<Block> TIER_A_SMITHING_ANVIL = registerBlock("tier_a_smithing_anvil",
+             () -> new TierASmithingAnvil(AnvilTier.ABOVE_A, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
+     public static final DeferredBlock<Block> TIER_B_SMITHING_ANVIL = registerBlock("tier_b_smithing_anvil",
+             () -> new TierBSmithingAnvil(AnvilTier.ABOVE_B, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
 
-    public static final DeferredBlock<Block> STONE_SMITHING_ANVIL = registerBlock("stone_anvil",
-            () -> new StoneSmithingAnvil(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).noOcclusion()));
-
+     public static final DeferredBlock<Block> STONE_SMITHING_ANVIL = registerBlock("stone_anvil",
+             () -> new StoneSmithingAnvil(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).noOcclusion()));
+ */
     public static final DeferredBlock<Block> STEEL_BLOCK = registerBlock("steel_block",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)));
 
-    public static final DeferredBlock<Block> DRAFTING_TABLE = registerBlock("drafting_table",
-            () -> new BlueprintWorkbenchBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE)));
+   /* public static final DeferredBlock<Block> DRAFTING_TABLE = registerBlock("drafting_table",
+            () -> new BlueprintWorkbenchBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE)));*/
 
     /*public static final DeferredBlock<Block> SMITHING_ANVIL_TEST = registerBlock("smithing_anvil_test",
             () -> new CounterBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));*/

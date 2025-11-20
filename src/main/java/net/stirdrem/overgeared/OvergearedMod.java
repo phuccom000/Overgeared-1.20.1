@@ -2,72 +2,43 @@ package net.stirdrem.overgeared;
 
 //import cech12.bucketlib.api.BucketLibApi;
 
-import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DispenserBlock;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.block.UpgradeArrowDispenseBehavior;
-import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
-import net.stirdrem.overgeared.component.ForgingQualityComponents;
-import net.stirdrem.overgeared.entity.ModEntities;
+import net.stirdrem.overgeared.component.data.ForgingQualityComponents;
 
-import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
-import net.stirdrem.overgeared.entity.renderer.UpgradeArrowEntityRenderer;
-import net.stirdrem.overgeared.item.armor.model.CustomCopperHelmet;
+
+import net.stirdrem.overgeared.component.ModDataComponents;
 import net.stirdrem.overgeared.block.ModBlocks;
-import net.stirdrem.overgeared.block.entity.ModBlockEntities;
-import net.stirdrem.overgeared.block.entity.renderer.SmithingAnvilBlockEntityRenderer;
+
 import net.stirdrem.overgeared.config.ClientConfig;
 import net.stirdrem.overgeared.config.ServerConfig;
-//import net.stirdrem.overgeared.core.waterbarrel.BarrelInteraction;
-import net.stirdrem.overgeared.event.ModAttributes;
+
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
 import net.stirdrem.overgeared.item.ModItems;
 
 import net.stirdrem.overgeared.item.ToolTypeRegistry;
-import net.stirdrem.overgeared.item.armor.model.CustomCopperLeggings;
 import net.stirdrem.overgeared.loot.ModLootModifiers;
-import net.stirdrem.overgeared.networking.ModMessages;
-import net.stirdrem.overgeared.recipe.BetterBrewingRecipe;
-import net.stirdrem.overgeared.recipe.ModRecipeTypes;
-import net.stirdrem.overgeared.recipe.ModRecipes;
-import net.stirdrem.overgeared.screen.*;
 import net.stirdrem.overgeared.sound.ModSounds;
-import net.stirdrem.overgeared.util.ModTags;
-import net.stirdrem.overgeared.util.TickScheduler;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Unique;
-
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.List;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(OvergearedMod.MOD_ID)
@@ -101,51 +72,47 @@ public class OvergearedMod {
 
         ModBlocks.register(modEventBus);
 
-        ModBlockEntities.register(modEventBus);
+     /*   ModBlockEntities.register(modEventBus);
 
         ModMenuTypes.register(modEventBus);
 
         ModRecipes.register(modEventBus);
 
-        ModRecipeTypes.register(modEventBus);
+        ModRecipeTypes.register(modEventBus);*/
 
         ModLootModifiers.register(modEventBus);
 
         ModSounds.register(modEventBus);
 
-        ModEntities.register(modEventBus);
+      /*  ModEntities.register(modEventBus);
 
         ModAttributes.register(modEventBus);
 
         ModComponents.REGISTRAR.register(modBus);
 
-        MinecraftForge.EVENT_BUS.register(TickScheduler.class);
-
+        MinecraftForge.EVENT_BUS.register(TickScheduler.class);*/
+        ModDataComponents.REGISTER.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::sendImc);
-        MinecraftForge.EVENT_BUS.register(this);
+        //MinecraftForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::addCreative);
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
-        // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        //context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        ModMessages.register();
+        //ModMessages.register();
         ToolTypeRegistry.init();
         LOGGER.info("Tool types initialized: {}",
                 ToolTypeRegistry.getRegisteredTypes().size());
         //}
-        if (ServerConfig.ENABLE_DRAGON_BREATH_RECIPE.get())
+        /*if (ServerConfig.ENABLE_DRAGON_BREATH_RECIPE.get())
             BrewingRecipeRegistry.addRecipe(
                     new BetterBrewingRecipe(
                             Potions.THICK,
                             Items.CHORUS_FRUIT,
                             new ItemStack(Items.DRAGON_BREATH)
                     )
-            );
+            );*/
     }
 
     // Add the example block item to the building blocks tab
@@ -282,7 +249,7 @@ public class OvergearedMod {
 
     }
 
-    @Unique
+   /* @Unique
     public static Item getCooledIngot(Item heatedItem) {
         var heatedTag = BuiltInRegistries.ITEM.getTag(ModTags.Items.HEATED_METALS);
         var cooledTag = BuiltInRegistries.ITEM.getTag(ModTags.Items.HEATABLE_METALS);
@@ -301,7 +268,7 @@ public class OvergearedMod {
             index++;
         }
         return heatedItem;
-    }
+    }*/
 
     @Unique
     public static boolean isDurabilityMultiplierBlacklisted(ItemStack stack) {
@@ -309,6 +276,7 @@ public class OvergearedMod {
         return ServerConfig.BASE_DURABILITY_BLACKLIST.get().contains(id.toString());
     }
 
+/*
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class CommonModEvents {
         @SubscribeEvent
@@ -483,4 +451,5 @@ public class OvergearedMod {
 
         }
     }
+*/
 }

@@ -13,7 +13,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.entity.ArrowTier;
 import net.stirdrem.overgeared.item.custom.*;
 
 public class ModItems {
@@ -180,13 +179,13 @@ public class ModItems {
 */
 
     public static final DeferredItem<Item> STEEL_SWORD = ITEMS.register("steel_sword",
-        () -> new SwordItem(ModToolTiers.STEEL,
-            new Item.Properties().attributes(
-                    SwordItem.createAttributes(ModToolTiers.STEEL, 3, -2.4f))));
+            () -> new SwordItem(ModToolTiers.STEEL,
+                    new Item.Properties().attributes(
+                            SwordItem.createAttributes(ModToolTiers.STEEL, 3, -2.4f))));
     public static final DeferredItem<Item> STEEL_PICKAXE = ITEMS.register("steel_pickaxe",
-        () -> new PickaxeItem(ModToolTiers.STEEL,
-            new Item.Properties().attributes(
-                    SwordItem.createAttributes(ModToolTiers.STEEL, 3, -2.4f))));
+            () -> new PickaxeItem(ModToolTiers.STEEL,
+                    new Item.Properties().attributes(
+                            SwordItem.createAttributes(ModToolTiers.STEEL, 3, -2.4f))));
 
     public static final DeferredItem<Item> STEEL_AXE = ITEMS.register("steel_axe",
             () -> new AxeItem(ModToolTiers.STEEL, new Item.Properties()
@@ -300,11 +299,9 @@ public class ModItems {
 //    public static final DeferredItem<Item> COPPER_SHOVEL = ITEMS.register("copper_shovel",
 //            () -> new ShovelItem(ModToolTiers.COPPER, 1.5f, -3, new Item.Properties()));
 
-    public static final DeferredItem<Item> LINGERING_ARROW = ITEMS.register("lingering_arrow",
+    /*public static final DeferredItem<Item> LINGERING_ARROW = ITEMS.register("lingering_arrow",
             () -> new LingeringArrowItem(new Item.Properties(), ArrowTier.FLINT));
 
-    /*public static final DeferredItem<Item> MODULAR_ARROW = ITEMS.register("modular_arrow",
-            () -> new ModularArrowItem(new Item.Properties()));*/
 
 
     public static final DeferredItem<Item> IRON_UPGRADE_ARROW = ITEMS.register("iron_arrow",
@@ -312,7 +309,7 @@ public class ModItems {
     public static final DeferredItem<Item> STEEL_UPGRADE_ARROW = ITEMS.register("steel_arrow",
             () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.STEEL));
     public static final DeferredItem<Item> DIAMOND_UPGRADE_ARROW = ITEMS.register("diamond_arrow",
-            () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.DIAMOND));
+            () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.DIAMOND));*/
 
 
     public static void register(IEventBus eventBus) {

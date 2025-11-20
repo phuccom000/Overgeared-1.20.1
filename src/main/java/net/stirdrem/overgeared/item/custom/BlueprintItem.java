@@ -36,8 +36,8 @@ public class BlueprintItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+
         super.appendHoverText(stack, level, tooltip, flag);
 
         CompoundTag tag = stack.getTag();

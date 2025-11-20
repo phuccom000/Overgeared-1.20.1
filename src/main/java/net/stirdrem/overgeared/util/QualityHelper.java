@@ -11,7 +11,7 @@ import java.util.Optional;
 import static net.stirdrem.overgeared.ForgingQuality.*;
 
 public class QualityHelper {
-//    public static float getQualityMultiplier(ItemStack stack) {
+    //    public static float getQualityMultiplier(ItemStack stack) {
 //        if (stack.has(DataComponents.CUSTOM_DATA) && stack.get(DataComponents.CUSTOM_DATA).contains("ForgingQuality")) {
 //            String quality = stack.get(DataComponents.CUSTOM_DATA).copyTag().getString("ForgingQuality");
 //            return switch (quality) {
@@ -36,6 +36,7 @@ public class QualityHelper {
                     case EXPERT -> ServerConfig.EXPERT_DURABILITY_BONUS.get().floatValue();
                     case PERFECT -> ServerConfig.PERFECT_DURABILITY_BONUS.get().floatValue();
                     case MASTER -> ServerConfig.MASTER_DURABILITY_BONUS.get().floatValue();
+                    case NONE -> null;
                 })
                 .orElse(1.0f);
     }

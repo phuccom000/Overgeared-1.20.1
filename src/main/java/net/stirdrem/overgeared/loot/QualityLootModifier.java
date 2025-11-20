@@ -14,8 +14,8 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.common.loot.LootModifier;
 import net.stirdrem.overgeared.ForgingQuality;
-import net.stirdrem.overgeared.compoment.ForgingQualityComponents;
-import net.stirdrem.overgeared.compoment.ForgingQualityValue;
+
+import net.stirdrem.overgeared.component.data.ForgingQualityComponents;
 import net.stirdrem.overgeared.config.ServerConfig;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +25,7 @@ public class QualityLootModifier extends LootModifier {
     public QualityLootModifier(LootItemCondition[] conditionsIn) {
         super(conditionsIn);
     }
+
     // ~ IDK what i'm doing
     @NotNull
     @Override
