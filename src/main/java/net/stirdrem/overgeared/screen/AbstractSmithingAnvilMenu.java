@@ -66,7 +66,7 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
             }); //hammer
 
             if (hasBlueprint)
-                this.addSlot(new SlotItemHandler(iItemHandler, 11, 8, 35) {
+                this.addSlot(new SlotItemHandler(iItemHandler, 11, 111, 53) {
                     @Override
                     public boolean mayPlace(@NotNull ItemStack stack) {
                         if (stack.is(ModItems.BLUEPRINT.get()) || stack.getItem() instanceof SmithingTemplateItem) {

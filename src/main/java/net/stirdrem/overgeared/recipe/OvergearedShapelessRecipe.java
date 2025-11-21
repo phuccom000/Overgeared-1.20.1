@@ -116,7 +116,7 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
         // Original minigame-enabled logic
         CompoundTag resultTag = result.getOrCreateTag();
         String foundQuality = null;
-        boolean isPolished = false;
+        boolean isPolished = true;
         boolean unquenched = false;
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack ingredient = container.getItem(i);
@@ -126,23 +126,23 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                     if (!tag.getString("ForgingQuality").equals("none"))
                         foundQuality = tag.getString("ForgingQuality");
                 }
-                if (tag.contains("Polished") && tag.getBoolean("Polished")) {
-                    isPolished = true;
+                if (!tag.contains("Polished") || !tag.getBoolean("Polished")) {
+                    isPolished = false;
                 }
                 if (tag.contains("Heated") && tag.getBoolean("Heated")) {
                     unquenched = true;
                 }
             }
         }
-
-        if ((foundQuality == null || foundQuality.equals("none")) && (!isPolished || unquenched)) {
-            // If foundQuality is null AND (isPolished OR unquenched), set POOR
-            resultTag.putString("ForgingQuality", ForgingQuality.POOR.getDisplayName());
-            result.setTag(resultTag);
+        if (foundQuality == null || foundQuality.equals("none")) {
+            // If no quality found
+            if (!isPolished || unquenched) {
+                // Either polished OR unquenched (or both) → set to POOR
+                resultTag.putString("ForgingQuality", ForgingQuality.POOR.getDisplayName());
+                result.setTag(resultTag);
+            }
             return result;
-        }
-
-        if (foundQuality != null && !foundQuality.equals("none")) {
+        } else {
             ForgingQuality quality = ForgingQuality.fromString(foundQuality);
 
             if (!isPolished) {
@@ -156,14 +156,6 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
             result.setTag(resultTag);
             return result;
         }
-
-        // If foundQuality is null AND only unquenched → empty item
-        if (foundQuality == null && unquenched) {
-            return ItemStack.EMPTY;
-        }
-
-        return result;
-
     }
 
     @Override
