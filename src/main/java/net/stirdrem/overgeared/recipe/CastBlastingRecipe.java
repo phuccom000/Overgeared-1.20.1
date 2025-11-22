@@ -89,6 +89,8 @@ public class CastBlastingRecipe extends BlastingRecipe {
         CompoundTag tag = input.getTag();
         if (tag == null || !tag.contains("Materials")) return false;
         if (!toolType.equals(tag.getString("ToolType").toLowerCase())) return false;
+        if (tag.contains("Amount") && tag.getFloat("Amount") <= 0) return false;
+        if (!tag.contains("Amount")) return false;
 
         Map<String, Double> materials = readMaterials(tag.getCompound("Materials"));
 

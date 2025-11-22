@@ -3,17 +3,22 @@ package net.stirdrem.overgeared.recipe;
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.custom.ToolCastItem;
+import net.stirdrem.overgeared.util.CastingConfigHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -89,6 +94,8 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
         CompoundTag tag = input.getTag();
         if (tag == null || !tag.contains("Materials")) return false;
         if (!toolType.equals(tag.getString("ToolType").toLowerCase())) return false;
+        if (tag.contains("Amount") && tag.getFloat("Amount") <= 0) return false;
+        if (!tag.contains("Amount")) return false;
 
         Map<String, Double> materials = readMaterials(tag.getCompound("Materials"));
 
@@ -212,11 +219,61 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
         return needPolishing;
     }
 
-    /*@Override
-    public RecipeType<?> getType() {
-        return ModRecipeTypes.CAST_SMELTING.get();
+    private boolean insertMaterial(ItemStack cast, ItemStack material) {
+        if (material.isEmpty()) return false;
+
+        CompoundTag tag = cast.getOrCreateTag();
+        ListTag list = tag.getList("input", Tag.TAG_COMPOUND);
+
+        String itemId = BuiltInRegistries.ITEM.getKey(material.getItem()).toString();
+
+        int value = CastingConfigHelper.getMaterialValue(material);
+        if (value <= 0) return false;
+
+        int amount = tag.getInt("Amount");
+        int maxAmount = tag.contains("MaxAmount") ? tag.getInt("MaxAmount") : Integer.MAX_VALUE;
+
+        // Block overfilling
+        if (amount + value > maxAmount) {
+            //player.displayClientMessage(Component.translatable("message.overgeared.cast_full"), true);
+            return false;
+        }
+
+        // === Update Materials NBT correctly ===
+        String mat = CastingConfigHelper.getMaterialForItem(material);
+        CompoundTag mats = tag.contains("Materials") ? tag.getCompound("Materials") : new CompoundTag();
+
+        int prev = mats.getInt(mat); // ✅ read using material key (mat)
+        mats.putInt(mat, prev + value); // ✅ store using material key
+        tag.put("Materials", mats);
+
+
+        // === Try merge into existing input entry ===
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag entry = list.getCompound(i);
+            ItemStack entryStack = ItemStack.of(entry);
+
+            if (ItemStack.isSameItemSameTags(entryStack, material)) {
+                entryStack.grow(1);
+                entryStack.save(entry);
+                list.set(i, entry);
+
+                tag.put("input", list);
+                tag.putInt("Amount", amount + value);
+                return true;
+            }
+        }
+
+        // === No merge found, add new entry ===
+        ItemStack stored = material.copy();
+        stored.setCount(1);
+        list.add(stored.save(new CompoundTag()));
+
+        tag.put("input", list);
+        tag.putInt("Amount", amount + value);
+        return true;
     }
-*/
+
     @Override
     public RecipeSerializer<?> getSerializer() {
         return ModRecipes.CAST_SMELTING.get();

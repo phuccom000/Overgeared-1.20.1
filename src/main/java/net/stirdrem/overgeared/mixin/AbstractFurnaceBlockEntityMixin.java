@@ -48,6 +48,13 @@ public abstract class AbstractFurnaceBlockEntityMixin {
             @SuppressWarnings("unchecked")
             Recipe<net.minecraft.world.Container> typedRecipe = (Recipe<net.minecraft.world.Container>) recipe;
             ItemStack remainder = typedRecipe.getRemainingItems(container).get(0);
+            boolean isContainerItem = input.getItem().hasCraftingRemainingItem();
+
+            if (isContainerItem) {
+                input.shrink(1); // shrink normally
+                cir.setReturnValue(true); // skip shrink
+                return;
+            }
 
             if (!remainder.isEmpty()) {
                 // Apply remainder instead of shrinking

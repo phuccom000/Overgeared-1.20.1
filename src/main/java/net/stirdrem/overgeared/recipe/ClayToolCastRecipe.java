@@ -75,7 +75,6 @@ public class ClayToolCastRecipe extends CustomRecipe {
                 : ServerLifecycleHooks.getCurrentServer().overworld();
 
         String toolType = CastingConfigHelper.getToolTypeForItem(level, center);
-        if (toolType == null) return ItemStack.EMPTY;
         if ("none".equals(toolType) || toolType.isBlank()) return ItemStack.EMPTY;
 
         // detect if nether bricks were used
@@ -108,7 +107,8 @@ public class ClayToolCastRecipe extends CustomRecipe {
         // Attach all relevant NBT data
         CompoundTag tag = result.getOrCreateTag();
         tag.putString("ToolType", toolType);
-        tag.putString("Quality", quality);
+        if (!quality.equalsIgnoreCase("none"))
+            tag.putString("Quality", quality);
         tag.putInt("Amount", 0);
         tag.putInt("MaxAmount", maxAmount);
         tag.put("Materials", new CompoundTag());
