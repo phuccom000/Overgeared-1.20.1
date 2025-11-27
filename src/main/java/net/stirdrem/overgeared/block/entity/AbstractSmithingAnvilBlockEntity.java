@@ -283,6 +283,12 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             }
         }
 
+        if (recipe.hasQuality() && player != null && ServerConfig.PLAYER_AUTHOR_TOOLTIPS.get()) {
+            CompoundTag tag = new CompoundTag();
+            tag.putString("Creator", player.getName().getString());
+            result.setTag(tag);
+        }
+
         if (recipe.hasQuality()) {
             if (ServerConfig.ENABLE_MINIGAME.get()) {
                 String qualityStr = determineForgingQuality();

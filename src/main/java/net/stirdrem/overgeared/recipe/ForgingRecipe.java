@@ -11,6 +11,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -344,7 +345,7 @@ public class ForgingRecipe implements Recipe<Container> {
             boolean hasQuality = GsonHelper.getAsBoolean(json, "has_quality", true);
             boolean needsMinigame = GsonHelper.getAsBoolean(json, "needs_minigame", false);
             boolean hasPolishing = GsonHelper.getAsBoolean(json, "has_polishing", true);
-            boolean needQuenching = GsonHelper.getAsBoolean(json, "need_quenching", true);
+
             boolean showNotification = GsonHelper.getAsBoolean(json, "show_notification", true);
             ForgingQuality minimumQuality = ForgingQuality.fromString(GsonHelper.getAsString(json, "minimumQuality", ForgingQuality.POOR.getDisplayName()));
             ForgingQuality qualityDifficulty = ForgingQuality.fromString(GsonHelper.getAsString(json, "quality_difficulty", ForgingQuality.NONE.getDisplayName()));
@@ -357,6 +358,10 @@ public class ForgingRecipe implements Recipe<Container> {
             NonNullList<Ingredient> ingredients = dissolvePattern(pattern, keyMap, width, height);
 
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
+
+            boolean defaultQuench = !(result.getItem() instanceof ArmorItem);
+            boolean needQuenching = GsonHelper.getAsBoolean(json, "need_quenching", defaultQuench);
+
             ItemStack failedResult = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result_failed", GsonHelper.getAsJsonObject(json, "result")));
             return new ForgingRecipe(recipeId, group, requiresBlueprint, blueprintTypes, tier, ingredients, result, failedResult,
                     hammering, hasQuality, needsMinigame, hasPolishing, needQuenching, showNotification, minimumQuality, qualityDifficulty, width, height);

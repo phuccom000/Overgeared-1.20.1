@@ -219,8 +219,8 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
     //runtimeOnly fg.deobf("curse.maven:tmrv-1194921:6717421")
 
-    compileOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1:api")
-    runtimeOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1")
+    /* compileOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1:api")
+     runtimeOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1")*/
 
     runtimeOnly fg.deobf("curse.maven:curios-309927:6418456")
     runtimeOnly fg.deobf("curse.maven:lionfish-api-1001614:5922047")
@@ -232,18 +232,21 @@ dependencies {
     //implementation fg.deobf("curse.maven:max-health-fix-492246:5378283")
     //implementation fg.deobf("curse.maven:insanelib-465109:6927148")
     //implementation fg.deobf("curse.maven:iguanatweaks-reborn-285690:6988962")
-    implementation fg.deobf("curse.maven:selene-499980:6983934")
-    implementation fg.deobf("curse.maven:spelunkery-790530:6122072")
-    implementation fg.deobf("curse.maven:galosphere-631098:4983871")
+    /* implementation fg.deobf("curse.maven:selene-499980:6983934")
+     implementation fg.deobf("curse.maven:spelunkery-790530:6122072")
+     implementation fg.deobf("curse.maven:galosphere-631098:4983871")*/
     //runtimeOnly fg.deobf("maven.modrinth:kap_lib:v1.26.3-mc1.20.1-FML47.3.0")
-    runtimeOnly fg.deobf("curse.maven:zeta-968868:6432578")
-    runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")
+    /* runtimeOnly fg.deobf("curse.maven:zeta-968868:6432578")
+     runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")*/
     //runtimeOnly fg.deobf("curse.maven:modernfix-790626:6837713")
 
-    //implementation fg.deobf("curse.maven:v-tweaks-238048:7119159")
+    implementation fg.deobf("curse.maven:v-tweaks-238048:7119159")
     implementation fg.deobf("curse.maven:spartan-weaponry-278141:6842571")
     implementation fg.deobf("curse.maven:bookling-gear-1122766:7192165")
-    implementation fg.deobf("curse.maven:lit-it-up-916334:7217689")
+    implementation fg.deobf("curse.maven:lit-it-up-916334:7239006")
+    //implementation fg.deobf("curse.maven:polymorph-388800:6450982")
+    implementation fg.deobf("curse.maven:cupboard-326652:5470032")
+    implementation fg.deobf("curse.maven:recipe-essentials-forge-fabric-907856:6165709")
     /*    implementation fg.deobf("curse.maven:amendments-896746:6913537")
     implementation fg.deobf("curse.maven:accessories-938917:6201361")
     implementation fg.deobf("curse.maven:playeranimator-658587:4587214")
@@ -281,7 +284,7 @@ dependencies {
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"
     // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
-    implementation fg.deobf("curse.maven:spark-361579:4738952")
+    //implementation fg.deobf("curse.maven:spark-361579:4738952")
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html

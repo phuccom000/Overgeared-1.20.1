@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.custom.ToolCastItem;
 import net.stirdrem.overgeared.util.CastingConfigHelper;
@@ -35,7 +36,9 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
     public CastSmeltingRecipe(ResourceLocation id, String group, CookingBookCategory category,
                               ItemStack result, float xp, int time,
                               Map<String, Double> reqMaterials, String toolType, boolean needPolishing) {
-        super(id, group, category, Ingredient.EMPTY, result, xp, time);
+        super(id, group, category,
+                Ingredient.of(ModItems.CLAY_TOOL_CAST.get(), ModItems.NETHER_TOOL_CAST.get()),
+                result, xp, time);
         this.requiredMaterials = reqMaterials;
         this.toolType = toolType;
         this.needPolishing = needPolishing;
@@ -125,13 +128,15 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
         }
 
         output.getOrCreateTag().putBoolean("Heated", true);
+
+        // Copy custom name from cast to Creator tag
+        if (input.hasCustomHoverName() && ServerConfig.PLAYER_AUTHOR_TOOLTIPS.get()) {
+            Component customName = input.getHoverName();
+            String creatorName = customName.getString();
+            output.getOrCreateTag().putString("Creator", creatorName);
+        }
+
         return output;
-    }
-
-
-    @Override
-    public boolean isSpecial() {
-        return true;
     }
 
     @Override
@@ -191,14 +196,9 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
                 mats.remove(r);
             }
 
-            // ✅ Recalculate total "Amount"
-            double total = 0;
-            for (String mat : mats.getAllKeys()) {
-                total += mats.getDouble(mat);
-            }
-            tag.putDouble("Amount", total);
+            tag.putDouble("Amount", 0);
 
-            tag.put("Materials", mats);
+            tag.put("Materials", new CompoundTag());
         }
         return tag;
     }
@@ -219,69 +219,14 @@ public class CastSmeltingRecipe extends SmeltingRecipe {
         return needPolishing;
     }
 
-    private boolean insertMaterial(ItemStack cast, ItemStack material) {
-        if (material.isEmpty()) return false;
-
-        CompoundTag tag = cast.getOrCreateTag();
-        ListTag list = tag.getList("input", Tag.TAG_COMPOUND);
-
-        String itemId = BuiltInRegistries.ITEM.getKey(material.getItem()).toString();
-
-        int value = CastingConfigHelper.getMaterialValue(material);
-        if (value <= 0) return false;
-
-        int amount = tag.getInt("Amount");
-        int maxAmount = tag.contains("MaxAmount") ? tag.getInt("MaxAmount") : Integer.MAX_VALUE;
-
-        // Block overfilling
-        if (amount + value > maxAmount) {
-            //player.displayClientMessage(Component.translatable("message.overgeared.cast_full"), true);
-            return false;
-        }
-
-        // === Update Materials NBT correctly ===
-        String mat = CastingConfigHelper.getMaterialForItem(material);
-        CompoundTag mats = tag.contains("Materials") ? tag.getCompound("Materials") : new CompoundTag();
-
-        int prev = mats.getInt(mat); // ✅ read using material key (mat)
-        mats.putInt(mat, prev + value); // ✅ store using material key
-        tag.put("Materials", mats);
-
-
-        // === Try merge into existing input entry ===
-        for (int i = 0; i < list.size(); i++) {
-            CompoundTag entry = list.getCompound(i);
-            ItemStack entryStack = ItemStack.of(entry);
-
-            if (ItemStack.isSameItemSameTags(entryStack, material)) {
-                entryStack.grow(1);
-                entryStack.save(entry);
-                list.set(i, entry);
-
-                tag.put("input", list);
-                tag.putInt("Amount", amount + value);
-                return true;
-            }
-        }
-
-        // === No merge found, add new entry ===
-        ItemStack stored = material.copy();
-        stored.setCount(1);
-        list.add(stored.save(new CompoundTag()));
-
-        tag.put("input", list);
-        tag.putInt("Amount", amount + value);
-        return true;
+    @Override
+    public @NotNull RecipeType<?> getType() {
+        return RecipeType.SMELTING;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
         return ModRecipes.CAST_SMELTING.get();
-    }
-
-    public static class Type implements RecipeType<CastSmeltingRecipe> {
-        public static final CastSmeltingRecipe.Type INSTANCE = new Type();
-        public static final String ID = "cast_smelting";
     }
 
     public static class Serializer implements RecipeSerializer<CastSmeltingRecipe> {

@@ -30,6 +30,7 @@ public class ModTags {
         public static final TagKey<Item> HEATED_METALS = tag("heated_metals");
         public static final TagKey<Item> HOT_ITEMS = tag("hot_items");
         public static final TagKey<Item> SMITHING_HAMMERS = tag("smithing_hammers");
+        public static final TagKey<Item> TOOL_CAST = tag("tool_casts");
 
 
         private static TagKey<Item> tag(String name) {

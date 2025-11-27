@@ -18,10 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -157,6 +154,7 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipes(CoolingRecipeCategory.TYPE, coolingRecipes);
         List<GrindingRecipe> grindingRecipes = recipeManager.getAllRecipesFor(GrindingRecipe.Type.INSTANCE);
         registration.addRecipes(GrindingRecipeCategory.TYPE, grindingRecipes);
+
         if (ServerConfig.ENABLE_CASTING.get()) {
             registration.addRecipes(RecipeTypes.CRAFTING, ClayToolCastRecipeMaker.createRecipes(recipeManager));
             registration.addRecipes(RecipeTypes.CRAFTING, NetherToolCastRecipeMaker.createRecipes(recipeManager));

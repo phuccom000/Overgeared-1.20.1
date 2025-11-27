@@ -23,6 +23,7 @@ public class ModCommands {
         // /setforgingquality <quality>
         dispatcher.register(
                 Commands.literal("setforgingquality")
+                        .requires(source -> source.hasPermission(2)) // Requires operator level 2 or higher
                         .then(Commands.argument("quality", StringArgumentType.string())
                                 .suggests((c, b) -> {
                                     for (String q : QUALITIES) b.suggest(q);
@@ -52,6 +53,7 @@ public class ModCommands {
         // /givecast <toolType> [quality] [material]
         dispatcher.register(
                 Commands.literal("givecast")
+                        .requires(source -> source.hasPermission(2)) // Requires operator level 2 or higher
                         .then(Commands.argument("toolType", StringArgumentType.string())
                                 .then(Commands.argument("quality", StringArgumentType.string())
                                         .suggests((c, b) -> {

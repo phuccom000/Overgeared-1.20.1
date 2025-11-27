@@ -82,6 +82,7 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
             boolean hasUnpolishedQualityItem = false;
             boolean unquenched = false;
             String foundQuality = null;
+            String creator = null;
             for (int i = 0; i < container.getContainerSize(); i++) {
                 ItemStack ingredient = container.getItem(i);
                 if (ingredient.hasTag()) {
@@ -99,6 +100,9 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                         if (!tag.getString("ForgingQuality").equals("none"))
                             foundQuality = tag.getString("ForgingQuality");
                     }
+                    if (tag.contains("Creator")) {
+                        creator = tag.getString("Creator");
+                    }
                 }
             }
 
@@ -109,6 +113,8 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
             CompoundTag resultTag = result.getOrCreateTag();
             ForgingQuality quality = ForgingQuality.fromString(foundQuality);
             resultTag.putString("ForgingQuality", quality.getDisplayName());
+            if (creator != null)
+                resultTag.putString("Creator", creator);
             result.setTag(resultTag);
             return result;
         }
@@ -118,6 +124,7 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
         String foundQuality = null;
         boolean isPolished = true;
         boolean unquenched = false;
+        String creator = null;
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack ingredient = container.getItem(i);
             if (ingredient.hasTag()) {
@@ -131,6 +138,9 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                 }
                 if (tag.contains("Heated") && tag.getBoolean("Heated")) {
                     unquenched = true;
+                }
+                if (tag.contains("Creator")) {
+                    creator = tag.getString("Creator");
                 }
             }
         }
@@ -153,6 +163,8 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
             }
 
             resultTag.putString("ForgingQuality", quality.getDisplayName());
+            if (creator != null)
+                resultTag.putString("Creator", creator);
             result.setTag(resultTag);
             return result;
         }

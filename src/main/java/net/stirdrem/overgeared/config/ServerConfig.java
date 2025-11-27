@@ -41,12 +41,6 @@ public class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue WELL_QUALITY_SCORE;
 
 
-    public static final ForgeConfigSpec.IntValue POOR_ZONE_STARTING_SIZE;
-    public static final ForgeConfigSpec.IntValue POOR_MIN_PERFECT_ZONE;
-    public static final ForgeConfigSpec.DoubleValue POOR_ZONE_SHRINK_FACTOR;
-    public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED;
-    public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED_INCREASE;
-    public static final ForgeConfigSpec.DoubleValue POOR_MAX_ARROW_SPEED;
     // --- Durability & Grinding ---
     public static final ForgeConfigSpec.DoubleValue BASE_DURABILITY_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> BASE_DURABILITY_BLACKLIST;
@@ -103,6 +97,18 @@ public class ServerConfig {
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MATERIAL_TYPES;
     public static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> MATERIAL_SETTING;
     public static final ForgeConfigSpec.BooleanValue ENABLE_CASTING;
+    public static ForgeConfigSpec.IntValue DEFAULT_ZONE_STARTING_SIZE;
+    public static ForgeConfigSpec.DoubleValue DEFAULT_ZONE_SHRINK_FACTOR;
+    public static ForgeConfigSpec.IntValue DEFAULT_MIN_PERFECT_ZONE;
+    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
+    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
+    public static ForgeConfigSpec.DoubleValue DEFAULT_MAX_ARROW_SPEED;
+    public static final ForgeConfigSpec.IntValue POOR_ZONE_STARTING_SIZE;
+    public static final ForgeConfigSpec.IntValue POOR_MIN_PERFECT_ZONE;
+    public static final ForgeConfigSpec.DoubleValue POOR_ZONE_SHRINK_FACTOR;
+    public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED;
+    public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED_INCREASE;
+    public static final ForgeConfigSpec.DoubleValue POOR_MAX_ARROW_SPEED;
     public static ForgeConfigSpec.IntValue WELL_ZONE_STARTING_SIZE;
     public static ForgeConfigSpec.DoubleValue WELL_ZONE_SHRINK_FACTOR;
     public static ForgeConfigSpec.IntValue WELL_MIN_PERFECT_ZONE;
@@ -127,19 +133,15 @@ public class ServerConfig {
     public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED;
     public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED_INCREASE;
     public static ForgeConfigSpec.DoubleValue MASTER_MAX_ARROW_SPEED;
-    public static ForgeConfigSpec.IntValue DEFAULT_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue DEFAULT_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue DEFAULT_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue DEFAULT_MAX_ARROW_SPEED;
+
     public static ForgeConfigSpec.IntValue FIRED_CAST_DURABILITY;
     public static ForgeConfigSpec.BooleanValue EXPERT_ABOVE_INCREASE_BLUEPRINT;
+    public static ForgeConfigSpec.BooleanValue PLAYER_AUTHOR_TOOLTIPS;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         builder.push("General Configs");
-        ENABLE_MOD_TOOLTIPS = builder.comment("Toggle for mod's custom tooltips").define("enableModTooltips", true);
+        ENABLE_MOD_TOOLTIPS = builder.comment("Toggle for the mod's custom tooltips").define("enableModTooltips", true);
         builder.pop();
         // --- Anvil Conversion ---
         builder.push("Anvil Conversion");
@@ -172,6 +174,7 @@ public class ServerConfig {
         MASTER_QUALITY_CHANCE = builder.comment("How likely it is for the player to get Masterwork when getting Perfectly Forged. Set to 0 to disable it.").defineInRange("masterQualityChance", 0.05, 0, 1);
         MASTER_FROM_INGREDIENT_CHANCE = builder.comment("Chance that using a Master-quality ingredient results in Master-quality result").defineInRange("masterFromIngredientChance", 0.5, 0.0, 1.0);
         MAX_ANVIL_DISTANCE = builder.comment("Maximum distance you can go from your Smithing Anvil before minigame reset").defineInRange("maxAnvilDistance", 100, 0, 1000);
+        PLAYER_AUTHOR_TOOLTIPS = builder.comment("Toggle for if the result item has player's name").define("enableAuthorTooltips", true);
 
         PERFECT_QUALITY_SCORE = builder.comment("Lowest score required to get perfect quality").defineInRange("perfectQualityScore", 0.9, 0, 1.0);
         EXPERT_QUALITY_SCORE = builder.comment("Lowest score required to get expert quality").defineInRange("expertQualityScore", 0.6, 0, 1.0);

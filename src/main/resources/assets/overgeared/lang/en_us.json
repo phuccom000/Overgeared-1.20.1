@@ -267,6 +267,8 @@
   "gui.overgeared.jei.category.nether_alloy_smelting": "Nether Alloying",
   "gui.overgeared.jei.category.cooling": "Water Cooling",
   "gui.overgeared.jei.category.grinding": "Grinding",
-  "tooltip.overgeared.add_materials": "Pick up the materials and right-click on the cast to add"
+  "tooltip.overgeared.add_materials": "Pick up the materials and right-click on the cast to add",
+  "tooltip.overgeared.made_by": "Made by",
+  "tooltip.overgeared.stone_hammer_head": "Can only be used to make a hammer tool cast"
 }
 

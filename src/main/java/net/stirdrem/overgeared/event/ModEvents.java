@@ -417,6 +417,10 @@ public class ModEvents {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.diamond_shard")
                     .withStyle(ChatFormatting.GRAY));
         }
+        if (stack.is(ModItems.STONE_HAMMER_HEAD.get())) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.stone_hammer_head")
+                    .withStyle(ChatFormatting.GRAY));
+        }
         if (stack.is(ModTags.Items.HEATED_METALS)) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatedingots.tooltip")
                     .withStyle(ChatFormatting.RED));
@@ -435,6 +439,16 @@ public class ModEvents {
             tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.grindable")
                     .withStyle(ChatFormatting.GRAY));
         }*/
+
+        if (stack.hasTag() && stack.getTag().contains("Creator")) {
+            String creatorName = stack.getTag().getString("Creator");
+            Component creatorComponent = Component.translatable("tooltip.overgeared.made_by")
+                    .append(" ")
+                    .append(creatorName)
+                    .withStyle(ChatFormatting.GRAY);
+            tooltip.add(insertOffset++, creatorComponent);
+
+        }
     }
 
     @SubscribeEvent

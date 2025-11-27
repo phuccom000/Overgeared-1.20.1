@@ -3,17 +3,23 @@ package net.stirdrem.overgeared.recipe;
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.custom.ToolCastItem;
+import net.stirdrem.overgeared.util.CastingConfigHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -30,7 +36,9 @@ public class CastBlastingRecipe extends BlastingRecipe {
     public CastBlastingRecipe(ResourceLocation id, String group, CookingBookCategory category,
                               ItemStack result, float xp, int time,
                               Map<String, Double> reqMaterials, String toolType, boolean needPolishing) {
-        super(id, group, category, Ingredient.EMPTY, result, xp, time);
+        super(id, group, category,
+                Ingredient.of(ModItems.CLAY_TOOL_CAST.get(), ModItems.NETHER_TOOL_CAST.get()),
+                result, xp, time);
         this.requiredMaterials = reqMaterials;
         this.toolType = toolType;
         this.needPolishing = needPolishing;
@@ -120,13 +128,15 @@ public class CastBlastingRecipe extends BlastingRecipe {
         }
 
         output.getOrCreateTag().putBoolean("Heated", true);
+
+        // Copy custom name from cast to Creator tag
+        if (input.hasCustomHoverName() && ServerConfig.PLAYER_AUTHOR_TOOLTIPS.get()) {
+            Component customName = input.getHoverName();
+            String creatorName = customName.getString();
+            output.getOrCreateTag().putString("Creator", creatorName);
+        }
+
         return output;
-    }
-
-
-    @Override
-    public boolean isSpecial() {
-        return true;
     }
 
     @Override
@@ -186,14 +196,9 @@ public class CastBlastingRecipe extends BlastingRecipe {
                 mats.remove(r);
             }
 
-            // ✅ Recalculate total "Amount"
-            double total = 0;
-            for (String mat : mats.getAllKeys()) {
-                total += mats.getDouble(mat);
-            }
-            tag.putDouble("Amount", total);
+            tag.putDouble("Amount", 0);
 
-            tag.put("Materials", mats);
+            tag.put("Materials", new CompoundTag());
         }
         return tag;
     }
@@ -214,19 +219,14 @@ public class CastBlastingRecipe extends BlastingRecipe {
         return needPolishing;
     }
 
-    /*@Override
-    public RecipeType<?> getType() {
-        return ModRecipeTypes.CAST_BLASTING.get();
+    @Override
+    public @NotNull RecipeType<?> getType() {
+        return RecipeType.BLASTING;
     }
-*/
+
     @Override
     public RecipeSerializer<?> getSerializer() {
         return ModRecipes.CAST_BLASTING.get();
-    }
-
-    public static class Type implements RecipeType<CastBlastingRecipe> {
-        public static final CastBlastingRecipe.Type INSTANCE = new Type();
-        public static final String ID = "cast_blasting";
     }
 
     public static class Serializer implements RecipeSerializer<CastBlastingRecipe> {
