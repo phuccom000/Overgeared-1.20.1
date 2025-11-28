@@ -137,6 +137,7 @@ public class ServerConfig {
     public static ForgeConfigSpec.IntValue FIRED_CAST_DURABILITY;
     public static ForgeConfigSpec.BooleanValue EXPERT_ABOVE_INCREASE_BLUEPRINT;
     public static ForgeConfigSpec.BooleanValue PLAYER_AUTHOR_TOOLTIPS;
+    public static ForgeConfigSpec.BooleanValue ENABLE_STONE_ANVIL_BREAKING;
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -151,6 +152,7 @@ public class ServerConfig {
 
         builder.push("Stone Smithing Anvil");
         STONE_ANVIL_MAX_USES = builder.comment("Number of uses before the Stone Smithing Anvil breaks. Set to 0 to disable.").defineInRange("max_uses", 64, 0, Integer.MAX_VALUE);
+        ENABLE_STONE_ANVIL_BREAKING = builder.comment("Enable Stone Smithing Anvil turns into cobblestone after falling").define("enableAnvilToStone", true);
         builder.pop();
 
         builder.push("Heated Items");

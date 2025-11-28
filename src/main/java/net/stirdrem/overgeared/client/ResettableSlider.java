@@ -1,4 +1,4 @@
-package net.stirdrem.overgeared.config;
+package net.stirdrem.overgeared.client;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;

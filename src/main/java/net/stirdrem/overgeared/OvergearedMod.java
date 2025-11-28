@@ -1,7 +1,5 @@
 package net.stirdrem.overgeared;
 
-//import cech12.bucketlib.api.BucketLibApi;
-
 import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -32,6 +30,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -40,12 +39,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.block.UpgradeArrowDispenseBehavior;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
+import net.stirdrem.overgeared.client.ClientInit;
 import net.stirdrem.overgeared.command.ModCommands;
-import net.stirdrem.overgeared.config.OvergearedConfigScreen;
+import net.stirdrem.overgeared.client.OvergearedConfigScreen;
 import net.stirdrem.overgeared.entity.ModEntities;
 
 import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
@@ -133,12 +132,6 @@ public class OvergearedMod {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
 
-        ModLoadingContext.get().registerExtensionPoint(
-                ConfigScreenHandler.ConfigScreenFactory.class,
-                () -> new ConfigScreenHandler.ConfigScreenFactory(
-                        (minecraft, parentScreen) -> new OvergearedConfigScreen(parentScreen)
-                )
-        );
     }
 
     @Unique
@@ -529,6 +522,8 @@ public class OvergearedMod {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+            DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientInit::init);
+
             MenuScreens.register(ModMenuTypes.STEEL_SMITHING_ANVIL_MENU.get(), SteelSmithingAnvilScreen::new);
             MenuScreens.register(ModMenuTypes.TIER_A_SMITHING_ANVIL_MENU.get(), TierASmithingAnvilScreen::new);
             MenuScreens.register(ModMenuTypes.TIER_B_SMITHING_ANVIL_MENU.get(), TierBSmithingAnvilScreen::new);

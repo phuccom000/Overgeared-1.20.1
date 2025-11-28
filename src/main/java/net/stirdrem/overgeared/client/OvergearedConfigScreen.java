@@ -1,4 +1,4 @@
-package net.stirdrem.overgeared.config;
+package net.stirdrem.overgeared.client;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
@@ -10,7 +10,13 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.stirdrem.overgeared.config.ServerConfig;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -18,6 +24,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@OnlyIn(Dist.CLIENT)
 public class OvergearedConfigScreen extends Screen {
     private final Screen parent;
     private CommentedFileConfig configFile;
@@ -211,10 +218,15 @@ public class OvergearedConfigScreen extends Screen {
                 v -> setInt("Arrow Fletching Settings.maxPotionTipping", v.intValue()), true
         ));
         configList.addConfigEntry(new ManualInputEntry(
-                "How many uses the Stone Anvil has before breaking",
+                "How many uses the Stone Anvil has. Set 0 to disable",
                 () -> (double) getInt("Stone Smithing Anvil.max_uses"),
                 v -> setInt("Stone Smithing Anvil.max_uses", v.intValue()),
                 true));
+        configList.addConfigEntry(new BooleanEntry(
+                "Enable the Stone Anvil to turn into Cobblestone after falling",
+                () -> getBoolean("Stone Smithing Anvil.enableAnvilToStone"),
+                v -> setBoolean("Stone Smithing Anvil.enableAnvilToStone", v)
+        ));
         configList.addConfigEntry(new IntEntry(
                 "Max distance from the anvil until minigame resets",
                 () -> getInt("Minigame Common Settings.maxAnvilDistance"),

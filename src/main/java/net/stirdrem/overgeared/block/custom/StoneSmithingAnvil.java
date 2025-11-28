@@ -28,6 +28,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.StoneSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.config.ServerConfig;
 import org.jetbrains.annotations.Nullable;
 
 public class StoneSmithingAnvil extends AbstractSmithingAnvilNew {
@@ -112,10 +113,9 @@ public class StoneSmithingAnvil extends AbstractSmithingAnvilNew {
 
     @Override
     public void onLand(Level level, BlockPos pos, BlockState fallingState, BlockState hitState, FallingBlockEntity fallingBlock) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide && ServerConfig.ENABLE_STONE_ANVIL_BREAKING.get()) {
             // Show break particles of the anvil
             level.levelEvent(2001, pos, Block.getId(fallingState)); // 2001 = block break effect
-
             // Replace with cobblestone block instead of dropping item
             level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.COBBLESTONE.defaultBlockState());
 
@@ -129,7 +129,7 @@ public class StoneSmithingAnvil extends AbstractSmithingAnvilNew {
 
     @Override
     public void onBrokenAfterFall(Level level, BlockPos pos, FallingBlockEntity fallingBlock) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide && ServerConfig.ENABLE_STONE_ANVIL_BREAKING.get()) {
             BlockState state = fallingBlock.getBlockState();
             level.levelEvent(2001, pos, Block.getId(state)); // Show break particles
             Block.popResource(level, pos, new ItemStack(net.minecraft.world.item.Items.COBBLESTONE));
