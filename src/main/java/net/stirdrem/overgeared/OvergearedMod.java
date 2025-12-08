@@ -2,6 +2,7 @@ package net.stirdrem.overgeared;
 
 import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.registries.Registries;
@@ -35,6 +36,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
@@ -45,6 +47,8 @@ import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
 import net.stirdrem.overgeared.client.ClientInit;
 import net.stirdrem.overgeared.command.ModCommands;
 import net.stirdrem.overgeared.client.OvergearedConfigScreen;
+import net.stirdrem.overgeared.datapack.DurabilityBlacklistReloadListener;
+import net.stirdrem.overgeared.datapack.GrindingBlacklistReloadListener;
 import net.stirdrem.overgeared.entity.ModEntities;
 
 import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
@@ -71,6 +75,7 @@ import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.*;
 import net.stirdrem.overgeared.sound.ModSounds;
+import net.stirdrem.overgeared.util.ConfigHelper;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.TickScheduler;
 import org.jetbrains.annotations.NotNull;
@@ -78,6 +83,7 @@ import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Unique;
 
 import javax.annotation.Nullable;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -134,6 +140,20 @@ public class OvergearedMod {
 
     }
 
+    // Subscribe to the MOD event bus for config events
+    @SubscribeEvent
+    public static void onModConfigReloading(final ModConfigEvent.Reloading event) {
+        // Check that the reloaded config is the one for your mod
+        if (event.getConfig().getSpec() == ServerConfig.SERVER_CONFIG) {
+            System.out.println("Your mod's config has been reloaded!");
+            // Re-cache your config values here
+            Path configPath = Minecraft.getInstance().gameDirectory.toPath()
+                    .resolve("config")
+                    .resolve("overgeared-common.toml");
+            ServerConfig.loadConfig(configPath);
+        }
+    }
+
     @Unique
     @Nullable
     public static Item getCooledIngot(@Nullable Item heatedItem, @NotNull Level level) {
@@ -173,7 +193,7 @@ public class OvergearedMod {
     }
 
     @Unique
-    public static boolean isDurabilityMultiplierBlacklisted(ItemStack stack) {
+    public static boolean isDurabilityBlacklisted(ItemStack stack) {
         ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
         List<? extends String> blacklist = ServerConfig.BASE_DURABILITY_BLACKLIST.get();
 
@@ -188,8 +208,7 @@ public class OvergearedMod {
                 if (itemId != null && itemId.equals(ResourceLocation.tryParse(entry))) return true;
             }
         }
-
-        return false;
+        return DurabilityBlacklistReloadListener.isBlacklisted(stack);
     }
 
 
@@ -200,9 +219,7 @@ public class OvergearedMod {
     private void commonSetup(final FMLCommonSetupEvent event) {
         ModMessages.register();
         ToolTypeRegistry.init();
-        LOGGER.info("Tool types initialized: {}",
-                ToolTypeRegistry.getRegisteredTypes().size());
-        //}
+
         if (ServerConfig.ENABLE_DRAGON_BREATH_RECIPE.get())
             BrewingRecipeRegistry.addRecipe(
                     new BetterBrewingRecipe(
@@ -514,6 +531,13 @@ public class OvergearedMod {
                 DispenserBlock.registerBehavior(ModItems.STEEL_UPGRADE_ARROW.get(), new UpgradeArrowDispenseBehavior());
                 DispenserBlock.registerBehavior(ModItems.DIAMOND_UPGRADE_ARROW.get(), new UpgradeArrowDispenseBehavior());
             });
+        }
+
+        @SubscribeEvent
+        public static void onConfigLoad(final ModConfigEvent event) {
+            if (event.getConfig().getSpec() == ServerConfig.SERVER_CONFIG) {
+                ToolTypeRegistry.init();
+            }
         }
     }
 

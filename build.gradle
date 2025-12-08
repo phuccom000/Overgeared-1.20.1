@@ -247,11 +247,15 @@ dependencies {
     //implementation fg.deobf("curse.maven:polymorph-388800:6450982")
     implementation fg.deobf("curse.maven:cupboard-326652:5470032")
     implementation fg.deobf("curse.maven:recipe-essentials-forge-fabric-907856:6165709")
+
+    implementation fg.deobf("curse.maven:irons-spells-n-spellbooks-855414:6970299")
+    implementation fg.deobf("curse.maven:caelus-308989:5281700")
+    implementation fg.deobf("curse.maven:attribute-setter-1064034:7196879")
     /*    implementation fg.deobf("curse.maven:amendments-896746:6913537")
-    implementation fg.deobf("curse.maven:accessories-938917:6201361")
+    implementation fg.deobf("curse.maven:accessories-938917:6201361")*/
     implementation fg.deobf("curse.maven:playeranimator-658587:4587214")
-    //implementation fg.deobf("curse.maven:geckolib-388172:7025129")
-    implementation fg.deobf("curse.maven:forgified-fabric-api-889079:6885853")
+    implementation fg.deobf("curse.maven:geckolib-388172:7025129")
+    /*implementation fg.deobf("curse.maven:forgified-fabric-api-889079:6885853")
     implementation fg.deobf("curse.maven:better-combat-by-daedelus-639842:5625757")
     runtimeOnly fg.deobf("curse.maven:connector-extras-913445:5490637")
     runtimeOnly fg.deobf("curse.maven:sinytra-connector-890127:5761411")

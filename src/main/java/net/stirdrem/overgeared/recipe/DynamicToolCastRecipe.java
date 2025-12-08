@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
-import net.stirdrem.overgeared.util.CastingConfigHelper;
+import net.stirdrem.overgeared.util.ConfigHelper;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -22,13 +22,6 @@ public class DynamicToolCastRecipe extends CustomRecipe {
 
     public DynamicToolCastRecipe(ResourceLocation id, CraftingBookCategory category) {
         super(id, category);
-    }
-
-    private static String getItemIdStringSafe(ItemStack stack) {
-        if (stack.isEmpty()) return "NONE";
-        ResourceLocation key = ForgeRegistries.ITEMS.getKey(stack.getItem());
-        if (key == null) return "NONE";
-        return key.toString();
     }
 
     @Override
@@ -45,14 +38,15 @@ public class DynamicToolCastRecipe extends CustomRecipe {
                 if (!cast.isEmpty()) {
                     return false;
                 }
+                if (!stack.hasTag()) return false;
+                if (stack.getTag().getString("ToolType").isBlank()) return false;
                 cast = stack;
                 continue;
             }
 
-            String itemId = getItemIdStringSafe(stack);
-            String material = CastingConfigHelper.getMaterialForItem(stack);
+            String material = ConfigHelper.getMaterialForItem(stack);
 
-            if (!material.equals("NONE")) {
+            if (!material.equals("none")) {
                 foundMaterial = true;
                 continue;
             }
@@ -72,7 +66,7 @@ public class DynamicToolCastRecipe extends CustomRecipe {
         List<ItemStack> inputItems = new ArrayList<>(); // Store the actual ItemStacks for comparison
         int newAmount = 0;
         int maxAmount = 0;
-        String toolType = "NONE";
+        String toolType = "none";
 
         // Scan grid
         for (int i = 0; i < inv.getContainerSize(); i++) {
@@ -83,14 +77,14 @@ public class DynamicToolCastRecipe extends CustomRecipe {
                 cast = stack.copy();
                 CompoundTag tag = cast.getOrCreateTag();
                 toolType = tag.getString("ToolType");
-                maxAmount = CastingConfigHelper.getMaxMaterialAmount(toolType);
+                maxAmount = ConfigHelper.getMaxMaterialAmount(toolType);
             }
             // Process materials
             else if (!stack.isEmpty()) {
                 String itemId = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
-                String material = CastingConfigHelper.getMaterialForItem(stack);
-                if (!material.equals("NONE")) {
-                    int value = CastingConfigHelper.getMaterialValue(stack);
+                String material = ConfigHelper.getMaterialForItem(stack);
+                if (!material.equals("none")) {
+                    int value = ConfigHelper.getMaterialValue(stack);
                     materialTotals.put(material, materialTotals.getOrDefault(material, 0) + value);
                     newAmount += value;
 

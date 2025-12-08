@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -20,8 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.BlueprintQuality;
-import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.util.CastingConfigHelper;
+import net.stirdrem.overgeared.util.ConfigHelper;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -155,12 +153,12 @@ public class ToolCastItem extends Item {
         String itemId = BuiltInRegistries.ITEM.getKey(material.getItem()).toString();
 
         // Validate material type
-        if (!CastingConfigHelper.isValidMaterial(material)) {
+        if (!ConfigHelper.isValidMaterial(material)) {
             player.displayClientMessage(Component.translatable("message.overgeared.invalid_material"), true);
             return false;
         }
 
-        int value = CastingConfigHelper.getMaterialValue(material);
+        int value = ConfigHelper.getMaterialValue(material);
         if (value <= 0) return false;
 
         int amount = tag.getInt("Amount");
@@ -173,7 +171,7 @@ public class ToolCastItem extends Item {
         }
 
         // === Update Materials NBT correctly ===
-        String mat = CastingConfigHelper.getMaterialForItem(material);
+        String mat = ConfigHelper.getMaterialForItem(material);
         CompoundTag mats = tag.contains("Materials") ? tag.getCompound("Materials") : new CompoundTag();
 
         int prev = mats.getInt(mat); // ✅ read using material key (mat)

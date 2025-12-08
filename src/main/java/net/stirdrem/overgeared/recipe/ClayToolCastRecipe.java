@@ -9,12 +9,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
-import net.stirdrem.overgeared.util.CastingConfigHelper;
+import net.stirdrem.overgeared.util.ConfigHelper;
 
 public class ClayToolCastRecipe extends CustomRecipe {
 
@@ -38,7 +37,7 @@ public class ClayToolCastRecipe extends CustomRecipe {
         if (center.isEmpty()) return false;
 
         // Must be mapped to a tool type in config
-        String toolType = CastingConfigHelper.getToolTypeForItem(level, center);
+        String toolType = ConfigHelper.getToolTypeForItem(level, center);
         if ("none".equals(toolType)) return false;
 
         boolean clayPattern = true;
@@ -74,7 +73,7 @@ public class ClayToolCastRecipe extends CustomRecipe {
                 ? lastLevel
                 : ServerLifecycleHooks.getCurrentServer().overworld();
 
-        String toolType = CastingConfigHelper.getToolTypeForItem(level, center);
+        String toolType = ConfigHelper.getToolTypeForItem(level, center);
         if ("none".equals(toolType) || toolType.isBlank()) return ItemStack.EMPTY;
 
         // detect if nether bricks were used
@@ -97,7 +96,7 @@ public class ClayToolCastRecipe extends CustomRecipe {
             if (quality.isEmpty()) quality = "none";
         }
 
-        int maxAmount = CastingConfigHelper.getMaxMaterialAmount(toolType);
+        int maxAmount = ConfigHelper.getMaxMaterialAmount(toolType);
         if (maxAmount <= 0) maxAmount = 9;
 
         // downgrade the quality one level

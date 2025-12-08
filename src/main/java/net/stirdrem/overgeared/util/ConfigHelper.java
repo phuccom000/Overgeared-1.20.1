@@ -8,12 +8,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.datapack.MaterialSettingsReloadListener;
 import net.stirdrem.overgeared.recipe.ItemToToolTypeRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 
 import java.util.List;
+import java.util.Optional;
 
-public class CastingConfigHelper {
+public class ConfigHelper {
 
     // -----------------------
     // Tool Types
@@ -67,7 +69,7 @@ public class CastingConfigHelper {
     }
 
     // -----------------------
-    // Material from Item
+    // Material from Item (UPDATED - uses datapack)
     // -----------------------
 
     /**
@@ -78,6 +80,17 @@ public class CastingConfigHelper {
     }
 
     public static String getMaterialForItem(Item item) {
+        // First check datapack entries
+        Optional<MaterialSettingsReloadListener.MaterialEntry> datapackEntry =
+                MaterialSettingsReloadListener.getAllMaterialEntries().stream()
+                        .filter(entry -> matchesItemOrTag(item, entry.getItemOrTag()))
+                        .findFirst();
+
+        if (datapackEntry.isPresent()) {
+            return datapackEntry.get().getMaterialId();
+        }
+
+        // Fallback to config for backward compatibility
         for (var e : ServerConfig.MATERIAL_SETTING.get()) {
             List<?> row = (List<?>) e;
             String key = (String) row.get(0);
@@ -96,6 +109,17 @@ public class CastingConfigHelper {
     }
 
     public static int getMaterialValue(Item item) {
+        // First check datapack entries
+        Optional<MaterialSettingsReloadListener.MaterialEntry> datapackEntry =
+                MaterialSettingsReloadListener.getAllMaterialEntries().stream()
+                        .filter(entry -> matchesItemOrTag(item, entry.getItemOrTag()))
+                        .findFirst();
+
+        if (datapackEntry.isPresent()) {
+            return datapackEntry.get().getMaterialValue();
+        }
+
+        // Fallback to config for backward compatibility
         for (var e : ServerConfig.MATERIAL_SETTING.get()) {
             List<?> row = (List<?>) e;
             String key = (String) row.get(0);
@@ -114,6 +138,15 @@ public class CastingConfigHelper {
     }
 
     public static boolean isValidMaterial(Item item) {
+        // First check datapack entries
+        boolean isValidInDatapack = MaterialSettingsReloadListener.getAllMaterialEntries().stream()
+                .anyMatch(entry -> matchesItemOrTag(item, entry.getItemOrTag()));
+
+        if (isValidInDatapack) {
+            return true;
+        }
+
+        // Fallback to config for backward compatibility
         for (var e : ServerConfig.MATERIAL_SETTING.get()) {
             List<?> row = (List<?>) e;
             String key = (String) row.get(0);
@@ -122,6 +155,35 @@ public class CastingConfigHelper {
             }
         }
         return false;
+    }
+
+    /**
+     * Get all material values for an item (useful when an item belongs to multiple materials)
+     */
+    public static java.util.Map<String, Integer> getMaterialValuesForItem(ItemStack stack) {
+        return getMaterialValuesForItem(stack.getItem());
+    }
+
+    public static java.util.Map<String, Integer> getMaterialValuesForItem(Item item) {
+        java.util.Map<String, Integer> result = new java.util.HashMap<>();
+
+        // Add datapack entries
+        MaterialSettingsReloadListener.getAllMaterialEntries().stream()
+                .filter(entry -> matchesItemOrTag(item, entry.getItemOrTag()))
+                .forEach(entry -> result.put(entry.getMaterialId(), entry.getMaterialValue()));
+
+        // Add config entries (will override datapack if same material ID)
+        for (var e : ServerConfig.MATERIAL_SETTING.get()) {
+            List<?> row = (List<?>) e;
+            String key = (String) row.get(0);
+            if (matchesItemOrTag(item, key)) {
+                String materialId = (String) row.get(1);
+                int value = ((Number) row.get(2)).intValue();
+                result.put(materialId, value);
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -139,5 +201,51 @@ public class CastingConfigHelper {
         }
 
         return false;
+    }
+
+    // -----------------------
+    // New utility methods for datapack integration
+    // -----------------------
+
+    /**
+     * Get all available material IDs from both datapack and config
+     */
+    public static java.util.Set<String> getAllMaterialIds() {
+        java.util.Set<String> materialIds = new java.util.HashSet<>();
+
+        // From datapack
+        MaterialSettingsReloadListener.getAllMaterialEntries().stream()
+                .map(MaterialSettingsReloadListener.MaterialEntry::getMaterialId)
+                .forEach(materialIds::add);
+
+        // From config
+        for (var e : ServerConfig.MATERIAL_SETTING.get()) {
+            List<?> row = (List<?>) e;
+            materialIds.add((String) row.get(1));
+        }
+
+        return materialIds;
+    }
+
+    /**
+     * Get all items for a specific material
+     */
+    public static java.util.List<String> getItemsForMaterial(String materialId) {
+        java.util.List<String> items = new java.util.ArrayList<>();
+
+        // From datapack
+        MaterialSettingsReloadListener.getEntriesForMaterial(materialId).stream()
+                .map(MaterialSettingsReloadListener.MaterialEntry::getItemOrTag)
+                .forEach(items::add);
+
+        // From config
+        for (var e : ServerConfig.MATERIAL_SETTING.get()) {
+            List<?> row = (List<?>) e;
+            if (row.get(1).equals(materialId)) {
+                items.add((String) row.get(0));
+            }
+        }
+
+        return items;
     }
 }

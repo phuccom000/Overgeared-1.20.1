@@ -101,7 +101,7 @@ public class ModEvents {
     }
 
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onItemAttributes(ItemAttributeModifierEvent event) {
         ItemStack stack = event.getItemStack();
 
@@ -109,12 +109,12 @@ public class ModEvents {
             String quality = stack.getTag().getString("ForgingQuality");
             Item item = stack.getItem();
 
-            //if (isWeapon(item)) {
-            if (!isArmor(item))
+            if (isWeapon(item)) {
                 applyWeaponAttributes(event, quality);
-            //} else if (isArmor(item)) {
-            applyArmorAttributes(event, quality);
-            //}
+            }
+            if (isArmor(item)) {
+                applyArmorAttributes(event, quality);
+            }
         }
     }
 
@@ -132,30 +132,25 @@ public class ModEvents {
     }
 
     private static void modifyAttribute(ItemAttributeModifierEvent event, Attribute attribute, double bonus) {
-        Multimap<Attribute, AttributeModifier> originalModifiers = event.getOriginalModifiers();
+        Multimap<Attribute, AttributeModifier> originalModifiers = event.getModifiers();
 
-        // Check if this attribute exists at all
-        if (!originalModifiers.containsKey(attribute)) {
-            return;
-        }
+        if (!originalModifiers.containsKey(attribute)) return;
 
-        for (AttributeModifier modifier : originalModifiers.get(attribute)) {
+        // ✅ COPY before modifying
+        List<AttributeModifier> modifiers = List.copyOf(originalModifiers.get(attribute));
 
-            // Skip modifiers with zero value
-            if (modifier.getAmount() == 0) {
-                continue;
-            }
+        for (AttributeModifier modifier : modifiers) {
+            if (modifier.getAmount() == 0) continue;
 
             event.removeModifier(attribute, modifier);
             event.addModifier(attribute, createModifiedAttribute(modifier, bonus));
         }
     }
 
-
     private static AttributeModifier createModifiedAttribute(AttributeModifier original, double bonus) {
         return new AttributeModifier(
                 original.getId(),
-                original.getName(),
+                "Overgeared",
                 original.getAmount() + bonus,
                 original.getOperation()
         );

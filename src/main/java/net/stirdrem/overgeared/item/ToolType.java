@@ -27,13 +27,13 @@ public class ToolType {
         if (id == null || id.isEmpty())
             throw new IllegalArgumentException("Tool type ID cannot be null or empty");
 
-        if (!id.matches("^[A-Z0-9_]+$"))
-            throw new IllegalArgumentException("Tool type ID must be uppercase alphanumeric with underscores");
+        if (!id.matches("^[A-Za-z0-9_]+$"))
+            throw new IllegalArgumentException("Tool type ID must be alphanumeric with underscores");
 
-        this.id = id.toUpperCase(Locale.ROOT);
+        this.id = id.toLowerCase(Locale.ROOT); // ✅ internal canonical form
 
-        // Overgeared namespace for all custom tool types
-        this.translationKey = "tooltype.overgeared." + this.id.toLowerCase(Locale.ROOT);
+        // ✅ Translation always uses lowercase
+        this.translationKey = "tooltype.overgeared." + this.id;
 
     }
 

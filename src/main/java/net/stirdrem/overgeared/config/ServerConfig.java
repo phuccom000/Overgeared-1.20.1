@@ -429,9 +429,9 @@ public class ServerConfig {
         SERVER_CONFIG = builder.build();
     }
 
-    public static void loadConfig(ForgeConfigSpec spec, Path path) {
+    public static void loadConfig(Path path) {
         final CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave().writingMode(WritingMode.REPLACE).preserveInsertionOrder().build();
         configData.load();
-        spec.setConfig(configData);
+        SERVER_CONFIG.setConfig(configData);
     }
 }

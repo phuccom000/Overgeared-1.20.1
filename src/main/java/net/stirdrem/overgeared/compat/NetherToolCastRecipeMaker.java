@@ -1,7 +1,6 @@
 package net.stirdrem.overgeared.compat;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -9,11 +8,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.ItemToToolTypeRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
-import net.stirdrem.overgeared.util.CastingConfigHelper;
+import net.stirdrem.overgeared.util.ConfigHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -84,7 +82,7 @@ public final class NetherToolCastRecipeMaker {
 
         tag.putString("ToolType", toolType);
         tag.putInt("Amount", 0);
-        tag.putInt("MaxAmount", CastingConfigHelper.getMaxMaterialAmount(toolType));
+        tag.putInt("MaxAmount", ConfigHelper.getMaxMaterialAmount(toolType));
 
         return result;
     }

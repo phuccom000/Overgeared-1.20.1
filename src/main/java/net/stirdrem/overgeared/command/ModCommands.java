@@ -8,11 +8,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.registries.BuiltInRegistries;
 
 import net.stirdrem.overgeared.item.ModItems;
-import net.stirdrem.overgeared.util.CastingConfigHelper;
+import net.stirdrem.overgeared.util.ConfigHelper;
 
 public class ModCommands {
 
@@ -101,7 +99,7 @@ public class ModCommands {
         CompoundTag tag = stack.getOrCreateTag();
         tag.putString("ToolType", toolType.toLowerCase());
         tag.putInt("Amount", 0);
-        tag.putInt("MaxAmount", CastingConfigHelper.getMaxMaterialAmount(toolType));
+        tag.putInt("MaxAmount", ConfigHelper.getMaxMaterialAmount(toolType));
         tag.put("Materials", new CompoundTag()); // Empty compound instead of remove
 
         if (!quality.equalsIgnoreCase("none"))

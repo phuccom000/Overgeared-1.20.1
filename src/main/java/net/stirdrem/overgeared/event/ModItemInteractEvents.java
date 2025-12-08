@@ -54,6 +54,7 @@ import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.datapack.GrindingBlacklistReloadListener;
 import net.stirdrem.overgeared.heatedtem.HeatedItemProvider;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.networking.ModMessages;
@@ -63,6 +64,7 @@ import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.GrindingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.screen.FletchingStationMenu;
+import net.stirdrem.overgeared.util.ConfigHelper;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.QualityHelper;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -500,7 +502,12 @@ public class ModItemInteractEvents {
                             }
                         }
                     }
-
+                    boolean isBlacklisted = GrindingBlacklistReloadListener.isBlacklisted(stack);
+                    if (isBlacklisted) {
+                        event.setCancellationResult(InteractionResult.PASS);
+                        event.setCanceled(true);
+                        return;
+                    }
 
                     CompoundTag tag = stack.getOrCreateTag();
                     int reducedCount = tag.getInt("ReducedMaxDurability");

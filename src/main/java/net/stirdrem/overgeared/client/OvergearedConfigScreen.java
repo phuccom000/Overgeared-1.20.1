@@ -853,6 +853,7 @@ public class OvergearedConfigScreen extends Screen {
         private final Consumer<Double> setter;
         private final EditBox editBox;
         private final boolean acceptIntegers;
+        private boolean isFocused = false;
 
         public ManualInputEntry(String label, Supplier<Double> getter, Consumer<Double> setter) {
             this(label, getter, setter, false);
@@ -904,15 +905,12 @@ public class OvergearedConfigScreen extends Screen {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            // Check if click is within the edit box area
-            if (editBox.isMouseOver(mouseX, mouseY)) {
+            // Let the edit box handle the click first
+            if (editBox.mouseClicked(mouseX, mouseY, button) && !editBox.isFocused()) {
                 editBox.setFocused(true);
-                return editBox.mouseClicked(mouseX, mouseY, button);
-            } else {
-                // Clicked outside - remove focus
-                editBox.setFocused(false);
-                return false;
+                return true;
             }
+            return false;
         }
 
         @Override
