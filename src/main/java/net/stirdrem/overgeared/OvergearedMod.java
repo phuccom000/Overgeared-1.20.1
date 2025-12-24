@@ -20,7 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
@@ -42,13 +41,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
 import net.stirdrem.overgeared.block.UpgradeArrowDispenseBehavior;
 import net.stirdrem.overgeared.client.AnvilMinigameOverlay;
 import net.stirdrem.overgeared.client.ClientInit;
+import net.stirdrem.overgeared.client.PopupOverlay;
 import net.stirdrem.overgeared.command.ModCommands;
-import net.stirdrem.overgeared.client.OvergearedConfigScreen;
 import net.stirdrem.overgeared.datapack.DurabilityBlacklistReloadListener;
-import net.stirdrem.overgeared.datapack.GrindingBlacklistReloadListener;
 import net.stirdrem.overgeared.entity.ModEntities;
 
 import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
@@ -75,7 +74,6 @@ import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.*;
 import net.stirdrem.overgeared.sound.ModSounds;
-import net.stirdrem.overgeared.util.ConfigHelper;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.TickScheduler;
 import org.jetbrains.annotations.NotNull;
@@ -156,7 +154,7 @@ public class OvergearedMod {
 
     @Unique
     @Nullable
-    public static Item getCooledIngot(@Nullable Item heatedItem, @NotNull Level level) {
+    public static Item getCooledItem(@Nullable Item heatedItem, @NotNull Level level) {
         if (heatedItem == null || level == null) return null;
 
         // Wrap the single item in a container for recipe matching
@@ -531,6 +529,7 @@ public class OvergearedMod {
                 DispenserBlock.registerBehavior(ModItems.STEEL_UPGRADE_ARROW.get(), new UpgradeArrowDispenseBehavior());
                 DispenserBlock.registerBehavior(ModItems.DIAMOND_UPGRADE_ARROW.get(), new UpgradeArrowDispenseBehavior());
             });
+            event.enqueueWork(ModAdvancementTriggers::register);
         }
 
         @SubscribeEvent
@@ -586,6 +585,7 @@ public class OvergearedMod {
         @SubscribeEvent
         public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
             event.registerBelowAll("anvil_mg", AnvilMinigameOverlay.ANVIL_MG);
+            event.registerBelowAll("popup_mg", PopupOverlay.POPUP_OVERLAY);
         }
 
         @SubscribeEvent

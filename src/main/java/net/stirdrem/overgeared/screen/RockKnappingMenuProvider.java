@@ -6,9 +6,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.Level;
-
 public class RockKnappingMenuProvider implements MenuProvider {
     @Override
     public Component getDisplayName() {
@@ -17,8 +14,7 @@ public class RockKnappingMenuProvider implements MenuProvider {
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
-        return new RockKnappingMenu(id, inv,
-                player.level().getRecipeManager(),
-                player.getMainHandItem(), player.getOffhandItem()); // Use the passed items
+        // The menu constructor will handle checking if player has knappable rocks
+        return new RockKnappingMenu(id, inv, player.level().getRecipeManager());
     }
 }

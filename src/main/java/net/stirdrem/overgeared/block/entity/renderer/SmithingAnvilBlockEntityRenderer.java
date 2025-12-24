@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,9 +46,18 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
         boolean inputsEmpty = areInputSlotsEmpty(pBlockEntity);
         float zOffset = inputsEmpty ? 0f : -0.43f;
 
+        float heightScale;
+        int progress = pBlockEntity.getContainerData().get(0);
+        int max = pBlockEntity.getContainerData().get(1);
+
+        if (max <= 0) {
+            heightScale = 1.0f; // default when no recipe / not started
+        } else {
+            heightScale = 1.0f - ((float) progress / max);
+        }
         if (!output.isEmpty()) {
             float yOffset = isBlockItem(output) ? 1.05f : 1.02f;
-            renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, zOffset, 110f, 0.4f);
+            renderStack(pPoseStack, pBuffer, itemRenderer, output, pBlockEntity, 0.0f, yOffset, zOffset, 110f, 0.4f, 1.0f);
         }
 
         // 1️⃣ First pass: render up to three unique input items
@@ -57,17 +67,17 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
 
         // First pass: render unique items
         rendered = renderPass(pPoseStack, pBuffer, itemRenderer, pBlockEntity,
-                renderedItems, renderedSlots, 0f, rendered, true);
+                renderedItems, renderedSlots, 0f, rendered, true, heightScale);
 
         // Second pass: fill remaining slots with any items
         if (rendered < 3) {
             renderPass(pPoseStack, pBuffer, itemRenderer, pBlockEntity,
-                    renderedItems, renderedSlots, 0f, rendered, false);
+                    renderedItems, renderedSlots, 0f, rendered, false, heightScale);
         }
 
         // Render the hammer from slot 9
         ItemStack hammer = pBlockEntity.getRenderStack(9);
-        renderStack(pPoseStack, pBuffer, itemRenderer, hammer, pBlockEntity, 0f, 1.025f, 0.43f, 135f, 0.5f);
+        renderStack(pPoseStack, pBuffer, itemRenderer, hammer, pBlockEntity, 0f, 1.025f, 0.43f, 135f, 0.5f, 1.0f);
     }
 
     private boolean areInputSlotsEmpty(AbstractSmithingAnvilBlockEntity be) {
@@ -82,7 +92,7 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
     private int renderPass(PoseStack pPoseStack, MultiBufferSource pBuffer,
                            ItemRenderer itemRenderer, AbstractSmithingAnvilBlockEntity pBlockEntity,
                            Set<Item> renderedItems, Set<Integer> renderedSlots,
-                           float zOffset, int renderedCount, boolean checkUniqueness) {
+                           float zOffset, int renderedCount, boolean checkUniqueness, float heightScale) {
 
         // Use an accumulated Y offset instead of rendered index
         float currentHeight = BASE_Y;
@@ -120,10 +130,9 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
             if (isBlockItem(stack)) {
                 yOffset += BLOCK_BASE_Y_OFFSET;
             }
-
             renderStack(
                     pPoseStack, pBuffer, itemRenderer, stack, pBlockEntity,
-                    0.0f, yOffset, zOffset, rotation, scale
+                    0.0f, yOffset, zOffset, rotation, scale, heightScale
             );
 
             // Add height for next item
@@ -148,7 +157,8 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
 
     private void renderStack(PoseStack poseStack, MultiBufferSource buffer, ItemRenderer itemRenderer,
                              ItemStack itemStack, AbstractSmithingAnvilBlockEntity blockEntity,
-                             float xOffset, float yOffset, float zOffset, float rotationDegrees, float scale) {
+                             float xOffset, float yOffset, float zOffset,
+                             float rotationDegrees, float scale, float heightScale) {
 
         if (itemStack == null || itemStack.isEmpty()) return;
 
@@ -178,8 +188,8 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
         float rotatedX = (float) (xOffset * cos - zOffset * sin);
         float rotatedZ = (float) (xOffset * sin + zOffset * cos);
 
-        // Translate to center plus rotated offset, keep yOffset as is
-        poseStack.translate(0.5f - rotatedX, yOffset, 0.5f + rotatedZ);
+        // Translate to center plus rotated offset, apply height scale to yOffset
+        poseStack.translate(0.5f - rotatedX, yOffset - (0.01 * (1 - heightScale)), 0.5f + rotatedZ);
 
         // Apply facing rotation
         poseStack.mulPose(Axis.YP.rotationDegrees(facingRotationDegrees));
@@ -193,8 +203,7 @@ public class SmithingAnvilBlockEntityRenderer implements BlockEntityRenderer<Abs
         // Flip non-block items upright
         poseStack.mulPose(Axis.XP.rotationDegrees(isBlock ? 0 : 90));
 
-        // Scale depending on type
-        poseStack.scale(scale, scale, scale);
+        poseStack.scale(scale, scale, scale * heightScale);
 
         // Render the item
         itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED,

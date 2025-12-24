@@ -5,7 +5,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,11 +12,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
-import static net.stirdrem.overgeared.OvergearedMod.getCooledIngot;
+import static net.stirdrem.overgeared.OvergearedMod.getCooledItem;
 
 @Mixin(AbstractContainerMenu.class)
 public abstract class AbstractContainerMenuMixin {
@@ -42,7 +40,7 @@ public abstract class AbstractContainerMenuMixin {
 
                     long heatedAt = stack.getTag().getLong("HeatedSince");
                     if (now - heatedAt >= cooldown) {
-                        ItemStack cooled = getCooledIngot(stack.getItem(), player.level()).getDefaultInstance();
+                        ItemStack cooled = getCooledItem(stack.getItem(), player.level()).getDefaultInstance();
                         slot.set(cooled);
                         menu.broadcastChanges(); // sync change
                     }

@@ -13,7 +13,10 @@
   "parent": "overgeared:perfect_forging",
   "criteria": {
     "master_forging": {
-      "trigger": "minecraft:impossible"
+      "trigger": "overgeared:forging_quality",
+      "conditions": {
+        "quality": "master"
+      }
     }
   },
   "rewards": {

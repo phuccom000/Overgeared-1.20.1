@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.BlueprintQuality;
+import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ToolType;
 import net.stirdrem.overgeared.item.ToolTypeRegistry;
 import org.jetbrains.annotations.Nullable;
@@ -109,13 +110,16 @@ public class BlueprintItem extends Item {
 
     public static ToolType getToolType(ItemStack stack) {
         CompoundTag tag = stack.getTag();
+
         if (tag == null || !tag.contains("ToolType")) {
             List<ToolType> types = ToolTypeRegistry.getRegisteredTypesAll();
-            return !types.isEmpty() ? types.get(0) : ToolType.SWORD; // Default to first available or SWORD
+            return !types.isEmpty() ? types.get(0) : ToolType.SWORD;
         }
-        return ToolTypeRegistry.byId(tag.getString("ToolType"))
-                .orElse(ToolType.SWORD); // Default to SWORD if invalid
+
+        String id = tag.getString("ToolType");
+        return ToolTypeRegistry.byId(id).orElse(ToolType.SWORD);
     }
+
 
     public static void cycleToolType(ItemStack stack) {
         List<ToolType> available = ToolTypeRegistry.getRegisteredTypesAll();

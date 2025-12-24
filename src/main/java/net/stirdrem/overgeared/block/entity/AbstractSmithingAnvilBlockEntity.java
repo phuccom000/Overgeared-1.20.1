@@ -2,14 +2,12 @@ package net.stirdrem.overgeared.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -22,7 +20,6 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -37,9 +34,9 @@ import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
 import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvilNew;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 import net.stirdrem.overgeared.event.ModEvents;
 
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
@@ -49,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static net.stirdrem.overgeared.OvergearedMod.getCooledIngot;
+import static net.stirdrem.overgeared.OvergearedMod.getCooledItem;
 
 public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
     protected static final int INPUT_SLOT = 0;
@@ -65,8 +62,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     };
     protected final ContainerData data;
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
-    protected int progress = 0;
-    protected int maxProgress = 0;
+    protected int progress;
+    protected int maxProgress;
     protected int hitRemains;
     protected long busyUntilGameTime = 0L;
     protected UUID ownerUUID = null;
@@ -158,6 +155,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.putInt("hitRemains", hitRemains);
+        tag.putInt("progress", progress);
+        tag.putInt("maxProgress", maxProgress);
         tag.put("inventory", itemHandler.serializeNBT());
 
         if (ownerUUID != null) {
@@ -187,6 +186,12 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         }
         if (tag.contains("hitRemains")) {
             hitRemains = tag.getInt("hitRemains");
+        }
+        if (tag.contains("progress")) {
+            progress = tag.getInt("progress");
+        }
+        if (tag.contains("maxProgress")) {
+            maxProgress = tag.getInt("maxProgress");
         }
         if (tag.hasUUID("ownerUUID")) {
             ownerUUID = tag.getUUID("ownerUUID");
@@ -245,23 +250,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         player = null;
     }
 
-    void triggerAdvancement(ServerPlayer player, String path) {
-        // Use Minecraft's advancement system to grant the advancement
-        var advancement = player.server.getAdvancements().getAdvancement(
-                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, path)
-        );
-
-        if (advancement != null) {
-            var progress = player.getAdvancements().getOrStartProgress(advancement);
-            if (!progress.isDone()) {
-                // Grant all criteria to complete the advancement
-                for (String criterion : progress.getRemainingCriteria()) {
-                    player.getAdvancements().award(advancement, criterion);
-                }
-            }
-        }
-    }
-
     protected void craftItem() {
         Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
         if (recipeOptional.isEmpty()) return;
@@ -299,26 +287,25 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                         if (minimumQuality != null && quality.ordinal() < minimumQuality.ordinal()) {
                             quality = minimumQuality;
                         }
-
+                        // Clamp to maximum quality
                         if (maxIngredientQuality != null && quality.ordinal() > maxIngredientQuality.ordinal() && ServerConfig.INGREDIENTS_DEFINE_MAX_QUALITY.get()) {
                             quality = maxIngredientQuality;
                         }
 
                         CompoundTag tag = result.getOrCreateTag();
 
-                        if (quality != ForgingQuality.PERFECT) {
-                            tag.putString("ForgingQuality", quality.getDisplayName());
-                        } else {
+                        if (quality == ForgingQuality.PERFECT) {
                             if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 &&
                                     new Random().nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
                                 quality = ForgingQuality.MASTER;
-                                triggerAdvancement((ServerPlayer) player, "master_forging");
                             }
-                            if (quality.equals(ForgingQuality.PERFECT))
-                                triggerAdvancement((ServerPlayer) player, "perfect_forging");
-                            tag.putString("ForgingQuality", quality.getDisplayName());
                         }
+                        tag.putString("ForgingQuality", quality.getDisplayName());
 
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            ModAdvancementTriggers.FORGING_QUALITY
+                                    .trigger(serverPlayer, quality.getDisplayName());
+                        }
                         if (!(result.getItem() instanceof ArmorItem) &&
                                 !(result.getItem() instanceof ShieldItem) &&
                                 recipe.hasPolishing()) {
@@ -430,9 +417,16 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                             tag.putString("Quality", nextQuality.getDisplayName());
                             tag.putInt("Uses", 0);
                             tag.putInt("UsesToLevel", nextQuality.getUse());
+                            if (player instanceof ServerPlayer serverPlayer) {
+                                if (nextQuality.equals(BlueprintQuality.PERFECT) || nextQuality.equals(BlueprintQuality.MASTER))
+                                    ModAdvancementTriggers.MAX_LEVEL_BLUEPRINT.trigger(serverPlayer);
+                                ModAdvancementTriggers.BLUEPRINT_QUALITY.trigger(serverPlayer, nextQuality.getDisplayName());
+                            }
                         } else {
                             tag.putInt("Uses", usesToLevel); // Clamp
                         }
+
+
                     } else {
                         tag.putInt("Uses", uses); // Just increment
                     }
@@ -532,9 +526,22 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         return progress >= maxProgress;
     }
 
-    protected void increaseCraftingProgress() {
+    public void increaseCraftingProgress() {
         progress++;
+
+        setChanged();
+
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+
+        if (data != null) {
+            data.set(0, progress);
+            data.set(1, maxProgress);
+            data.set(2, hitRemains);
+        }
     }
+
 
     public boolean isBusy(long currentGameTime) {
         return currentGameTime < busyUntilGameTime;
@@ -623,7 +630,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     public CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
         tag.put("inventory", itemHandler.serializeNBT());
-        // Add progress data for client sync
         tag.putInt("progress", progress);
         tag.putInt("maxProgress", maxProgress);
         tag.putInt("hitRemains", hitRemains);
@@ -633,7 +639,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
-        // Read the synced progress data on client side
         if (tag.contains("progress")) {
             this.progress = tag.getInt("progress");
         }
@@ -819,7 +824,11 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     }
 
     public int getProgress() {
-        return progress;
+        if (level != null && level.isClientSide() && data != null) {
+            // On client, get from synced container data
+            return data.get(0);
+        }
+        return this.progress;
     }
 
     @Override
@@ -937,7 +946,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
             // Cooldown complete → convert to cooled version
             if (tick - heatedSince >= cooldownTicks) {
-                Item cooled = getCooledIngot(stack.getItem(), level);
+                Item cooled = getCooledItem(stack.getItem(), level);
                 if (cooled != null) {
                     ItemStack newStack = new ItemStack(cooled, stack.getCount());
                     // Preserve quality or other metadata if needed

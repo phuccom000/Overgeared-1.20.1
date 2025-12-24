@@ -12,7 +12,7 @@
   },
   "parent": "overgeared:making_anvil",
   "criteria": {
-    "smithing_hammer": {
+    "blueprint": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [

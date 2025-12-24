@@ -88,7 +88,7 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                 if (ingredient.hasTag()) {
                     CompoundTag tag = ingredient.getTag();
 
-                    if (!tag.contains("Polished") || !tag.getBoolean("Polished")) {
+                    if (!tag.getBoolean("Polished")) {
                         hasUnpolishedQualityItem = true;
                         break; // No need to check further if we found one
                     }
@@ -133,7 +133,7 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                     if (!tag.getString("ForgingQuality").equals("none"))
                         foundQuality = tag.getString("ForgingQuality");
                 }
-                if (!tag.contains("Polished") || !tag.getBoolean("Polished")) {
+                if (!tag.getBoolean("Polished")) {
                     isPolished = false;
                 }
                 if (tag.contains("Heated") && tag.getBoolean("Heated")) {

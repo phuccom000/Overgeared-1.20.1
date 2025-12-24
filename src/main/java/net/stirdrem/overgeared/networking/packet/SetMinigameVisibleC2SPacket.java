@@ -7,6 +7,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvilNew;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
+import net.stirdrem.overgeared.event.ModItemInteractEvents;
 
 import java.util.function.Supplier;
 
@@ -37,6 +38,7 @@ public class SetMinigameVisibleC2SPacket {
             ServerPlayer sender = ctx.get().getSender();
             if (sender != null && sender.level().getBlockEntity(msg.pos) instanceof AbstractSmithingAnvilBlockEntity anvilBlock) {
                 anvilBlock.setMinigameOn(msg.getVisible());
+                ModItemInteractEvents.playerMinigameVisibility.put(sender.getUUID(), msg.getVisible());
             }
         });
         ctx.get().setPacketHandled(true);

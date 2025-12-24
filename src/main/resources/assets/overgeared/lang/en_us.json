@@ -245,6 +245,7 @@
   "tooltip.overgeared.tool_cast.type": "Type:",
   "tooltip.overgeared.tool_cast.materials": "Materials:",
   "tooltip.overgeared.tool_cast.amount": "Amount:",
+  "tooltip.overgeared.tool_cast.contains": "Contains:",
   "quality.overgeared.master": "Master",
   "quality.overgeared.perfect": "Perfect",
   "quality.overgeared.expert": "Expert",
@@ -259,7 +260,7 @@
   "message.overgeared.cast_empty": "Cast contains no materials",
   "message.overgeared.materials_returned": "Materials returned from cast",
   "message.overgeared.no_materials": "No materials could be returned",
-  "tooltip.overgeared.cast_right_click": "Crouch + Right-click to return materials",
+  "tooltip.overgeared.cast_right_click": "Right-click to return materials",
   "message.overgeared.invalid_material": "Not a valid material",
   "container.overgeared.alloy_smelter": "Alloy Furnace",
   "gui.overgeared.jei.category.alloy_smelting": "Alloying",
@@ -269,6 +270,9 @@
   "gui.overgeared.jei.category.grinding": "Grinding",
   "tooltip.overgeared.add_materials": "Pick up the materials and right-click on the cast to add",
   "tooltip.overgeared.made_by": "Made by",
-  "tooltip.overgeared.stone_hammer_head": "Can only be used to make a hammer tool cast"
+  "tooltip.overgeared.stone_hammer_head": "Can only be used to make a hammer tool cast",
+  "overgeared.forging.perfect": "PERFECT!",
+  "overgeared.forging.good": "GOOD!",
+  "overgeared.forging.miss": "MISS!"
 }
 

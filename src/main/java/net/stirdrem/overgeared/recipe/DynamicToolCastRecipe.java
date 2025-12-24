@@ -27,35 +27,52 @@ public class DynamicToolCastRecipe extends CustomRecipe {
     @Override
     public boolean matches(CraftingContainer inv, Level level) {
         ItemStack cast = ItemStack.EMPTY;
+        int existingAmount = 0;
+        int addedAmount = 0;
+        int maxAmount = 0;
         boolean foundMaterial = false;
 
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stack = inv.getItem(i);
-
             if (stack.isEmpty()) continue;
 
+            // === CAST ===
             if (stack.is(ModItems.CLAY_TOOL_CAST.get()) || stack.is(ModItems.NETHER_TOOL_CAST.get())) {
-                if (!cast.isEmpty()) {
-                    return false;
-                }
+                if (!cast.isEmpty()) return false; // only one cast allowed
                 if (!stack.hasTag()) return false;
-                if (stack.getTag().getString("ToolType").isBlank()) return false;
+
+                CompoundTag tag = stack.getTag();
+                String toolType = tag.getString("ToolType");
+                if (toolType.isBlank()) return false;
+
                 cast = stack;
+                existingAmount = tag.getInt("Amount");
+                maxAmount = ConfigHelper.getMaxMaterialAmount(toolType);
                 continue;
             }
 
+            // === MATERIAL ===
             String material = ConfigHelper.getMaterialForItem(stack);
-
             if (!material.equals("none")) {
                 foundMaterial = true;
+                addedAmount += ConfigHelper.getMaterialValue(stack);
                 continue;
             }
 
+            // === INVALID ITEM ===
             return false;
         }
 
-        return !cast.isEmpty() && foundMaterial;
+        if (cast.isEmpty() || !foundMaterial) return false;
+
+        // ❌ Overflow check
+        if (maxAmount > 0 && existingAmount + addedAmount > maxAmount) {
+            return false;
+        }
+
+        return true;
     }
+
 
     @Override
     public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {

@@ -18,7 +18,7 @@ public class ToolTypeRegistry {
 
         BlueprintTooltypesReloadListener.DATA.values().forEach(data -> {
             for (String id : data.getToolTypes()) {
-                BY_ID.computeIfAbsent(id, ToolType::new);
+                BY_ID.computeIfAbsent(id.toLowerCase(Locale.ROOT), ToolType::new);
             }
         });
 
@@ -26,7 +26,7 @@ public class ToolTypeRegistry {
         List<? extends String> availableIds = ServerConfig.AVAILABLE_TOOL_TYPES.get();
         if (availableIds != null) {
             for (String id : availableIds) {
-                BY_ID.computeIfAbsent(id, ToolType::new);
+                BY_ID.computeIfAbsent(id.toLowerCase(Locale.ROOT), ToolType::new);
             }
         }
 

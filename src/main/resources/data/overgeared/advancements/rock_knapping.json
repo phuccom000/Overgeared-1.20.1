@@ -13,7 +13,7 @@
   "parent": "overgeared:root",
   "criteria": {
     "knapping": {
-      "trigger": "minecraft:impossible"
+      "trigger": "overgeared:finished_knapping"
     }
   }
 }

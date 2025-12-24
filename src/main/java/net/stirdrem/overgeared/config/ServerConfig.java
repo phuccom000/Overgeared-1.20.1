@@ -267,7 +267,7 @@ public class ServerConfig {
                         "Lang format: tooltype.overgeared.your_custom_type"
                 )
                 .defineList("availableToolTypes",
-                        Arrays.asList("sword", "axe", "pickaxe", "shovel", "hoe", "hammer"),
+                        Arrays.asList("sword", "axe", "pickaxe", "shovel", "hoe"),
                         entry -> entry instanceof String
                 );
 

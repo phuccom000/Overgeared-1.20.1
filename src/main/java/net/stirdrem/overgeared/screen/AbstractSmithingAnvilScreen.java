@@ -76,7 +76,7 @@ public abstract class AbstractSmithingAnvilScreen<T extends AbstractSmithingAnvi
             this.recipeBookComponent.renderGhostRecipe(guiGraphics, this.leftPos, this.topPos, true, delta);
         }*/
         super.render(guiGraphics, mouseX, mouseY, delta);
-        renderHitsRemaining(guiGraphics);
+        //renderHitsRemaining(guiGraphics);
         for (var widget : this.renderables) {
             if (widget instanceof TooltipButton button && button.isHovered()) {
                 guiGraphics.renderTooltip(this.font, button.getTooltipComponent(), mouseX, mouseY);

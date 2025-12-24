@@ -106,6 +106,7 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
         if (level.isClientSide()) {
             if (player.isCrouching()) return InteractionResult.SUCCESS;
             if (anvil.hasRecipe() && isHammer) {
+                AnvilMinigameEvents.resetPopUps();
                 if (!pos.equals(AnvilMinigameEvents.getAnvilPos(player.getUUID()))) {
                     //player.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED));
                     return InteractionResult.SUCCESS;
@@ -128,7 +129,6 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
        /* if (anvil.isBusy(now)) {
             return InteractionResult.CONSUME;
         }*/
-
         if (anvil.hasRecipe()) {
             UUID currentOwner = anvil.getOwnerUUID();
             if (currentOwner != null && !currentOwner.equals(player.getUUID()) && player instanceof ServerPlayer serverPlayer) {
@@ -158,12 +158,19 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
                 return InteractionResult.FAIL;
             }
 
-            if (isHammer && (anvil.isMinigameOn() || !anvil.hasQuality() && !anvil.needsMinigame() || !ServerConfig.ENABLE_MINIGAME.get())) {
+            if (isHammer && (anvil.isMinigameOn() || (!anvil.hasQuality() && !anvil.needsMinigame()) || !ServerConfig.ENABLE_MINIGAME.get())) {
                 BlockPos pos1 = ModItemInteractEvents.playerAnvilPositions.get(player.getUUID());
                 if (pos1 != null && !pos.equals(ModItemInteractEvents.playerAnvilPositions.get(player.getUUID()))) {
                     ServerPlayer serverPlayer = (ServerPlayer) player;
                     serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED), true);
                     return InteractionResult.FAIL;
+                }
+                Boolean visible = ModItemInteractEvents.playerMinigameVisibility.get(player.getUUID());
+
+                if (visible == null && anvil.isMinigameOn()) {
+                    ModItemInteractEvents.hideMinigame((ServerPlayer) player);
+                    NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
+                    return InteractionResult.sidedSuccess(level.isClientSide());
                 }
                 if (!ServerConfig.ENABLE_MINIGAME.get())
                     anvil.setBusyUntil(now + HAMMER_SOUND_DURATION_TICKS);
@@ -181,6 +188,7 @@ public abstract class AbstractSmithingAnvilNew extends BaseEntityBlock implement
             ModItemInteractEvents.hideMinigame((ServerPlayer) player);
             NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
         } else {
+            //if (pos.equals(pos1))
             ModItemInteractEvents.releaseAnvil((ServerPlayer) player, pos);
             NetworkHooks.openScreen((ServerPlayer) player, anvil, pos);
         }

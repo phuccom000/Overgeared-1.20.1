@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.custom.KnappableRockItem;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
@@ -27,7 +28,6 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     private boolean knappingFinished = false;
     private boolean resultCollected = false;
     private boolean rockConsumed = false; // Track if rock has been consumed
-    private boolean advancementTriggered = false; // Track if advancement has been triggered
 
     // Slot indices constants
     private static final int PLAYER_INVENTORY_SLOT_COUNT = 36; // 27 main + 9 hotbar
@@ -38,46 +38,50 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     private static final int RESULT_SLOT_INDEX = GRID_LAST_SLOT_INDEX + 1;
 
     public RockKnappingMenu(int id, Inventory playerInv, FriendlyByteBuf extraData) {
-        this(id, playerInv, playerInv.player.level().getRecipeManager(),
-                playerInv.player.getMainHandItem(), playerInv.player.getOffhandItem()); // Use held item by default
+        this(id, playerInv, playerInv.player.level().getRecipeManager());
     }
 
-    public RockKnappingMenu(int id, Inventory playerInv, RecipeManager recipeManager, ItemStack mainHandItem, ItemStack offHandItem) {
+    public RockKnappingMenu(int id, Inventory playerInv, RecipeManager recipeManager) {
         super(ModMenuTypes.ROCK_KNAPPING_MENU.get(), id);
-        // Verify both items are knappable rocks
-        if (!(mainHandItem.getItem() instanceof KnappableRockItem) ||
-                !(offHandItem.getItem() instanceof KnappableRockItem)) {
-            playerInv.player.closeContainer();
-        }
         this.level = playerInv.player.level();
         this.recipeManager = recipeManager;
         this.player = playerInv.player;
-// Determine which hand has the rock (main hand takes priority)
-        // Add player inventory slots
-        addPlayerHotbar(playerInv);
-        addPlayerInventory(playerInv);
 
-        this.inputRock = mainHandItem.getItem() instanceof KnappableRockItem ? mainHandItem.copy() :
-                offHandItem.getItem() instanceof KnappableRockItem ? offHandItem.copy() :
-                        ItemStack.EMPTY;
+        // Check if player has a knappable rock in either hand
+        ItemStack mainHandItem = player.getMainHandItem();
+        ItemStack offHandItem = player.getOffhandItem();
 
-        // Verify we actually have a rock
-        if (this.inputRock.isEmpty()) {
+        if (mainHandItem.getItem() instanceof KnappableRockItem) {
+            this.inputRock = mainHandItem.copy();
+        } else if (offHandItem.getItem() instanceof KnappableRockItem) {
+            this.inputRock = offHandItem.copy();
+        } else {
+            // No knappable rock found - close the menu
             playerInv.player.closeContainer();
             return;
         }
 
-        // Add knapping grid slots (0-8) - these are now virtual slots for the buttons
+        // Add player inventory slots
+        addPlayerHotbar(playerInv);
+        addPlayerInventory(playerInv);
+
+        // Add knapping grid slots (36-44) - virtual slots for the buttons
+        // These are placed off-screen since they're just for tracking state
         for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(craftingGrid, i, 10000, 10000) {
+            this.addSlot(new Slot(craftingGrid, i, -1000, -1000) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
+                    return false;
+                }
+
+                @Override
+                public boolean mayPickup(Player player) {
                     return false;
                 }
             });
         }
 
-        // Add result/output slot (slot 9)
+        // Add result/output slot (slot 45)
         this.addSlot(new Slot(resultContainer, 0, 124, 35) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -86,50 +90,28 @@ public class RockKnappingMenu extends AbstractContainerMenu {
 
             @Override
             public void onTake(Player player, ItemStack stack) {
-                knappingFinished = true;
-                markResultCollected();
-                if (!advancementTriggered && player instanceof ServerPlayer serverPlayer) {
-                    triggerKnappingAdvancement(serverPlayer);
-                    advancementTriggered = true;
-                }
                 super.onTake(player, stack);
+                knappingFinished = true;
+                resultCollected = true;
+                if (player instanceof ServerPlayer serverPlayer) {
+                    ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+                }
             }
 
             @Override
             public boolean mayPickup(Player player) {
-                return !getItem().isEmpty();
+                return !getItem().isEmpty() && !knappingFinished;
             }
         });
-
-
-    }
-
-    // Method to trigger the knapping advancement
-    private void triggerKnappingAdvancement(ServerPlayer player) {
-        // Use Minecraft's advancement system to grant the advancement
-        var advancement = player.server.getAdvancements().getAdvancement(
-                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "rock_knapping")
-        );
-
-        if (advancement != null) {
-            var progress = player.getAdvancements().getOrStartProgress(advancement);
-            if (!progress.isDone()) {
-                // Grant all criteria to complete the advancement
-                for (String criterion : progress.getRemainingCriteria()) {
-                    player.getAdvancements().award(advancement, criterion);
-                }
-            }
-        }
     }
 
     public boolean isResultCollected() {
         return resultCollected;
     }
 
-    // Call this when result is taken
     public void markResultCollected() {
         this.resultCollected = true;
-        //clearGrid(); // Optional: clear grid when result is taken
+        this.knappingFinished = true;
     }
 
     private void addPlayerInventory(Inventory playerInv) {
@@ -146,36 +128,30 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         }
     }
 
-    public void handleResultCollection(Player player, ItemStack result) {
-        if (player instanceof ServerPlayer) {
-            knappingFinished = true; // ✅ Disable further interaction
-        }
-    }
-
     @Override
     public boolean stillValid(Player player) {
-        //hasInputRock(player);
+        // Only close if the input rock disappears before being consumed
         if (!rockConsumed) {
             return hasInputRock(player);
         }
+
+        // After rock is consumed, keep menu open until player closes it manually
         return true;
     }
 
-
     private boolean hasInputRock(Player player) {
-        // Check main hand and offhand first
-        if (ItemStack.isSameItemSameTags(player.getMainHandItem(), inputRock) &&
-                ItemStack.isSameItemSameTags(player.getOffhandItem(), inputRock)) {
-            //OvergearedMod.LOGGER.debug("has input rock");
-            return true;
+        // Check if player still has the rock in either hand
+        ItemStack mainHand = player.getMainHandItem();
+        ItemStack offHand = player.getOffhandItem();
+
+        boolean hasRock = (ItemStack.isSameItemSameTags(mainHand, inputRock) && mainHand.getCount() > 0) ||
+                (ItemStack.isSameItemSameTags(offHand, inputRock) && offHand.getCount() > 0);
+
+        if (!hasRock && !player.level().isClientSide) {
+            player.closeContainer();
         }
 
-        // Rock not found - close menu
-        if (!player.level().isClientSide) {
-            player.closeContainer();
-            //OvergearedMod.LOGGER.debug("has no input rock");
-        }
-        return false;
+        return hasRock;
     }
 
     @Override
@@ -189,8 +165,6 @@ public class RockKnappingMenu extends AbstractContainerMenu {
 
             // Result slot (slot 45)
             if (index == RESULT_SLOT_INDEX) {
-                knappingFinished = true;
-                // Try to move the result to player inventory (slots 0-35)
                 if (!this.moveItemStackTo(itemstack1, PLAYER_FIRST_SLOT_INDEX, PLAYER_LAST_SLOT_INDEX + 1, true)) {
                     return ItemStack.EMPTY;
                 }
@@ -200,31 +174,28 @@ public class RockKnappingMenu extends AbstractContainerMenu {
                 // Handle result collection
                 if (itemstack1.isEmpty()) {
                     slot.set(ItemStack.EMPTY);
+                    knappingFinished = true;
+                    resultCollected = true;
+
+                    // Trigger advancement when taking result via shift-click
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+                    }
                 } else {
                     slot.setChanged();
                 }
 
-                // Trigger advancement when taking result via shift-click
-                if (!advancementTriggered && player instanceof ServerPlayer serverPlayer) {
-                    triggerKnappingAdvancement(serverPlayer);
-                    advancementTriggered = true;
-                }
-
-                // Update menu state
-                this.markResultCollected();
                 return itemstack;
             }
             // Player inventory slots (0-35)
             else if (index >= PLAYER_FIRST_SLOT_INDEX && index <= PLAYER_LAST_SLOT_INDEX) {
-                // Try to move items from player inventory to appropriate slots
-                // Since grid slots are virtual, we don't allow moving items into them
                 // Just reorganize within player inventory
-                if (index < 27) { // Main inventory to hotbar
-                    if (!this.moveItemStackTo(itemstack1, 27, 36, false)) {
+                if (index < PLAYER_FIRST_SLOT_INDEX + 27) { // Main inventory to hotbar
+                    if (!this.moveItemStackTo(itemstack1, PLAYER_FIRST_SLOT_INDEX + 27, PLAYER_LAST_SLOT_INDEX + 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else { // Hotbar to main inventory
-                    if (!this.moveItemStackTo(itemstack1, 0, 27, false)) {
+                    if (!this.moveItemStackTo(itemstack1, PLAYER_FIRST_SLOT_INDEX, PLAYER_FIRST_SLOT_INDEX + 27, false)) {
                         return ItemStack.EMPTY;
                     }
                 }
@@ -253,26 +224,39 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     public void setChip(int index) {
         if (knappingFinished || resultCollected) return;
 
+        // Consume rock on first chip
         if (!rockConsumed) {
             consumeInputRock();
             rockConsumed = true;
         }
-        if (isChipped(index)) {
+
+        // Toggle the chip state
+        if (!craftingGrid.getItem(index).isEmpty()) {
+            // Remove chip (make unchipped)
             craftingGrid.setItem(index, ItemStack.EMPTY);
         } else {
+            // Add chip (make chipped) - using a marker item
             craftingGrid.setItem(index, new ItemStack(net.minecraft.world.item.Items.FLINT));
         }
+
         updateResult();
     }
 
     private void consumeInputRock() {
         if (level.isClientSide) return;
 
-        // Check both hands first
+        // Check both hands and consume from whichever has the rock
         ItemStack mainHand = player.getMainHandItem();
+        ItemStack offHand = player.getOffhandItem();
 
-        if (ItemStack.isSameItemSameTags(mainHand, inputRock)) {
+        if (ItemStack.isSameItemSameTags(mainHand, inputRock) && mainHand.getCount() > 0) {
             mainHand.shrink(1);
+            player.getInventory().setChanged();
+        } else if (ItemStack.isSameItemSameTags(offHand, inputRock) && offHand.getCount() > 0) {
+            offHand.shrink(1);
+            if (player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.inventoryMenu.broadcastChanges();
+            }
         }
     }
 
@@ -283,7 +267,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
                 .getRecipeFor(ModRecipeTypes.KNAPPING.get(), craftingGrid, level)
                 .orElse(null);
 
-        if (matchingRecipe != null && !knappingFinished) {
+        if (matchingRecipe != null) {
             resultContainer.setItem(0, matchingRecipe.getResultItem(level.registryAccess()).copy());
         } else {
             resultContainer.setItem(0, ItemStack.EMPTY);
@@ -293,13 +277,15 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     }
 
     public boolean isChipped(int index) {
-        if (level == null || knappingFinished || resultCollected) return true;
-        else return !craftingGrid.getItem(index).isEmpty();
+        // Returns true if this position is chipped (has a marker item)
+        return !craftingGrid.getItem(index).isEmpty();
     }
 
     public void clearGrid() {
-        craftingGrid.clearContent();
-        resultContainer.clearContent();
+        for (int i = 0; i < 9; i++) {
+            craftingGrid.setItem(i, ItemStack.EMPTY);
+        }
+        resultContainer.setItem(0, ItemStack.EMPTY);
         broadcastChanges();
     }
 
@@ -320,17 +306,30 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     public void removed(Player player) {
         super.removed(player);
 
-        // If the player hasn't taken the result, but it's there
+        // Only on server side
+        // If the player hasn't taken the result, but it's there, give it to them
         ItemStack result = resultContainer.getItem(0);
         if (!result.isEmpty() && !resultCollected) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+            }
             if (!player.getInventory().add(result.copy())) {
                 // Drop if inventory is full
                 player.drop(result.copy(), false);
             }
+            resultContainer.setItem(0, ItemStack.EMPTY);
         }
 
-        // Optionally: clear the grid
-        //this.markResultCollected();
     }
 
+    // Helper method to get the current grid state as a boolean array
+    public boolean[][] getGridState() {
+        boolean[][] grid = new boolean[3][3];
+        for (int i = 0; i < 9; i++) {
+            int row = i / 3;
+            int col = i % 3;
+            grid[row][col] = isChipped(i);
+        }
+        return grid;
+    }
 }

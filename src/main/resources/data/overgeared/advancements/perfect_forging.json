@@ -13,7 +13,10 @@
   "parent": "overgeared:blueprint",
   "criteria": {
     "perfect_forging": {
-      "trigger": "minecraft:impossible"
+      "trigger": "overgeared:forging_quality",
+      "conditions": {
+        "quality": "perfect"
+      }
     }
   }
 }

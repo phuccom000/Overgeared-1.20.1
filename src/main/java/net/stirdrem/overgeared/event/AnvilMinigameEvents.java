@@ -2,6 +2,7 @@ package net.stirdrem.overgeared.event;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
@@ -24,6 +25,7 @@ public class AnvilMinigameEvents {
     public static boolean minigameStarted = false;
     public static ItemStack resultItem = null;
     public static int hitsRemaining = 0;
+    public static int maxHits = 0;
     public static float arrowPosition = 1;
 
     // Initialize with placeholder defaults (will be overridden later)
@@ -49,6 +51,15 @@ public class AnvilMinigameEvents {
     private static int TICKS_PER_PRINT = 1;
     private static int tickAccumulator = 0;
     private static boolean movingDown = false;
+
+    // ===============================
+    // Popup system
+    // ===============================
+    private static final java.util.List<Popup> POPUPS = new java.util.ArrayList<>();
+    private static final float POPUP_DURATION_MS = 10000f;
+    private static int lastPerfect = 0;
+    private static int lastGood = 0;
+    private static int lastMiss = 0;
 
     public static void ensureInitialized() {
         // Only run if defaults haven't been set yet
@@ -141,14 +152,14 @@ public class AnvilMinigameEvents {
         ensureInitialized();
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
+        if (!mc.isPaused()) updatePopups();
         if (mc.isPaused() || !isIsVisible()) return;
 
         tickAccumulator++;
         if (tickAccumulator < TICKS_PER_PRINT) return;
         tickAccumulator = 0;
 
-        // Commented out display for brevity
-        // Only change direction at endpoints
+        // Update arrow movement
         if (arrowPosition >= 100) {
             movingDown = true;
         } else if (arrowPosition <= 1) {
@@ -158,6 +169,28 @@ public class AnvilMinigameEvents {
         // Determine movement based on current speed and direction
         float delta = arrowSpeed * (movingDown ? -1 : 1);
         arrowPosition = Math.max(1, Math.min(arrowPosition + delta, 100));
+
+        // Update popups
+
+    }
+
+    private static void updatePopups() {
+        // Age existing popups
+        for (int i = 0; i < POPUPS.size(); i++) {
+            Popup popup = POPUPS.get(i);
+            popup.age += Minecraft.getInstance().getDeltaFrameTime() * 1000f;
+            if (popup.age >= POPUP_DURATION_MS) {
+                POPUPS.remove(i--);
+            }
+        }
+    }
+
+    public static void triggerPopup(Component text) {
+        POPUPS.add(new Popup(text));
+    }
+
+    public static java.util.List<Popup> getPopups() {
+        return POPUPS;
     }
 
     public static void speedUp() {
@@ -177,6 +210,9 @@ public class AnvilMinigameEvents {
         ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, isVisible));
     }
 
+    public static void resetPopUps() {
+        POPUPS.clear();
+    }
 
     public static void reset(String blueprintQuality) {
         isVisible = false;
@@ -189,6 +225,10 @@ public class AnvilMinigameEvents {
         movingDown = false;
         currentPerfectZoneSize = 0;
         currentGoodZoneSize = 0;
+        lastPerfect = 0;
+        lastGood = 0;
+        lastMiss = 0;
+        //POPUPS.clear();
 
         setupForQuality(blueprintQuality); // 🔥 initialize from blueprint
 
@@ -204,6 +244,10 @@ public class AnvilMinigameEvents {
         missedHits = 0;
         arrowPosition = 50;
         movingDown = false;
+        lastPerfect = 0;
+        lastGood = 0;
+        lastMiss = 0;
+        //POPUPS.clear();
 
         setupForQuality("none"); // 🔥 initialize from blueprint
 
@@ -250,6 +294,10 @@ public class AnvilMinigameEvents {
         return hitsRemaining;
     }
 
+    public static int getMaxHits() {
+        return maxHits;
+    }
+
     public static int getPerfectHits() {
         return perfectHits;
     }
@@ -267,11 +315,21 @@ public class AnvilMinigameEvents {
 
         if (arrowPosition >= perfectZoneStart && arrowPosition <= perfectZoneEnd) {
             perfectHits++;
+            lastPerfect = perfectHits;
+            triggerPopup(Component.translatable("overgeared.forging.perfect")
+                    .withStyle(s -> s.withBold(true).withColor(0xFFD700)));
         } else if (arrowPosition >= goodZoneStart && arrowPosition <= goodZoneEnd) {
             goodHits++;
+            lastGood = goodHits;
+            triggerPopup(Component.translatable("overgeared.forging.good")
+                    .withStyle(s -> s.withBold(true).withColor(0x55FF55)));
         } else {
             missedHits++;
+            lastMiss = missedHits;
+            triggerPopup(Component.translatable("overgeared.forging.miss")
+                    .withStyle(s -> s.withBold(true).withColor(0xFF5555)));
         }
+
         shrinkAndShiftZones();
         hitsRemaining--;
 
@@ -281,8 +339,10 @@ public class AnvilMinigameEvents {
         return "poor";
     }
 
+
     public static void setHitsRemaining(int hitsRemaining) {
         AnvilMinigameEvents.hitsRemaining = hitsRemaining;
+        AnvilMinigameEvents.maxHits = hitsRemaining;
     }
 
     public static String finishForging() {
@@ -450,5 +510,18 @@ public class AnvilMinigameEvents {
             ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, false));
         }
         //clearAnvilPos(playerId);
+    }
+
+    // ===============================
+    // Popup class
+    // ===============================
+    public static class Popup {
+        public final Component text;
+        public float age; // milliseconds
+
+        public Popup(Component text) {
+            this.text = text;
+            this.age = 0f;
+        }
     }
 }

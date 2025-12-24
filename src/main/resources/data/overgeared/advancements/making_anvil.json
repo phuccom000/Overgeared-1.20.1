@@ -12,8 +12,8 @@
   },
   "parent": "overgeared:hammer",
   "criteria": {
-    "made_anvil": {
-      "trigger": "minecraft:impossible"
+    "make_anvil": {
+      "trigger": "overgeared:make_smithing_anvil"
     }
   }
 }

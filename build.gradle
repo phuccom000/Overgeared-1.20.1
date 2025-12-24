@@ -242,7 +242,7 @@ dependencies {
 
     implementation fg.deobf("curse.maven:v-tweaks-238048:7119159")
     implementation fg.deobf("curse.maven:spartan-weaponry-278141:6842571")
-    implementation fg.deobf("curse.maven:bookling-gear-1122766:7192165")
+    implementation fg.deobf("curse.maven:bookling-gear-1122766:7317926")
     implementation fg.deobf("curse.maven:lit-it-up-916334:7239006")
     //implementation fg.deobf("curse.maven:polymorph-388800:6450982")
     implementation fg.deobf("curse.maven:cupboard-326652:5470032")
@@ -255,6 +255,7 @@ dependencies {
     implementation fg.deobf("curse.maven:accessories-938917:6201361")*/
     implementation fg.deobf("curse.maven:playeranimator-658587:4587214")
     implementation fg.deobf("curse.maven:geckolib-388172:7025129")
+
     /*implementation fg.deobf("curse.maven:forgified-fabric-api-889079:6885853")
     implementation fg.deobf("curse.maven:better-combat-by-daedelus-639842:5625757")
     runtimeOnly fg.deobf("curse.maven:connector-extras-913445:5490637")

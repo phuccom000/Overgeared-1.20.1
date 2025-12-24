@@ -8,6 +8,8 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
@@ -111,31 +113,56 @@ public class CastBlastingRecipe extends BlastingRecipe {
     @Override
     public ItemStack assemble(Container inv, RegistryAccess registryAccess) {
         ItemStack input = inv.getItem(0);
-        ItemStack output = super.assemble(inv, registryAccess);
 
-        // Transfer quality only
+        // Copy the cast itself
+        ItemStack cast = input.copy();
+        CompoundTag castTag = cast.getOrCreateTag();
+
+
+        // Build the real result item
+        ItemStack result = super.assemble(inv, registryAccess);
+
+        CompoundTag resultTag = result.getOrCreateTag();
+
+        // Transfer quality
         if (input.hasTag() && input.getTag().contains("Quality")) {
-            if (!input.getTag().getString("Quality").equals("none"))
-                output.getOrCreateTag().put("ForgingQuality", input.getTag().get("Quality"));
+            String q = input.getTag().getString("Quality");
+            if (!q.equals("none")) {
+                resultTag.putString("ForgingQuality", q);
+            }
         }
-        // Only mark unpolished if recipe says so
+
+        // Polishing flag
         if (needPolishing) {
-            output.getOrCreateTag().putBoolean("Polished", false);
+            resultTag.putBoolean("Polished", false);
         }
 
-        output.getOrCreateTag().putBoolean("Heated", true);
+        // Heated result
+        resultTag.putBoolean("Heated", true);
 
-        // Copy custom name from cast to Creator tag
+        // Creator
         if (input.hasCustomHoverName() && ServerConfig.PLAYER_AUTHOR_TOOLTIPS.get()) {
-            Component customName = input.getHoverName();
-            String creatorName = customName.getString();
-            output.getOrCreateTag().putString("Creator", creatorName);
+            resultTag.putString("Creator", input.getHoverName().getString());
         }
 
-        return output;
+        // Store output INSIDE the cast
+        castTag.put("Output", result.save(new CompoundTag()));
+        castTag.put("Materials", new CompoundTag());
+        // Mark cast as filled / heated
+        castTag.putBoolean("Heated", true);
+        if (cast.isDamageableItem()) {
+            if (cast.getDamageValue() + 1 >= cast.getMaxDamage()) {
+                cast.shrink(1);
+                return result;
+            } else {
+                cast.setDamageValue(cast.getDamageValue() + 1);
+            }
+        }
+        return cast;
     }
 
-    @Override
+
+    /*@Override
     public @NotNull NonNullList<ItemStack> getRemainingItems(Container inv) {
         NonNullList<ItemStack> remains = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
         ItemStack input = inv.getItem(0);
@@ -159,7 +186,7 @@ public class CastBlastingRecipe extends BlastingRecipe {
         remains.set(0, castCopy);
 
         return remains;
-    }
+    }*/
 
     private @NotNull CompoundTag getCompoundTag(ItemStack castCopy) {
         CompoundTag tag = castCopy.getOrCreateTag();
