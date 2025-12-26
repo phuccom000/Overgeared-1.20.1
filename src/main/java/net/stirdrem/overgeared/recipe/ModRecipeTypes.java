@@ -33,6 +33,8 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register("cooling", () -> CoolingRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeType<GrindingRecipe>> GRINDING_RECIPE =
             RECIPE_TYPES.register("grinding", () -> GrindingRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeType<CastingRecipe>> CASTING =
+            RECIPE_TYPES.register("casting", () -> CastingRecipe.Type.INSTANCE);
 
     public static void register(IEventBus eventBus) {
         RECIPE_TYPES.register(eventBus);

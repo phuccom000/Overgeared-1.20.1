@@ -49,5 +49,10 @@ public class ModBlockEntities {
                     BlockEntityType.Builder.of(NetherAlloySmelterBlockEntity::new,
                             ModBlocks.NETHER_ALLOY_FURNACE.get()).build(null));
 
+    public static final RegistryObject<BlockEntityType<CastFurnaceBlockEntity>> CAST_FURNACE_BE =
+            BLOCK_ENTITIES.register("casting_furnace_be", () ->
+                    BlockEntityType.Builder.of(CastFurnaceBlockEntity::new,
+                            ModBlocks.CAST_FURNACE.get()).build(null));
+
 
 }

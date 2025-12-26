@@ -1,0 +1,17 @@
+{
+  "type": "overgeared:casting",
+  "category": "misc",
+  "cookingtime": 150,
+  "experience": 0.5,
+  "group": "misc",
+  "input": {
+    "material": {
+      "copper": 27
+    }
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:copper_axe_head"
+  },
+  "tool_type": "axe"
+}

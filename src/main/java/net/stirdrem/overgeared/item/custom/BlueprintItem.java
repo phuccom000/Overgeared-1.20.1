@@ -70,9 +70,9 @@ public class BlueprintItem extends Item {
 
         // ToolType line only if present
         if (tag.contains("ToolType")) {
-            ToolType toolType = getToolType(stack);
+            String toolType = tag.getString("ToolType");
             tooltip.add(Component.translatable("tooltip.overgeared.blueprint.tool_type").withStyle(ChatFormatting.GRAY)
-                    .append(toolType.getDisplayName().withStyle(ChatFormatting.BLUE)));
+                    .append(Component.translatable("tooltype.overgeared." + toolType).withStyle(ChatFormatting.BLUE)));
         }
 
         if (tag.contains("Required")) {
@@ -110,26 +110,10 @@ public class BlueprintItem extends Item {
 
     public static ToolType getToolType(ItemStack stack) {
         CompoundTag tag = stack.getTag();
-
-        if (tag == null || !tag.contains("ToolType")) {
-            List<ToolType> types = ToolTypeRegistry.getRegisteredTypesAll();
-            return !types.isEmpty() ? types.get(0) : ToolType.SWORD;
-        }
-
         String id = tag.getString("ToolType");
-        return ToolTypeRegistry.byId(id).orElse(ToolType.SWORD);
-    }
 
-
-    public static void cycleToolType(ItemStack stack) {
-        List<ToolType> available = ToolTypeRegistry.getRegisteredTypesAll();
-        if (available.isEmpty()) return;
-
-        ToolType current = getToolType(stack);
-        int currentIndex = available.indexOf(current);
-        int nextIndex = (currentIndex + 1) % available.size();
-
-        stack.getOrCreateTag().putString("ToolType", available.get(nextIndex).getId());
+        // ✅ Create-or-fetch instead of defaulting
+        return ToolType.of(id);
     }
 
     private static int getUsesToNextLevel(BlueprintQuality quality) {

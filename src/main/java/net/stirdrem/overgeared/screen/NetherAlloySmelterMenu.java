@@ -35,7 +35,7 @@ public class NetherAlloySmelterMenu extends AbstractContainerMenu {
         this(id, inv, (NetherAlloySmelterBlockEntity) inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(11));
     }
 
-    public NetherAlloySmelterMenu(int id, Inventory playerInv, BlockEntity blockEntity, ContainerData data) {
+    public NetherAlloySmelterMenu(int id, Inventory playerInv, NetherAlloySmelterBlockEntity blockEntity, ContainerData data) {
         super(ModMenuTypes.NETHER_ALLOY_SMELTER_MENU.get(), id);
         checkContainerSize(playerInv, 11);
         this.blockEntity = (NetherAlloySmelterBlockEntity) blockEntity;
@@ -58,7 +58,7 @@ public class NetherAlloySmelterMenu extends AbstractContainerMenu {
                 }
             }
             this.addSlot(new SlotItemHandler(iItemHandler, 9, 8, 53)); // Fuel
-            this.addSlot(new SlotItemHandler(iItemHandler, 10, 124, 35) {
+            this.addSlot(new FurnaceResultSlot(playerInv.player, blockEntity, 10, 124, 35) {
                 @Override
                 public void onTake(Player player, ItemStack stack) {
                     super.onTake(player, stack);

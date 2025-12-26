@@ -136,12 +136,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModBlocks.DRAFTING_TABLE.get());
                         pOutput.accept(ModBlocks.ALLOY_FURNACE.get());
                         pOutput.accept(ModBlocks.NETHER_ALLOY_FURNACE.get());
-                        //pOutput.accept(ModBlocks.SMITHING_ANVIL_TEST.get());
-                        //pOutput.accept(ModBlocks.WATER_BARREL.get());
-                        //pOutput.accept(ModBlocks.WATER_BARREL_FULL.get());
-
-
-                        //pOutput.accept(Items.DIAMOND); //.get() only for custom items
+                        pOutput.accept(ModBlocks.CAST_FURNACE.get());
 
                     })
                     .build());

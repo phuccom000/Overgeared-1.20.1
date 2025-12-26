@@ -42,6 +42,8 @@ public class ModBlocks {
             () -> new AlloySmelterBlock(BlockBehaviour.Properties.copy(Blocks.BRICKS).noOcclusion().requiresCorrectToolForDrops().strength(3.5F, 6.0F).lightLevel(litBlockEmission(13))));
     public static final RegistryObject<Block> NETHER_ALLOY_FURNACE = registerBlock("nether_alloy_furnace",
             () -> new NetherAlloySmelterBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_BRICKS).noOcclusion().requiresCorrectToolForDrops().strength(3.5F, 6.0F).lightLevel(litBlockEmission(13))));
+    public static final RegistryObject<Block> CAST_FURNACE = registerBlock("casting_furnace",
+            () -> new CastFurnaceBlock(BlockBehaviour.Properties.copy(Blocks.BRICKS).noOcclusion().requiresCorrectToolForDrops().strength(3.5F, 6.0F).lightLevel(litBlockEmission(13))));
 
     private static ToIntFunction<BlockState> litBlockEmission(int pLightValue) {
         return (p_50763_) -> {

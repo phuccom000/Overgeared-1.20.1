@@ -556,6 +556,7 @@ public class OvergearedMod {
             MenuScreens.register(ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingStationScreen::new);
             MenuScreens.register(ModMenuTypes.ALLOY_SMELTER_MENU.get(), AlloySmelterScreen::new);
             MenuScreens.register(ModMenuTypes.NETHER_ALLOY_SMELTER_MENU.get(), NetherAlloySmelterScreen::new);
+            MenuScreens.register(ModMenuTypes.CAST_FURNACE.get(), CastFurnaceScreen::new);
 
             registerArrowProperties(ModItems.IRON_UPGRADE_ARROW.get());
             registerArrowProperties(ModItems.STEEL_UPGRADE_ARROW.get());

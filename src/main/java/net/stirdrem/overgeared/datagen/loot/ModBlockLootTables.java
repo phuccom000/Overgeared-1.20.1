@@ -34,16 +34,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropOther(ModBlocks.STONE_SMITHING_ANVIL.get(), Blocks.COBBLESTONE);
         this.dropSelf(ModBlocks.ALLOY_FURNACE.get());
         this.dropSelf(ModBlocks.NETHER_ALLOY_FURNACE.get());
-        //this.dropOther(ModBlocks.ROCK.get(), ModItems.ROCK.get());
-      /*  this.dropSelf(ModBlocks.WATER_BARREL.get());
-        this.dropOther(ModBlocks.WATER_BARREL_FULL.get(), ModBlocks.WATER_BARREL.get());*/
-
-
-
-
-
-       /* this.add(ModBlocks.SAPPHIRE_ORE.get(),
-                block -> createCopperLikeOreDrops(ModBlocks.SAPPHIRE_ORE.get(), ModItems.RAW_SAPPHIRE.get()));*/
+        this.dropSelf(ModBlocks.CAST_FURNACE.get());
     }
 
     protected LootTable.Builder createCopperLikeOreDrops(Block pBlock, Item item) {

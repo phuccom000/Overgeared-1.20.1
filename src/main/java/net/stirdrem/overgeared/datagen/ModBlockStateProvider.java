@@ -35,6 +35,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 new ModelFile.UncheckedModelFile(modLoc("block/stone_anvil")));
         facingLitBlock(ModBlocks.ALLOY_FURNACE.get(), "alloy_furnace", "alloy_furnace_on");
         facingLitBlock(ModBlocks.NETHER_ALLOY_FURNACE.get(), "nether_alloy_furnace", "nether_alloy_furnace_on");
+        facingLitBlock(ModBlocks.CAST_FURNACE.get(), "casting_furnace", "casting_furnace_on");
 
         /*simpleBlock(ModBlocks.WATER_BARREL.get(),
                 new ModelFile.UncheckedModelFile(modLoc("block/water_barrel")));*/

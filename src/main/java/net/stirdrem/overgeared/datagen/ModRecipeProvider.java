@@ -1187,7 +1187,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
                 .save(pWriter, rl("steel_hoe_head"));
 
-
 // ===== CAST BLASTING =====
 
 // COPPER
@@ -1306,7 +1305,148 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .toolType("hoe").material("steel", 18).needsPolishing(true)
                 .unlockedBy("has_cast", has(ModItems.UNFIRED_TOOL_CAST.get()))
                 .save(pWriter, rl("steel_hoe_head"));
+// Axe
+        CastingRecipeBuilder.casting(ModItems.COPPER_AXE_HEAD.get(), 0.4f, 150)
+                .toolType("axe")
+                .material("copper", 27)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
 
+// Pickaxe
+        CastingRecipeBuilder.casting(ModItems.COPPER_PICKAXE_HEAD.get(), 0.4f, 150)
+                .toolType("pickaxe")
+                .material("copper", 27)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+// Shovel
+        CastingRecipeBuilder.casting(ModItems.COPPER_SHOVEL_HEAD.get(), 0.3f, 120)
+                .toolType("shovel")
+                .material("copper", 18)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+// Hoe
+        CastingRecipeBuilder.casting(ModItems.COPPER_HOE_HEAD.get(), 0.3f, 100)
+                .toolType("hoe")
+                .material("copper", 15)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+// Sword
+        CastingRecipeBuilder.casting(ModItems.COPPER_SWORD_BLADE.get(), 0.5f, 160)
+                .toolType("sword")
+                .material("copper", 30)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.IRON_AXE_HEAD.get(), 0.6f, 180)
+                .toolType("axe")
+                .material("iron", 27)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.IRON_PICKAXE_HEAD.get(), 0.6f, 180)
+                .toolType("pickaxe")
+                .material("iron", 27)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.IRON_SHOVEL_HEAD.get(), 0.5f, 140)
+                .toolType("shovel")
+                .material("iron", 18)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.IRON_HOE_HEAD.get(), 0.5f, 120)
+                .toolType("hoe")
+                .material("iron", 15)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.IRON_SWORD_BLADE.get(), 0.7f, 190)
+                .toolType("sword")
+                .material("iron", 30)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+        CastingRecipeBuilder.casting(ModItems.STEEL_AXE_HEAD.get(), 0.8f, 220)
+                .toolType("axe")
+                .material("steel", 32)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.STEEL_PICKAXE_HEAD.get(), 0.8f, 220)
+                .toolType("pickaxe")
+                .material("steel", 32)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.STEEL_SHOVEL_HEAD.get(), 0.7f, 180)
+                .toolType("shovel")
+                .material("steel", 22)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.STEEL_HOE_HEAD.get(), 0.7f, 160)
+                .toolType("hoe")
+                .material("steel", 18)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.STEEL_SWORD_BLADE.get(), 0.9f, 240)
+                .toolType("sword")
+                .material("steel", 36)
+                .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+        CastingRecipeBuilder.casting(ModItems.GOLDEN_AXE_HEAD.get(), 0.3f, 100)
+                .toolType("axe")
+                .material("gold", 23)
+                .needsPolishing(false)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.GOLDEN_PICKAXE_HEAD.get(), 0.3f, 100)
+                .toolType("pickaxe")
+                .material("gold", 23)
+                .needsPolishing(false)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.GOLDEN_SHOVEL_HEAD.get(), 0.2f, 80)
+                .toolType("shovel")
+                .material("gold", 15)
+                .needsPolishing(false)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.GOLDEN_HOE_HEAD.get(), 0.2f, 70)
+                .toolType("hoe")
+                .material("gold", 13)
+                .needsPolishing(false)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.GOLDEN_SWORD_BLADE.get(), 0.4f, 110)
+                .toolType("sword")
+                .material("gold", 26)
+                .needsPolishing(false)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
 
     }
 

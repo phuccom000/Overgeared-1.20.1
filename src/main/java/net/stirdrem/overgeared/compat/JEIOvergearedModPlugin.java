@@ -19,6 +19,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -84,12 +85,17 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipeCategories(new NetherAlloySmeltingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new CoolingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new GrindingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new CastingRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        if (Minecraft.getInstance().level == null) return;
-        RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
+
+        Minecraft mc = Minecraft.getInstance();
+        Level level = mc.level;
+
+        if (level == null) return;
+        RecipeManager recipeManager = level.getRecipeManager();
 
         List<ForgingRecipe> allForgingRecipes = recipeManager.getAllRecipesFor(ForgingRecipe.Type.INSTANCE);
 
@@ -133,7 +139,10 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                     .compareToIgnoreCase(b.getResultItem(null).getDisplayName().getString());
         });
         registration.addRecipes(ForgingRecipeCategory.FORGING_RECIPE_TYPE, combinedSteelCategory);
-
+        registration.addRecipes(
+                CastingRecipeCategory.CASTING_TYPE,
+                level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.CASTING.get())
+        );
         // Rock Knapping
         List<RockKnappingRecipe> knappingRecipes = recipeManager.getAllRecipesFor(RockKnappingRecipe.Type.INSTANCE);
         registration.addRecipes(KnappingRecipeCategory.KNAPPING_RECIPE_TYPE, knappingRecipes);
@@ -403,28 +412,10 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 new ItemStack(Blocks.FLETCHING_TABLE), // or your custom source block
                 FletchingCategory.FLETCHING_RECIPE_TYPE
         );
-    }
+        registration.addRecipeCatalyst(
+                new ItemStack(ModBlocks.CAST_FURNACE.get()), // or your custom source block
+                CastingRecipeCategory.CASTING_TYPE
+        );
 
-    private List<ItemStack> getTippedArrowPotions() {
-        List<ItemStack> potions = new ArrayList<>();
-        // Example: Add all potion types (you can customize this)
-        for (Potion potion : ForgeRegistries.POTIONS) {
-            if (potion != Potions.EMPTY) {
-                potions.add(PotionUtils.setPotion(new ItemStack(Items.POTION), potion));
-            }
-        }
-        return potions;
-    }
-
-    // Helper method to get lingering potions (for lingering arrows)
-    private List<ItemStack> getLingeringPotions() {
-        List<ItemStack> potions = new ArrayList<>();
-        // Example: Add all lingering potion types
-        for (Potion potion : ForgeRegistries.POTIONS) {
-            if (potion != Potions.EMPTY) {
-                potions.add(PotionUtils.setPotion(new ItemStack(Items.LINGERING_POTION), potion));
-            }
-        }
-        return potions;
     }
 }

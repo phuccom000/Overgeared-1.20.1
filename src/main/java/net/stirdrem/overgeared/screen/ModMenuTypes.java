@@ -54,4 +54,8 @@ public class ModMenuTypes {
     public static final RegistryObject<MenuType<NetherAlloySmelterMenu>> NETHER_ALLOY_SMELTER_MENU =
             registerMenuType("nether_alloy_smelter_menu", NetherAlloySmelterMenu::new);
 
+    public static final RegistryObject<MenuType<CastFurnaceMenu>> CAST_FURNACE =
+            registerMenuType("casting_furnace", CastFurnaceMenu::new);
+
+
 }

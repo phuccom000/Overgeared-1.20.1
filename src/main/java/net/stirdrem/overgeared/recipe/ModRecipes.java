@@ -49,6 +49,8 @@ public class ModRecipes {
             SERIALIZERS.register("cooling", CoolingRecipe.Serializer::new);
     public static final RegistryObject<RecipeSerializer<GrindingRecipe>> GRINDING_SERIALIZER =
             SERIALIZERS.register("grinding", GrindingRecipe.Serializer::new);
+    public static final RegistryObject<RecipeSerializer<CastingRecipe>> CASTING =
+            SERIALIZERS.register("casting", () -> CastingRecipe.Serializer.INSTANCE);
 
     public static void register(IEventBus eventBus) {
         SERIALIZERS.register(eventBus);

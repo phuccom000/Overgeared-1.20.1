@@ -1,0 +1,16 @@
+{
+  "type": "overgeared:casting",
+  "category": "misc",
+  "cookingtime": 180,
+  "experience": 0.7,
+  "input": {
+    "material": {
+      "steel": 22
+    }
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:steel_shovel_head"
+  },
+  "tool_type": "shovel"
+}

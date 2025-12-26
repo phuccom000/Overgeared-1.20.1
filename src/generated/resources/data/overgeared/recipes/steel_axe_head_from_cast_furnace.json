@@ -1,0 +1,16 @@
+{
+  "type": "overgeared:casting",
+  "category": "misc",
+  "cookingtime": 220,
+  "experience": 0.8,
+  "input": {
+    "material": {
+      "steel": 32
+    }
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:steel_axe_head"
+  },
+  "tool_type": "axe"
+}

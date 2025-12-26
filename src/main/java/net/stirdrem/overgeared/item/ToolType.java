@@ -51,6 +51,17 @@ public class ToolType {
         return trans.copy();
     }
 
+    public static ToolType of(String id) {
+        if (id == null || id.isEmpty())
+            throw new IllegalArgumentException("Tool type ID cannot be null or empty");
+
+        if (!id.matches("^[A-Za-z0-9_]+$"))
+            throw new IllegalArgumentException("Tool type ID must be alphanumeric with underscores");
+
+        String key = id.toLowerCase(Locale.ROOT);
+        return ToolTypeRegistry.BY_ID.computeIfAbsent(key, ToolType::new);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,0 +1,16 @@
+{
+  "type": "overgeared:casting",
+  "category": "misc",
+  "cookingtime": 160,
+  "experience": 0.5,
+  "input": {
+    "material": {
+      "copper": 30
+    }
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:copper_sword_blade"
+  },
+  "tool_type": "sword"
+}

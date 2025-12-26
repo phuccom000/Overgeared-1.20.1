@@ -1,0 +1,16 @@
+{
+  "type": "overgeared:casting",
+  "category": "misc",
+  "cookingtime": 120,
+  "experience": 0.5,
+  "input": {
+    "material": {
+      "iron": 15
+    }
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:iron_hoe_head"
+  },
+  "tool_type": "hoe"
+}

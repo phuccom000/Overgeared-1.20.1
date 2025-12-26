@@ -42,7 +42,7 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
         this(id, inv, (AlloySmelterBlockEntity) inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(6));
     }
 
-    public AlloySmelterMenu(int id, Inventory playerInv, BlockEntity blockEntity, ContainerData data) {
+    public AlloySmelterMenu(int id, Inventory playerInv, AlloySmelterBlockEntity blockEntity, ContainerData data) {
         super(ModMenuTypes.ALLOY_SMELTER_MENU.get(), id);
         checkContainerSize(playerInv, 6);
         this.blockEntity = (AlloySmelterBlockEntity) blockEntity;
@@ -60,7 +60,7 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
             this.addSlot(new SlotItemHandler(iItemHandler, 2, 39, 44)); // Input 3
             this.addSlot(new SlotItemHandler(iItemHandler, 3, 57, 44)); // Input 4
             this.addSlot(new SlotItemHandler(iItemHandler, 4, 8, 53)); // Fuel
-            this.addSlot(new SlotItemHandler(iItemHandler, 5, 124, 35) {
+            this.addSlot(new FurnaceResultSlot(playerInv.player, blockEntity, 5, 124, 35) {
                 @Override
                 public void onTake(Player player, ItemStack stack) {
                     super.onTake(player, stack);

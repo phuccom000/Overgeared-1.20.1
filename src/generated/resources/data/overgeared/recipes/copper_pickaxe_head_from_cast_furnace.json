@@ -1,0 +1,16 @@
+{
+  "type": "overgeared:casting",
+  "category": "misc",
+  "cookingtime": 150,
+  "experience": 0.4,
+  "input": {
+    "material": {
+      "copper": 27
+    }
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:copper_pickaxe_head"
+  },
+  "tool_type": "pickaxe"
+}

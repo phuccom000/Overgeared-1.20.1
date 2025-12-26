@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class ToolTypeRegistry {
 
     private static final List<ToolType> HIDDEN_TYPES = new ArrayList<>();
-    private static final Map<String, ToolType> BY_ID = new HashMap<>();
+    public static final Map<String, ToolType> BY_ID = new HashMap<>();
 
     public static void init() {
         BY_ID.clear();

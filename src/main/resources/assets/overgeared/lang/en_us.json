@@ -273,6 +273,9 @@
   "tooltip.overgeared.stone_hammer_head": "Can only be used to make a hammer tool cast",
   "overgeared.forging.perfect": "PERFECT!",
   "overgeared.forging.good": "GOOD!",
-  "overgeared.forging.miss": "MISS!"
+  "overgeared.forging.miss": "MISS!",
+  "block.overgeared.casting_furnace": "Casting Furnace",
+  "container.overgeared.casting_furnace": "Casting Furnace",
+  "gui.overgeared.jei.category.casting": "Casting"
 }
 

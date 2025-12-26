@@ -1,0 +1,16 @@
+{
+  "type": "overgeared:casting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.3,
+  "input": {
+    "material": {
+      "copper": 15
+    }
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:copper_hoe_head"
+  },
+  "tool_type": "hoe"
+}

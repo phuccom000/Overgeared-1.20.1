@@ -1,0 +1,16 @@
+{
+  "type": "overgeared:casting",
+  "category": "misc",
+  "cookingtime": 240,
+  "experience": 0.9,
+  "input": {
+    "material": {
+      "steel": 36
+    }
+  },
+  "need_polishing": true,
+  "result": {
+    "item": "overgeared:steel_sword_blade"
+  },
+  "tool_type": "sword"
+}
