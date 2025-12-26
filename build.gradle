@@ -1,363 +1,93 @@
 plugins {
-    id 'eclipse'
-    id 'idea'
+    id 'dev.architectury.loom' version '1.11-SNAPSHOT'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'org.spongepowered.mixin' version '0.7.+'
 }
 
-version = mod_version
-group = mod_group_id
+group = project.maven_group
+version = project.mod_version
 
 base {
-    archivesName = mod_id
+    archivesName = project.mod_id
 }
-
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    // The mappings can be changed at any time and must be in the following format.
-    // Channel:   Version:
-    // official   MCVersion             Official field/method names from Mojang mapping files
-    // parchment  YYYY.MM.DD-MCVersion  Open community-sourced parameter names and javadocs layered on top of official
-    //
-    // You must be aware of the Mojang license when using the 'official' or 'parchment' mappings.
-    // See more information here: https://github.com/MinecraftForge/MCPConfig/blob/master/Mojang.md
-    //
-    // Parchment is an unofficial project maintained by ParchmentMC, separate from MinecraftForge
-    // Additional setup is needed to use their mappings: https://parchmentmc.org/docs/getting-started
-    //
-    // Use non-default mappings at your own risk. They may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: mapping_channel, version: mapping_version
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
-    // When true, this property will have all Eclipse/IntelliJ IDEA run configurations run the "prepareX" task for the given run configuration before launching the game.
-    // In most cases, it is not necessary to enable.
-    // enableEclipsePrepareRuns = true
-    // enableIdeaPrepareRuns = true
-
-    // This property allows configuring Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
-    // It is REQUIRED to be set to true for this template to function.
-    // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-    copyIdeResources = true
-
-    // When true, this property will add the folder name of all declared run configurations to generated IDE run configurations.
-    // The folder name can be set on a run configuration using the "folderName" property.
-    // By default, the folder name of a run configuration is the name of the Gradle project containing it.
-    // generateRunFolders = true
-
-    // This property enables access transformers for use in development.
-    // They will be applied to the Minecraft artifact.
-    // The access transformer file can be anywhere in the project.
-    // However, it must be at "META-INF/accesstransformer.cfg" in the final mod jar to be loaded by Forge.
-    // This default location is a best practice to automatically put the file in the right place in the final jar.
-    // See https://docs.minecraftforge.net/en/latest/advanced/accesstransformers/ for more information.
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
-    runs {
-        // applies to all the run configs below
-        configureEach {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            // The markers can be added/remove as needed separated by commas.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        client {
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            property 'forge.enabledGameTestNamespaces', mod_id
-        }
-
-        server {
-            property 'forge.enabledGameTestNamespaces', mod_id
-            args '--nogui'
-        }
-
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
-        gameTestServer {
-            property 'forge.enabledGameTestNamespaces', mod_id
-        }
-
-        data {
-            // example of overriding the workingDirectory set in configureEach above
-            workingDirectory project.file('run-data')
-
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-        }
-    }
-}
-
-// Include resources generated by data generators.
-sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    // Put repositories for dependencies here
-    // ForgeGradle automatically adds the Forge maven and Maven Central for you
-
-    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
-    // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
-    flatDir {
-        dir 'libs'
-    }
+    // Add NeoForged repository.
     maven {
-        // location of the maven that hosts JEI files before January 2023
-        name = "Progwml6's maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of the maven that hosts JEI files since January 2023
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.dev"
-    }
-    maven {
-        name 'Jitpack'
-        url 'https://jitpack.io'
+        name = 'NeoForged'
+        url = 'https://maven.neoforged.net/releases'
     }
 
     maven {
-        // Shedaniel's maven (Architectury API)
-        url = "https://maven.architectury.dev"
-        content {
-            includeGroup "dev.architectury"
-        }
-    }
-    maven { url "https://maven.shedaniel.me/" }
-    maven {
-        // saps.dev Maven (KubeJS and Rhino)
-        url = "https://maven.saps.dev/minecraft"
-        content {
-            includeGroup "dev.latvian.mods"
-        }
-    }
-    maven {
-        url "https://maven.latvian.dev/releases"
-        content {
-            includeGroup "dev.latvian.mods"
-            includeGroup "dev.latvian.apps"
-        }
+        name = 'ParchmentMC'
+        url = 'https://maven.parchmentmc.org'
     }
 
-    maven {
-        url 'https://jitpack.io'
-        content {
-            includeGroup "com.github.rtyley"
-        }
-    }
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+}
 
-    maven {
-        url "https://cursemaven.com"
-        content {
-            includeGroup "curse.maven"
-        }
-    }
-    maven {
-        url "https://maven.theillusivec4.top/"
-    }
-    maven {
-        name = "TerraformersMC"
-        url = "https://maven.terraformersmc.com/"
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
-            }
-        }
-        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
-        filter {
-            includeGroup "maven.modrinth"
-        }
-    }
+loom {
+    silentMojangMappingsLicense()
 }
 
 dependencies {
-    // Specify the version of Minecraft to use.
-    // Any artifact can be supplied so long as it has a "userdev" classifier artifact and is a compatible patcher artifact.
-    // The "userdev" classifier will be requested and setup by ForgeGradle.
-    // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
-    // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
-    // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
-    // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
-    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
-    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
-    //runtimeOnly fg.deobf("curse.maven:tmrv-1194921:6717421")
-
-    /* compileOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1:api")
-     runtimeOnly fg.deobf("dev.emi:emi-forge:1.1.22+1.20.1")*/
-
-    runtimeOnly fg.deobf("curse.maven:curios-309927:6418456")
-    runtimeOnly fg.deobf("curse.maven:lionfish-api-1001614:5922047")
-
-    runtimeOnly fg.deobf("curse.maven:lendercataclysm-551586:6906993")
-    //runtimeOnly fg.deobf("curse.maven:item-nbt-viewer-514135:4578522")
-    //implementation fg.deobf("curse.maven:no-tree-punching-289043:4599926")
-    implementation fg.deobf("curse.maven:ytech-917366:6616815")
-    //implementation fg.deobf("curse.maven:max-health-fix-492246:5378283")
-    //implementation fg.deobf("curse.maven:insanelib-465109:6927148")
-    //implementation fg.deobf("curse.maven:iguanatweaks-reborn-285690:6988962")
-    /* implementation fg.deobf("curse.maven:selene-499980:6983934")
-     implementation fg.deobf("curse.maven:spelunkery-790530:6122072")
-     implementation fg.deobf("curse.maven:galosphere-631098:4983871")*/
-    //runtimeOnly fg.deobf("maven.modrinth:kap_lib:v1.26.3-mc1.20.1-FML47.3.0")
-    /* runtimeOnly fg.deobf("curse.maven:zeta-968868:6432578")
-     runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")*/
-    //runtimeOnly fg.deobf("curse.maven:modernfix-790626:6837713")
-
-    implementation fg.deobf("curse.maven:v-tweaks-238048:7119159")
-    implementation fg.deobf("curse.maven:spartan-weaponry-278141:6842571")
-    implementation fg.deobf("curse.maven:bookling-gear-1122766:7317926")
-    implementation fg.deobf("curse.maven:lit-it-up-916334:7239006")
-    //implementation fg.deobf("curse.maven:polymorph-388800:6450982")
-    implementation fg.deobf("curse.maven:cupboard-326652:5470032")
-    implementation fg.deobf("curse.maven:recipe-essentials-forge-fabric-907856:6165709")
-
-    implementation fg.deobf("curse.maven:irons-spells-n-spellbooks-855414:6970299")
-    implementation fg.deobf("curse.maven:caelus-308989:5281700")
-    implementation fg.deobf("curse.maven:attribute-setter-1064034:7196879")
-    /*    implementation fg.deobf("curse.maven:amendments-896746:6913537")
-    implementation fg.deobf("curse.maven:accessories-938917:6201361")*/
-    implementation fg.deobf("curse.maven:playeranimator-658587:4587214")
-    implementation fg.deobf("curse.maven:geckolib-388172:7025129")
-
-    /*implementation fg.deobf("curse.maven:forgified-fabric-api-889079:6885853")
-    implementation fg.deobf("curse.maven:better-combat-by-daedelus-639842:5625757")
-    runtimeOnly fg.deobf("curse.maven:connector-extras-913445:5490637")
-    runtimeOnly fg.deobf("curse.maven:sinytra-connector-890127:5761411")
-    runtimeOnly fg.deobf("blank:KnightsHeraldry:0.7.3")
-    runtimeOnly fg.deobf("blank:stoneycore:0.6.3")
-    runtimeOnly fg.deobf("blank:owo-lib:0.11.2+1.20")
-    runtimeOnly fg.deobf("blank:geckolib-fabric-1.20.1:4.8.2")
-    runtimeOnly fg.deobf("blank:overknights:1.0.0")*/
-    //implementation fg.deobf("curse.maven:xtra-arrows-566441:6434918")
-    //runtimeOnly fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6826548")
-
-    /*implementation fg.deobf("curse.maven:blueprint-382216:6408581")
-    implementation fg.deobf("curse.maven:oreganized-769203:7182747")
-    implementation fg.deobf("curse.maven:caverns-and-chasms-438005:6040957")
-    implementation fg.deobf("curse.maven:gsoc-compat-1144022:6955143")*/
-    implementation fg.deobf("curse.maven:immersive-armors-580681:6851704")
-    implementation fg.deobf("curse.maven:jade-324717:6855440")
-    //implementation fg.deobf("curse.maven:savage-and-ravage-381736:6040963")
-    //implementation fg.deobf("curse.maven:hold-my-items-reforged-1246920:6608415")
-
-    /*runtimeOnly fg.deobf("curse.maven:epic-knights-armor-and-weapons-509041:6373737")
-    runtimeOnly fg.deobf("curse.maven:epic-knights-addon-925866:6036869")
-    runtimeOnly fg.deobf("curse.maven:epic-knights-slavic-armory-942000:5458480")
-    runtimeOnly fg.deobf("curse.maven:cloth-config-348521:5729105")
-    runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137938")
-    */
-    //runtimeOnly fg.deobf("curse.maven:archery-expansion-1164945:6424928")
-    //runtimeOnly fg.deobf("curse.maven:archery-expansion-squared-1217171:6425344")
-    // Example mod dependency using a mod jar from ./libs with a flat dir repository
-    // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
-    // The group id is ignored when searching -- in this case, it is "blank"
-    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
-    //implementation fg.deobf("curse.maven:spark-361579:4738952")
-    // For more info:
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    minecraft "net.minecraft:minecraft:$project.minecraft_version"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-$project.minecraft_version:$project.parchment_version@zip")
+    }
+    neoForge "net.neoforged:neoforge:$project.neoforge_version"
 }
 
-// This block of code expands all declared replace properties in the specified resource targets.
-// A missing property will result in an error. Properties are expanded using ${} Groovy notation.
-// When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
-// See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-tasks.named('processResources', ProcessResources).configure {
+processResources {
     var replaceProperties = [
-            minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
-            forge_version       : forge_version, forge_version_range: forge_version_range,
-            loader_version_range: loader_version_range,
-            mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors         : mod_authors, mod_description: mod_description,
-            bucketlib           : bucketlib_version, bucketlib_version_range: bucketlib_version_range,
-            magitu              : magitu, magitu_addon: magitu_addon, slavic: slavic
+            minecraft_version       : minecraft_version,
+            minecraft_version_range : minecraft_version_range,
+            mod_id                  : mod_id,
+            mod_name                : mod_name,
+            mod_license             : mod_license,
+            mod_version             : mod_version,
+            mod_authors             : mod_authors,
+            mod_description         : mod_description,
+            neoforge_version_range  : neoforge_version_range
     ]
     inputs.properties replaceProperties
 
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+    filesMatching('META-INF/neoforge.mods.toml') {
         expand replaceProperties + [project: project]
     }
 }
 
-// Example for how to get properties into the manifest for reading at runtime.
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : '1', // We are version 1 of ourselves
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
+java {
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
 
-    // This is the preferred method to reobfuscate your jar file
-    finalizedBy 'reobfJar'
-}
-
-// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing:
-// tasks.named('publish').configure {
-//     dependsOn 'reobfJar'
-// }
-
-// Example configuration to allow publishing using the maven-publish plugin
-publishing {
-    publications {
-        register('mavenJava', MavenPublication) {
-            artifact jar
-        }
-    }
-    repositories {
-        maven {
-            url "file://${project.projectDir}/mcmodsrepo"
-        }
-    }
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    it.options.release = 21
 }
-mixin {
-    // MixinGradle Settings
-    add sourceSets.main, 'mixins.overgeared.refmap.json'
-    config 'mixins.overgeared.json'
+
+// Configure Maven publishing.
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
 }

@@ -2,21 +2,23 @@ package net.stirdrem.overgeared.recipe;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.OvergearedMod;
-import org.jetbrains.annotations.Nullable;
 
-public class RockKnappingRecipe implements Recipe<Container> {
+public class RockKnappingRecipe implements Recipe<RecipeInput> {
     private final ResourceLocation id;
     private final ItemStack output;
     private final boolean[][] pattern; // true means clicked, false means unclicked
@@ -35,15 +37,15 @@ public class RockKnappingRecipe implements Recipe<Container> {
     }
 
     @Override
-    public boolean matches(Container inv, Level world) {
-        if (inv.getContainerSize() != 9) return false;
+    public boolean matches(RecipeInput input, Level world) {
+        if (input.size() != 9) return false;
 
-        // Convert container to 3x3 grid (true = unchipped, false = chipped)
+        // Convert recipe input to 3x3 grid (true = unchipped, false = chipped)
         boolean[][] inputGrid = new boolean[3][3];
         for (int i = 0; i < 9; i++) {
             int row = i / 3;
             int col = i % 3;
-            inputGrid[row][col] = inv.getItem(i).isEmpty(); // Inverted logic: empty slot = chipped
+            inputGrid[row][col] = input.getItem(i).isEmpty(); // Inverted logic: empty slot = chipped
         }
 
         // Check pattern at all possible offsets
@@ -117,7 +119,7 @@ public class RockKnappingRecipe implements Recipe<Container> {
 
 
     @Override
-    public ItemStack assemble(Container pContainer, RegistryAccess pRegistryAccess) {
+    public ItemStack assemble(RecipeInput pInput, HolderLookup.Provider pRegistries) {
         return output.copy();
     }
 
@@ -128,11 +130,10 @@ public class RockKnappingRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider pRegistries) {
         return output;
     }
 
-    @Override
     public ResourceLocation getId() {
         return id;
     }
@@ -160,34 +161,98 @@ public class RockKnappingRecipe implements Recipe<Container> {
         public static final Serializer INSTANCE = new Serializer();
         public static final ResourceLocation ID = ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "rock_knapping");
 
-        @Override
-        public RockKnappingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
-            ItemStack output = buffer.readItem(); // Must match writeItem
-            boolean[][] pattern = new boolean[3][3];
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    pattern[i][j] = buffer.readBoolean(); // 9 reads
+        private static final Codec<boolean[][]> PATTERN_CODEC = Codec.STRING.listOf().xmap(
+                list -> {
+                    boolean[][] pattern = new boolean[3][3];
+                    for (int i = 0; i < Math.min(3, list.size()); i++) {
+                        String row = list.get(i);
+                        for (int j = 0; j < Math.min(3, row.length()); j++) {
+                            char c = row.charAt(j);
+                            pattern[i][j] = (c == 'x' || c == 'X');
+                        }
+                    }
+                    return pattern;
+                },
+                pattern -> {
+                    java.util.List<String> list = new java.util.ArrayList<>();
+                    for (int i = 0; i < 3; i++) {
+                        StringBuilder row = new StringBuilder();
+                        for (int j = 0; j < 3; j++) {
+                            row.append(pattern[i][j] ? 'x' : ' ');
+                        }
+                        list.add(row.toString());
+                    }
+                    return list;
+                }
+        );
+
+        private static final MapCodec<RockKnappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                ItemStack.CODEC.fieldOf("result").forGetter(recipe -> recipe.output),
+                PATTERN_CODEC.fieldOf("pattern").forGetter(recipe -> recipe.pattern),
+                Codec.BOOL.optionalFieldOf("mirrored", false).forGetter(recipe -> recipe.mirrored)
+        ).apply(instance, (output, pattern, mirrored) -> {
+            // We'll need to handle the ID separately since it's not in the JSON
+            return new RockKnappingRecipe(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "rock_knapping"), output, pattern, mirrored);
+        }));
+
+        private static StreamCodec<RegistryFriendlyByteBuf, boolean[][]> PATTERN_STREAM_CODEC = new StreamCodec<RegistryFriendlyByteBuf, boolean[][]>() {
+            @Override
+            public boolean[][] decode(RegistryFriendlyByteBuf buffer) {
+                boolean[][] pattern = new boolean[3][3];
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        pattern[i][j] = buffer.readBoolean();
+                    }
+                }
+                return pattern;
+            }
+
+            @Override
+            public void encode(RegistryFriendlyByteBuf buffer, boolean[][] pattern) {
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        buffer.writeBoolean(pattern[i][j]);
+                    }
                 }
             }
-            boolean mirrored = buffer.readBoolean(); // 1 read
-            return new RockKnappingRecipe(id, output, pattern, mirrored);
-        }
-
+        };
 
         @Override
-        public void toNetwork(FriendlyByteBuf buffer, RockKnappingRecipe recipe) {
-            buffer.writeItem(recipe.output); // This writes variable number of bytes
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    buffer.writeBoolean(recipe.pattern[i][j]); // 9 booleans = 9 bytes
-                }
-            }
-            buffer.writeBoolean(recipe.mirrored); // 1 byte
+        public MapCodec<RockKnappingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
+        public StreamCodec<RegistryFriendlyByteBuf, RockKnappingRecipe> streamCodec() {
+            return StreamCodec.composite(
+                    ItemStack.STREAM_CODEC,
+                    recipe -> recipe.output,
+                    PATTERN_STREAM_CODEC,
+                    recipe -> recipe.pattern,
+                    new StreamCodec<RegistryFriendlyByteBuf, Boolean>() {
+                        @Override
+                        public Boolean decode(RegistryFriendlyByteBuf buffer) {
+                            return buffer.readBoolean();
+                        }
+
+                        @Override
+                        public void encode(RegistryFriendlyByteBuf buffer, Boolean value) {
+                            buffer.writeBoolean(value);
+                        }
+                    },
+                    recipe -> recipe.mirrored,
+                    (output, pattern, mirrored) -> new RockKnappingRecipe(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "rock_knapping"), output, pattern, mirrored)
+            );
+        }
+
+        // Legacy JSON support - kept for backwards compatibility if needed
         public RockKnappingRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
-            ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "result"));
+            // Use codec to parse from JSON
+            JsonObject resultObj = GsonHelper.getAsJsonObject(pSerializedRecipe, "result");
+            // Parse ItemStack from JSON using the codec
+            com.mojang.serialization.JsonOps jsonOps = com.mojang.serialization.JsonOps.INSTANCE;
+            ItemStack output = ItemStack.CODEC.parse(jsonOps, resultObj)
+                    .resultOrPartial(error -> {}).orElse(ItemStack.EMPTY);
 
             JsonArray patternArray = GsonHelper.getAsJsonArray(pSerializedRecipe, "pattern");
             boolean[][] pattern = new boolean[3][3];

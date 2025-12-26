@@ -3,14 +3,15 @@ package net.stirdrem.overgeared.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.KnappingChipC2SPacket;
 
 import java.util.HashSet;
@@ -22,7 +23,7 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
     private static final ResourceLocation CHIPPED_TEXTURE =
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/blank.png");
     private static final ResourceLocation UNCHIPPED_TEXTURE =
-            ResourceLocation.tryParse("textures/block/stone.png");
+            ResourceLocation.parse("minecraft:textures/block/stone.png");
 
     private static final int GRID_ORIGIN_X = 32;
     private static final int GRID_ORIGIN_Y = 19;
@@ -78,21 +79,20 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
             int y = this.topPos + GRID_ORIGIN_Y + row * SLOT_SIZE;
 
             final int index = i;
-            ResourceLocation texture = menu.isChipped(i) || resultCollected ? CHIPPED_TEXTURE : UNCHIPPED_TEXTURE;
+            WidgetSprites sprite = new WidgetSprites(UNCHIPPED_TEXTURE, CHIPPED_TEXTURE);
             boolean isChipped = menu.isChipped(i);
+
 
             ImageButton button = new ImageButton(
                     x, y,
                     SLOT_SIZE, SLOT_SIZE,
-                    0, 0, 0,
-                    texture,
-                    SLOT_SIZE, SLOT_SIZE,
+                    sprite,
                     btn -> {
                         if ((!hasResult || canContinueKnapping) && !isChipped) {
                             menu.setChip(index);
                             chippedSpots.add(index);
                             if (!resultCollected) {
-                                ModMessages.sendToServer(new KnappingChipC2SPacket(index));
+                                PacketDistributor.sendToServer(new KnappingChipC2SPacket(index));
                                 minecraft.player.playSound(net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.0F, 1.0F);
                             }
                             addKnappingButtons(); // Refresh visuals
@@ -123,7 +123,7 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        renderBackground(guiGraphics);
+        renderBackground(guiGraphics, mouseX, mouseY, partialTick);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
     }
@@ -139,11 +139,6 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
 
         // Draw main background
         graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
-
-        /*// Draw input rock icon if needed
-        if (!menu.getInputRock().isEmpty()) {
-            graphics.renderItem(menu.getInputRock(), x + 8, y + 35);
-        }*/
     }
 
     @Override
@@ -167,7 +162,7 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
                 menu.setChip(i);
                 chippedSpots.add(i);
                 if (!menu.isResultCollected()) {
-                    ModMessages.sendToServer(new KnappingChipC2SPacket(i));
+                    PacketDistributor.sendToServer(new KnappingChipC2SPacket(i));
                     minecraft.player.playSound(net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.0F, 1.0F);
                 }
 
