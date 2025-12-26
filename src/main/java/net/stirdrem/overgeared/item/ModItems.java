@@ -1,4 +1,4 @@
-package net.stirdrem.overgeared.items;
+package net.stirdrem.overgeared.item;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.*;
@@ -6,6 +6,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.item.custom.KnappableRockItem;
 
 public class ModItems {
   public static final DeferredRegister<Item> ITEMS =
@@ -17,8 +18,8 @@ public class ModItems {
   public static final DeferredHolder<Item, Item> HEATED_CRUDE_STEEL = ITEMS.register("heated_crude_steel",
           () -> new Item(new Item.Properties()));
 
-  /*public static final DeferredHolder<Item, Item> ROCK = ITEMS.register("knappable_rock",
-          () -> new KnappableRockItem(new Item.Properties()));*/
+  public static final DeferredHolder<Item, Item> ROCK = ITEMS.register("knappable_rock",
+          () -> new KnappableRockItem(new Item.Properties()));
 
   public static final DeferredHolder<Item, Item> STEEL_INGOT = ITEMS.register("steel_ingot",
           () -> new Item(new Item.Properties()));

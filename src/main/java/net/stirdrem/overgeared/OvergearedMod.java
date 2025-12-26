@@ -3,7 +3,10 @@ package net.stirdrem.overgeared;
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.stirdrem.overgeared.items.ModItems;
+import net.stirdrem.overgeared.item.ModItems;
+import net.stirdrem.overgeared.recipe.ModRecipes;
+import net.stirdrem.overgeared.recipe.ModRecipeTypes;
+import net.stirdrem.overgeared.screen.ModMenuTypes;
 import org.slf4j.Logger;
 
 @Mod(OvergearedMod.MOD_ID)
@@ -13,5 +16,8 @@ public final class OvergearedMod {
 
     public OvergearedMod(IEventBus modEventBus) {
         ModItems.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
+        ModRecipeTypes.register(modEventBus);
+        ModRecipes.register(modEventBus);
     }
 }
