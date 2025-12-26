@@ -69,7 +69,7 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
         boolean resultCollected = menu.isResultCollected(); // Need to track this in menu
 
         // Knapping is only finished when result is collected
-        // Allow continuing knapping if there's a result but it hasn't been collected
+        // Allow continuing knapping if there's a result, but it hasn't been collected
         boolean canContinueKnapping = hasResult && !resultCollected;
 
         for (int i = 0; i < 9; i++) {
@@ -79,21 +79,22 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
             int y = this.topPos + GRID_ORIGIN_Y + row * SLOT_SIZE;
 
             final int index = i;
-            WidgetSprites sprite = new WidgetSprites(UNCHIPPED_TEXTURE, CHIPPED_TEXTURE);
             boolean isChipped = menu.isChipped(i);
 
 
             ImageButton button = new ImageButton(
                     x, y,
                     SLOT_SIZE, SLOT_SIZE,
-                    sprite,
+                    new WidgetSprites(UNCHIPPED_TEXTURE, CHIPPED_TEXTURE),
                     btn -> {
                         if ((!hasResult || canContinueKnapping) && !isChipped) {
                             menu.setChip(index);
                             chippedSpots.add(index);
                             if (!resultCollected) {
                                 PacketDistributor.sendToServer(new KnappingChipC2SPacket(index));
+                              if (minecraft != null && minecraft.player != null) {
                                 minecraft.player.playSound(net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.0F, 1.0F);
+                              }
                             }
                             addKnappingButtons(); // Refresh visuals
                         }
@@ -109,6 +110,11 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
 
                 @Override
                 public void playDownSound(SoundManager pHandler) {
+                }
+
+                @Override
+                public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+                    // Don't render the default button texture - we'll render manually in renderBg
                 }
 
             };
@@ -139,6 +145,17 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
 
         // Draw main background
         graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
+
+        // Render the knapping grid textures
+        for (int i = 0; i < 9; i++) {
+            int col = i % 3;
+            int row = i / 3;
+            int spotX = x + GRID_ORIGIN_X + col * SLOT_SIZE;
+            int spotY = y + GRID_ORIGIN_Y + row * SLOT_SIZE;
+
+            ResourceLocation texture = menu.isChipped(i) ? CHIPPED_TEXTURE : UNCHIPPED_TEXTURE;
+            graphics.blit(texture, spotX, spotY, 0, 0, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE);
+        }
     }
 
     @Override
@@ -163,7 +180,9 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
                 chippedSpots.add(i);
                 if (!menu.isResultCollected()) {
                     PacketDistributor.sendToServer(new KnappingChipC2SPacket(i));
-                    minecraft.player.playSound(net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.0F, 1.0F);
+                    if (minecraft != null && minecraft.player != null) {
+                        minecraft.player.playSound(net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.0F, 1.0F);
+                    }
                 }
 
                 addKnappingButtons(); // Refresh visuals
