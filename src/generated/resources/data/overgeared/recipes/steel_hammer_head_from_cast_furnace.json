@@ -1,16 +1,16 @@
 {
   "type": "overgeared:casting",
   "category": "misc",
-  "cookingtime": 100,
-  "experience": 0.3,
+  "cookingtime": 240,
+  "experience": 0.9,
   "input": {
     "material": {
-      "gold": 27
+      "steel": 18
     }
   },
   "need_polishing": false,
   "result": {
-    "item": "overgeared:golden_axe_head"
+    "item": "overgeared:steel_hammer_head"
   },
-  "tool_type": "axe"
+  "tool_type": "hammer"
 }

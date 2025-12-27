@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -43,14 +44,10 @@ import java.util.Optional;
 
 public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer, MenuProvider {
 
-    /* ================= SLOTS ================= */
-
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_FUEL = 1;
     public static final int SLOT_OUTPUT = 2;
     public static final int SLOT_CAST = 3;
-
-    /* ================= INVENTORY ================= */
 
     private final ItemStackHandler itemHandler = new ItemStackHandler(4) {
         @Override
@@ -62,8 +59,6 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
     private final LazyOptional<? extends IItemHandler>[] sidedHandlers =
             SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH);
-
-    /* ================= DATA ================= */
 
     private int burnTime;
     private int maxBurnTime;
@@ -103,8 +98,6 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
         super(ModBlockEntities.CAST_FURNACE_BE.get(), pos, state);
     }
 
-    /* ================= TICK ================= */
-
     public static void tick(Level level, BlockPos pos, BlockState state, CastFurnaceBlockEntity be) {
         boolean wasLit = be.isLit();
         boolean dirty = false;
@@ -143,11 +136,10 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
         if (dirty) be.setChanged();
     }
 
+
     private boolean isLit() {
         return burnTime > 0;
     }
-
-    /* ================= RECIPE ================= */
 
     private boolean canSmelt() {
         if (level == null) return false;
@@ -208,10 +200,10 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
         }
 
         // Heated flag (always)
-        if (outTag != null) {
-            outTag.putBoolean("Heated", true);
-            output.setTag(outTag);
-        }
+        if (outTag == null) outTag = new CompoundTag();
+        outTag.putBoolean("Heated", true);
+        output.setTag(outTag);
+        
 
         return output;
     }
@@ -253,6 +245,7 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
             if (outTag == null) outTag = new CompoundTag();
             outTag.putBoolean("Polished", false);
         }
+
         if (outTag == null) outTag = new CompoundTag();
         outTag.putBoolean("Heated", true);
         output.setTag(outTag);
@@ -260,7 +253,7 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
         if (itemHandler.getStackInSlot(SLOT_OUTPUT).isEmpty()) {
             itemHandler.setStackInSlot(SLOT_OUTPUT, output);
         } else {
-            output.grow(result.getCount());
+            itemHandler.getStackInSlot(SLOT_OUTPUT).grow(1);
         }
         Map<String, Integer> availableMaterials =
                 ConfigHelper.getMaterialValuesForItem(itemHandler.getStackInSlot(SLOT_INPUT));
@@ -271,9 +264,12 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
             double needed = entry.getValue();
             double available = availableMaterials
                     .getOrDefault(material, (int) needed);
-            itemconsumeamount = (int) (needed / available);
+
+            itemconsumeamount = (int) Math.max(1, Math.ceil(needed / available));
         }
+
         itemHandler.getStackInSlot(SLOT_INPUT).shrink(itemconsumeamount);
+
 
         // Damage cast
         if (cast.isDamageableItem()) {
@@ -286,8 +282,6 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
         if (!level.isClientSide && xp > 0)
             storedExperience += xp;
     }
-
-    /* ================= EXPERIENCE ================= */
 
     private void spawnExperience(float xp) {
         if (level == null || level.isClientSide) return;
@@ -306,8 +300,6 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
                     split));
         }
     }
-
-    /* ================= MENU ================= */
 
     @Override
     public Component getDisplayName() {
@@ -329,8 +321,6 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
     protected AbstractContainerMenu createMenu(int pContainerId, Inventory pInventory) {
         return null;
     }
-
-    /* ================= CAPS ================= */
 
     @Override
     public void onLoad() {
@@ -357,8 +347,6 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
         return super.getCapability(cap, side);
     }
 
-    /* ================= NBT ================= */
-
     @Override
     protected void saveAdditional(@NotNull CompoundTag tag) {
         super.saveAdditional(tag);
@@ -381,7 +369,6 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
         storedExperience = tag.getFloat("storedXp");
     }
 
-    /* ================= DROPS ================= */
 
     public void drops() {
         SimpleContainer inv = new SimpleContainer(itemHandler.getSlots());
@@ -415,7 +402,6 @@ public class CastFurnaceBlockEntity extends BaseContainerBlockEntity implements 
             setChanged();
         }
     }
-    /* ================= HOPPERS ================= */
 
     @Override
     public int[] getSlotsForFace(Direction side) {

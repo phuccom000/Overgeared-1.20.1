@@ -56,10 +56,6 @@ public class CastingRecipe implements Recipe<Container> {
         this.needPolishing = needPolishing;
     }
 
-    /* ============================================================= */
-    /* MATCH LOGIC — EXACTLY LIKE CastSmeltingRecipe                  */
-    /* ============================================================= */
-
     @Override
     public boolean matches(Container inv, Level level) {
         if (level.isClientSide) return false;
@@ -104,10 +100,6 @@ public class CastingRecipe implements Recipe<Container> {
         return true;
     }
 
-
-    /* ============================================================= */
-    /* ASSEMBLE — FILLS THE CAST (LIKE YOUR SMELTING)                */
-    /* ============================================================= */
 
     @Override
     public ItemStack assemble(Container inv, RegistryAccess registryAccess) {
@@ -224,10 +216,6 @@ public class CastingRecipe implements Recipe<Container> {
         return ModRecipeTypes.CASTING.get();
     }
 
-    /* ============================================================= */
-    /* HELPERS                                                       */
-    /* ============================================================= */
-
     public static Map<String, Double> readMaterials(CompoundTag tag) {
         Map<String, Double> map = new HashMap<>();
         for (String key : tag.getAllKeys()) {
@@ -264,9 +252,6 @@ public class CastingRecipe implements Recipe<Container> {
         public static final CastingRecipe.Type INSTANCE = new CastingRecipe.Type();
         public static final String ID = "casting";
     }
-    /* ============================================================= */
-    /* SERIALIZER                                                    */
-    /* ============================================================= */
 
     public static class Serializer implements RecipeSerializer<CastingRecipe> {
         public static final CastingRecipe.Serializer INSTANCE = new CastingRecipe.Serializer();

@@ -1,16 +1,16 @@
 {
   "type": "overgeared:casting",
   "category": "misc",
-  "cookingtime": 140,
+  "cookingtime": 160,
   "experience": 0.5,
   "input": {
     "material": {
-      "iron": 9
+      "copper": 18
     }
   },
-  "need_polishing": true,
+  "need_polishing": false,
   "result": {
-    "item": "overgeared:iron_shovel_head"
+    "item": "overgeared:copper_hammer_head"
   },
-  "tool_type": "shovel"
+  "tool_type": "hammer"
 }

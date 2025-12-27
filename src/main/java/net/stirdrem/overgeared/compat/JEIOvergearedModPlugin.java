@@ -141,8 +141,17 @@ public class JEIOvergearedModPlugin implements IModPlugin {
         registration.addRecipes(ForgingRecipeCategory.FORGING_RECIPE_TYPE, combinedSteelCategory);
         registration.addRecipes(
                 CastingRecipeCategory.CASTING_TYPE,
-                level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.CASTING.get())
+                level.getRecipeManager()
+                        .getAllRecipesFor(ModRecipeTypes.CASTING.get())
+                        .stream()
+                        .sorted(Comparator.comparing(recipe ->
+                                BuiltInRegistries.ITEM.getKey(
+                                        recipe.getResultItem(level.registryAccess()).getItem()
+                                ).toString()
+                        ))
+                        .toList()
         );
+
         // Rock Knapping
         List<RockKnappingRecipe> knappingRecipes = recipeManager.getAllRecipesFor(RockKnappingRecipe.Type.INSTANCE);
         registration.addRecipes(KnappingRecipeCategory.KNAPPING_RECIPE_TYPE, knappingRecipes);

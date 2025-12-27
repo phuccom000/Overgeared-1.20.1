@@ -1324,7 +1324,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 // Shovel
         CastingRecipeBuilder.casting(ModItems.COPPER_SHOVEL_HEAD.get(), 0.3f, 120)
                 .toolType("shovel")
-                .material("copper", 18)
+                .material("copper", 9)
                 .needsPolishing(true)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
@@ -1332,7 +1332,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 // Hoe
         CastingRecipeBuilder.casting(ModItems.COPPER_HOE_HEAD.get(), 0.3f, 100)
                 .toolType("hoe")
-                .material("copper", 15)
+                .material("copper", 18)
                 .needsPolishing(true)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
@@ -1340,8 +1340,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 // Sword
         CastingRecipeBuilder.casting(ModItems.COPPER_SWORD_BLADE.get(), 0.5f, 160)
                 .toolType("sword")
-                .material("copper", 30)
+                .material("copper", 18)
                 .needsPolishing(true)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.COPPER_HAMMER_HEAD.get(), 0.5f, 160)
+                .toolType("hammer")
+                .material("copper", 18)
+                .needsPolishing(false)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
 
@@ -1361,41 +1368,41 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
         CastingRecipeBuilder.casting(ModItems.IRON_SHOVEL_HEAD.get(), 0.5f, 140)
                 .toolType("shovel")
-                .material("iron", 18)
+                .material("iron", 9)
                 .needsPolishing(true)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
 
         CastingRecipeBuilder.casting(ModItems.IRON_HOE_HEAD.get(), 0.5f, 120)
                 .toolType("hoe")
-                .material("iron", 15)
+                .material("iron", 18)
                 .needsPolishing(true)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
 
         CastingRecipeBuilder.casting(ModItems.IRON_SWORD_BLADE.get(), 0.7f, 190)
                 .toolType("sword")
-                .material("iron", 30)
+                .material("iron", 18)
                 .needsPolishing(true)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
         CastingRecipeBuilder.casting(ModItems.STEEL_AXE_HEAD.get(), 0.8f, 220)
                 .toolType("axe")
-                .material("steel", 32)
+                .material("steel", 27)
                 .needsPolishing(true)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
 
         CastingRecipeBuilder.casting(ModItems.STEEL_PICKAXE_HEAD.get(), 0.8f, 220)
                 .toolType("pickaxe")
-                .material("steel", 32)
+                .material("steel", 27)
                 .needsPolishing(true)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
 
         CastingRecipeBuilder.casting(ModItems.STEEL_SHOVEL_HEAD.get(), 0.7f, 180)
                 .toolType("shovel")
-                .material("steel", 22)
+                .material("steel", 9)
                 .needsPolishing(true)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
@@ -1409,41 +1416,49 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
         CastingRecipeBuilder.casting(ModItems.STEEL_SWORD_BLADE.get(), 0.9f, 240)
                 .toolType("sword")
-                .material("steel", 36)
+                .material("steel", 18)
                 .needsPolishing(true)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
+
+        CastingRecipeBuilder.casting(ModItems.STEEL_HAMMER_HEAD.get(), 0.9f, 240)
+                .toolType("hammer")
+                .material("steel", 18)
+                .needsPolishing(false)
+                .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
+                .save(pWriter);
+
         CastingRecipeBuilder.casting(ModItems.GOLDEN_AXE_HEAD.get(), 0.3f, 100)
                 .toolType("axe")
-                .material("gold", 23)
+                .material("gold", 27)
                 .needsPolishing(false)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
 
         CastingRecipeBuilder.casting(ModItems.GOLDEN_PICKAXE_HEAD.get(), 0.3f, 100)
                 .toolType("pickaxe")
-                .material("gold", 23)
+                .material("gold", 27)
                 .needsPolishing(false)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
 
         CastingRecipeBuilder.casting(ModItems.GOLDEN_SHOVEL_HEAD.get(), 0.2f, 80)
                 .toolType("shovel")
-                .material("gold", 15)
+                .material("gold", 9)
                 .needsPolishing(false)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
 
         CastingRecipeBuilder.casting(ModItems.GOLDEN_HOE_HEAD.get(), 0.2f, 70)
                 .toolType("hoe")
-                .material("gold", 13)
+                .material("gold", 18)
                 .needsPolishing(false)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
 
         CastingRecipeBuilder.casting(ModItems.GOLDEN_SWORD_BLADE.get(), 0.4f, 110)
                 .toolType("sword")
-                .material("gold", 26)
+                .material("gold", 18)
                 .needsPolishing(false)
                 .unlockedBy("has_cast", has(ModTags.Items.TOOL_CAST))
                 .save(pWriter);
