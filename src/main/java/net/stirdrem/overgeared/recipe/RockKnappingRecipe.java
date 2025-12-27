@@ -195,26 +195,26 @@ public class RockKnappingRecipe implements Recipe<RecipeInput> {
             return new RockKnappingRecipe(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "rock_knapping"), output, pattern, mirrored);
         }));
 
-        private static StreamCodec<RegistryFriendlyByteBuf, boolean[][]> PATTERN_STREAM_CODEC = new StreamCodec<RegistryFriendlyByteBuf, boolean[][]>() {
-            @Override
-            public boolean[][] decode(RegistryFriendlyByteBuf buffer) {
-                boolean[][] pattern = new boolean[3][3];
-                for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        pattern[i][j] = buffer.readBoolean();
-                    }
-                }
-                return pattern;
+        private static final StreamCodec<RegistryFriendlyByteBuf, boolean[][]> PATTERN_STREAM_CODEC = new StreamCodec<>() {
+          @Override
+          public boolean[][] decode(RegistryFriendlyByteBuf buffer) {
+            boolean[][] pattern = new boolean[3][3];
+            for (int i = 0; i < 3; i++) {
+              for (int j = 0; j < 3; j++) {
+                pattern[i][j] = buffer.readBoolean();
+              }
             }
+            return pattern;
+          }
 
-            @Override
-            public void encode(RegistryFriendlyByteBuf buffer, boolean[][] pattern) {
-                for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        buffer.writeBoolean(pattern[i][j]);
-                    }
-                }
+          @Override
+          public void encode(RegistryFriendlyByteBuf buffer, boolean[][] pattern) {
+            for (int i = 0; i < 3; i++) {
+              for (int j = 0; j < 3; j++) {
+                buffer.writeBoolean(pattern[i][j]);
+              }
             }
+          }
         };
 
         @Override
@@ -229,16 +229,16 @@ public class RockKnappingRecipe implements Recipe<RecipeInput> {
                     recipe -> recipe.output,
                     PATTERN_STREAM_CODEC,
                     recipe -> recipe.pattern,
-                    new StreamCodec<RegistryFriendlyByteBuf, Boolean>() {
-                        @Override
-                        public Boolean decode(RegistryFriendlyByteBuf buffer) {
-                            return buffer.readBoolean();
-                        }
+                    new StreamCodec<>() {
+                      @Override
+                      public Boolean decode(RegistryFriendlyByteBuf buffer) {
+                        return buffer.readBoolean();
+                      }
 
-                        @Override
-                        public void encode(RegistryFriendlyByteBuf buffer, Boolean value) {
-                            buffer.writeBoolean(value);
-                        }
+                      @Override
+                      public void encode(RegistryFriendlyByteBuf buffer, Boolean value) {
+                        buffer.writeBoolean(value);
+                      }
                     },
                     recipe -> recipe.mirrored,
                     (output, pattern, mirrored) -> new RockKnappingRecipe(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "rock_knapping"), output, pattern, mirrored)
