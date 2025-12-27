@@ -8,14 +8,16 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.stirdrem.overgeared.OvergearedMod;
 
+import java.util.function.Supplier;
+
 public class ModRecipes {
     public static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS =
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, OvergearedMod.MOD_ID);
 
 //    public static final RegistryObject<RecipeSerializer<ForgingRecipe>> FORGING_SERIALIZER =
 //            SERIALIZERS.register("forging", () -> ForgingRecipe.Serializer.INSTANCE);
-    public static final DeferredHolder<RecipeSerializer<?>, RockKnappingRecipe.Serializer> ROCK_KNAPPING_SERIALIZER =
-            SERIALIZERS.register(RockKnappingRecipe.Serializer.ID.getPath(), () -> RockKnappingRecipe.Serializer.INSTANCE);
+    public static final Supplier<RecipeSerializer<RockKnappingRecipe>> ROCK_KNAPPING_SERIALIZER =
+            SERIALIZERS.register("rock_knapping", RockKnappingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<OvergearedShapelessRecipe>> CRAFTING_SHAPELESS =
 //            SERIALIZERS.register("crafting_shapeless", () -> OvergearedShapelessRecipe.Serializer.INSTANCE);
 //    public static final RegistryObject<RecipeSerializer<BlueprintCloningRecipe>> CRAFTING_BLUEPRINTCLONING =

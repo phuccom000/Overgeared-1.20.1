@@ -1,11 +1,13 @@
 package net.stirdrem.overgeared.recipe;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.stirdrem.overgeared.OvergearedMod;
+
+import java.util.function.Supplier;
 
 public class ModRecipeTypes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES =
@@ -13,8 +15,8 @@ public class ModRecipeTypes {
 
 //    public static final RegistryObject<RecipeType<ForgingRecipe>> FORGING =
 //            RECIPE_TYPES.register(ForgingRecipe.Type.ID, () -> ForgingRecipe.Type.INSTANCE);
-    public static final DeferredHolder<RecipeType<?>, RockKnappingRecipe.Type> KNAPPING =
-            RECIPE_TYPES.register(RockKnappingRecipe.Type.ID, () -> RockKnappingRecipe.Type.INSTANCE);
+    public static final Supplier<RecipeType<RockKnappingRecipe>> KNAPPING =
+            RECIPE_TYPES.register("rock_knapping", () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "rock_knapping")));
 //    public static final RegistryObject<RecipeType<FletchingRecipe>> FLETCHING =
 //            RECIPE_TYPES.register(FletchingRecipe.Type.ID, () -> FletchingRecipe.Type.INSTANCE);
 //    public static final RegistryObject<RecipeType<AlloySmeltingRecipe>> ALLOY_SMELTING =
