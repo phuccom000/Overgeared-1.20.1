@@ -17,7 +17,7 @@ public class ModRecipes {
 //    public static final RegistryObject<RecipeSerializer<ForgingRecipe>> FORGING_SERIALIZER =
 //            SERIALIZERS.register("forging", () -> ForgingRecipe.Serializer.INSTANCE);
     public static final Supplier<RecipeSerializer<RockKnappingRecipe>> ROCK_KNAPPING_SERIALIZER =
-            SERIALIZERS.register("rock_knapping", RockKnappingRecipe.Serializer::new);
+            SERIALIZERS.register("rock_knapping", RockKnappingSerializer::new);
 //    public static final RegistryObject<RecipeSerializer<OvergearedShapelessRecipe>> CRAFTING_SHAPELESS =
 //            SERIALIZERS.register("crafting_shapeless", () -> OvergearedShapelessRecipe.Serializer.INSTANCE);
 //    public static final RegistryObject<RecipeSerializer<BlueprintCloningRecipe>> CRAFTING_BLUEPRINTCLONING =
