@@ -5,7 +5,8 @@
     "x"
   ],
   "result": {
-    "item": "overgeared:stone_sword_blade"
+    "id": "overgeared:stone_sword_blade",
+    "Count": 1
   },
   "show_notification": true
 }

@@ -4,7 +4,8 @@
     "xx"
   ],
   "result": {
-    "item": "overgeared:stone_hoe_head"
+    "id": "overgeared:stone_hoe_head",
+    "Count": 1
   },
   "show_notification": true
 }

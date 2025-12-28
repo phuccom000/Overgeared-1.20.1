@@ -4,7 +4,8 @@
     "xxx"
   ],
   "result": {
-    "item": "overgeared:stone_pickaxe_head"
+    "id": "overgeared:stone_pickaxe_head",
+    "Count": 1
   },
   "show_notification": true
 }

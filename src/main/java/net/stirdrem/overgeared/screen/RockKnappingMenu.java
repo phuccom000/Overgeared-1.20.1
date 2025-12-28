@@ -9,20 +9,21 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 //import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
 import net.stirdrem.overgeared.item.custom.KnappableRockItem;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class RockKnappingMenu extends AbstractContainerMenu {
     private final Container craftingGrid = new SimpleContainer(9); // 3x3 grid
+    private final IItemHandler craftingGridHandler = new InvWrapper(craftingGrid);
     private final Container resultContainer = new SimpleContainer(1); // Output slot
     private final Level level;
     private final RecipeManager recipeManager;
@@ -275,12 +276,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     private void updateResult() {
         if (level == null || knappingFinished || resultCollected) return;
 
-        // Create RecipeInput from container items
-        List<ItemStack> items = new ArrayList<>(9);
-        for (int i = 0; i < 9; i++) {
-            items.add(craftingGrid.getItem(i));
-        }
-        CraftingInput recipeInput = CraftingInput.of(3, 3, items);
+        RecipeInput recipeInput = new RecipeWrapper(craftingGridHandler);
 
         RecipeHolder<RockKnappingRecipe> recipeHolder = recipeManager
                 .getRecipeFor(ModRecipeTypes.KNAPPING.get(), recipeInput, level)
