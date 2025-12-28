@@ -12,9 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkHooks;
 import net.stirdrem.overgeared.screen.RockKnappingMenuProvider;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -41,11 +39,12 @@ public class KnappableRockItem extends Item {
 
             // Only open GUI if both hands have rocks
             if (mainHand.getItem() instanceof KnappableRockItem && offHand.getItem() instanceof KnappableRockItem) {
-                NetworkHooks.openScreen((ServerPlayer) player, new RockKnappingMenuProvider(), buf -> {
-                    // Pass both items to the menu
-                    buf.writeItem(mainHand);
-                    buf.writeItem(offHand);
-                });
+                if (player instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.openMenu(new RockKnappingMenuProvider(), buf -> {
+                        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, mainHand);
+                        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, offHand);
+                    });
+                }
             }
         }
 
@@ -53,9 +52,11 @@ public class KnappableRockItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(Component.translatable("tooltip.overgeared.knappable_rock.tooltip").withStyle(ChatFormatting.DARK_GRAY)
-        );
-        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(
+                Component.translatable(
+                        "tooltip.overgeared.knappable_rock.tooltip")
+                        .withStyle(ChatFormatting.DARK_GRAY));
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 }

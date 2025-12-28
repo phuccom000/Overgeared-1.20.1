@@ -1,0 +1,31 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+issueTrackerURL = "https://github.com/phuccom000/Overgeared-1.20.1/issues"
+license = "${mod_license}"
+
+[[mods]]
+authors = "${mod_authors}"
+credits = "To everyone in waccyy's Fantasia Discord server for helping me with this mod."
+description = "${mod_description}"
+displayName = "${mod_name}"
+displayURL = "https://github.com/phuccom000/Overgeared-1.20.1"
+logoFile = "logo.png"
+modId = "${mod_id}"
+version = "${mod_version}"
+
+[[dependencies.${ mod_id }]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${ mod_id }]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config = "overgeared.mixins.json"

@@ -1,29 +1,17 @@
 package net.stirdrem.overgeared.recipe;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.stirdrem.overgeared.OvergearedMod;
-import org.jetbrains.annotations.Nullable;
 
-public class RockKnappingRecipe implements Recipe<Container> {
-    private final ResourceLocation id;
-    private final ItemStack output;
-    private final boolean[][] pattern; // true means clicked, false means unclicked
-    private final boolean mirrored; // whether the pattern should accept mirror versions
-
-    public RockKnappingRecipe(ResourceLocation id, ItemStack output, boolean[][] pattern, boolean mirrored) {
-        this.id = id;
+/**
+ * @param pattern  true means clicked, false means unclicked
+ * @param mirrored whether the pattern should accept mirror versions
+ */
+public record RockKnappingRecipe(ItemStack output, boolean[][] pattern,
+                                 boolean mirrored) implements Recipe<RecipeInput> {
+    public RockKnappingRecipe(ItemStack output, boolean[][] pattern, boolean mirrored) {
         this.output = output;
         this.pattern = pattern;
         this.mirrored = mirrored;
@@ -35,15 +23,15 @@ public class RockKnappingRecipe implements Recipe<Container> {
     }
 
     @Override
-    public boolean matches(Container inv, Level world) {
-        if (inv.getContainerSize() != 9) return false;
+    public boolean matches(RecipeInput input, Level world) {
+        if (input.size() != 9) return false;
 
-        // Convert container to 3x3 grid (true = unchipped, false = chipped)
+        // Convert recipe input to 3x3 grid (true = unchipped, false = chipped)
         boolean[][] inputGrid = new boolean[3][3];
         for (int i = 0; i < 9; i++) {
             int row = i / 3;
             int col = i % 3;
-            inputGrid[row][col] = inv.getItem(i).isEmpty(); // Inverted logic: empty slot = chipped
+            inputGrid[row][col] = input.getItem(i).isEmpty(); // Inverted logic: empty slot = chipped
         }
 
         // Check pattern at all possible offsets
@@ -117,7 +105,7 @@ public class RockKnappingRecipe implements Recipe<Container> {
 
 
     @Override
-    public ItemStack assemble(Container pContainer, RegistryAccess pRegistryAccess) {
+    public ItemStack assemble(RecipeInput pInput, HolderLookup.Provider pRegistries) {
         return output.copy();
     }
 
@@ -128,81 +116,17 @@ public class RockKnappingRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider pRegistries) {
         return output;
     }
 
     @Override
-    public ResourceLocation getId() {
-        return id;
-    }
-
-    @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.ROCK_KNAPPING_SERIALIZER.get();
+        return ModRecipeSerializers.ROCK_KNAPPING_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<?> getType() {
         return ModRecipeTypes.KNAPPING.get();
-    }
-
-    public boolean[][] getPattern() {
-        return pattern;
-    }
-
-    public static class Type implements RecipeType<RockKnappingRecipe> {
-        public static final Type INSTANCE = new Type();
-        public static final String ID = "rock_knapping";
-    }
-
-    public static class Serializer implements RecipeSerializer<RockKnappingRecipe> {
-        public static final Serializer INSTANCE = new Serializer();
-        public static final ResourceLocation ID = ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "rock_knapping");
-
-        @Override
-        public RockKnappingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
-            ItemStack output = buffer.readItem(); // Must match writeItem
-            boolean[][] pattern = new boolean[3][3];
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    pattern[i][j] = buffer.readBoolean(); // 9 reads
-                }
-            }
-            boolean mirrored = buffer.readBoolean(); // 1 read
-            return new RockKnappingRecipe(id, output, pattern, mirrored);
-        }
-
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buffer, RockKnappingRecipe recipe) {
-            buffer.writeItem(recipe.output); // This writes variable number of bytes
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    buffer.writeBoolean(recipe.pattern[i][j]); // 9 booleans = 9 bytes
-                }
-            }
-            buffer.writeBoolean(recipe.mirrored); // 1 byte
-        }
-
-        @Override
-        public RockKnappingRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
-            ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "result"));
-
-            JsonArray patternArray = GsonHelper.getAsJsonArray(pSerializedRecipe, "pattern");
-            boolean[][] pattern = new boolean[3][3];
-
-            for (int i = 0; i < patternArray.size(); i++) {
-                String row = GsonHelper.convertToString(patternArray.get(i), "pattern row");
-                for (int j = 0; j < row.length(); j++) {
-                    char c = row.charAt(j);
-                    pattern[i][j] = (c == 'x' || c == 'X');
-                }
-            }
-
-            boolean mirrored = GsonHelper.getAsBoolean(pSerializedRecipe, "mirrored", false);
-
-            return new RockKnappingRecipe(pRecipeId, output, pattern, mirrored);
-        }
     }
 }
