@@ -7,7 +7,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
-import net.stirdrem.overgeared.recipe.ModRecipes;
+import net.stirdrem.overgeared.recipe.ModRecipeSerializers;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ public final class OvergearedMod {
         ModItems.register(modEventBus);
         ModMenuTypes.register(modEventBus);
         ModRecipeTypes.register(modEventBus);
-        ModRecipes.register(modEventBus);
+        ModRecipeSerializers.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
         //ModLoadingContext.get().registerExtensionPoint(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);

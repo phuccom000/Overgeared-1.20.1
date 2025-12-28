@@ -1,23 +1,21 @@
 package net.stirdrem.overgeared.recipe;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.stirdrem.overgeared.OvergearedMod;
 
 import java.util.function.Supplier;
 
-public class ModRecipes {
-    public static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS =
+public class ModRecipeSerializers {
+    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, OvergearedMod.MOD_ID);
 
 //    public static final RegistryObject<RecipeSerializer<ForgingRecipe>> FORGING_SERIALIZER =
 //            SERIALIZERS.register("forging", () -> ForgingRecipe.Serializer.INSTANCE);
     public static final Supplier<RecipeSerializer<RockKnappingRecipe>> ROCK_KNAPPING_SERIALIZER =
-            SERIALIZERS.register("rock_knapping", RockKnappingSerializer::new);
+            RECIPE_SERIALIZERS.register("rock_knapping", RockKnappingSerializer::new);
 //    public static final RegistryObject<RecipeSerializer<OvergearedShapelessRecipe>> CRAFTING_SHAPELESS =
 //            SERIALIZERS.register("crafting_shapeless", () -> OvergearedShapelessRecipe.Serializer.INSTANCE);
 //    public static final RegistryObject<RecipeSerializer<BlueprintCloningRecipe>> CRAFTING_BLUEPRINTCLONING =
@@ -52,7 +50,7 @@ public class ModRecipes {
 //            SERIALIZERS.register("grinding", GrindingRecipe.Serializer::new);
 
     public static void register(IEventBus eventBus) {
-        SERIALIZERS.register(eventBus);
+        RECIPE_SERIALIZERS.register(eventBus);
     }
 }
 

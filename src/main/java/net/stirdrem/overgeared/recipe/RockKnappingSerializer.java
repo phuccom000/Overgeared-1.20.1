@@ -34,13 +34,13 @@ public class RockKnappingSerializer implements RecipeSerializer<RockKnappingReci
           }
   );
 
-  private static final MapCodec<RockKnappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-          ItemStack.CODEC.fieldOf("result").forGetter(RockKnappingRecipe::getOutput),
-          PATTERN_CODEC.fieldOf("pattern").forGetter(RockKnappingRecipe::getPattern),
-          Codec.BOOL.optionalFieldOf("mirrored", false).forGetter(RockKnappingRecipe::isMirrored)
+  public static final MapCodec<RockKnappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+          ItemStack.CODEC.fieldOf("result").forGetter(RockKnappingRecipe::output),
+          PATTERN_CODEC.fieldOf("pattern").forGetter(RockKnappingRecipe::pattern),
+          Codec.BOOL.optionalFieldOf("mirrored", false).forGetter(RockKnappingRecipe::mirrored)
   ).apply(instance, RockKnappingRecipe::new));
 
-  private static final StreamCodec<RegistryFriendlyByteBuf, boolean[][]> PATTERN_STREAM_CODEC = new StreamCodec<>() {
+  public static final StreamCodec<RegistryFriendlyByteBuf, boolean[][]> PATTERN_STREAM_CODEC = new StreamCodec<>() {
     @Override
     public boolean[][] decode(RegistryFriendlyByteBuf buffer) {
       boolean[][] pattern = new boolean[3][3];
@@ -71,9 +71,9 @@ public class RockKnappingSerializer implements RecipeSerializer<RockKnappingReci
   public StreamCodec<RegistryFriendlyByteBuf, RockKnappingRecipe> streamCodec() {
     return StreamCodec.composite(
             ItemStack.STREAM_CODEC,
-            RockKnappingRecipe::getOutput,
+            RockKnappingRecipe::output,
             PATTERN_STREAM_CODEC,
-            RockKnappingRecipe::getPattern,
+            RockKnappingRecipe::pattern,
             new StreamCodec<>() {
               @Override
               public Boolean decode(RegistryFriendlyByteBuf buffer) {
@@ -85,7 +85,7 @@ public class RockKnappingSerializer implements RecipeSerializer<RockKnappingReci
                 buffer.writeBoolean(value);
               }
             },
-            RockKnappingRecipe::isMirrored,
+            RockKnappingRecipe::mirrored,
             RockKnappingRecipe::new
     );
   }

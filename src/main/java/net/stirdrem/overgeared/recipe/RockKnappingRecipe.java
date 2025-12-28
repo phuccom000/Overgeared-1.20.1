@@ -5,11 +5,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
-public class RockKnappingRecipe implements Recipe<CraftingInput> {
-    private final ItemStack output;
-    private final boolean[][] pattern; // true means clicked, false means unclicked
-    private final boolean mirrored; // whether the pattern should accept mirror versions
-
+/**
+ * @param pattern  true means clicked, false means unclicked
+ * @param mirrored whether the pattern should accept mirror versions
+ */
+public record RockKnappingRecipe(ItemStack output, boolean[][] pattern,
+                                 boolean mirrored) implements Recipe<RecipeInput> {
     public RockKnappingRecipe(ItemStack output, boolean[][] pattern, boolean mirrored) {
         this.output = output;
         this.pattern = pattern;
@@ -22,7 +23,7 @@ public class RockKnappingRecipe implements Recipe<CraftingInput> {
     }
 
     @Override
-    public boolean matches(CraftingInput input, Level world) {
+    public boolean matches(RecipeInput input, Level world) {
         if (input.size() != 9) return false;
 
         // Convert recipe input to 3x3 grid (true = unchipped, false = chipped)
@@ -104,7 +105,7 @@ public class RockKnappingRecipe implements Recipe<CraftingInput> {
 
 
     @Override
-    public ItemStack assemble(CraftingInput pInput, HolderLookup.Provider pRegistries) {
+    public ItemStack assemble(RecipeInput pInput, HolderLookup.Provider pRegistries) {
         return output.copy();
     }
 
@@ -121,23 +122,11 @@ public class RockKnappingRecipe implements Recipe<CraftingInput> {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.ROCK_KNAPPING_SERIALIZER.get();
+        return ModRecipeSerializers.ROCK_KNAPPING_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<?> getType() {
         return ModRecipeTypes.KNAPPING.get();
-    }
-
-    public boolean[][] getPattern() {
-        return pattern;
-    }
-
-    public ItemStack getOutput() {
-      return output;
-    }
-
-    public boolean isMirrored() {
-      return mirrored;
     }
 }
