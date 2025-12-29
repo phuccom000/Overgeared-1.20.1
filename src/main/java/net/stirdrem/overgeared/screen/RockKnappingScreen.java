@@ -17,6 +17,8 @@ import net.stirdrem.overgeared.networking.packet.KnappingChipC2SPacket;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.minecraft.sounds.SoundEvents.STONE_BREAK;
+
 public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu> {
     private static final ResourceLocation TEXTURE =
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/rock_knapping_gui.png");
@@ -29,8 +31,6 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
     private static final int GRID_ORIGIN_Y = 19;
     private static final int SLOT_SIZE = 16;
 
-    private final Set<Integer> chippedSpots = new HashSet<>();
-
     public RockKnappingScreen(RockKnappingMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageWidth = 176;
@@ -42,22 +42,15 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
     protected void init() {
         super.init();
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
-
-        // Clear any existing chipped spots when initializing
-        chippedSpots.clear();
-
         addKnappingButtons(); // Build initial button states
-
     }
 
     @Override
     protected void containerTick() {
         super.containerTick();
-        if (!menu.isKnappingFinished()) {
-            // Recipe just finished - update buttons
-            addKnappingButtons();
-        } else this.clearWidgets(); // Clears old buttons
-
+        if (menu.isKnappingFinished()) {
+            this.clearWidgets(); // Clears old buttons
+        }
     }
 
     private void addKnappingButtons() {
@@ -82,46 +75,21 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
             boolean isChipped = menu.isChipped(i);
 
 
-            ImageButton button = new ImageButton(
+            ImageButton button = new KnappingImageButton(
                     x, y,
                     SLOT_SIZE, SLOT_SIZE,
-                    new WidgetSprites(UNCHIPPED_TEXTURE, CHIPPED_TEXTURE),
+                    new WidgetSprites(UNCHIPPED_TEXTURE, CHIPPED_TEXTURE, UNCHIPPED_TEXTURE, CHIPPED_TEXTURE),
+                    menu,
                     btn -> {
                         if ((!hasResult || canContinueKnapping) && !isChipped) {
                             menu.setChip(index);
-                            chippedSpots.add(index);
                             if (!resultCollected) {
                                 PacketDistributor.sendToServer(new KnappingChipC2SPacket(index));
-                              if (minecraft != null && minecraft.player != null) {
-                                minecraft.player.playSound(net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.0F, 1.0F);
-                              }
                             }
-                            addKnappingButtons(); // Refresh visuals
+                            btn.active = false;
                         }
                     }
-            ) {
-                @Override
-                public boolean mouseClicked(double mouseX, double mouseY, int button) {
-                    if (!menu.isKnappingFinished()) {
-                        return super.mouseClicked(mouseX, mouseY, button);
-                    }
-                    return false;
-                }
-
-                @Override
-                public void playDownSound(SoundManager pHandler) {
-                }
-
-                @Override
-                public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-                    // Don't render the default button texture - we'll render manually in renderBg
-                }
-
-            };
-
-            // ❗ Disable the button if knapping is done or spot is already chipped
-            button.active = !menu.isKnappingFinished();
-
+            );
             this.addRenderableWidget(button);
         }
     }
@@ -145,17 +113,6 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
 
         // Draw main background
         graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
-
-        // Render the knapping grid textures
-        for (int i = 0; i < 9; i++) {
-            int col = i % 3;
-            int row = i / 3;
-            int spotX = x + GRID_ORIGIN_X + col * SLOT_SIZE;
-            int spotY = y + GRID_ORIGIN_Y + row * SLOT_SIZE;
-
-            ResourceLocation texture = menu.isChipped(i) ? CHIPPED_TEXTURE : UNCHIPPED_TEXTURE;
-            graphics.blit(texture, spotX, spotY, 0, 0, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE);
-        }
     }
 
     @Override
@@ -164,31 +121,35 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
         graphics.drawString(this.font, this.playerInventoryTitle, 8, this.inventoryLabelY, 0x404040, false);
     }
 
-    private void handleKnappingDrag(double mouseX, double mouseY) {
-        for (int i = 0; i < 9; i++) {
-            int col = i % 3;
-            int row = i / 3;
-            int x = this.leftPos + GRID_ORIGIN_X + col * SLOT_SIZE;
-            int y = this.topPos + GRID_ORIGIN_Y + row * SLOT_SIZE;
+    private class KnappingImageButton extends ImageButton {
 
-            if (mouseX >= x && mouseX < x + SLOT_SIZE &&
-                    mouseY >= y && mouseY < y + SLOT_SIZE &&
-                    !menu.isKnappingFinished() &&
-                    !menu.isChipped(i)) {
+        private final RockKnappingMenu menu;
 
-                menu.setChip(i);
-                chippedSpots.add(i);
-                if (!menu.isResultCollected()) {
-                    PacketDistributor.sendToServer(new KnappingChipC2SPacket(i));
-                    if (minecraft != null && minecraft.player != null) {
-                        minecraft.player.playSound(net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.0F, 1.0F);
-                    }
-                }
+        public KnappingImageButton(int x, int y, int width, int height, WidgetSprites sprites, RockKnappingMenu menu, OnPress onPress) {
+            super(x, y, width, height, sprites, onPress);
+            this.menu = menu;
+        }
 
-                addKnappingButtons(); // Refresh visuals
-                break; // Avoid double-processing
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (!menu.isKnappingFinished()) {
+                return super.mouseClicked(mouseX, mouseY, button);
+            }
+            return false;
+        }
+
+        @Override
+        public void playDownSound(SoundManager pHandler) {
+            if (minecraft != null && minecraft.player != null) {
+                minecraft.player.playSound(STONE_BREAK, 1.0F, 1.0F);
             }
         }
-    }
 
+        @Override
+        public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            ResourceLocation resourceLocation = this.sprites.get(this.isActive(), this.isHoveredOrFocused());
+            // we're using guiGraphics.blit instead of blitSprite because our textures are not in the gui atlas
+            guiGraphics.blit(resourceLocation, this.getX(), this.getY(), 0, 0, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE);
+        }
+    }
 }
