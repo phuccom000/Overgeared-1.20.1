@@ -3,6 +3,7 @@ package net.stirdrem.overgeared.screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
+import net.stirdrem.overgeared.datapack.KnappingResourceReloadListener;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
@@ -55,6 +57,11 @@ public class RockKnappingMenu extends AbstractContainerMenu {
             this.inputRock = offHandItem.copy();
         } else {
             // No knappable item found – close the menu
+            playerInv.player.closeContainer();
+            return;
+        }
+        if (!mainHandItem.is(ModTags.Items.KNAPPABLE)
+                || !ItemStack.isSameItemSameTags(mainHandItem, offHandItem)) {
             playerInv.player.closeContainer();
             return;
         }
@@ -124,6 +131,14 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         for (int col = 0; col < 9; ++col) {
             this.addSlot(new Slot(playerInv, col, 8 + col * 18, 142));
         }
+    }
+
+    public ResourceLocation getUnchippedTexture() {
+        return KnappingResourceReloadListener.getTexture(inputRock);
+    }
+
+    public SoundEvent getSound() {
+        return KnappingResourceReloadListener.getSound(inputRock);
     }
 
     @Override
@@ -234,7 +249,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
             craftingGrid.setItem(index, ItemStack.EMPTY);
         } else {
             // Add chip (make chipped) - using a marker item
-            craftingGrid.setItem(index, new ItemStack(net.minecraft.world.item.Items.FLINT));
+            craftingGrid.setItem(index, new ItemStack(inputRock.getItem()));
         }
 
         updateResult();
@@ -262,17 +277,23 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         if (level == null || knappingFinished || resultCollected) return;
 
         RockKnappingRecipe matchingRecipe = recipeManager
-                .getRecipeFor(ModRecipeTypes.KNAPPING.get(), craftingGrid, level)
+                .getAllRecipesFor(ModRecipeTypes.KNAPPING.get())
+                .stream()
+                .filter(recipe -> recipe.getIngredient().test(inputRock))
+                .filter(recipe -> recipe.matches(craftingGrid, level))
+                .findFirst()
                 .orElse(null);
 
         if (matchingRecipe != null) {
-            resultContainer.setItem(0, matchingRecipe.getResultItem(level.registryAccess()).copy());
+            resultContainer.setItem(0,
+                    matchingRecipe.getResultItem(level.registryAccess()).copy());
         } else {
             resultContainer.setItem(0, ItemStack.EMPTY);
         }
 
         broadcastChanges();
     }
+
 
     public boolean isChipped(int index) {
         // Returns true if this position is chipped (has a marker item)

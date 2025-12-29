@@ -4,6 +4,7 @@
   "hammering": 4,
   "has_quality": false,
   "needs_minigame": false,
+  "need_quenching": false,
   "pattern": [
     "#"
   ],

@@ -4,6 +4,9 @@
     "x",
     "x"
   ],
+  "ingredient": {
+    "item": "overgeared:knappable_rock"
+  },
   "result": {
     "item": "overgeared:stone_sword_blade"
   },

@@ -410,6 +410,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_PLATE.get(), 3)
                 .tier(AnvilTier.STONE)
+                .setNeedQuenching(false)
                 .setQuality(false)
                 .pattern("#")
                 .define('#', Items.IRON_INGOT)
@@ -417,6 +418,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .save(pWriter);
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COPPER_PLATE.get(), 3)
                 .tier(AnvilTier.STONE)
+                .setNeedQuenching(false)
                 .setQuality(false)
                 .pattern("#")
                 .define('#', Items.COPPER_INGOT)

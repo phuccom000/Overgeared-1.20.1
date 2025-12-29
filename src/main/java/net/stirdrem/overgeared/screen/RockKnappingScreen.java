@@ -21,8 +21,6 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/rock_knapping_gui.png");
     private static final ResourceLocation CHIPPED_TEXTURE =
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/blank.png");
-    private static final ResourceLocation UNCHIPPED_TEXTURE =
-            ResourceLocation.tryParse("textures/block/stone.png");
 
     private static final int GRID_ORIGIN_X = 32;
     private static final int GRID_ORIGIN_Y = 19;
@@ -78,7 +76,10 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
             int y = this.topPos + GRID_ORIGIN_Y + row * SLOT_SIZE;
 
             final int index = i;
-            ResourceLocation texture = menu.isChipped(i) || resultCollected ? CHIPPED_TEXTURE : UNCHIPPED_TEXTURE;
+            ResourceLocation texture = menu.isChipped(i) || resultCollected
+                    ? CHIPPED_TEXTURE
+                    : menu.getUnchippedTexture();
+
             boolean isChipped = menu.isChipped(i);
 
             ImageButton button = new ImageButton(
@@ -93,7 +94,8 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
                             chippedSpots.add(index);
                             if (!resultCollected) {
                                 ModMessages.sendToServer(new KnappingChipC2SPacket(index));
-                                minecraft.player.playSound(net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.0F, 1.0F);
+
+                                minecraft.player.playSound(menu.getSound(), 1.0F, 1.0F);
                             }
                             addKnappingButtons(); // Refresh visuals
                         }

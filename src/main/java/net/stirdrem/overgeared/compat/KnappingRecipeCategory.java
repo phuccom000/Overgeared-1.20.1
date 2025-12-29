@@ -9,13 +9,12 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.ModBlocks;
+import net.stirdrem.overgeared.datapack.KnappingResourceReloadListener;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
 
@@ -25,8 +24,6 @@ public class KnappingRecipeCategory implements IRecipeCategory<RockKnappingRecip
             "textures/gui/rock_knapping_jei.png");
     private static final ResourceLocation CHIPPED_TEXTURE =
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/blank.png");
-    private static final ResourceLocation UNCHIPPED_TEXTURE =
-            ResourceLocation.tryParse("textures/block/stone.png");
 
     public static final RecipeType<RockKnappingRecipe> KNAPPING_RECIPE_TYPE =
             new RecipeType<>(UID, RockKnappingRecipe.class);
@@ -75,26 +72,52 @@ public class KnappingRecipeCategory implements IRecipeCategory<RockKnappingRecip
     }
 
     @Override
-    public void draw(RockKnappingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics,
-                     double mouseX, double mouseY) {
-        Minecraft mc = Minecraft.getInstance();
+    public void draw(RockKnappingRecipe recipe,
+                     IRecipeSlotsView recipeSlotsView,
+                     GuiGraphics guiGraphics,
+                     double mouseX,
+                     double mouseY) {
 
-        // Draw 3×3 texture grid
         boolean[][] pattern = recipe.getPattern();
+
+        int patternHeight = pattern.length;
+        int patternWidth = patternHeight > 0 ? pattern[0].length : 0;
+
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
+
                 int posX = 3 + x * 16;
                 int posY = 3 + y * 16;
 
-                ResourceLocation texture = pattern[y][x] ? UNCHIPPED_TEXTURE : CHIPPED_TEXTURE;
+                boolean isUnchipped = false;
+
+                // ✅ SAFE bounds check
+                if (y < patternHeight && x < patternWidth) {
+                    isUnchipped = pattern[y][x];
+                }
+
+                ResourceLocation texture = isUnchipped
+                        ? resolveUnchippedTexture(recipe)
+                        : CHIPPED_TEXTURE;
+
                 guiGraphics.blit(texture, posX, posY, 0, 0, 16, 16, 16, 16);
             }
         }
-
-       /* // Optional: text under grid
-        guiGraphics.drawString(mc.font,
-                Component.translatable("jei.overgeared.knapping_pattern"),
-                30, HEIGHT - 10, 0x404040, false);*/
     }
+
+    private ResourceLocation resolveUnchippedTexture(RockKnappingRecipe recipe) {
+        ItemStack[] stacks = recipe.getIngredient().getItems();
+
+        for (ItemStack stack : stacks) {
+            ResourceLocation tex = KnappingResourceReloadListener.getTexture(stack);
+            if (tex != null) {
+                return tex;
+            }
+        }
+
+        // Fallback if no datapack entry exists
+        return ResourceLocation.tryParse("textures/block/stone.png");
+    }
+
 
 }

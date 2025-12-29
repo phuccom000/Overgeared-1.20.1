@@ -292,129 +292,141 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     }
 
     protected void craftItem() {
-        Optional<ForgingRecipe> recipeOptional = getCurrentRecipe();
-        if (recipeOptional.isEmpty()) return;
+        Optional<ForgingRecipe> opt = getCurrentRecipe();
+        if (opt.isEmpty()) return;
 
-        ForgingRecipe recipe = recipeOptional.get();
-        ItemStack result = recipe.getResultItem(getLevel().registryAccess());
-        failedResult = recipe.getFailedResultItem(getLevel().registryAccess());
-        ForgingQuality minimumQuality = recipe.getMinimumQuality();
-        // Only set quality if recipe supports it
+        ForgingRecipe recipe = opt.get();
+        ItemStack result = recipe.getResultItem(level.registryAccess());
+        failedResult = recipe.getFailedResultItem(level.registryAccess());
 
+        // Collect max ingredient quality
         ForgingQuality maxIngredientQuality = null;
         for (int i = 0; i < 9; i++) {
-            ItemStack ingredient = itemHandler.getStackInSlot(i);
-            if (ingredient.hasTag() && ingredient.getTag().contains("ForgingQuality")) {
-                ForgingQuality q = ForgingQuality.fromString(ingredient.getTag().getString("ForgingQuality"));
-                if (q != null && (maxIngredientQuality == null || q.ordinal() > maxIngredientQuality.ordinal())) {
-                    maxIngredientQuality = q;
+            ItemStack stack = itemHandler.getStackInSlot(i);
+            if (!stack.hasTag()) continue;
+
+            ForgingQuality q =
+                    ForgingQuality.fromString(stack.getTag().getString("ForgingQuality"));
+
+            if (q != null && (maxIngredientQuality == null || q.ordinal() > maxIngredientQuality.ordinal())) {
+                maxIngredientQuality = q;
+            }
+        }
+
+        CompoundTag resultTag = result.getOrCreateTag();
+
+        // Base result NBT
+        if (recipe.hasQuality()
+                && player != null
+                && ServerConfig.PLAYER_AUTHOR_TOOLTIPS.get()) {
+            resultTag.putString("Creator", player.getName().getString());
+        }
+
+        if (recipe.needQuenching()
+                && !result.is(ModTags.Items.HEATED_METALS)
+                && !result.is(ModTags.Items.HOT_ITEMS)) {
+            resultTag.putBoolean("Heated", true);
+        }
+
+        // Quality & minigame resolution
+        if (ServerConfig.ENABLE_MINIGAME.get()
+                && (recipe.hasQuality() || recipe.needsMinigame())) {
+
+            ForgingQuality quality =
+                    ForgingQuality.fromString(determineForgingQuality());
+
+            if (quality != null && quality != ForgingQuality.NONE) {
+
+                // Clamp minimum
+                ForgingQuality minimum = recipe.getMinimumQuality();
+                if (minimum != null && quality.ordinal() < minimum.ordinal()) {
+                    quality = minimum;
+                }
+
+                // Clamp ingredient max
+                if (maxIngredientQuality != null
+                        && ServerConfig.INGREDIENTS_DEFINE_MAX_QUALITY.get()
+                        && quality.ordinal() > maxIngredientQuality.ordinal()) {
+                    quality = maxIngredientQuality;
+                }
+
+                // PERFECT → MASTER roll
+                if (quality == ForgingQuality.PERFECT
+                        && ServerConfig.MASTER_QUALITY_CHANCE.get() > 0
+                        && level.random.nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
+                    quality = ForgingQuality.MASTER;
+                }
+
+                // Apply quality NBT
+                if (recipe.hasQuality()) {
+                    resultTag.putString("ForgingQuality", quality.getDisplayName());
+
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        ModAdvancementTriggers.FORGING_QUALITY
+                                .trigger(serverPlayer, quality.getDisplayName());
+                    }
+                    if (!(result.getItem() instanceof ArmorItem)
+                            && !(result.getItem() instanceof ShieldItem)
+                            && recipe.hasPolishing()) {
+                        resultTag.putBoolean("Polished", false);
+                    }
+                }
+
+                // Failure roll
+                if (rollFailure(quality)) {
+                    result = failedResult.copy();
                 }
             }
         }
 
-        if (recipe.hasQuality() && player != null && ServerConfig.PLAYER_AUTHOR_TOOLTIPS.get()) {
-            CompoundTag tag = new CompoundTag();
-            tag.putString("Creator", player.getName().getString());
-            result.setTag(tag);
-        }
-
-        if (recipe.hasQuality()) {
-            if (ServerConfig.ENABLE_MINIGAME.get()) {
-                String qualityStr = determineForgingQuality();
-                if (!Objects.equals(qualityStr, ForgingQuality.NONE.getDisplayName())) {
-                    ForgingQuality quality = ForgingQuality.fromString(qualityStr);
-                    if (quality != null) {
-                        // Clamp to minimum quality if needed
-                        if (minimumQuality != null && quality.ordinal() < minimumQuality.ordinal()) {
-                            quality = minimumQuality;
-                        }
-                        // Clamp to maximum quality
-                        if (maxIngredientQuality != null && quality.ordinal() > maxIngredientQuality.ordinal() && ServerConfig.INGREDIENTS_DEFINE_MAX_QUALITY.get()) {
-                            quality = maxIngredientQuality;
-                        }
-
-                        CompoundTag tag = result.getOrCreateTag();
-
-                        if (quality == ForgingQuality.PERFECT) {
-                            if (ServerConfig.MASTER_QUALITY_CHANCE.get() != 0 &&
-                                    new Random().nextFloat() < ServerConfig.MASTER_QUALITY_CHANCE.get()) {
-                                quality = ForgingQuality.MASTER;
-                            }
-                        }
-                        tag.putString("ForgingQuality", quality.getDisplayName());
-
-                        if (player instanceof ServerPlayer serverPlayer) {
-                            ModAdvancementTriggers.FORGING_QUALITY
-                                    .trigger(serverPlayer, quality.getDisplayName());
-                        }
-                        if (!(result.getItem() instanceof ArmorItem) &&
-                                !(result.getItem() instanceof ShieldItem) &&
-                                recipe.hasPolishing()) {
-                            tag.putBoolean("Polished", false);
-                        }
-                        if (recipe.needQuenching() && (!result.is(ModTags.Items.HEATED_METALS) || !result.is(ModTags.Items.HOT_ITEMS))) {
-                            tag.putBoolean("Heated", true);
-                            result.setTag(tag);
-                        }
-                    }
-                }
-            }
-        } else if (recipe.needsMinigame()) {
-            // Handle minigame result without quality
-            if (ServerConfig.ENABLE_MINIGAME.get()) {
-                String quality = determineForgingQuality();
-                if (!Objects.equals(quality, ForgingQuality.NONE.getDisplayName())) {
-                    boolean fail = false;
-
-                    if (quality.equals(ForgingQuality.POOR.getDisplayName())) {
-                        fail = true;
-                    } else if (quality.equals(ForgingQuality.WELL.getDisplayName())) {
-                        float failChance = ServerConfig.FAIL_ON_WELL_QUALITY_CHANCE.get().floatValue();
-                        fail = new Random().nextFloat() < failChance;
-                    } else if (quality.equals(ForgingQuality.EXPERT.getDisplayName())) {
-                        float failChance = ServerConfig.FAIL_ON_EXPERT_QUALITY_CHANCE.get().floatValue();
-                        fail = new Random().nextFloat() < failChance;
-                    }
-
-                    if (fail) {
-                        result = failedResult.copy();
-                    }
-                }
-            }
-        }
+        transferIngredientNBT(result, recipe);
 
 
-        // Extract ingredients
         for (int i = 0; i < 9; i++) {
-            this.itemHandler.extractItem(i, 1, false);
+            itemHandler.extractItem(i, 1, false);
         }
 
-        ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);
+
+        ItemStack existing = itemHandler.getStackInSlot(OUTPUT_SLOT);
 
         if (existing.isEmpty()) {
-            // If the output slot is empty, just set the result
-            this.itemHandler.setStackInSlot(OUTPUT_SLOT, result);
-        } else if (ItemStack.isSameItemSameTags(existing, result)) {
-            // If the same item (with same NBT), try to stack them
-            int total = existing.getCount() + result.getCount();
-            int maxSize = Math.min(existing.getMaxStackSize(), this.itemHandler.getSlotLimit(OUTPUT_SLOT));
-
-            if (total <= maxSize) {
-                existing.grow(result.getCount());
-                this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
-            } else {
-                // If not all items fit, grow to max and optionally handle overflow
-                int remainder = total - maxSize;
-                existing.setCount(maxSize);
-                this.itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
-
-                // Handle remainder if needed (e.g. drop, store elsewhere, etc.)
-                ItemStack overflow = result.copy();
-                overflow.setCount(remainder);
-                // Example: drop the overflow into the world
-                Containers.dropItemStack(getLevel(), getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), overflow);
-            }
+            itemHandler.setStackInSlot(OUTPUT_SLOT, result);
+            return;
         }
+
+        if (!ItemStack.isSameItemSameTags(existing, result)) return;
+
+        int total = existing.getCount() + result.getCount();
+        int max = Math.min(existing.getMaxStackSize(),
+                itemHandler.getSlotLimit(OUTPUT_SLOT));
+
+        if (total <= max) {
+            existing.grow(result.getCount());
+        } else {
+            int overflow = total - max;
+            existing.setCount(max);
+
+            ItemStack drop = result.copy();
+            drop.setCount(overflow);
+            Containers.dropItemStack(level,
+                    worldPosition.getX(),
+                    worldPosition.getY(),
+                    worldPosition.getZ(),
+                    drop);
+        }
+
+        itemHandler.setStackInSlot(OUTPUT_SLOT, existing);
+    }
+
+    private boolean rollFailure(ForgingQuality quality) {
+        return switch (quality) {
+            case POOR -> true;
+            case WELL -> level.random.nextFloat()
+                    < ServerConfig.FAIL_ON_WELL_QUALITY_CHANCE.get();
+            case EXPERT -> level.random.nextFloat()
+                    < ServerConfig.FAIL_ON_EXPERT_QUALITY_CHANCE.get();
+            default -> false;
+        };
     }
 
     protected void craftItemWithBlueprint() {
@@ -478,6 +490,63 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             }
         }
     }
+
+    private void transferIngredientNBT(ItemStack result, ForgingRecipe recipe) {
+        CompoundTag resultTag = result.getOrCreateTag();
+
+        List<ForgingRecipe.ForgingIngredient> ingredients =
+                recipe.getForgingIngredients();
+
+        int transferredDamage = Integer.MAX_VALUE;
+        boolean foundDamage = false;
+
+        for (int slot = 0; slot < Math.min(9, ingredients.size()); slot++) {
+            ForgingRecipe.ForgingIngredient forgingIngredient =
+                    ingredients.get(slot);
+
+            if (!forgingIngredient.transferNbt()) continue;
+
+            ItemStack ingredientStack = itemHandler.getStackInSlot(slot);
+            if (ingredientStack.isEmpty()) continue;
+
+            // Damage transfer (lowest)
+            if (ingredientStack.isDamageableItem()
+                    && result.isDamageableItem()) {
+
+                transferredDamage = Math.min(
+                        transferredDamage,
+                        ingredientStack.getDamageValue()
+                );
+                foundDamage = true;
+            }
+
+            // NBT transfer
+            if (!ingredientStack.hasTag()) continue;
+
+            CompoundTag ingredientTag = ingredientStack.getTag();
+            if (ingredientTag == null) continue;
+
+            for (String key : ingredientTag.getAllKeys()) {
+                if (key.equals("ForgingQuality")
+                        || key.equals("Creator")
+                        || key.equals("Heated")
+                        || key.equals("Damage")) {
+                    continue;
+                }
+
+                resultTag.put(key, ingredientTag.get(key).copy());
+            }
+        }
+
+        if (foundDamage && result.isDamageableItem()) {
+            result.setDamageValue(
+                    Math.min(transferredDamage, result.getMaxDamage() - 1)
+            );
+        }
+
+        result.setTag(resultTag);
+    }
+
 
     public boolean isFailedResult() {
         ItemStack result = this.itemHandler.getStackInSlot(OUTPUT_SLOT);

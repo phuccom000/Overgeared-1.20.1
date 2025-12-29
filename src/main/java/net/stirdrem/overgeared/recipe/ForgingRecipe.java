@@ -166,8 +166,26 @@ public class ForgingRecipe implements Recipe<Container> {
 
     @Override
     public ItemStack assemble(Container inv, RegistryAccess registryAccess) {
-        return result.copy();
+        ItemStack out = result.copy();
+        CompoundTag merged = new CompoundTag();
+
+        for (int i = 0; i < ingredients.size(); i++) {
+            ForgingIngredient ing = ingredients.get(i);
+            if (!ing.transferNbt()) continue;
+
+            ItemStack stack = inv.getItem(i);
+            if (!stack.hasTag()) continue;
+
+            mergeCompound(merged, stack.getTag());
+        }
+
+        if (!merged.isEmpty()) {
+            out.setTag(merged);
+        }
+
+        return out;
     }
+
 
     @Override
     public boolean canCraftInDimensions(int width, int height) {
@@ -193,6 +211,10 @@ public class ForgingRecipe implements Recipe<Container> {
         }
 
         return list;
+    }
+
+    public NonNullList<ForgingIngredient> getForgingIngredients() {
+        return ingredients;
     }
 
     @Override
@@ -302,9 +324,10 @@ public class ForgingRecipe implements Recipe<Container> {
 
                 Ingredient ingredient = Ingredient.fromJson(obj);
                 boolean requiresHeated = GsonHelper.getAsBoolean(obj, "requires_heated", false);
+                boolean transferNbt = GsonHelper.getAsBoolean(obj, "transfer_nbt", false);
 
                 keyMap.put(entry.getKey().charAt(0),
-                        new ForgingIngredient(ingredient, requiresHeated));
+                        new ForgingIngredient(ingredient, requiresHeated, transferNbt));
             }
 
             return keyMap;
@@ -319,7 +342,7 @@ public class ForgingRecipe implements Recipe<Container> {
         ) {
             NonNullList<ForgingIngredient> ingredients =
                     NonNullList.withSize(width * height,
-                            new ForgingIngredient(Ingredient.EMPTY, false));
+                            new ForgingIngredient(Ingredient.EMPTY, false, false));
 
             for (int y = 0; y < height; y++) {
                 String row = GsonHelper.convertToString(pattern.get(y), "pattern[" + y + "]");
@@ -334,7 +357,7 @@ public class ForgingRecipe implements Recipe<Container> {
 
                     if (ingredient == null) {
                         if (c == ' ') {
-                            ingredient = new ForgingIngredient(Ingredient.EMPTY, false);
+                            ingredient = new ForgingIngredient(Ingredient.EMPTY, false, false);
                         } else {
                             throw new JsonSyntaxException(
                                     "Pattern references undefined symbol: '" + c + "'"
@@ -463,10 +486,16 @@ public class ForgingRecipe implements Recipe<Container> {
             NonNullList<ForgingIngredient> ingredients =
                     NonNullList.withSize(
                             width * height,
-                            new ForgingIngredient(Ingredient.EMPTY, false)
+                            new ForgingIngredient(Ingredient.EMPTY, false, false)
                     );
 
-            ingredients.replaceAll(ignored -> new ForgingIngredient(Ingredient.fromNetwork(buffer), buffer.readBoolean()));
+            ingredients.replaceAll(ignored ->
+                    new ForgingIngredient(
+                            Ingredient.fromNetwork(buffer),
+                            buffer.readBoolean(),
+                            buffer.readBoolean()
+                    )
+            );
 
             ForgingQuality qualityDifficulty = ForgingQuality.fromString(buffer.readUtf());
 
@@ -498,7 +527,9 @@ public class ForgingRecipe implements Recipe<Container> {
             for (ForgingIngredient ingredient : recipe.ingredients) {
                 ingredient.ingredient.toNetwork(buffer);
                 buffer.writeBoolean(ingredient.requiresHeated);
+                buffer.writeBoolean(ingredient.transferNbt);
             }
+
             buffer.writeUtf(recipe.qualityDifficulty.toString());
 
             buffer.writeItem(recipe.result);
@@ -506,15 +537,11 @@ public class ForgingRecipe implements Recipe<Container> {
         }
     }
 
-    public static class ForgingIngredient {
-        public final Ingredient ingredient;
-        public final boolean requiresHeated;
-
-        public ForgingIngredient(Ingredient ingredient, boolean requiresHeated) {
-            this.ingredient = ingredient;
-            this.requiresHeated = requiresHeated;
-        }
-
+    public record ForgingIngredient(
+            Ingredient ingredient,
+            boolean requiresHeated,
+            boolean transferNbt
+    ) {
         public boolean test(ItemStack stack) {
             if (!ingredient.test(stack)) return false;
 
@@ -524,6 +551,20 @@ public class ForgingRecipe implements Recipe<Container> {
             }
 
             return true;
+        }
+    }
+
+    private static void mergeCompound(CompoundTag target, CompoundTag source) {
+        for (String key : source.getAllKeys()) {
+            if (target.contains(key)
+                    && target.get(key) instanceof CompoundTag t
+                    && source.get(key) instanceof CompoundTag s) {
+                // Deep merge
+                mergeCompound(t, s);
+            } else {
+                // Overwrite or add
+                target.put(key, source.get(key).copy());
+            }
         }
     }
 
