@@ -11,12 +11,10 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
-import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
-import net.stirdrem.overgeared.item.ModItems;
-import net.stirdrem.overgeared.item.custom.KnappableRockItem;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
+import net.stirdrem.overgeared.util.ModTags;
 
 public class RockKnappingMenu extends AbstractContainerMenu {
     private final Container craftingGrid = new SimpleContainer(9); // 3x3 grid
@@ -51,12 +49,12 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         ItemStack mainHandItem = player.getMainHandItem();
         ItemStack offHandItem = player.getOffhandItem();
 
-        if (mainHandItem.getItem() instanceof KnappableRockItem) {
+        if (mainHandItem.is(ModTags.Items.KNAPPABLE)) {
             this.inputRock = mainHandItem.copy();
-        } else if (offHandItem.getItem() instanceof KnappableRockItem) {
+        } else if (offHandItem.is(ModTags.Items.KNAPPABLE)) {
             this.inputRock = offHandItem.copy();
         } else {
-            // No knappable rock found - close the menu
+            // No knappable item found – close the menu
             playerInv.player.closeContainer();
             return;
         }

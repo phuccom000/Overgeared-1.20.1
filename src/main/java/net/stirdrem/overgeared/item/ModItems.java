@@ -30,7 +30,7 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> ROCK = ITEMS.register("knappable_rock",
-            () -> new KnappableRockItem(new Item.Properties()));
+            () -> new Item(new Item.Properties()));
 
     public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register("steel_ingot",
             () -> new Item(new Item.Properties()));

@@ -60,8 +60,45 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             }
         }
     };
+
+
     protected final ContainerData data;
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+    private final LazyOptional<IItemHandler> outputHandler =
+            LazyOptional.of(() -> new IItemHandler() {
+
+                @Override
+                public int getSlots() {
+                    return 1;
+                }
+
+                @Override
+                public @NotNull ItemStack getStackInSlot(int slot) {
+                    return itemHandler.getStackInSlot(OUTPUT_SLOT);
+                }
+
+                @Override
+                public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+                    return stack;
+                }
+
+                @Override
+                public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+                    return itemHandler.extractItem(OUTPUT_SLOT, amount, simulate);
+                }
+
+                @Override
+                public int getSlotLimit(int slot) {
+                    return itemHandler.getSlotLimit(OUTPUT_SLOT);
+                }
+
+                @Override
+                public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+                    return false;
+                }
+            });
+
+
     protected int progress;
     protected int maxProgress;
     protected int hitRemains;
@@ -120,6 +157,9 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            if (side == Direction.DOWN) {
+                return outputHandler.cast();
+            }
             return LazyOptional.of(() -> itemHandler).cast();
         }
 
@@ -136,6 +176,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     public void invalidateCaps() {
         super.invalidateCaps();
         lazyItemHandler.invalidate();
+        outputHandler.invalidate();
     }
 
     public void drops() {

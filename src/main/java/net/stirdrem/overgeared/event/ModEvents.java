@@ -416,6 +416,9 @@ public class ModEvents {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.stone_hammer_head")
                     .withStyle(ChatFormatting.GRAY));
         }
+        if (stack.is(ModTags.Items.KNAPPABLE)) {
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.knappable_rock.tooltip").withStyle(ChatFormatting.DARK_GRAY));
+        }
         if (stack.is(ModTags.Items.HEATED_METALS)) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatedingots.tooltip")
                     .withStyle(ChatFormatting.RED));
@@ -430,6 +433,7 @@ public class ModEvents {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.hotitems.tooltip")
                     .withStyle(ChatFormatting.RED));
         }
+
         /*if (stack.is(ModTags.Items.GRINDABLE)) {
             tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.grindable")
                     .withStyle(ChatFormatting.GRAY));

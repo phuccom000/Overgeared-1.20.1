@@ -87,7 +87,6 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.STEEL_ARROW_HEAD.get(),
                         ModItems.DIAMOND_SHARD.get()
                 );
-
         this.tag(ItemTags.TOOLS)
                 .add(
                         ModItems.WOODEN_TONGS.get(),
@@ -228,6 +227,10 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.HOT_ITEMS)
                 .add(
                         Items.LAVA_BUCKET
+                );
+        this.tag(ModTags.Items.KNAPPABLE)
+                .add(
+                        ModItems.ROCK.get()
                 );
         this.tag(ModTags.Items.TOOL_CAST)
                 .add(

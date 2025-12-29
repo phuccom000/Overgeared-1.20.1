@@ -9,7 +9,8 @@
   "has_quality": true,
   "key": {
     "#": {
-      "item": "overgeared:heated_copper_ingot"
+      "item": "overgeared:heated_copper_ingot",
+      "requires_heated": true
     }
   },
   "minimum_quality": "poor",

@@ -1,7 +1,6 @@
 package net.stirdrem.overgeared.recipe;
 
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;

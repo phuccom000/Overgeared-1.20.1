@@ -65,6 +65,7 @@ import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.GrindingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.screen.FletchingStationMenu;
+import net.stirdrem.overgeared.screen.RockKnappingMenuProvider;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.util.QualityHelper;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -558,6 +559,48 @@ public class ModItemInteractEvents {
             if (!mainHand.is(ModTags.Items.SMITHING_HAMMERS) || !state.is(ModTags.Blocks.SMITHING_ANVIL)) {
                 hideMinigame((ServerPlayer) player);
             }
+        }
+
+    }
+
+    @SubscribeEvent
+    public static void onUsingKnappable(PlayerInteractEvent.RightClickItem event) {
+        Player player = event.getEntity();
+        InteractionHand hand = event.getHand();
+        ItemStack usedStack = event.getItemStack();
+
+        // Only trigger for knappable items
+        if (!usedStack.is(ModTags.Items.KNAPPABLE)) {
+            return;
+        }
+
+        ItemStack mainHand = player.getMainHandItem();
+        ItemStack offHand = player.getOffhandItem();
+
+        // Require BOTH hands to be knappable
+        if (!(mainHand.is(ModTags.Items.KNAPPABLE) && offHand.is(ModTags.Items.KNAPPABLE))) {
+            return;
+        }
+
+        // Prevent vanilla handling
+        event.setCanceled(true);
+        event.setCancellationResult(InteractionResult.SUCCESS);
+
+        if (!player.level().isClientSide && player instanceof ServerPlayer serverPlayer) {
+
+            player.level().playSound(
+                    null,
+                    player.blockPosition(),
+                    SoundEvents.STONE_PLACE,
+                    SoundSource.PLAYERS,
+                    0.6f,
+                    1.0f
+            );
+
+            NetworkHooks.openScreen(serverPlayer, new RockKnappingMenuProvider(), buf -> {
+                buf.writeItem(mainHand);
+                buf.writeItem(offHand);
+            });
         }
     }
 
