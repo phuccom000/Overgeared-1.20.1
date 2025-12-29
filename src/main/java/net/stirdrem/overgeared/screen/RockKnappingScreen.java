@@ -14,18 +14,17 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.networking.packet.KnappingChipC2SPacket;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static net.minecraft.sounds.SoundEvents.STONE_BREAK;
 
 public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu> {
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/rock_knapping_gui.png");
+            ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "textures/gui/rock_knapping_gui.png");
     private static final ResourceLocation CHIPPED_TEXTURE =
-            ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/blank.png");
+            ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "textures/gui/blank.png");
     private static final ResourceLocation UNCHIPPED_TEXTURE =
             ResourceLocation.parse("minecraft:textures/block/stone.png");
+    private static final WidgetSprites WIDGET_SPRITES = new
+            WidgetSprites(UNCHIPPED_TEXTURE, CHIPPED_TEXTURE, UNCHIPPED_TEXTURE, CHIPPED_TEXTURE);
 
     private static final int GRID_ORIGIN_X = 32;
     private static final int GRID_ORIGIN_Y = 19;
@@ -75,11 +74,7 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
             boolean isChipped = menu.isChipped(i);
 
 
-            ImageButton button = new KnappingImageButton(
-                    x, y,
-                    SLOT_SIZE, SLOT_SIZE,
-                    new WidgetSprites(UNCHIPPED_TEXTURE, CHIPPED_TEXTURE, UNCHIPPED_TEXTURE, CHIPPED_TEXTURE),
-                    menu,
+            ImageButton button = new KnappingImageButton(x, y, SLOT_SIZE, SLOT_SIZE, WIDGET_SPRITES,
                     btn -> {
                         if ((!hasResult || canContinueKnapping) && !isChipped) {
                             menu.setChip(index);
@@ -122,20 +117,8 @@ public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu
     }
 
     private class KnappingImageButton extends ImageButton {
-
-        private final RockKnappingMenu menu;
-
-        public KnappingImageButton(int x, int y, int width, int height, WidgetSprites sprites, RockKnappingMenu menu, OnPress onPress) {
+        public KnappingImageButton(int x, int y, int width, int height, WidgetSprites sprites, OnPress onPress) {
             super(x, y, width, height, sprites, onPress);
-            this.menu = menu;
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (!menu.isKnappingFinished()) {
-                return super.mouseClicked(mouseX, mouseY, button);
-            }
-            return false;
         }
 
         @Override
