@@ -405,11 +405,6 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE
         );
         registration.addRecipeCatalyst(
-                new ItemStack(ModItems.ROCK.get()), // or your custom source block
-                KnappingRecipeCategory.KNAPPING_RECIPE_TYPE
-        );
-
-        registration.addRecipeCatalyst(
                 new ItemStack(ModBlocks.TIER_A_SMITHING_ANVIL.get()), // or your custom source block
                 ForgingRecipeCategory.FORGING_RECIPE_TYPE
         );

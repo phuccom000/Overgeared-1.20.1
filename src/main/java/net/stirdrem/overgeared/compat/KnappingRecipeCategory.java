@@ -36,7 +36,7 @@ public class KnappingRecipeCategory implements IRecipeCategory<RockKnappingRecip
 
     public KnappingRecipeCategory(IGuiHelper helper) {
         this.helper = helper;
-        this.background = helper.createDrawable(TEXTURE, 29, 16, 116, 54);
+        this.background = helper.createDrawable(TEXTURE, 7, 16, 138, 54);
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,
                 new ItemStack(ModItems.ROCK.get())); // Or your rock item if preferred
     }
@@ -64,10 +64,10 @@ public class KnappingRecipeCategory implements IRecipeCategory<RockKnappingRecip
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RockKnappingRecipe recipe, IFocusGroup focuses) {
         // Add input rock slot
-        builder.addSlot(RecipeIngredientRole.INPUT, 10000, 10000)
-                .addItemStack(new ItemStack(ModItems.ROCK.get())); // Or your knappable rock item
+        builder.addSlot(RecipeIngredientRole.INPUT, 1, 19)
+                .addIngredients(recipe.getIngredient()); // Or your knappable rock item
         // Add output slot
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 95, 19)
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 19)
                 .addItemStack(recipe.getResultItem(null));
     }
 
@@ -86,7 +86,7 @@ public class KnappingRecipeCategory implements IRecipeCategory<RockKnappingRecip
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
 
-                int posX = 3 + x * 16;
+                int posX = 25 + x * 16;
                 int posY = 3 + y * 16;
 
                 boolean isUnchipped = false;

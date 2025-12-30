@@ -148,7 +148,7 @@
   "message.overgeared.anvil_in_use_by_another": "This anvil is in use by another player!",
   "message.overgeared.item_has_no_quality": "This recipe does not have quality modifier",
   "message.overgeared.no_recipe": "There is no valid recipe!",
-  "tooltip.overgeared.knappable_rock.tooltip": "Hold a rock in each hand and right click to start knapping.",
+  "tooltip.overgeared.knappable": "Hold in each hand and right click to start knapping.",
   "tooltip.overgeared.flint_flavor": "Right click on stone to carve out a piece of rock. Has a chance to break.",
   "tooltip.overgeared.polished": "Polished",
   "tooltip.overgeared.unpolished": "Unpolished",

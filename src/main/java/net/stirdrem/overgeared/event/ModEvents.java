@@ -417,7 +417,7 @@ public class ModEvents {
                     .withStyle(ChatFormatting.GRAY));
         }
         if (stack.is(ModTags.Items.KNAPPABLE)) {
-            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.knappable_rock.tooltip").withStyle(ChatFormatting.DARK_GRAY));
+            tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.knappable").withStyle(ChatFormatting.DARK_GRAY));
         }
         if (stack.is(ModTags.Items.HEATED_METALS)) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heatedingots.tooltip")

@@ -324,22 +324,25 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     @Override
     public void removed(Player player) {
         super.removed(player);
-
-        // Only on server side
-        // If the player hasn't taken the result, but it's there, give it to them
-        ItemStack result = resultContainer.getItem(0);
-        if (!result.isEmpty() && !resultCollected) {
-            if (player instanceof ServerPlayer serverPlayer) {
-                ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
-            }
-            if (!player.getInventory().add(result.copy())) {
-                // Drop if inventory is full
-                player.drop(result.copy(), false);
-            }
-            resultContainer.setItem(0, ItemStack.EMPTY);
+        if (player.containerMenu != this) {
+            return;
         }
+        if (!player.level().isClientSide) {
+            ItemStack result = resultContainer.getItem(0);
+            if (!result.isEmpty() && !resultCollected) {
+                if (player instanceof ServerPlayer serverPlayer) {
+                    ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+                }
 
+                if (!player.getInventory().add(result.copy())) {
+                    player.drop(result.copy(), false);
+                }
+
+                resultContainer.setItem(0, ItemStack.EMPTY);
+            }
+        }
     }
+
 
     // Helper method to get the current grid state as a boolean array
     public boolean[][] getGridState() {

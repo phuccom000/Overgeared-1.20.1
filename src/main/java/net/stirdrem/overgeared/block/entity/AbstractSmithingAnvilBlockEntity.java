@@ -301,14 +301,20 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
         // Collect max ingredient quality
         ForgingQuality maxIngredientQuality = null;
+
         for (int i = 0; i < 9; i++) {
             ItemStack stack = itemHandler.getStackInSlot(i);
             if (!stack.hasTag()) continue;
 
-            ForgingQuality q =
-                    ForgingQuality.fromString(stack.getTag().getString("ForgingQuality"));
+            CompoundTag tag = stack.getTag();
+            if (tag == null || !tag.contains("ForgingQuality", CompoundTag.TAG_STRING)) {
+                continue;
+            }
 
-            if (q != null && (maxIngredientQuality == null || q.ordinal() > maxIngredientQuality.ordinal())) {
+            ForgingQuality q = ForgingQuality.fromString(tag.getString("ForgingQuality"));
+            if (q == null) continue;
+
+            if (maxIngredientQuality == null || q.ordinal() > maxIngredientQuality.ordinal()) {
                 maxIngredientQuality = q;
             }
         }
@@ -371,9 +377,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                         resultTag.putBoolean("Polished", false);
                     }
                 }
-
-                // Failure roll
-                if (rollFailure(quality)) {
+                if (!failedResult.isEmpty() & rollFailure(quality)) {
                     result = failedResult.copy();
                 }
             }
@@ -814,8 +818,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             switch (qualityTiers.get(finalIndex)) {
                 case "poor":
                     return ForgingQuality.POOR.getDisplayName();
-                case "well":
-                    return ForgingQuality.WELL.getDisplayName();
                 case "expert":
                     return ForgingQuality.EXPERT.getDisplayName();
                 case "perfect": {
