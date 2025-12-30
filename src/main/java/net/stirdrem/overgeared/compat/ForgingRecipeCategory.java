@@ -119,27 +119,58 @@ public class ForgingRecipeCategory implements IRecipeCategory<ForgingRecipe> {
         int recipeWidth = recipe.width;
         int recipeHeight = recipe.height;
 
-        NonNullList<Ingredient> ingredients = recipe.getIngredients();
-        Set<String> type = recipe.getBlueprintTypes();
+        NonNullList<ForgingRecipe.ForgingIngredient> forgingIngredients =
+                recipe.getForgingIngredients();
 
         // Create ALL 9 slots of the 3x3 grid
         for (int gridY = 0; gridY < gridHeight; gridY++) {
             for (int gridX = 0; gridX < gridWidth; gridX++) {
+
                 int recipeIndex = gridY * recipeWidth + gridX;
 
-                // Check if this grid position has an ingredient in the recipe
-                if (gridX < recipeWidth && gridY < recipeHeight && recipeIndex < ingredients.size()) {
-                    // This position has an ingredient - add it
-                    Ingredient ingredient = ingredients.get(recipeIndex);
-                    builder.addSlot(RecipeIngredientRole.INPUT, 23 + gridX * 18, 1 + gridY * 18)
-                            .addIngredients(ingredient);
+                var slotBuilder = builder.addSlot(
+                        RecipeIngredientRole.INPUT,
+                        23 + gridX * 18,
+                        1 + gridY * 18
+                );
+
+                if (gridX < recipeWidth
+                        && gridY < recipeHeight
+                        && recipeIndex < forgingIngredients.size()) {
+
+                    ForgingRecipe.ForgingIngredient forgingIngredient =
+                            forgingIngredients.get(recipeIndex);
+
+                    Ingredient ingredient = forgingIngredient.ingredient();
+
+                    // Expand ingredient into item stacks
+                    ItemStack[] stacks = ingredient.getItems();
+
+                    if (stacks.length > 0) {
+                        List<ItemStack> displayStacks = new ArrayList<>();
+
+                        for (ItemStack stack : stacks) {
+                            ItemStack copy = stack.copy();
+
+                            if (forgingIngredient.requiresHeated()) {
+                                copy.getOrCreateTag().putBoolean("Heated", true);
+                            }
+
+                            displayStacks.add(copy);
+                        }
+
+                        slotBuilder.addItemStacks(displayStacks);
+                    } else {
+                        slotBuilder.addItemStack(ItemStack.EMPTY);
+                    }
+
                 } else {
-                    // This position is empty in the recipe - add empty ingredient
-                    builder.addSlot(RecipeIngredientRole.INPUT, 23 + gridX * 18, 1 + gridY * 18)
-                            .addIngredients(Ingredient.EMPTY);
+                    // Empty grid slot
+                    slotBuilder.addItemStack(ItemStack.EMPTY);
                 }
             }
         }
+
 
         // Rest of your code (blueprint and output slots) remains the same...
         //BLUEPRINT SLOT

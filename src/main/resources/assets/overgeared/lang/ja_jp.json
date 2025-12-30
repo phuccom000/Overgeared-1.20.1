@@ -148,7 +148,7 @@
   "message.overgeared.anvil_in_use_by_another": "この金床は他のプレイヤーが使用中！",
   "message.overgeared.item_has_no_quality": "このレシピは品質補正無し",
   "message.overgeared.no_recipe": "有効なレシピがありません！",
-  "tooltip.overgeared.knappable_rock.tooltip": "石を両手に持ち右クリックでノミ打ち開始。",
+  "tooltip.overgeared.knappable": "Hold in each hand and right click to start knapping.",
   "tooltip.overgeared.flint_flavor": "石にノミ打ち。壊れる場合があります。",
   "tooltip.overgeared.polished": "磨かれています",
   "tooltip.overgeared.unpolished": "未磨き",
@@ -236,7 +236,7 @@
   "item.overgeared.arrow.effect.quark.resilience": "Stability",
   "tooltip.overgeared.grindable": "Can be grinded",
   "tooltip.overgeared.diamond_shard": "Sharpened diamond tip from grinding diamond",
-  "tooltip.overgeared.heated": "Needs quenching",
+  "tooltip.overgeared.heated": "Heated",
   "item.overgeared.wooden_tongs": "Wooden Tongs",
   "item.overgeared.unfired_tool_cast": "Unfired Tool Cast",
   "item.overgeared.clay_tool_cast": "Clay Tool Cast",
@@ -245,6 +245,7 @@
   "tooltip.overgeared.tool_cast.type": "Type:",
   "tooltip.overgeared.tool_cast.materials": "Materials:",
   "tooltip.overgeared.tool_cast.amount": "Amount:",
+  "tooltip.overgeared.tool_cast.contains": "Contains:",
   "quality.overgeared.master": "Master",
   "quality.overgeared.perfect": "Perfect",
   "quality.overgeared.expert": "Expert",
@@ -272,5 +273,9 @@
   "tooltip.overgeared.stone_hammer_head": "Can only be used to make a hammer tool cast",
   "overgeared.forging.perfect": "PERFECT!",
   "overgeared.forging.good": "GOOD!",
-  "overgeared.forging.miss": "MISS!"
+  "overgeared.forging.miss": "MISS!",
+  "block.overgeared.casting_furnace": "Casting Furnace",
+  "container.overgeared.casting_furnace": "Casting Furnace",
+  "gui.overgeared.jei.category.casting": "Casting",
+  "tooltip.overgeared.knappable_rock.tooltip": "石を両手に持ち右クリックでノミ打ち開始。"
 }
