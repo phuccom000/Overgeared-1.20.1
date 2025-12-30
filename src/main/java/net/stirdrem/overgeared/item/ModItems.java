@@ -7,6 +7,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.custom.KnappableRockItem;
+import net.stirdrem.overgeared.item.custom.Tongs;
 
 public class ModItems {
   public static final DeferredRegister<Item> ITEMS =
@@ -80,13 +81,13 @@ public class ModItems {
           () -> new Item(new Item.Properties()));
   public static final DeferredHolder<Item, Item> IRON_TONG = ITEMS.register("iron_tong",
           () -> new Item(new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> WOODEN_TONGS = ITEMS.register("wooden_tongs",
-//          () -> new Tongs(Tiers.WOOD, -1, -2f, new Item.Properties().durability(120)));
-//  public static final DeferredHolder<Item, Item> IRON_TONGS = ITEMS.register("iron_tongs",
-//          () -> new Tongs(Tiers.IRON, -1, -2f, new Item.Properties().durability(512)));
-//
-//  public static final DeferredHolder<Item, Item> STEEL_TONGS = ITEMS.register("steel_tongs",
-//          () -> new Tongs(ModToolTiers.STEEL, -1, -2f, new Item.Properties().durability(1024)));
+  public static final DeferredHolder<Item, Item> WOODEN_TONGS = ITEMS.register("wooden_tongs",
+          () -> new Tongs(Tiers.WOOD, -1, -2f, new Item.Properties().durability(120)));
+  public static final DeferredHolder<Item, Item> IRON_TONGS = ITEMS.register("iron_tongs",
+          () -> new Tongs(Tiers.IRON, -1, -2f, new Item.Properties().durability(512)));
+
+  public static final DeferredHolder<Item, Item> STEEL_TONGS = ITEMS.register("steel_tongs",
+          () -> new Tongs(ModToolTiers.STEEL, -1, -2f, new Item.Properties().durability(1024)));
 
   public static final DeferredHolder<Item, Item> STONE_HAMMER_HEAD = ITEMS.register("stone_hammer_head",
           () -> new Item(new Item.Properties()));
