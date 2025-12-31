@@ -18,8 +18,8 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.armor.custom.ArmorModelHelper;
-import net.stirdrem.overgeared.item.armor.model.CustomCopperHelmet;
-import net.stirdrem.overgeared.item.armor.model.CustomCopperLeggings;
+import net.stirdrem.overgeared.item.armor.model.CopperHelmet;
+import net.stirdrem.overgeared.item.armor.model.CopperLeggings;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
 import net.stirdrem.overgeared.screen.RockKnappingMenu;
 import net.stirdrem.overgeared.screen.RockKnappingScreen;
@@ -52,8 +52,8 @@ public class ClientModEvents {
 
     @SubscribeEvent
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(CustomCopperHelmet.LAYER_LOCATION, CustomCopperHelmet::createBodyLayer);
-        event.registerLayerDefinition(CustomCopperLeggings.LAYER_LOCATION, CustomCopperLeggings::createBodyLayer);
+        event.registerLayerDefinition(CopperHelmet.LAYER_LOCATION, CopperHelmet::createBodyLayer);
+        event.registerLayerDefinition(CopperLeggings.LAYER_LOCATION, CopperLeggings::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -61,7 +61,7 @@ public class ClientModEvents {
         event.registerItem(new IClientItemExtensions() {
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                return ArmorModelHelper.withPart("head", new CustomCopperHelmet<>(Minecraft.getInstance().getEntityModels().bakeLayer(CustomCopperHelmet.LAYER_LOCATION)).Head);
+                return ArmorModelHelper.withPart("head", new CopperHelmet<>(Minecraft.getInstance().getEntityModels().bakeLayer(CopperHelmet.LAYER_LOCATION)).Head);
             }
         }, ModItems.COPPER_HELMET);
 
@@ -71,11 +71,11 @@ public class ClientModEvents {
                 Map<String, ModelPart> parts = new HashMap<>();
                 parts.put("head", new ModelPart(Collections.emptyList(), Collections.emptyMap()));
                 parts.put("hat", new ModelPart(Collections.emptyList(), Collections.emptyMap()));
-                parts.put("body", new CustomCopperLeggings<>(Minecraft.getInstance().getEntityModels().bakeLayer(CustomCopperLeggings.LAYER_LOCATION)).Body);
+                parts.put("body", new CopperLeggings<>(Minecraft.getInstance().getEntityModels().bakeLayer(CopperLeggings.LAYER_LOCATION)).Body);
                 parts.put("right_arm", new ModelPart(Collections.emptyList(), Collections.emptyMap()));
                 parts.put("left_arm", new ModelPart(Collections.emptyList(), Collections.emptyMap()));
-                parts.put("right_leg", new CustomCopperLeggings<>(Minecraft.getInstance().getEntityModels().bakeLayer(CustomCopperLeggings.LAYER_LOCATION)).RightLeg);
-                parts.put("left_leg", new CustomCopperLeggings<>(Minecraft.getInstance().getEntityModels().bakeLayer(CustomCopperLeggings.LAYER_LOCATION)).LeftLeg);
+                parts.put("right_leg", new CopperLeggings<>(Minecraft.getInstance().getEntityModels().bakeLayer(CopperLeggings.LAYER_LOCATION)).RightLeg);
+                parts.put("left_leg", new CopperLeggings<>(Minecraft.getInstance().getEntityModels().bakeLayer(CopperLeggings.LAYER_LOCATION)).LeftLeg);
 
                 return new HumanoidModel<>(new ModelPart(Collections.emptyList(), parts));
             }

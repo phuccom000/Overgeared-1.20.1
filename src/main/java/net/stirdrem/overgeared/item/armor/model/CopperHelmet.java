@@ -15,12 +15,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.stirdrem.overgeared.OvergearedMod;
 
-public class CustomCopperHelmet<T extends Entity> extends EntityModel<T> {
+public class CopperHelmet<T extends Entity> extends EntityModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "copper_helmet"), "main");
     public final ModelPart Head;
 
-    public CustomCopperHelmet(ModelPart root) {
+    public CopperHelmet(ModelPart root) {
         this.Head = root.getChild("Head");
     }
 

@@ -15,14 +15,14 @@ import net.stirdrem.overgeared.OvergearedMod;
 // Paste this class into your mod and generate all required imports
 
 
-public class CustomCopperLeggings<T extends Entity> extends EntityModel<T> {
+public class CopperLeggings<T extends Entity> extends EntityModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "copper_leggings"), "main");
     public final ModelPart Body;
     public final ModelPart RightLeg;
     public final ModelPart LeftLeg;
 
-    public CustomCopperLeggings(ModelPart root) {
+    public CopperLeggings(ModelPart root) {
         this.Body = root.getChild("Body");
         this.RightLeg = root.getChild("RightLeg");
         this.LeftLeg = root.getChild("LeftLeg");
