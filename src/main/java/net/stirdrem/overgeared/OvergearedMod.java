@@ -3,6 +3,7 @@ package net.stirdrem.overgeared;
 import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.registries.Registries;
@@ -603,6 +604,22 @@ public class OvergearedMod {
             registerArrowColor(event, ModItems.STEEL_UPGRADE_ARROW.get());
             registerArrowColor(event, ModItems.DIAMOND_UPGRADE_ARROW.get());
             registerArrowColor(event, ModItems.LINGERING_ARROW.get());
+
+            ItemColor heatedTint = (stack, tintIndex) -> {
+                if (tintIndex != 0) return -1;
+
+                CompoundTag tag = stack.getTag();
+                if (tag != null && tag.getBoolean("Heated")) {
+                    return 0xfa7c05; // hot orange
+                }
+
+                return -1;
+            };
+
+            event.register(
+                    heatedTint,
+                    ForgeRegistries.ITEMS.getValues().toArray(Item[]::new)
+            );
         }
 
         private static void registerArrowColor(RegisterColorHandlersEvent.Item event, Item item) {

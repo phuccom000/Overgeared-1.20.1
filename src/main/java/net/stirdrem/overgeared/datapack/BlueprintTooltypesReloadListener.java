@@ -13,12 +13,13 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ToolTypeRegistry;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BlueprintTooltypesReloadListener
         extends SimpleJsonResourceReloadListener {
 
-    public static final Map<ResourceLocation, BlueprintTooltypesData> DATA = new HashMap<>();
-    
+    public static final Map<ResourceLocation, BlueprintTooltypesData> DATA = new ConcurrentHashMap<>();
+
     private static final Gson GSON = new Gson();
 
     public BlueprintTooltypesReloadListener() {
@@ -32,6 +33,8 @@ public class BlueprintTooltypesReloadListener
             ProfilerFiller profiler
     ) {
         DATA.clear();
+
+        Map<ResourceLocation, BlueprintTooltypesData> tempMap = new HashMap<>();
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : objects.entrySet()) {
             ResourceLocation id = entry.getKey();
@@ -52,7 +55,7 @@ public class BlueprintTooltypesReloadListener
                 BlueprintTooltypesData data =
                         new BlueprintTooltypesData(id, toolTypes);
 
-                DATA.put(id, data);
+                tempMap.put(id, data);
 
             } catch (Exception e) {
                 OvergearedMod.LOGGER.error(
@@ -61,12 +64,35 @@ public class BlueprintTooltypesReloadListener
             }
         }
 
+        DATA.putAll(tempMap);
+
         OvergearedMod.LOGGER.info(
                 "Loaded {} blueprint tooltype packs",
                 DATA.size()
         );
 
-        // ✅ IMPORTANT: rebuild registry after /reload
         ToolTypeRegistry.init();
+    }
+
+    public static Collection<BlueprintTooltypesData> getDataSnapshot() {
+        return new ArrayList<>(DATA.values());
+    }
+
+    public static class BlueprintTooltypesData {
+        private final ResourceLocation id;
+        private final List<String> toolTypes;
+
+        public BlueprintTooltypesData(ResourceLocation id, List<String> toolTypes) {
+            this.id = id;
+            this.toolTypes = toolTypes;
+        }
+
+        public ResourceLocation getId() {
+            return id;
+        }
+
+        public List<String> getToolTypes() {
+            return toolTypes;
+        }
     }
 }
