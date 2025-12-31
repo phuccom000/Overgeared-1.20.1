@@ -1,15 +1,33 @@
 package net.stirdrem.overgeared.client;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.item.ModItems;
+import net.stirdrem.overgeared.item.armor.custom.ArmorModelHelper;
+import net.stirdrem.overgeared.item.armor.model.CustomCopperHelmet;
+import net.stirdrem.overgeared.item.armor.model.CustomCopperLeggings;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
 import net.stirdrem.overgeared.screen.RockKnappingMenu;
 import net.stirdrem.overgeared.screen.RockKnappingScreen;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @EventBusSubscriber(modid = OvergearedMod.MOD_ID, value = Dist.CLIENT)
 public class ClientModEvents {
@@ -30,6 +48,38 @@ public class ClientModEvents {
         // event.register(ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingStationScreen::new);
         // event.register(ModMenuTypes.ALLOY_SMELTER_MENU.get(), AlloySmelterScreen::new);
         // event.register(ModMenuTypes.NETHER_ALLOY_SMELTER_MENU.get(), NetherAlloySmelterScreen::new);
+    }
+
+    @SubscribeEvent
+    public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(CustomCopperHelmet.LAYER_LOCATION, CustomCopperHelmet::createBodyLayer);
+        event.registerLayerDefinition(CustomCopperLeggings.LAYER_LOCATION, CustomCopperLeggings::createBodyLayer);
+    }
+
+    @SubscribeEvent
+    public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+        event.registerItem(new IClientItemExtensions() {
+            @Override
+            public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
+                return ArmorModelHelper.withPart("head", new CustomCopperHelmet<>(Minecraft.getInstance().getEntityModels().bakeLayer(CustomCopperHelmet.LAYER_LOCATION)).Head);
+            }
+        }, ModItems.COPPER_HELMET);
+
+        event.registerItem(new IClientItemExtensions() {
+            @Override
+            public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
+                Map<String, ModelPart> parts = new HashMap<>();
+                parts.put("head", new ModelPart(Collections.emptyList(), Collections.emptyMap()));
+                parts.put("hat", new ModelPart(Collections.emptyList(), Collections.emptyMap()));
+                parts.put("body", new CustomCopperLeggings<>(Minecraft.getInstance().getEntityModels().bakeLayer(CustomCopperLeggings.LAYER_LOCATION)).Body);
+                parts.put("right_arm", new ModelPart(Collections.emptyList(), Collections.emptyMap()));
+                parts.put("left_arm", new ModelPart(Collections.emptyList(), Collections.emptyMap()));
+                parts.put("right_leg", new CustomCopperLeggings<>(Minecraft.getInstance().getEntityModels().bakeLayer(CustomCopperLeggings.LAYER_LOCATION)).RightLeg);
+                parts.put("left_leg", new CustomCopperLeggings<>(Minecraft.getInstance().getEntityModels().bakeLayer(CustomCopperLeggings.LAYER_LOCATION)).LeftLeg);
+
+                return new HumanoidModel<>(new ModelPart(Collections.emptyList(), parts));
+            }
+        }, ModItems.COPPER_LEGGINGS);
     }
 }
 

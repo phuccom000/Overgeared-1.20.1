@@ -1,7 +1,11 @@
 package net.stirdrem.overgeared.item;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -169,44 +173,44 @@ public class ModItems {
           () -> new Item(new Item.Properties()));
   public static final DeferredHolder<Item, Item> COPPER_HOE_HEAD = ITEMS.register("copper_hoe_head",
           () -> new Item(new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> STEEL_SWORD = ITEMS.register("steel_sword",
-//          () -> new SwordItem(ModToolTiers.STEEL, 3, -2.4f, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> STEEL_PICKAXE = ITEMS.register("steel_pickaxe",
-//          () -> new PickaxeItem(ModToolTiers.STEEL, 1, -2.8f, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> STEEL_AXE = ITEMS.register("steel_axe",
-//          () -> new AxeItem(ModToolTiers.STEEL, 5, -3f, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> STEEL_HOE = ITEMS.register("steel_hoe",
-//          () -> new HoeItem(ModToolTiers.STEEL, -3, -0.5f, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> STEEL_SHOVEL = ITEMS.register("steel_shovel",
-//          () -> new ShovelItem(ModToolTiers.STEEL, 1, -3, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> STEEL_HELMET = ITEMS.register("steel_helmet",
-//          () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.HELMET, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> STEEL_CHESTPLATE = ITEMS.register("steel_chestplate",
-//          () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> STEEL_LEGGINGS = ITEMS.register("steel_leggings",
-//          () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.LEGGINGS, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> STEEL_BOOTS = ITEMS.register("steel_boots",
-//          () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.BOOTS, new Item.Properties()));
+  public static final DeferredHolder<Item, Item> STEEL_SWORD = ITEMS.register("steel_sword",
+          () -> new SwordItem(ModToolTiers.STEEL, toolProperties(6, -2.4f)));
+  public static final DeferredHolder<Item, Item> STEEL_PICKAXE = ITEMS.register("steel_pickaxe",
+          () -> new PickaxeItem(ModToolTiers.STEEL, toolProperties(4, -2.8f)));
+  public static final DeferredHolder<Item, Item> STEEL_AXE = ITEMS.register("steel_axe",
+          () -> new AxeItem(ModToolTiers.STEEL, toolProperties(8, -3f)));
+  public static final DeferredHolder<Item, Item> STEEL_HOE = ITEMS.register("steel_hoe",
+          () -> new HoeItem(ModToolTiers.STEEL, toolProperties(0, -0.5f)));
+  public static final DeferredHolder<Item, Item> STEEL_SHOVEL = ITEMS.register("steel_shovel",
+          () -> new ShovelItem(ModToolTiers.STEEL, toolProperties(4, -3)));
+  public static final DeferredHolder<Item, Item> STEEL_HELMET = ITEMS.register("steel_helmet",
+          () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.HELMET, new Item.Properties()));
+  public static final DeferredHolder<Item, Item> STEEL_CHESTPLATE = ITEMS.register("steel_chestplate",
+          () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+  public static final DeferredHolder<Item, Item> STEEL_LEGGINGS = ITEMS.register("steel_leggings",
+          () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.LEGGINGS, new Item.Properties()));
+  public static final DeferredHolder<Item, Item> STEEL_BOOTS = ITEMS.register("steel_boots",
+          () -> new ArmorItem(ModArmorMaterials.STEEL, ArmorItem.Type.BOOTS, new Item.Properties()));
 
-//  public static final DeferredHolder<Item, Item> COPPER_HELMET = ITEMS.register("copper_helmet",
-//          () -> new CopperHelmet(ModArmorMaterials.COPPER, ArmorItem.Type.HELMET, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> COPPER_CHESTPLATE = ITEMS.register("copper_chestplate",
-//          () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> COPPER_LEGGINGS = ITEMS.register("copper_leggings",
-//          () -> new CopperLeggings(ModArmorMaterials.COPPER, ArmorItem.Type.LEGGINGS, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> COPPER_BOOTS = ITEMS.register("copper_boots",
-//          () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.BOOTS, new Item.Properties()));
+  public static final DeferredHolder<Item, Item> COPPER_HELMET = ITEMS.register("copper_helmet",
+          () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.HELMET, new Item.Properties()));
+  public static final DeferredHolder<Item, Item> COPPER_CHESTPLATE = ITEMS.register("copper_chestplate",
+          () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+  public static final DeferredHolder<Item, Item> COPPER_LEGGINGS = ITEMS.register("copper_leggings",
+          () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.LEGGINGS, new Item.Properties()));
+  public static final DeferredHolder<Item, Item> COPPER_BOOTS = ITEMS.register("copper_boots",
+          () -> new ArmorItem(ModArmorMaterials.COPPER, ArmorItem.Type.BOOTS, new Item.Properties()));
 
-//  public static final DeferredHolder<Item, Item> COPPER_SWORD = ITEMS.register("copper_sword",
-//          () -> new SwordItem(ModToolTiers.COPPER, 3, -2.4f, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> COPPER_PICKAXE = ITEMS.register("copper_pickaxe",
-//          () -> new PickaxeItem(ModToolTiers.COPPER, 1, -2.8f, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> COPPER_AXE = ITEMS.register("copper_axe",
-//          () -> new AxeItem(ModToolTiers.COPPER, 5, -3f, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> COPPER_HOE = ITEMS.register("copper_hoe",
-//          () -> new HoeItem(ModToolTiers.COPPER, -1, -1.5f, new Item.Properties()));
-//  public static final DeferredHolder<Item, Item> COPPER_SHOVEL = ITEMS.register("copper_shovel",
-//          () -> new ShovelItem(ModToolTiers.COPPER, 1.5f, -3, new Item.Properties()));
+  public static final DeferredHolder<Item, Item> COPPER_SWORD = ITEMS.register("copper_sword",
+          () -> new SwordItem(ModToolTiers.COPPER, toolProperties(4, -2.4f)));
+  public static final DeferredHolder<Item, Item> COPPER_PICKAXE = ITEMS.register("copper_pickaxe",
+          () -> new PickaxeItem(ModToolTiers.COPPER, toolProperties(2, -2.8f)));
+  public static final DeferredHolder<Item, Item> COPPER_AXE = ITEMS.register("copper_axe",
+          () -> new AxeItem(ModToolTiers.COPPER, toolProperties(6, -3f)));
+  public static final DeferredHolder<Item, Item> COPPER_HOE = ITEMS.register("copper_hoe",
+          () -> new HoeItem(ModToolTiers.COPPER, toolProperties(0, -1.5f)));
+  public static final DeferredHolder<Item, Item> COPPER_SHOVEL = ITEMS.register("copper_shovel",
+          () -> new ShovelItem(ModToolTiers.COPPER, toolProperties(2.5f, -3)));
 //
 //  public static final DeferredHolder<Item, Item> LINGERING_ARROW = ITEMS.register("lingering_arrow",
 //          () -> new LingeringArrowItem(new Item.Properties(), ArrowTier.FLINT));
@@ -218,7 +222,28 @@ public class ModItems {
 //          () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.STEEL));
 //  public static final DeferredHolder<Item, Item> DIAMOND_UPGRADE_ARROW = ITEMS.register("diamond_arrow",
 //          () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.DIAMOND));
-  
+
+  private static Item.Properties toolProperties(float attackDamage, float attackSpeed) {
+    ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();
+    builder.add(Attributes.ATTACK_DAMAGE,
+                    new AttributeModifier(
+                            Item.BASE_ATTACK_DAMAGE_ID,
+                            attackDamage,
+                            AttributeModifier.Operation.ADD_VALUE
+                    ),
+                    EquipmentSlotGroup.MAINHAND
+            )
+            .add(Attributes.ATTACK_SPEED,
+                    new AttributeModifier(
+                            Item.BASE_ATTACK_SPEED_ID,
+                            attackSpeed,
+                            AttributeModifier.Operation.ADD_VALUE
+                    ),
+                    EquipmentSlotGroup.MAINHAND
+            );
+    return new Item.Properties().attributes(builder.build());
+  }
+
   public static void register(IEventBus eventBus) {
     ITEMS.register(eventBus);
   }
