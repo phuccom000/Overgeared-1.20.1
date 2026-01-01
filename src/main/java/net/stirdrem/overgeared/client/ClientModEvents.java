@@ -9,12 +9,14 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.armor.custom.ArmorModelHelper;
@@ -34,7 +36,10 @@ public class ClientModEvents {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        ClientInit.init();
+        ModList.get().getModContainerById(OvergearedMod.MOD_ID).orElseThrow()
+                .registerExtensionPoint(
+                        IConfigScreenFactory.class,
+                        (container, parent) -> new OvergearedConfigScreen(parent));
     }
     
     @SuppressWarnings("unchecked")
