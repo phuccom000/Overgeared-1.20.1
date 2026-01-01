@@ -364,7 +364,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
             if (!this.qualityDifficulty.isEmpty()) {
                 json.addProperty("quality_difficulty", this.qualityDifficulty);
             }
-            if (this.needsMinigame != null || !this.needsMinigame) {
+            if (this.needsMinigame != null) {
                 json.addProperty("needs_minigame", this.needsMinigame);
             }
             if (this.needQuenching != null) {

@@ -489,7 +489,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COPPER_HAMMER_HEAD.get(), 3)
                 .tier(AnvilTier.STONE)
                 .setPolishing(false)
-                .setQuality(false)
+                .setQuality(true)
                 .pattern("# ")
                 .pattern(" #")
                 .define('#', ModItems.HEATED_COPPER_INGOT.get())
@@ -539,7 +539,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_HAMMER_HEAD.get(), 4)
-                .setQuality(false)
+                .setQuality(true)
                 .setPolishing(false)
                 .pattern("# ")
                 .pattern(" #")
