@@ -32,6 +32,7 @@ import java.util.Map;
 @EventBusSubscriber(modid = OvergearedMod.MOD_ID, value = Dist.CLIENT)
 public class ClientModEvents {
 
+    @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         ClientInit.init();
     }
