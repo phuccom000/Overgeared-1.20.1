@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -34,12 +35,6 @@ public class RockKnappingSerializer implements RecipeSerializer<RockKnappingReci
           }
   );
 
-  public static final MapCodec<RockKnappingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-          ItemStack.CODEC.fieldOf("result").forGetter(RockKnappingRecipe::output),
-          PATTERN_CODEC.fieldOf("pattern").forGetter(RockKnappingRecipe::pattern),
-          Codec.BOOL.optionalFieldOf("mirrored", false).forGetter(RockKnappingRecipe::mirrored)
-  ).apply(instance, RockKnappingRecipe::new));
-
   public static final StreamCodec<RegistryFriendlyByteBuf, boolean[][]> PATTERN_STREAM_CODEC = new StreamCodec<>() {
     @Override
     public boolean[][] decode(RegistryFriendlyByteBuf buffer) {
@@ -64,7 +59,11 @@ public class RockKnappingSerializer implements RecipeSerializer<RockKnappingReci
 
   @Override
   public MapCodec<RockKnappingRecipe> codec() {
-    return CODEC;
+    return RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ItemStack.CODEC.fieldOf("result").forGetter(RockKnappingRecipe::output),
+            PATTERN_CODEC.fieldOf("pattern").forGetter(RockKnappingRecipe::pattern),
+            Codec.BOOL.optionalFieldOf("mirrored", false).forGetter(RockKnappingRecipe::mirrored)
+    ).apply(instance, RockKnappingRecipe::new));
   }
 
   @Override
@@ -74,17 +73,7 @@ public class RockKnappingSerializer implements RecipeSerializer<RockKnappingReci
             RockKnappingRecipe::output,
             PATTERN_STREAM_CODEC,
             RockKnappingRecipe::pattern,
-            new StreamCodec<>() {
-              @Override
-              public Boolean decode(RegistryFriendlyByteBuf buffer) {
-                return buffer.readBoolean();
-              }
-
-              @Override
-              public void encode(RegistryFriendlyByteBuf buffer, Boolean value) {
-                buffer.writeBoolean(value);
-              }
-            },
+            ByteBufCodecs.BOOL,
             RockKnappingRecipe::mirrored,
             RockKnappingRecipe::new
     );

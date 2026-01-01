@@ -9,6 +9,7 @@ import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.ModRecipeSerializers;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
+import net.stirdrem.overgeared.recipe.ModRecipes;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
 import org.slf4j.Logger;
 
@@ -20,6 +21,7 @@ public final class OvergearedMod {
     public OvergearedMod(IEventBus modEventBus, ModContainer modContainer) {
         ModItems.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        ModRecipes.register(modEventBus);
         ModRecipeTypes.register(modEventBus);
         ModRecipeSerializers.register(modEventBus);
 
