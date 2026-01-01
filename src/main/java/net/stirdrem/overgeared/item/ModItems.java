@@ -10,7 +10,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.item.custom.DiamondUpgradeTemplateItem;
 import net.stirdrem.overgeared.item.custom.KnappableRockItem;
+import net.stirdrem.overgeared.item.custom.SmithingHammer;
 import net.stirdrem.overgeared.item.custom.Tongs;
 
 public class ModItems {
@@ -102,14 +104,14 @@ public class ModItems {
   public static final DeferredHolder<Item, Item> STEEL_HAMMER_HEAD = ITEMS.register("steel_hammer_head",
           () -> new Item(new Item.Properties()));
 
-//  public static final DeferredHolder<Item, Item> SMITHING_HAMMER = ITEMS.register("smithing_hammer",
-//          () -> new SmithingHammer(ModToolTiers.STEEL, -1, -2.8f, new Item.Properties().durability(512)));
-//
-//  public static final DeferredHolder<Item, Item> COPPER_SMITHING_HAMMER = ITEMS.register("copper_smithing_hammer",
-//          () -> new SmithingHammer(ModToolTiers.COPPER, -1, -2.8f, new Item.Properties().durability(120)));
-//
-//  public static final DeferredHolder<Item, Item> DIAMOND_UPGRADE_SMITHING_TEMPLATE = ITEMS.register("diamond_upgrade_smithing_template",
-//          DiamondUpgradeTemplateItem::createDiamondUpgradeTemplate);
+  public static final DeferredHolder<Item, Item> SMITHING_HAMMER = ITEMS.register("smithing_hammer",
+          () -> new SmithingHammer(ModToolTiers.STEEL, toolProperties(-1, -2.8f).durability(512)));
+
+  public static final DeferredHolder<Item, Item> COPPER_SMITHING_HAMMER = ITEMS.register("copper_smithing_hammer",
+          () -> new SmithingHammer(ModToolTiers.COPPER, toolProperties(-1, -2.8f).durability(120)));
+
+  public static final DeferredHolder<Item, Item> DIAMOND_UPGRADE_SMITHING_TEMPLATE = ITEMS.register("diamond_upgrade_smithing_template",
+          DiamondUpgradeTemplateItem::createDiamondUpgradeTemplate);
 
   public static final DeferredHolder<Item, Item> EMPTY_BLUEPRINT = ITEMS.register("empty_blueprint",
           () -> new Item(new Item.Properties()));
