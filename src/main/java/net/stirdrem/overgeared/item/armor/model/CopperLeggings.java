@@ -17,7 +17,7 @@ import net.stirdrem.overgeared.OvergearedMod;
 
 public class CopperLeggings<T extends Entity> extends EntityModel<T> {
   // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-  public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "copper_leggings"), "main");
+  public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(OvergearedMod.loc("copper_leggings"), "main");
   public final ModelPart Body;
   public final ModelPart RightLeg;
   public final ModelPart LeftLeg;

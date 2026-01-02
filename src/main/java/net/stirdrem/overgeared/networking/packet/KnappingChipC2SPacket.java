@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.stirdrem.overgeared.OvergearedMod;
 
 public record KnappingChipC2SPacket(int index) implements CustomPacketPayload {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "knapping_chip");
+    public static final ResourceLocation ID = OvergearedMod.loc("knapping_chip");
     public static final CustomPacketPayload.Type<KnappingChipC2SPacket> TYPE = new CustomPacketPayload.Type<>(ID);
     
     public static final StreamCodec<FriendlyByteBuf, KnappingChipC2SPacket> STREAM_CODEC = StreamCodec.of(

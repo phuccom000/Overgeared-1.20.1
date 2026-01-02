@@ -16,11 +16,11 @@ public class ModRecipeTypes {
 //    public static final RegistryObject<RecipeType<ForgingRecipe>> FORGING =
 //            RECIPE_TYPES.register(ForgingRecipe.Type.ID, () -> ForgingRecipe.Type.INSTANCE);
     public static final Supplier<RecipeType<RockKnappingRecipe>> KNAPPING =
-            RECIPE_TYPES.register("rock_knapping", () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "rock_knapping")));
+            RECIPE_TYPES.register("rock_knapping", () -> RecipeType.simple(OvergearedMod.loc("rock_knapping")));
 //    public static final RegistryObject<RecipeType<FletchingRecipe>> FLETCHING =
 //            RECIPE_TYPES.register(FletchingRecipe.Type.ID, () -> FletchingRecipe.Type.INSTANCE);
     public static final Supplier<RecipeType<AlloySmeltingRecipe>> ALLOY_SMELTING =
-            RECIPE_TYPES.register("alloy_smelting", () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "alloy_smelting")));
+            RECIPE_TYPES.register("alloy_smelting", () -> RecipeType.simple(OvergearedMod.loc("alloy_smelting")));
     public static final Supplier<RecipeType<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
             RECIPE_TYPES.register("nether_alloy_smelting", () -> RecipeType.simple(OvergearedMod.loc("nether_alloy_smelting")));
 //    public static final RegistryObject<RecipeType<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =

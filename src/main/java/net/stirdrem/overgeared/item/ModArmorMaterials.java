@@ -26,7 +26,7 @@ public final class ModArmorMaterials {
           SoundEvents.ARMOR_EQUIP_IRON,
           () -> Ingredient.of(ModItems.STEEL_INGOT.get()),
           List.of(
-                  new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "steel"))
+                  new ArmorMaterial.Layer(OvergearedMod.loc("steel"))
           ),
           1f,
           0f
@@ -43,7 +43,7 @@ public final class ModArmorMaterials {
           SoundEvents.ARMOR_EQUIP_IRON,
           () -> Ingredient.of(COPPER_INGOT),
           List.of(
-                  new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "copper"))
+                  new ArmorMaterial.Layer(OvergearedMod.loc("copper"))
           ),
           0f,
           0f

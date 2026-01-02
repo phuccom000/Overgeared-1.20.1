@@ -17,10 +17,8 @@ import net.stirdrem.overgeared.networking.packet.KnappingChipC2SPacket;
 import static net.minecraft.sounds.SoundEvents.STONE_BREAK;
 
 public class RockKnappingScreen extends AbstractContainerScreen<RockKnappingMenu> {
-    private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "textures/gui/rock_knapping_gui.png");
-    private static final ResourceLocation CHIPPED_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(OvergearedMod.MOD_ID, "textures/gui/blank.png");
+    private static final ResourceLocation TEXTURE = OvergearedMod.loc("textures/gui/rock_knapping_gui.png");
+    private static final ResourceLocation CHIPPED_TEXTURE = OvergearedMod.loc("textures/gui/blank.png");
     private static final ResourceLocation UNCHIPPED_TEXTURE =
             ResourceLocation.parse("minecraft:textures/block/stone.png");
     private static final WidgetSprites WIDGET_SPRITES = new
