@@ -38,14 +38,14 @@ public class ModRecipeSerializers {
             RECIPE_SERIALIZERS.register("alloy_smelting", AlloySmeltingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
 //            SERIALIZERS.register("shaped_alloy_smelting", () -> ShapedAlloySmeltingRecipe.Serializer.INSTANCE);
-//    public static final RegistryObject<RecipeSerializer<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
-//            SERIALIZERS.register("nether_alloy_smelting", () -> NetherAlloySmeltingRecipe.Serializer.INSTANCE);
+    public static final Supplier<RecipeSerializer<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
+        RECIPE_SERIALIZERS.register("nether_alloy_smelting", NetherAlloySmeltingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<ShapedNetherAlloySmeltingRecipe>> SHAPED_NETHER_ALLOY_SMELTING =
 //            SERIALIZERS.register("shaped_nether_alloy_smelting", () -> ShapedNetherAlloySmeltingRecipe.Serializer.INSTANCE);
 //    public static final RegistryObject<RecipeSerializer<ItemToToolTypeRecipe>> ITEM_TO_TOOLTYPE =
 //            SERIALIZERS.register("item_to_tooltype", ItemToToolTypeRecipe.Serializer::new);
-//    public static final RegistryObject<RecipeSerializer<CoolingRecipe>> COOLING_SERIALIZER =
-//            SERIALIZERS.register("cooling", CoolingRecipe.Serializer::new);
+    public static final Supplier<RecipeSerializer<CoolingRecipe>> COOLING_SERIALIZER =
+        RECIPE_SERIALIZERS.register("cooling", CoolingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<GrindingRecipe>> GRINDING_SERIALIZER =
 //            SERIALIZERS.register("grinding", GrindingRecipe.Serializer::new);
 

@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -25,5 +26,9 @@ public final class OvergearedMod {
 
         modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
         //ModLoadingContext.get().registerExtensionPoint(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
+    }
+
+    public static ResourceLocation loc (String name) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
     }
 }
