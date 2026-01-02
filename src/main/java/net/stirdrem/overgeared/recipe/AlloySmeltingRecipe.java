@@ -1,6 +1,12 @@
 package net.stirdrem.overgeared.recipe;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -76,7 +82,7 @@ public class AlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRecipe {
     }
 
     @Override
-    public ItemStack assemble(RecipeInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(RecipeInput input, HolderLookup.Provider provider) {
         return output.copy();
     }
 
@@ -86,23 +92,8 @@ public class AlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRecipe {
     }
 
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider registries) {
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
         return output;
-    }
-
-    @Override
-    public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess) {
-        return output;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.ALLOY_SMELTING.get();
-    }
-
-    @Override
-    public RecipeType<?> getType() {
-        return ModRecipeTypes.ALLOY_SMELTING.get();
     }
 
     public String getGroup() {
@@ -127,5 +118,46 @@ public class AlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRecipe {
 
     public ItemStack getResultItem() {
         return output;
+    }
+
+    @Override
+    public RecipeSerializer<?> getSerializer() {
+        return ModRecipeSerializers.ALLOY_SMELTING.get();
+    }
+
+    @Override
+    public RecipeType<?> getType() {
+        return ModRecipeTypes.ALLOY_SMELTING.get();
+    }
+
+    public static class Serializer implements RecipeSerializer<AlloySmeltingRecipe> {
+        public static final MapCodec<AlloySmeltingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Codec.STRING.fieldOf("group").forGetter(r -> r.group),
+                CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC).forGetter(r -> r.category),
+                Ingredient.CODEC.listOf(0, 4).fieldOf("ingredients").forGetter(r -> r.inputs),
+                ItemStack.CODEC.fieldOf("result").forGetter(r -> r.output),
+                Codec.FLOAT.optionalFieldOf("experience", 0.0F).forGetter(r -> r.experience),
+                Codec.INT.optionalFieldOf("cooking_time", 200).forGetter(r -> r.cookingTime)
+        ).apply(i, AlloySmeltingRecipe::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, AlloySmeltingRecipe> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, r -> r.group,
+                CraftingBookCategory.STREAM_CODEC, r -> r.category,
+                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(4)), r -> r.inputs,
+                ItemStack.STREAM_CODEC, r -> r.output,
+                ByteBufCodecs.FLOAT, r -> r.experience,
+                ByteBufCodecs.INT, r -> r.cookingTime,
+                AlloySmeltingRecipe::new
+        );
+
+        @Override
+        public MapCodec<AlloySmeltingRecipe> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, AlloySmeltingRecipe> streamCodec() {
+            return STREAM_CODEC;
+        }
     }
 }

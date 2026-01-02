@@ -34,8 +34,8 @@ public class ModRecipeSerializers {
 //            SERIALIZERS.register("cast_smelting", () -> CastSmeltingRecipe.Serializer.INSTANCE);
 //    public static final RegistryObject<RecipeSerializer<CastBlastingRecipe>> CAST_BLASTING =
 //            SERIALIZERS.register("cast_blasting", () -> CastBlastingRecipe.Serializer.INSTANCE);
-//    public static final RegistryObject<RecipeSerializer<AlloySmeltingRecipe>> ALLOY_SMELTING =
-//            SERIALIZERS.register("alloy_smelting", () -> AlloySmeltingRecipe.Serializer.INSTANCE);
+    public static final Supplier<RecipeSerializer<AlloySmeltingRecipe>> ALLOY_SMELTING =
+            RECIPE_SERIALIZERS.register("alloy_smelting", AlloySmeltingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
 //            SERIALIZERS.register("shaped_alloy_smelting", () -> ShapedAlloySmeltingRecipe.Serializer.INSTANCE);
 //    public static final RegistryObject<RecipeSerializer<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
