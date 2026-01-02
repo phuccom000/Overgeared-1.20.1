@@ -17,16 +17,16 @@ import java.util.List;
 public class NetherAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRecipe {
     private final String group;
     private final CraftingBookCategory category;
-    private final List<Ingredient> inputs;
-    private final ItemStack output;
+    private final List<Ingredient> ingredients;
+    private final ItemStack result;
     private final float experience;
     private final int cookingTime;
 
-    public NetherAlloySmeltingRecipe(String group, CraftingBookCategory category, List<Ingredient> inputs, ItemStack output, float experience, int cookingTime) {
+    public NetherAlloySmeltingRecipe(String group, CraftingBookCategory category, List<Ingredient> ingredients, ItemStack result, float experience, int cookingTime) {
         this.group = group;
         this.category = category;
-        this.inputs = inputs;
-        this.output = output;
+        this.ingredients = ingredients;
+        this.result = result;
         this.experience = experience;
         this.cookingTime = cookingTime;
     }
@@ -39,7 +39,7 @@ public class NetherAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRec
         List<ItemStack> remainingItems = new ArrayList<>();
 
         // Collect all recipe ingredients (skip empty ingredients if any)
-        for (Ingredient ingredient : inputs) {
+        for (Ingredient ingredient : ingredients) {
             if (!ingredient.isEmpty()) {
                 remainingIngredients.add(ingredient);
             }
@@ -81,7 +81,7 @@ public class NetherAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRec
 
     @Override
     public ItemStack assemble(RecipeInput input, HolderLookup.Provider provider) {
-        return output.copy();
+        return result.copy();
     }
 
     @Override
@@ -91,12 +91,12 @@ public class NetherAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRec
 
     @Override
     public List<Ingredient> getIngredientsList() {
-        return inputs;
+        return ingredients;
     }
 
     @Override
     public ItemStack getResultItem(HolderLookup.Provider provider) {
-        return output;
+        return result;
     }
 
     @Override
@@ -131,8 +131,8 @@ public class NetherAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRec
         public static final MapCodec<NetherAlloySmeltingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
                 Codec.STRING.optionalFieldOf("group", "").forGetter(r -> r.group),
                 CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC).forGetter(r -> r.category),
-                Ingredient.CODEC.listOf(0, 9).fieldOf("ingredients").forGetter(r -> r.inputs),
-                ItemStack.CODEC.fieldOf("result").forGetter(r -> r.output),
+                Ingredient.CODEC.listOf(0, 9).fieldOf("ingredients").forGetter(r -> r.ingredients),
+                ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
                 Codec.FLOAT.optionalFieldOf("experience", 0.0F).forGetter(r -> r.experience),
                 Codec.INT.optionalFieldOf("cooking_time", 200).forGetter(r -> r.cookingTime)
         ).apply(i, NetherAlloySmeltingRecipe::new));
@@ -140,8 +140,8 @@ public class NetherAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRec
         public static final StreamCodec<RegistryFriendlyByteBuf, NetherAlloySmeltingRecipe> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, r -> r.group,
                 CraftingBookCategory.STREAM_CODEC, r -> r.category,
-                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(9)), r -> r.inputs,
-                ItemStack.STREAM_CODEC, r -> r.output,
+                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(9)), r -> r.ingredients,
+                ItemStack.STREAM_CODEC, r -> r.result,
                 ByteBufCodecs.FLOAT, r -> r.experience,
                 ByteBufCodecs.INT, r -> r.cookingTime,
                 NetherAlloySmeltingRecipe::new

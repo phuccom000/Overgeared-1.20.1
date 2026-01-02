@@ -9,11 +9,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
-public class CoolingRecipe implements Recipe<SingleRecipeInput> {
+public class GrindingRecipe implements Recipe<SingleRecipeInput> {
     private final Ingredient ingredient;
     private final ItemStack result;
 
-    public CoolingRecipe(Ingredient ingredient, ItemStack result) {
+    public GrindingRecipe(Ingredient ingredient, ItemStack result) {
         this.ingredient = ingredient;
         this.result = result;
     }
@@ -40,33 +40,33 @@ public class CoolingRecipe implements Recipe<SingleRecipeInput> {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipeSerializers.COOLING_SERIALIZER.get();
+        return ModRecipeSerializers.GRINDING_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return ModRecipeTypes.COOLING_RECIPE.get();
+        return ModRecipeTypes.GRINDING_RECIPE.get();
     }
 
-    public static class Serializer implements RecipeSerializer<CoolingRecipe> {
-        public static final MapCodec<CoolingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(r -> r.ingredient),
-                ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result)
-        ).apply(i, CoolingRecipe::new));
+    public static class Serializer implements RecipeSerializer<GrindingRecipe> {
+        public static final MapCodec<GrindingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+               Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(r -> r.ingredient),
+               ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result)
+        ).apply(i, GrindingRecipe::new));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, CoolingRecipe> STREAM_CODEC = StreamCodec.composite(
+        public static final StreamCodec<RegistryFriendlyByteBuf, GrindingRecipe> STREAM_CODEC = StreamCodec.composite(
                 Ingredient.CONTENTS_STREAM_CODEC, r -> r.ingredient,
                 ItemStack.STREAM_CODEC, r -> r.result,
-                CoolingRecipe::new
+                GrindingRecipe::new
         );
 
         @Override
-        public MapCodec<CoolingRecipe> codec() {
+        public MapCodec<GrindingRecipe> codec() {
             return CODEC;
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, CoolingRecipe> streamCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, GrindingRecipe> streamCodec() {
             return STREAM_CODEC;
         }
     }

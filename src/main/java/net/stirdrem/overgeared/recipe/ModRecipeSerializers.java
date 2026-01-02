@@ -46,8 +46,8 @@ public class ModRecipeSerializers {
 //            SERIALIZERS.register("item_to_tooltype", ItemToToolTypeRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<CoolingRecipe>> COOLING_SERIALIZER =
         RECIPE_SERIALIZERS.register("cooling", CoolingRecipe.Serializer::new);
-//    public static final RegistryObject<RecipeSerializer<GrindingRecipe>> GRINDING_SERIALIZER =
-//            SERIALIZERS.register("grinding", GrindingRecipe.Serializer::new);
+    public static final Supplier<RecipeSerializer<GrindingRecipe>> GRINDING_SERIALIZER =
+        RECIPE_SERIALIZERS.register("grinding", GrindingRecipe.Serializer::new);
 
     public static void register(IEventBus eventBus) {
         RECIPE_SERIALIZERS.register(eventBus);
