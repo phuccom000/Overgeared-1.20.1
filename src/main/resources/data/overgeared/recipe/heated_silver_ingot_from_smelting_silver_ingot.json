@@ -1,11 +1,13 @@
 {
   "type": "minecraft:smelting",
+  "group": "silver_ingot",
   "category": "misc",
-  "cookingtime": 140,
-  "experience": 0.0,
-  "group": "steel_ingot",
   "ingredient": {
-    "tag": "forge:ingots/silver"
+    "tag": "c:ingots/silver"
   },
-  "result": "overgeared:heated_silver_ingot"
+  "result": {
+    "id": "overgeared:heated_silver_ingot"
+  },
+  "experience": 0,
+  "cookingtime": 140
 }

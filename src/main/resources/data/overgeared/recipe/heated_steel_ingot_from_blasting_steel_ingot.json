@@ -1,11 +1,13 @@
 {
   "type": "minecraft:blasting",
-  "category": "misc",
-  "cookingtime": 100,
-  "experience": 0.0,
   "group": "steel_ingot",
+  "category": "misc",
   "ingredient": {
-    "tag": "forge:ingots/steel"
+    "tag": "c:ingots/steel"
   },
-  "result": "overgeared:heated_steel_ingot"
+  "result": {
+    "id": "overgeared:heated_steel_ingot"
+  },
+  "experience": 0,
+  "cookingtime": 100
 }
