@@ -1,7 +1,6 @@
 package net.stirdrem.overgeared.screen;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
@@ -41,8 +40,8 @@ public class ModMenuTypes {
 //            MENUS.register("fletching_station",
 //                    () -> new MenuType<>(FletchingStationMenu::new, FeatureFlagSet.of()));
 //
-//    public static final RegistryObject<MenuType<AlloySmelterMenu>> ALLOY_SMELTER_MENU =
-//            registerMenuType("alloy_smelter_menu", AlloySmelterMenu::new);
+    public static final DeferredHolder<MenuType<?>, MenuType<?>> ALLOY_SMELTER_MENU =
+            registerMenuType("alloy_smelter_menu", AlloySmelterMenu::new);
 //
 //    public static final RegistryObject<MenuType<NetherAlloySmelterMenu>> NETHER_ALLOY_SMELTER_MENU =
 //            registerMenuType("nether_alloy_smelter_menu", NetherAlloySmelterMenu::new);

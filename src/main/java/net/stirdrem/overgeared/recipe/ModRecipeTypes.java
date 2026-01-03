@@ -1,7 +1,6 @@
 package net.stirdrem.overgeared.recipe;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -23,8 +22,12 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register("alloy_smelting", () -> RecipeType.simple(OvergearedMod.loc("alloy_smelting")));
     public static final Supplier<RecipeType<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
             RECIPE_TYPES.register("nether_alloy_smelting", () -> RecipeType.simple(OvergearedMod.loc("nether_alloy_smelting")));
+    public static final Supplier<RecipeType<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
+            RECIPE_TYPES.register(ShapedAlloySmeltingRecipe.Type.ID, () -> RecipeType.simple(OvergearedMod.loc(ShapedAlloySmeltingRecipe.Type.ID)));
 //    public static final RegistryObject<RecipeType<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
 //            RECIPE_TYPES.register(ShapedAlloySmeltingRecipe.Type.ID, () -> ShapedAlloySmeltingRecipe.Type.INSTANCE);
+//    public static final RegistryObject<RecipeType<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
+//            RECIPE_TYPES.register(NetherAlloySmeltingRecipe.Type.ID, () -> NetherAlloySmeltingRecipe.Type.INSTANCE);
 //    public static final RegistryObject<RecipeType<ShapedNetherAlloySmeltingRecipe>> SHAPED_NETHER_ALLOY_SMELTING =
 //            RECIPE_TYPES.register(ShapedNetherAlloySmeltingRecipe.Type.ID, () -> ShapedNetherAlloySmeltingRecipe.Type.INSTANCE);
 //    public static final RegistryObject<RecipeType<ItemToToolTypeRecipe>> ITEM_TO_TOOLTYPE =

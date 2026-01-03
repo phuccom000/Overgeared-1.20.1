@@ -113,11 +113,6 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         return resultCollected;
     }
 
-    public void markResultCollected() {
-        this.resultCollected = true;
-        this.knappingFinished = true;
-    }
-
     private void addPlayerInventory(Inventory playerInv) {
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
@@ -297,25 +292,8 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         return !craftingGrid.getItem(index).isEmpty();
     }
 
-    public void clearGrid() {
-        for (int i = 0; i < 9; i++) {
-            craftingGrid.setItem(i, ItemStack.EMPTY);
-        }
-        resultContainer.setItem(0, ItemStack.EMPTY);
-        broadcastChanges();
-    }
-
     public boolean isKnappingFinished() {
         return knappingFinished;
-    }
-
-    public boolean hasAnyChippedSpots() {
-        for (int i = 0; i < 9; i++) {
-            if (isChipped(i)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -336,16 +314,5 @@ public class RockKnappingMenu extends AbstractContainerMenu {
             resultContainer.setItem(0, ItemStack.EMPTY);
         }
 
-    }
-
-    // Helper method to get the current grid state as a boolean array
-    public boolean[][] getGridState() {
-        boolean[][] grid = new boolean[3][3];
-        for (int i = 0; i < 9; i++) {
-            int row = i / 3;
-            int col = i % 3;
-            grid[row][col] = isChipped(i);
-        }
-        return grid;
     }
 }

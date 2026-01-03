@@ -3,23 +3,15 @@
   "category": "misc",
   "group": "misc",
   "experience": 0.5,
-  "cookingtime": 250,
+  "cooking_time": 250,
   "ingredients": [
-    {
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "item": "minecraft:coal"
-    }
+    { "item": "minecraft:iron_ingot" },
+    { "item": "minecraft:iron_ingot" },
+    { "item": "minecraft:iron_ingot" },
+    { "item": "minecraft:coal" }
   ],
   "result": {
-    "item": "overgeared:crude_steel",
+    "id": "overgeared:crude_steel",
     "count": 4
   }
 }

@@ -4,12 +4,9 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 
 public class ModComponents {

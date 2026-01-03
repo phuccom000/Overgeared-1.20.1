@@ -1,10 +1,7 @@
 package net.stirdrem.overgeared.config;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.WritingMode;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 

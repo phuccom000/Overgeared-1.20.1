@@ -22,6 +22,8 @@ import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.armor.custom.ArmorModelHelper;
 import net.stirdrem.overgeared.item.armor.model.CopperHelmet;
 import net.stirdrem.overgeared.item.armor.model.CopperLeggings;
+import net.stirdrem.overgeared.screen.AlloySmelterMenu;
+import net.stirdrem.overgeared.screen.AlloySmelterScreen;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
 import net.stirdrem.overgeared.screen.RockKnappingMenu;
 import net.stirdrem.overgeared.screen.RockKnappingScreen;
@@ -52,7 +54,7 @@ public class ClientModEvents {
         event.register((MenuType<RockKnappingMenu>)ModMenuTypes.ROCK_KNAPPING_MENU.get(), RockKnappingScreen::new);
         // event.register(ModMenuTypes.BLUEPRINT_WORKBENCH_MENU.get(), BlueprintWorkbenchScreen::new);
         // event.register(ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingStationScreen::new);
-        // event.register(ModMenuTypes.ALLOY_SMELTER_MENU.get(), AlloySmelterScreen::new);
+        event.register((MenuType<AlloySmelterMenu>)ModMenuTypes.ALLOY_SMELTER_MENU.get(), AlloySmelterScreen::new);
         // event.register(ModMenuTypes.NETHER_ALLOY_SMELTER_MENU.get(), NetherAlloySmelterScreen::new);
     }
 

@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: make this extend AlloySmeltingRecipe to cut down on duplicate code
 public class NetherAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRecipe {
     private final String group;
     private final CraftingBookCategory category;
