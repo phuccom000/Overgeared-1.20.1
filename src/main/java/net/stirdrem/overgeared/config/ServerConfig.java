@@ -244,7 +244,7 @@ public class ServerConfig {
         GRINDING_RESTORE_DURABILITY = builder.comment("Can the grindstone be used for restoring durability or not").define("grindingToggle", true);
         GRINDING_BLACKLIST = builder
                 .comment("Items or tags that cannot be repaired or affected by grinding. " +
-                        "Prefix with '#' to use a tag, e.g. '#forge:ingots/iron'")
+                        "Prefix with '#' to use a tag, e.g. '#c:ingots/iron'")
                 .defineList("grindingBlacklist", List.of("minecraft:elytra", "overgeared:wooden_tongs", "overgeared:fired_tool_cast"), obj -> obj instanceof String);
         DURABILITY_REDUCE_PER_GRIND = builder.comment("How much the item durability reduce per grindstone use").defineInRange("durabilityReduce", 0.05, 0, 1);
         DAMAGE_RESTORE_PER_GRIND = builder.comment("How much the item's durability restore per grindstone use").defineInRange("damageRestore", 0.1, 0, 1);
@@ -401,18 +401,18 @@ public class ServerConfig {
 
                                 // copper
                                 List.of("minecraft:copper_ingot", "copper", 9),
-                                List.of("#forge:nuggets/copper", "copper", 1),
+                                List.of("#c:nuggets/copper", "copper", 1),
                                 List.of("minecraft:copper_block", "copper", 81),
 
                                 // steel
-                                List.of("#forge:ingots/steel", "steel", 9),
-                                List.of("#forge:nuggets/steel", "steel", 1),
-                                List.of("#forge:storage_blocks/steel", "steel", 81),
+                                List.of("#c:ingots/steel", "steel", 9),
+                                List.of("#c:nuggets/steel", "steel", 1),
+                                List.of("#c:storage_blocks/steel", "steel", 81),
 
                                 //silver
-                                List.of("#forge:ingots/silver", "silver", 9),
-                                List.of("#forge:nuggets/silver", "silver", 1),
-                                List.of("#forge:storage_blocks/silver", "silver", 81)
+                                List.of("#c:ingots/silver", "silver", 9),
+                                List.of("#c:nuggets/silver", "silver", 1),
+                                List.of("#c:storage_blocks/silver", "silver", 81)
                         ),
                         entry -> entry instanceof List<?> list &&
                                 list.size() == 3 &&
