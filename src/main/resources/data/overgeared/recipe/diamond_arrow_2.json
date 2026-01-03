@@ -1,25 +1,24 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
-  "key": {
-    "a": {
-      "item": "minecraft:feather"
-    },
-    "#": {
-      "item": "minecraft:stick"
-    },
-    "x": {
-      "item": "overgeared:diamond_shard"
-    }
-  },
   "pattern": [
     "x",
     "#",
     "a"
   ],
-  "result": {
-    "count": 4,
-    "item": "overgeared:diamond_arrow"
+  "key": {
+    "x": {
+      "item": "overgeared:diamond_shard"
+    },
+    "#": {
+      "item": "minecraft:stick"
+    },
+    "a": {
+      "item": "minecraft:feather"
+    }
   },
-  "show_notification": true
+  "result": {
+    "id": "overgeared:diamond_arrow",
+    "count": 4
+  }
 }
