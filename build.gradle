@@ -23,8 +23,23 @@ repositories {
     }
 }
 
+def generatedResources = file("src/generated")
+sourceSets {
+    main {
+        resources.srcDir generatedResources
+    }
+}
+
 loom {
     silentMojangMappingsLicense()
+    runs {
+        data {
+            data()
+            programArgs "--all", "--mod", "overgeared"
+            programArgs "--output", generatedResources.absolutePath
+            programArgs "--existing", file("src/main/resources").absolutePath
+        }
+    }
 }
 
 dependencies {

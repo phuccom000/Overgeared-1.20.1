@@ -23,7 +23,7 @@ public class DataGenerators {
 //        generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput));
 //        generator.addProvider(event.includeServer(), ModLootTableProvider.create(packOutput));
 //
-//        generator.addProvider(event.includeClient(), new ModBlockStateProvider(packOutput, existingFileHelper));
+        generator.addProvider(event.includeClient(), new ModBlockStateProvider(packOutput, existingFileHelper));
         generator.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));
 
 //        ModBlockTagGenerator blockTagGenerator = generator.addProvider(event.includeServer(),
