@@ -29,8 +29,8 @@ public class ModBlocks {
 //            () -> new TierBSmithingAnvil(AnvilTier.ABOVE_B, BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
 //    public static final RegistryObject<Block> STONE_SMITHING_ANVIL = registerBlock("stone_anvil",
 //            () -> new StoneSmithingAnvil(BlockBehaviour.Properties.copy(Blocks.STONE).noOcclusion()));
-//    public static final RegistryObject<Block> STEEL_BLOCK = registerBlock("steel_block",
-//            () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final DeferredHolder<Block, Block> STEEL_BLOCK = registerBlock("steel_block",
+            () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)));
 //    public static final RegistryObject<Block> DRAFTING_TABLE = registerBlock("drafting_table",
 //            () -> new BlueprintWorkbenchBlock(BlockBehaviour.Properties.copy(Blocks.CRAFTING_TABLE)));
     public static final DeferredHolder<Block, AlloySmelterBlock> ALLOY_FURNACE = registerBlock("alloy_furnace",
