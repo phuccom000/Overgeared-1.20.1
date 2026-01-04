@@ -10,10 +10,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.item.custom.DiamondUpgradeTemplateItem;
-import net.stirdrem.overgeared.item.custom.KnappableRockItem;
-import net.stirdrem.overgeared.item.custom.SmithingHammer;
-import net.stirdrem.overgeared.item.custom.Tongs;
+import net.stirdrem.overgeared.item.custom.*;
 
 public class ModItems {
   public static final DeferredRegister<Item> ITEMS =
@@ -116,9 +113,8 @@ public class ModItems {
   public static final DeferredHolder<Item, Item> EMPTY_BLUEPRINT = ITEMS.register("empty_blueprint",
           () -> new Item(new Item.Properties()));
 
-//  public static final DeferredHolder<Item, Item> BLUEPRINT = ITEMS.register("blueprint",
-//          () -> new BlueprintItem(new Item.Properties()));
-
+  public static final DeferredHolder<Item, Item> BLUEPRINT = ITEMS.register("blueprint",
+          () -> new BlueprintItem(new Item.Properties()));
 
   public static final DeferredHolder<Item, Item> STONE_SWORD_BLADE = ITEMS.register("stone_sword_blade",
           () -> new Item(new Item.Properties()));
