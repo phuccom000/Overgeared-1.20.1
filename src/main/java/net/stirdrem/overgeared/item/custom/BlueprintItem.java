@@ -95,7 +95,7 @@ public class BlueprintItem extends Item {
 
         if (customData.isEmpty() || !customData.contains("ToolType")) {
             List<ToolType> types = ToolTypeRegistry.getRegisteredTypesAll();
-            return !types.isEmpty() ? types.get(0) : ToolType.SWORD;
+            return !types.isEmpty() ? types.getFirst() : ToolType.SWORD;
         }
 
         String id = customData.copyTag().getString("ToolType");
@@ -113,7 +113,7 @@ public class BlueprintItem extends Item {
 
             // Set default tool type to first available or SWORD
             List<ToolType> types = ToolTypeRegistry.getRegisteredTypesAll();
-            tag.putString("ToolType", !types.isEmpty() ? types.get(0).getId() : "SWORD");
+            tag.putString("ToolType", !types.isEmpty() ? types.getFirst().getId() : "SWORD");
 
             return CustomData.of(tag);
         });

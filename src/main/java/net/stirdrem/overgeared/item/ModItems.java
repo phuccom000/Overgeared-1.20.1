@@ -32,15 +32,15 @@ public class ModItems {
   public static final DeferredHolder<Item, Item> NETHERITE_ALLOY = ITEMS.register("netherite_alloy",
           () -> new Item(new Item.Properties()));
 
-//  public static final DeferredHolder<Item, Item> UNFIRED_TOOL_CAST = ITEMS.register("unfired_tool_cast",
-//          () -> new ToolCastItem(false, false, new Item.Properties()));
-//
-//  public static final DeferredHolder<Item, Item> CLAY_TOOL_CAST = ITEMS.register("clay_tool_cast",
-//          () -> new ToolCastItem(true, true,
-//                  new Item.Properties().stacksTo(1).durability(1)));
-//
-//  public static final DeferredHolder<Item, Item> NETHER_TOOL_CAST = ITEMS.register("nether_tool_cast",
-//          () -> new ToolCastItem(true, false, new Item.Properties().stacksTo(1)));
+  public static final DeferredHolder<Item, Item> UNFIRED_TOOL_CAST = ITEMS.register("unfired_tool_cast",
+          () -> new ToolCastItem(false, false, new Item.Properties()));
+
+  public static final DeferredHolder<Item, Item> CLAY_TOOL_CAST = ITEMS.register("clay_tool_cast",
+          () -> new ToolCastItem(true, true,
+                  new Item.Properties().stacksTo(1).durability(1)));
+
+  public static final DeferredHolder<Item, Item> NETHER_TOOL_CAST = ITEMS.register("nether_tool_cast",
+          () -> new ToolCastItem(true, false, new Item.Properties().stacksTo(1)));
 
   public static final DeferredHolder<Item, Item> STEEL_NUGGET = ITEMS.register("steel_nugget",
           () -> new Item(new Item.Properties()));

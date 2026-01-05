@@ -53,9 +53,9 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.DIAMOND_SHARD);
         simpleItem(ModItems.IRON_ARROW_HEAD);
         simpleItem(ModItems.STEEL_ARROW_HEAD);
-//        simpleItem(ModItems.UNFIRED_TOOL_CAST);
-//        simpleItem(ModItems.CLAY_TOOL_CAST);
-//        simpleItem(ModItems.NETHER_TOOL_CAST);
+        simpleItem(ModItems.UNFIRED_TOOL_CAST);
+        simpleItem(ModItems.CLAY_TOOL_CAST);
+        simpleItem(ModItems.NETHER_TOOL_CAST);
         upgradeArrowModel(ModItems.LINGERING_ARROW);
         upgradeArrowModel(ModItems.IRON_UPGRADE_ARROW);
         upgradeArrowModel(ModItems.STEEL_UPGRADE_ARROW);
@@ -72,7 +72,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.IRON_TONG);
         simpleItem(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE);
         simpleItem(ModItems.EMPTY_BLUEPRINT);
-//        simpleItem(ModItems.BLUEPRINT);
+        simpleItem(ModItems.BLUEPRINT);
         trimmedArmorItem(ModItems.STEEL_HELMET);
         trimmedArmorItem(ModItems.STEEL_BOOTS);
         trimmedArmorItem(ModItems.STEEL_CHESTPLATE);

@@ -61,9 +61,9 @@ public class ModCreativeModeTabs {
                                 output.accept(ModItems.EMPTY_BLUEPRINT.get());
                                 output.accept(ModItems.BLUEPRINT.get());
                                 output.accept(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get());
-//                                output.accept(ModItems.UNFIRED_TOOL_CAST.get());
-//                                output.accept(ModItems.CLAY_TOOL_CAST.get());
-//                                output.accept(ModItems.NETHER_TOOL_CAST.get());
+                                output.accept(ModItems.UNFIRED_TOOL_CAST.get());
+                                output.accept(ModItems.CLAY_TOOL_CAST.get());
+                                output.accept(ModItems.NETHER_TOOL_CAST.get());
                                 output.accept(ModItems.COPPER_HELMET.get());
                                 output.accept(ModItems.COPPER_CHESTPLATE.get());
                                 output.accept(ModItems.COPPER_LEGGINGS.get());

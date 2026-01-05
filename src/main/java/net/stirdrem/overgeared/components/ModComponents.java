@@ -26,6 +26,12 @@ public class ModComponents {
                     .networkSynchronized(ByteBufCodecs.BOOL)
                     .build());
 
+    public static final Supplier<DataComponentType<CastData>> CAST_DATA =
+            COMPONENTS.register("cast_data", () -> DataComponentType.<CastData>builder()
+                    .persistent(CastData.CODEC)
+                    .networkSynchronized(CastData.STREAM_CODEC)
+                    .build());
+
     public static void register(IEventBus eventBus) {
         COMPONENTS.register(eventBus);
     }
