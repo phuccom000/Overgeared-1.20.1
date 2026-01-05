@@ -6,8 +6,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.datapack.MaterialSettingsReloadListener;
+import net.stirdrem.overgeared.recipe.ItemToToolTypeRecipe;
+import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,15 +57,15 @@ public class ConfigHelper {
     // -----------------------
     // Tool Head → Tool Type
     // -----------------------
-//    public static String getToolTypeForItem(Level level, ItemStack stack) {
-//        return level.getRecipeManager()
-//                .getAllRecipesFor(ModRecipeTypes.ITEM_TO_TOOLTYPE.get())
-//                .stream()
-//                .filter(r -> r.getInput().test(stack))
-//                .map(ItemToToolTypeRecipe::getToolType)
-//                .findFirst()
-//                .orElse("none");
-//    }
+    public static String getToolTypeForItem(Level level, ItemStack stack) {
+        return level.getRecipeManager()
+                .getAllRecipesFor(ModRecipeTypes.ITEM_TO_TOOLTYPE.get())
+                .stream()
+                .filter(r -> r.value().input().test(stack))
+                .map(r -> r.value().toolType())
+                .findFirst()
+                .orElse("none");
+    }
 
     // -----------------------
     // Material from Item (UPDATED - uses datapack)

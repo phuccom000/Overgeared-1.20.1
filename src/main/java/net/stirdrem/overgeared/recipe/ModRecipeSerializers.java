@@ -42,8 +42,8 @@ public class ModRecipeSerializers {
         RECIPE_SERIALIZERS.register("nether_alloy_smelting", NetherAlloySmeltingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<ShapedNetherAlloySmeltingRecipe>> SHAPED_NETHER_ALLOY_SMELTING =
 //            SERIALIZERS.register("shaped_nether_alloy_smelting", () -> ShapedNetherAlloySmeltingRecipe.Serializer.INSTANCE);
-//    public static final RegistryObject<RecipeSerializer<ItemToToolTypeRecipe>> ITEM_TO_TOOLTYPE =
-//            SERIALIZERS.register("item_to_tooltype", ItemToToolTypeRecipe.Serializer::new);
+    public static final Supplier<RecipeSerializer<ItemToToolTypeRecipe>> ITEM_TO_TOOLTYPE =
+        RECIPE_SERIALIZERS.register("item_to_tooltype", ItemToToolTypeRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<CoolingRecipe>> COOLING_SERIALIZER =
         RECIPE_SERIALIZERS.register("cooling", CoolingRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<GrindingRecipe>> GRINDING_SERIALIZER =
