@@ -15,7 +15,7 @@ public class ModRecipeSerializers {
 //    public static final RegistryObject<RecipeSerializer<ForgingRecipe>> FORGING_SERIALIZER =
 //            SERIALIZERS.register("forging", () -> ForgingRecipe.Serializer.INSTANCE);
     public static final Supplier<RecipeSerializer<RockKnappingRecipe>> ROCK_KNAPPING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("rock_knapping", RockKnappingSerializer::new);
+            RECIPE_SERIALIZERS.register("rock_knapping", RockKnappingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<OvergearedShapelessRecipe>> CRAFTING_SHAPELESS =
 //            SERIALIZERS.register("crafting_shapeless", () -> OvergearedShapelessRecipe.Serializer.INSTANCE);
 //    public static final RegistryObject<RecipeSerializer<BlueprintCloningRecipe>> CRAFTING_BLUEPRINTCLONING =
@@ -37,7 +37,7 @@ public class ModRecipeSerializers {
     public static final Supplier<RecipeSerializer<AlloySmeltingRecipe>> ALLOY_SMELTING =
             RECIPE_SERIALIZERS.register("alloy_smelting", AlloySmeltingRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
-            RECIPE_SERIALIZERS.register("shaped_alloy_smelting", () -> ShapedAlloySmeltingSerializer.INSTANCE);
+            RECIPE_SERIALIZERS.register("shaped_alloy_smelting", ShapedAlloySmeltingRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
         RECIPE_SERIALIZERS.register("nether_alloy_smelting", NetherAlloySmeltingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<ShapedNetherAlloySmeltingRecipe>> SHAPED_NETHER_ALLOY_SMELTING =
