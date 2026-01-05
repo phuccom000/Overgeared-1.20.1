@@ -23,9 +23,7 @@ public class ModRecipeTypes {
     public static final Supplier<RecipeType<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
             RECIPE_TYPES.register("nether_alloy_smelting", () -> RecipeType.simple(OvergearedMod.loc("nether_alloy_smelting")));
     public static final Supplier<RecipeType<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
-            RECIPE_TYPES.register(ShapedAlloySmeltingRecipe.Type.ID, () -> RecipeType.simple(OvergearedMod.loc(ShapedAlloySmeltingRecipe.Type.ID)));
-//    public static final RegistryObject<RecipeType<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
-//            RECIPE_TYPES.register(ShapedAlloySmeltingRecipe.Type.ID, () -> ShapedAlloySmeltingRecipe.Type.INSTANCE);
+            RECIPE_TYPES.register("shaped_alloy_smelting", () -> RecipeType.simple(OvergearedMod.loc("shaped_alloy_smelting")));
 //    public static final RegistryObject<RecipeType<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =
 //            RECIPE_TYPES.register(NetherAlloySmeltingRecipe.Type.ID, () -> NetherAlloySmeltingRecipe.Type.INSTANCE);
 //    public static final RegistryObject<RecipeType<ShapedNetherAlloySmeltingRecipe>> SHAPED_NETHER_ALLOY_SMELTING =

@@ -9,11 +9,6 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 public class ShapedAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRecipe {
-    public static class Type implements RecipeType<ShapedAlloySmeltingRecipe> {
-        public static final ShapedAlloySmeltingRecipe.Type INSTANCE = new ShapedAlloySmeltingRecipe.Type();
-        public static final String ID = "shaped_alloy_smelting";
-    }
-
     private final String group;
     private final CraftingBookCategory category;
     private final NonNullList<Ingredient> pattern; // size 4
