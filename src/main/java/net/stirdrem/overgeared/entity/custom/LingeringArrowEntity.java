@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+//TODO: there's tons of duplicate code between this and UpgradeArrowEntity
 public class LingeringArrowEntity extends AbstractArrow {
     private static final EntityDataAccessor<Integer> DATA_POTION_COLOR =
             SynchedEntityData.defineId(LingeringArrowEntity.class, EntityDataSerializers.INT);
