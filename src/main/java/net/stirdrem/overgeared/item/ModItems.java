@@ -10,6 +10,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.entity.ArrowTier;
 import net.stirdrem.overgeared.item.custom.*;
 
 public class ModItems {
@@ -209,17 +210,17 @@ public class ModItems {
           () -> new HoeItem(ModToolTiers.COPPER, toolProperties(0, -1.5f)));
   public static final DeferredHolder<Item, Item> COPPER_SHOVEL = ITEMS.register("copper_shovel",
           () -> new ShovelItem(ModToolTiers.COPPER, toolProperties(2.5f, -3)));
-//
-//  public static final DeferredHolder<Item, Item> LINGERING_ARROW = ITEMS.register("lingering_arrow",
-//          () -> new LingeringArrowItem(new Item.Properties(), ArrowTier.FLINT));
+
+  public static final DeferredHolder<Item, Item> LINGERING_ARROW = ITEMS.register("lingering_arrow",
+          () -> new LingeringArrowItem(new Item.Properties(), ArrowTier.FLINT));
 
 
-//  public static final DeferredHolder<Item, Item> IRON_UPGRADE_ARROW = ITEMS.register("iron_arrow",
-//          () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.IRON));
-//  public static final DeferredHolder<Item, Item> STEEL_UPGRADE_ARROW = ITEMS.register("steel_arrow",
-//          () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.STEEL));
-//  public static final DeferredHolder<Item, Item> DIAMOND_UPGRADE_ARROW = ITEMS.register("diamond_arrow",
-//          () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.DIAMOND));
+  public static final DeferredHolder<Item, Item> IRON_UPGRADE_ARROW = ITEMS.register("iron_arrow",
+          () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.IRON));
+  public static final DeferredHolder<Item, Item> STEEL_UPGRADE_ARROW = ITEMS.register("steel_arrow",
+          () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.STEEL));
+  public static final DeferredHolder<Item, Item> DIAMOND_UPGRADE_ARROW = ITEMS.register("diamond_arrow",
+          () -> new UpgradeArrowItem(new Item.Properties(), ArrowTier.DIAMOND));
 
   private static Item.Properties toolProperties(float attackDamage, float attackSpeed) {
     ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();

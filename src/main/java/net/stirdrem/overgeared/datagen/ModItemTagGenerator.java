@@ -75,14 +75,6 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.STEEL_SHOVEL_HEAD.get(),
                         ModItems.STEEL_HOE_HEAD.get(),
 
-                        /*
-                        // Diamond (commented out)
-                        ModItems.DIAMOND_SWORD_BLADE.get(),
-                        ModItems.DIAMOND_PICKAXE_HEAD.get(),
-                        ModItems.DIAMOND_AXE_HEAD.get(),
-                        ModItems.DIAMOND_SHOVEL_HEAD.get(),
-                        ModItems.DIAMOND_HOE_HEAD.get()
-                        */
                         ModItems.IRON_ARROW_HEAD.get(),
                         ModItems.STEEL_ARROW_HEAD.get(),
                         ModItems.DIAMOND_SHARD.get()
@@ -207,14 +199,13 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.COPPER_LEGGINGS.get(),
                         ModItems.COPPER_BOOTS.get()
                 );
-//        this.tag(ItemTags.ARROWS)
-//                .add(
-//                        ModItems.LINGERING_ARROW.get(),
-//                        //ModItems.MODULAR_ARROW.get(),
-//                        ModItems.IRON_UPGRADE_ARROW.get(),
-//                        ModItems.STEEL_UPGRADE_ARROW.get(),
-//                        ModItems.DIAMOND_UPGRADE_ARROW.get()
-//                );
+        this.tag(ItemTags.ARROWS)
+                .add(
+                        ModItems.LINGERING_ARROW.get(),
+                        ModItems.IRON_UPGRADE_ARROW.get(),
+                        ModItems.STEEL_UPGRADE_ARROW.get(),
+                        ModItems.DIAMOND_UPGRADE_ARROW.get()
+                );
         this.tag(ModTags.Items.HOT_ITEMS)
                 .add(
                         Items.LAVA_BUCKET

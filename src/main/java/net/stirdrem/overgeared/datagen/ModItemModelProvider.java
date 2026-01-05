@@ -56,9 +56,10 @@ public class ModItemModelProvider extends ItemModelProvider {
 //        simpleItem(ModItems.UNFIRED_TOOL_CAST);
 //        simpleItem(ModItems.CLAY_TOOL_CAST);
 //        simpleItem(ModItems.NETHER_TOOL_CAST);
-//        upgradeArrowModel(ModItems.IRON_UPGRADE_ARROW);
-//        upgradeArrowModel(ModItems.STEEL_UPGRADE_ARROW);
-//        upgradeArrowModel(ModItems.DIAMOND_UPGRADE_ARROW);
+        upgradeArrowModel(ModItems.LINGERING_ARROW);
+        upgradeArrowModel(ModItems.IRON_UPGRADE_ARROW);
+        upgradeArrowModel(ModItems.STEEL_UPGRADE_ARROW);
+        upgradeArrowModel(ModItems.DIAMOND_UPGRADE_ARROW);
         simpleItem(ModItems.HEATED_COPPER_INGOT);
         simpleItem(ModItems.HEATED_IRON_INGOT);
         simpleItem(ModItems.HEATED_STEEL_INGOT);
@@ -327,33 +328,59 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     private void upgradeArrowModel(DeferredHolder<Item, Item> item) {
         String baseName = item.getId().getPath();
+        boolean isLingeringArrow = baseName.startsWith("lingering_");
 
-        String head = "item/" + baseName;
+        // For lingering arrows, get the base arrow name (without "lingering_" prefix)
+        String baseArrowName = isLingeringArrow ? baseName.substring(10) : baseName;
+        
+        // For lingering arrows, use the base arrow texture
+        ResourceLocation headLoc;
+        if (isLingeringArrow) {
+            if (baseArrowName.equals("arrow")) {
+                // Use vanilla arrow texture
+                headLoc = ResourceLocation.withDefaultNamespace("item/arrow");
+            } else {
+                // Use mod's arrow texture (e.g., iron_arrow, steel_arrow)
+                headLoc = modLoc("item/" + baseArrowName);
+            }
+        } else {
+            headLoc = modLoc("item/" + baseName);
+        }
 
-        String tippedHead = "item/tipped_" + baseName + "_head";
-        String tippedBase = "item/tipped_" + baseName + "_base";
+        String tippedHead = "item/tipped_" + baseArrowName + "_head";
+        String tippedBase = "item/tipped_" + baseArrowName + "_base";
 
-        String lingeringHead = "item/lingering_" + baseName + "_head";
-        String lingeringBase = "item/lingering_" + baseName + "_base";
+        String lingeringHead = "item/lingering_" + baseArrowName + "_head";
+        String lingeringBase = "item/lingering_" + baseArrowName + "_base";
 
         // Base arrow (no potion) — only layer0
-        getBuilder(baseName)
+        ItemModelBuilder baseBuilder = getBuilder(baseName)
                 .parent(new ModelFile.UncheckedModelFile("item/generated"))
-                .texture("layer0", modLoc(head))
-                .override()
-                .predicate(OvergearedMod.loc("potion_type"), 1f)
-                .model(new ModelFile.UncheckedModelFile(modLoc("item/" + baseName + "_tipped")))
-                .end()
+                .texture("layer0", headLoc);
+
+        // Only add tipped override for non-lingering arrows
+        if (!isLingeringArrow) {
+            baseBuilder
+                    .override()
+                    .predicate(OvergearedMod.loc("potion_type"), 1f)
+                    .model(new ModelFile.UncheckedModelFile(modLoc("item/" + baseName + "_tipped")))
+                    .end();
+        }
+
+        // Add lingering override for all arrows
+        baseBuilder
                 .override()
                 .predicate(OvergearedMod.loc("potion_type"), 2f)
                 .model(new ModelFile.UncheckedModelFile(modLoc("item/" + baseName + "_lingering")))
                 .end();
 
-        // Tipped arrow — 2 layers
-        getBuilder(baseName + "_tipped")
-                .parent(new ModelFile.UncheckedModelFile("item/generated"))
-                .texture("layer0", modLoc(tippedHead))
-                .texture("layer1", modLoc(tippedBase));
+        // Tipped arrow — 2 layers (only for non-lingering arrows)
+        if (!isLingeringArrow) {
+            getBuilder(baseName + "_tipped")
+                    .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                    .texture("layer0", modLoc(tippedHead))
+                    .texture("layer1", modLoc(tippedBase));
+        }
 
         // Lingering arrow — 2 layers
         getBuilder(baseName + "_lingering")
@@ -361,5 +388,4 @@ public class ModItemModelProvider extends ItemModelProvider {
                 .texture("layer0", modLoc(lingeringHead))
                 .texture("layer1", modLoc(lingeringBase));
     }
-
 }

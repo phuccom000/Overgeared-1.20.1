@@ -1,13 +1,18 @@
 package net.stirdrem.overgeared.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -18,10 +23,16 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.components.ModComponents;
+import net.stirdrem.overgeared.entity.ModEntities;
+import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
+import net.stirdrem.overgeared.entity.renderer.UpgradeArrowEntityRenderer;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.armor.custom.ArmorModelHelper;
 import net.stirdrem.overgeared.item.armor.model.CopperHelmet;
 import net.stirdrem.overgeared.item.armor.model.CopperLeggings;
+import net.stirdrem.overgeared.item.custom.LingeringArrowItem;
+import net.stirdrem.overgeared.item.custom.UpgradeArrowItem;
 import net.stirdrem.overgeared.screen.AlloySmelterMenu;
 import net.stirdrem.overgeared.screen.AlloySmelterScreen;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
@@ -42,6 +53,47 @@ public class ClientModEvents {
                 .registerExtensionPoint(
                         IConfigScreenFactory.class,
                         (container, parent) -> new OvergearedConfigScreen(parent));
+        
+        event.enqueueWork(() -> {
+            // Register item properties for arrow potion type variants
+            // For LINGERING_ARROW, always show lingering variant when potion is present
+            ItemProperties.register(ModItems.LINGERING_ARROW.get(), OvergearedMod.loc("potion_type"),
+                    (stack, level, entity, seed) -> {
+                        PotionContents potionContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+                        if (potionContents.potion().isPresent() || potionContents.hasEffects()) {
+                            return 2.0f; // Lingering arrows always use lingering model
+                        }
+                        return 0.0f; // Base model
+                    });
+            
+            // For upgrade arrows, check LINGERING_STATUS to differentiate tipped vs lingering
+            registerArrowProperties(ModItems.IRON_UPGRADE_ARROW.get());
+            registerArrowProperties(ModItems.STEEL_UPGRADE_ARROW.get());
+            registerArrowProperties(ModItems.DIAMOND_UPGRADE_ARROW.get());
+            
+            // Register arrow color handlers
+            ItemColors itemColors = Minecraft.getInstance().getItemColors();
+            itemColors.register(LingeringArrowItem::getColor, ModItems.LINGERING_ARROW.get());
+            itemColors.register(UpgradeArrowItem::getColor, 
+                ModItems.IRON_UPGRADE_ARROW.get(),
+                ModItems.STEEL_UPGRADE_ARROW.get(),
+                ModItems.DIAMOND_UPGRADE_ARROW.get());
+        });
+    }
+    
+    private static void registerArrowProperties(Item item) {
+        ItemProperties.register(item, OvergearedMod.loc("potion_type"),
+                (stack, level, entity, seed) -> {
+                    PotionContents potionContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+                    boolean isLingering = stack.getOrDefault(ModComponents.LINGERING_STATUS, false);
+                    
+                    if (isLingering && (potionContents.potion().isPresent() || potionContents.hasEffects())) {
+                        return 2.0f; // Lingering potion model
+                    } else if (potionContents.potion().isPresent() || potionContents.hasEffects()) {
+                        return 1.0f; // Tipped potion model
+                    }
+                    return 0.0f; // Base model
+                });
     }
     
     @SuppressWarnings("unchecked")
@@ -62,6 +114,12 @@ public class ClientModEvents {
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(CopperHelmet.LAYER_LOCATION, CopperHelmet::createBodyLayer);
         event.registerLayerDefinition(CopperLeggings.LAYER_LOCATION, CopperLeggings::createBodyLayer);
+    }
+
+    @SubscribeEvent
+    public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.LINGERING_ARROW.get(), LingeringArrowEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.UPGRADE_ARROW.get(), UpgradeArrowEntityRenderer::new);
     }
 
     @SubscribeEvent
