@@ -104,7 +104,15 @@ public class UpgradeArrowItem extends ArrowItem {
                             potionId.equals("thick");
 
                     if (!isNoEffectPotion) {
-                        String effectKey = "item.overgeared.arrow.effect." + potionId;
+                        // Strip "long_" or "strong_" prefix to get base potion name
+                        String basePotionId = potionId;
+                        if (potionId.startsWith("long_")) {
+                            basePotionId = potionId.substring(5); // Remove "long_"
+                        } else if (potionId.startsWith("strong_")) {
+                            basePotionId = potionId.substring(7); // Remove "strong_"
+                        }
+                        
+                        String effectKey = "item.overgeared.arrow.effect." + basePotionId;
                         Component effectComponent = Component.translatable(effectKey);
 
                         return Component.translatable(getDescriptionId(stack), effectComponent);
