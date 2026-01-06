@@ -14,6 +14,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.custom.AlloySmelterBlock;
 import net.stirdrem.overgeared.block.custom.NetherAlloySmelterBlock;
+import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
 import net.stirdrem.overgeared.item.ModItems;
 
 import java.util.function.Supplier;
@@ -28,8 +29,8 @@ public class ModBlocks {
 //            () -> new TierASmithingAnvil(AnvilTier.ABOVE_A, BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
 //    public static final RegistryObject<Block> TIER_B_SMITHING_ANVIL = registerBlock("tier_b_smithing_anvil",
 //            () -> new TierBSmithingAnvil(AnvilTier.ABOVE_B, BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
-//    public static final RegistryObject<Block> STONE_SMITHING_ANVIL = registerBlock("stone_anvil",
-//            () -> new StoneSmithingAnvil(BlockBehaviour.Properties.copy(Blocks.STONE).noOcclusion()));
+    public static final DeferredHolder<Block, StoneSmithingAnvil> STONE_SMITHING_ANVIL = registerBlock("stone_anvil",
+            () -> new StoneSmithingAnvil(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).noOcclusion()));
     public static final DeferredHolder<Block, Block> STEEL_BLOCK = registerBlock("steel_block",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)));
 //    public static final RegistryObject<Block> DRAFTING_TABLE = registerBlock("drafting_table",

@@ -121,7 +121,7 @@ public class ModCreativeModeTabs {
                                 output.accept(ModItems.STEEL_SHOVEL_HEAD.get());
                                 output.accept(ModItems.STEEL_HOE_HEAD.get());
 
-//                                output.accept(ModBlocks.STONE_SMITHING_ANVIL.get());
+                                output.accept(ModBlocks.STONE_SMITHING_ANVIL.get());
 //                                output.accept(ModBlocks.SMITHING_ANVIL.get());
 //                                output.accept(ModBlocks.TIER_A_SMITHING_ANVIL.get());
 //                                output.accept(ModBlocks.TIER_B_SMITHING_ANVIL.get());

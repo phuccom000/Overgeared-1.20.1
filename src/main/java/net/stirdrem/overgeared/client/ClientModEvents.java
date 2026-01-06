@@ -98,7 +98,7 @@ public class ClientModEvents {
         // event.register(ModMenuTypes.STEEL_SMITHING_ANVIL_MENU.get(), SteelSmithingAnvilScreen::new);
         // event.register(ModMenuTypes.TIER_A_SMITHING_ANVIL_MENU.get(), TierASmithingAnvilScreen::new);
         // event.register(ModMenuTypes.TIER_B_SMITHING_ANVIL_MENU.get(), TierBSmithingAnvilScreen::new);
-        // event.register(ModMenuTypes.STONE_SMITHING_ANVIL_MENU.get(), StoneSmithingAnvilScreen::new);
+        event.register((MenuType<StoneSmithingAnvilMenu>)ModMenuTypes.STONE_SMITHING_ANVIL_MENU.get(), StoneSmithingAnvilScreen::new);
         event.register((MenuType<RockKnappingMenu>)ModMenuTypes.ROCK_KNAPPING_MENU.get(), RockKnappingScreen::new);
         // event.register(ModMenuTypes.BLUEPRINT_WORKBENCH_MENU.get(), BlueprintWorkbenchScreen::new);
         // event.register(ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingStationScreen::new);

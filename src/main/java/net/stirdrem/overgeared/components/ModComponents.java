@@ -38,6 +38,27 @@ public class ModComponents {
                     .networkSynchronized(BlueprintData.STREAM_CODEC)
                     .build());
 
+    // Forging quality stored on crafted items (sword, armor, etc.)
+    public static final Supplier<DataComponentType<String>> FORGING_QUALITY =
+            COMPONENTS.register("forging_quality", () -> DataComponentType.<String>builder()
+                    .persistent(Codec.STRING)
+                    .networkSynchronized(ByteBufCodecs.STRING_UTF8)
+                    .build());
+
+    // Creator name for items
+    public static final Supplier<DataComponentType<String>> CREATOR =
+            COMPONENTS.register("creator", () -> DataComponentType.<String>builder()
+                    .persistent(Codec.STRING)
+                    .networkSynchronized(ByteBufCodecs.STRING_UTF8)
+                    .build());
+
+    // Whether item needs polishing
+    public static final Supplier<DataComponentType<Boolean>> POLISHED =
+            COMPONENTS.register("polished", () -> DataComponentType.<Boolean>builder()
+                    .persistent(Codec.BOOL)
+                    .networkSynchronized(ByteBufCodecs.BOOL)
+                    .build());
+
     public static void register(IEventBus eventBus) {
         COMPONENTS.register(eventBus);
     }

@@ -192,8 +192,6 @@ public class ModItemModelProvider extends ItemModelProvider {
     }
 
     private void trimmedArmorItemWithOverlay(DeferredHolder<Item, Item> itemRegistryObject) {
-        final String MOD_ID = OvergearedMod.MOD_ID;
-
         if (itemRegistryObject.get() instanceof ArmorItem armorItem) {
             trimMaterials.forEach((trimMaterial, value) -> {
               float trimValue = value;
@@ -242,9 +240,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     }
 
     private void polishItem(DeferredHolder<Item, Item> itemRegistryObject) {
-        Item item = itemRegistryObject.get();
-
-        String itemPath = itemRegistryObject.getId().getPath(); // e.g. "steel_pickaxe_head"
+      String itemPath = itemRegistryObject.getId().getPath(); // e.g. "steel_pickaxe_head"
         String toolType = getToolTypeFromName(itemPath);        // → "pickaxe"
 
         ResourceLocation baseTexture = OvergearedMod.loc("item/" + itemPath);

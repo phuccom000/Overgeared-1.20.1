@@ -16,6 +16,7 @@ import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.ModRecipeSerializers;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.screen.ModMenuTypes;
+import net.stirdrem.overgeared.sound.ModSounds;
 import org.slf4j.Logger;
 
 @Mod(OvergearedMod.MOD_ID)
@@ -34,6 +35,7 @@ public final class OvergearedMod {
         ModMenuTypes.register(modEventBus);
         ModRecipeSerializers.register(modEventBus);
         ModRecipeTypes.register(modEventBus);
+        ModSounds.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
         //ModLoadingContext.get().registerExtensionPoint(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);

@@ -29,13 +29,13 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
 //                        ModBlocks.NETHER_ALLOY_FURNACE.get()
 //                );
 //
-//        this.tag(ModTags.Blocks.SMITHING_ANVIL)
-//                .add(
+        this.tag(ModTags.Blocks.SMITHING_ANVIL)
+                .add(
 //                        ModBlocks.SMITHING_ANVIL.get(),
-//                        ModBlocks.STONE_SMITHING_ANVIL.get(),
+                        ModBlocks.STONE_SMITHING_ANVIL.get()
 //                        ModBlocks.TIER_A_SMITHING_ANVIL.get(),
 //                        ModBlocks.TIER_B_SMITHING_ANVIL.get()
-//                );
+                );
 
         this.tag(ModTags.Blocks.NEEDS_STEEL_TOOL)
                 .add(

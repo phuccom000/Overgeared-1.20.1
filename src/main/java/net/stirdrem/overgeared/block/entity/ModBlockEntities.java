@@ -31,11 +31,11 @@ public class ModBlockEntities {
 //                                    ModBlocks.TIER_B_SMITHING_ANVIL.get()).
 //                            build(null));
 //
-//    public static final RegistryObject<BlockEntityType<StoneSmithingAnvilBlockEntity>> STONE_SMITHING_ANVIL_BE =
-//            BLOCK_ENTITIES.register("stone_smithing_table_be", () ->
-//                    BlockEntityType.Builder.of(StoneSmithingAnvilBlockEntity::new,
-//                                    ModBlocks.STONE_SMITHING_ANVIL.get()).
-//                            build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StoneSmithingAnvilBlockEntity>> STONE_SMITHING_ANVIL_BE =
+            BLOCK_ENTITIES.register("stone_smithing_table_be", () ->
+                    BlockEntityType.Builder.of(StoneSmithingAnvilBlockEntity::new,
+                                    ModBlocks.STONE_SMITHING_ANVIL.get()).
+                            build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AlloySmelterBlockEntity>> ALLOY_FURNACE_BE =
             BLOCK_ENTITIES.register("alloy_furnace_be", () ->
                     BlockEntityType.Builder.of(AlloySmelterBlockEntity::new,

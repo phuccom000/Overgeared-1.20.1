@@ -26,8 +26,8 @@ public class ModMenuTypes {
 //    public static final RegistryObject<MenuType<TierBSmithingAnvilMenu>> TIER_B_SMITHING_ANVIL_MENU =
 //            registerMenuType("tier_b_smithing_anvil_menu", TierBSmithingAnvilMenu::new);
 //
-//    public static final RegistryObject<MenuType<StoneSmithingAnvilMenu>> STONE_SMITHING_ANVIL_MENU =
-//            registerMenuType("stone_smithing_anvil_menu", StoneSmithingAnvilMenu::new);
+    public static final DeferredHolder<MenuType<?>, MenuType<?>> STONE_SMITHING_ANVIL_MENU =
+            registerMenuType("stone_smithing_anvil_menu", StoneSmithingAnvilMenu::new);
 
     public static final DeferredHolder<MenuType<?>, MenuType<?>> ROCK_KNAPPING_MENU =
             registerMenuType("rock_knapping_menu", RockKnappingMenu::new);
