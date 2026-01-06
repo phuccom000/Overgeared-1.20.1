@@ -4,7 +4,10 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.screen.RockKnappingMenu;
 
 public record KnappingChipC2SPacket(int index) implements CustomPacketPayload {
     public static final ResourceLocation ID = OvergearedMod.loc("knapping_chip");
@@ -18,5 +21,20 @@ public record KnappingChipC2SPacket(int index) implements CustomPacketPayload {
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
+    }
+
+    public static void handle(KnappingChipC2SPacket payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.player() instanceof ServerPlayer player) {
+                if (player.containerMenu instanceof RockKnappingMenu menu) {
+                    // Validate the index is within bounds
+                    if (payload.index() >= 0 && payload.index() < 9) {
+                        menu.setChip(payload.index());
+                        OvergearedMod.LOGGER.debug("Player {} chipped spot {} in knapping grid",
+                                player.getName().getString(), payload.index());
+                    }
+                }
+            }
+        });
     }
 }
