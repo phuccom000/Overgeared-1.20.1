@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared.block.entity;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -40,10 +41,10 @@ public class ModBlockEntities {
                     BlockEntityType.Builder.of(AlloySmelterBlockEntity::new,
                             ModBlocks.ALLOY_FURNACE.get()).build(null));
 
-//    public static final RegistryObject<BlockEntityType<NetherAlloySmelterBlockEntity>> NETHER_ALLOY_FURNACE_BE =
-//            BLOCK_ENTITIES.register("nether_alloy_furnace_be", () ->
-//                    BlockEntityType.Builder.of(NetherAlloySmelterBlockEntity::new,
-//                            ModBlocks.NETHER_ALLOY_FURNACE.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<NetherAlloySmelterBlockEntity>> NETHER_ALLOY_FURNACE_BE =
+            BLOCK_ENTITIES.register("nether_alloy_furnace_be", () ->
+                    BlockEntityType.Builder.of(NetherAlloySmelterBlockEntity::new,
+                            ModBlocks.NETHER_ALLOY_FURNACE.get()).build(null));
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

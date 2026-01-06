@@ -27,17 +27,17 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
-import net.stirdrem.overgeared.recipe.AlloySmeltingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
-import net.stirdrem.overgeared.recipe.ShapedAlloySmeltingRecipe;
-import net.stirdrem.overgeared.screen.AlloySmelterMenu;
+import net.stirdrem.overgeared.recipe.NetherAlloySmeltingRecipe;
+import net.stirdrem.overgeared.recipe.ShapedNetherAlloySmeltingRecipe;
+import net.stirdrem.overgeared.screen.NetherAlloySmelterMenu;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer {
+public class NetherAlloySmelterBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer {
 
-  private final int inventorySize = 6;
+  private final int inventorySize = 11;
   private final NonNullList<ItemStack> inventory = NonNullList.withSize(inventorySize, ItemStack.EMPTY);
 
   private final ItemStackHandler itemHandler = new ItemStackHandler(inventory) {
@@ -55,11 +55,10 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
   private int cookTimeTotal;
   private float storedExperience;
 
-  public AlloySmelterBlockEntity(BlockPos pos, BlockState state) {
-    super(ModBlockEntities.ALLOY_FURNACE_BE.get(), pos, state);
+  public NetherAlloySmelterBlockEntity(BlockPos pos, BlockState state) {
+    super(ModBlockEntities.NETHER_ALLOY_FURNACE_BE.get(), pos, state);
 
     this.data = new ContainerData() {
-      @Override
       public int get(int index) {
         return switch (index) {
           case 0 -> burnTime;
@@ -70,7 +69,6 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
         };
       }
 
-      @Override
       public void set(int index, int value) {
         switch (index) {
           case 0 -> burnTime = value;
@@ -80,7 +78,6 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
         }
       }
 
-      @Override
       public int getCount() {
         return 4;
       }
@@ -90,24 +87,24 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
   // --------------------------------------------------
   // Tick logic
   // --------------------------------------------------
-  public static void tick(Level level, BlockPos pos, BlockState state, AlloySmelterBlockEntity be) {
+  public static void tick(Level level, BlockPos pos, BlockState state, NetherAlloySmelterBlockEntity be) {
     boolean wasLit = be.burnTime > 0;
     boolean changed = false;
 
     if (be.burnTime > 0) {
       be.burnTime--;
-      changed = true;
     }
 
-    ItemStack fuel = be.itemHandler.getStackInSlot(4);
+    ItemStack fuel = be.itemHandler.getStackInSlot(9);
 
     if (be.burnTime == 0 && be.canSmelt()) {
       be.maxBurnTime = be.burnTime = fuel.getBurnTime(RecipeType.SMELTING);
       if (be.burnTime > 0 && !fuel.isEmpty()) {
-        ItemStack fuelContainer = fuel.getCraftingRemainingItem();
-        fuel.shrink(1);
-        if (fuel.isEmpty() && !fuelContainer.isEmpty())
-          be.itemHandler.setStackInSlot(4, fuelContainer);
+        if (fuel.hasCraftingRemainingItem()) {
+          be.itemHandler.setStackInSlot(9, fuel.getCraftingRemainingItem());
+        } else {
+          fuel.shrink(1);
+        }
         changed = true;
       }
     }
@@ -119,9 +116,8 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
         be.smelt();
         changed = true;
       }
-    } else if (!be.isLit() && be.cookTime > 0) {  // Only reset if not lit
+    } else if (!be.canSmelt()) {
       be.cookTime = 0;
-      changed = true;  // Mark dirty since we changed cookTime
     }
 
     if (wasLit != be.isLit()) {
@@ -136,9 +132,9 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
   public Optional<RecipeHolder<?>> getCurrentRecipe() {
     if (level == null) return Optional.empty();
 
-    // we have to copy our item handler to one that is of size 4
+    // we have to copy our item handler to one that is of size 9
     // so that we don't include the fuel and output slots in the recipe
-    ItemStackHandler input = new ItemStackHandler(4);
+    ItemStackHandler input = new ItemStackHandler(9);
     for (int i = 0; i < input.getSlots(); i++) {
       input.setStackInSlot(i, itemHandler.getStackInSlot(i));
     }
@@ -146,9 +142,9 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
     RecipeInput recipeInput = new RecipeWrapper(input);
     RecipeManager rm = level.getRecipeManager();
 
-    Optional<RecipeHolder<?>> result = rm.getRecipeFor(ModRecipeTypes.ALLOY_SMELTING.get(), recipeInput, level).map(r -> r);
+    Optional<RecipeHolder<?>> result = rm.getRecipeFor(ModRecipeTypes.NETHER_ALLOY_SMELTING.get(), recipeInput, level).map(r -> r);
     if (result.isEmpty()) {
-      result = rm.getRecipeFor(ModRecipeTypes.SHAPED_ALLOY_SMELTING.get(), recipeInput, level).map(r -> r);
+      result = rm.getRecipeFor(ModRecipeTypes.SHAPED_NETHER_ALLOY_SMELTING.get(), recipeInput, level).map(r -> r);
     }
     return result;
   }
@@ -165,15 +161,15 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
     if (recipe.isEmpty()) return false;
 
     ItemStack result;
-    if (recipe.get().value() instanceof AlloySmeltingRecipe shapeless) {
+    if (recipe.get().value() instanceof NetherAlloySmeltingRecipe shapeless) {
+      result = shapeless.getResultItem(level.registryAccess());
       cookTimeTotal = shapeless.getCookingTime();
-      result = shapeless.getResultItem();
-    } else if (recipe.get().value() instanceof ShapedAlloySmeltingRecipe shaped) {
+    } else if (recipe.get().value() instanceof ShapedNetherAlloySmeltingRecipe shaped) {
+      result = shaped.getResultItem(level.registryAccess());
       cookTimeTotal = shaped.getCookingTime();
-      result = shaped.getResultItem();
     } else return false;
 
-    ItemStack output = itemHandler.getStackInSlot(5);
+    ItemStack output = itemHandler.getStackInSlot(10);
     return (output.isEmpty() || (output.is(result.getItem()) &&
                     output.getCount() + result.getCount() <= output.getMaxStackSize()));
   }
@@ -187,22 +183,22 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
     ItemStack result;
     float xp;
 
-    if (recipe.get().value() instanceof AlloySmeltingRecipe shapeless) {
-      result = shapeless.getResultItem();
+    if (recipe.get().value() instanceof NetherAlloySmeltingRecipe shapeless) {
+      result = shapeless.getResultItem(level.registryAccess());
       xp = shapeless.getExperience();
-    } else if (recipe.get().value() instanceof ShapedAlloySmeltingRecipe shaped) {
-      result = shaped.getResultItem();
+    } else if (recipe.get().value() instanceof ShapedNetherAlloySmeltingRecipe shaped) {
+      result = shaped.getResultItem(level.registryAccess());
       xp = shaped.getExperience();
     } else return;
 
-    ItemStack output = itemHandler.getStackInSlot(5);
+    ItemStack output = itemHandler.getStackInSlot(10);
     if (output.isEmpty()) {
-      itemHandler.setStackInSlot(5, result.copy());
+      itemHandler.setStackInSlot(10, result.copy());
     } else if (output.is(result.getItem())) {
       output.grow(result.getCount());
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 9; i++) {
       ItemStack input = itemHandler.getStackInSlot(i);
       if (!input.isEmpty()) input.shrink(1);
     }
@@ -243,7 +239,7 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
   // --------------------------------------------------
   @Override
   public Component getDisplayName() {
-    return Component.translatable("container.overgeared.alloy_smelter");
+    return Component.translatable("container.overgeared.nether_alloy_smelter");
   }
 
   @Override
@@ -258,17 +254,15 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
 
   @Override
   protected void setItems(NonNullList<ItemStack> items) {
-    if (items.size() != itemHandler.getSlots()) return;
-
-    for (int i = 0; i < itemHandler.getSlots(); i++) {
-      itemHandler.setStackInSlot(i, items.get(i));
+    for (int i = 0; i < Math.min(items.size(), inventory.size()); i++) {
+      inventory.set(i, items.get(i));
     }
   }
 
   @Nullable
   @Override
   public AbstractContainerMenu createMenu(int id, Inventory playerInv, Player player) {
-    return new AlloySmelterMenu(id, playerInv, this, this.data);
+    return new NetherAlloySmelterMenu(id, playerInv, this, this.data);
   }
 
   @Override
@@ -327,12 +321,11 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
   }
 
   public void drops() {
-    if (this.level == null) return;
-    SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
+    SimpleContainer simpleContainer = new SimpleContainer(itemHandler.getSlots());
     for (int i = 0; i < itemHandler.getSlots(); i++) {
-      inventory.setItem(i, itemHandler.getStackInSlot(i));
+      simpleContainer.setItem(i, itemHandler.getStackInSlot(i));
     }
-    Containers.dropContents(this.level, this.worldPosition, inventory);
+    Containers.dropContents(this.level, this.worldPosition, simpleContainer);
     spawnExperience(storedExperience);
   }
 
@@ -341,21 +334,26 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
   // --------------------------------------------------
   @Override
   public int[] getSlotsForFace(Direction side) {
-    if (side == Direction.UP) return new int[]{0, 1, 2, 3};
-    else if (side == Direction.DOWN) return new int[]{5};
-    else return new int[]{4};
+    if (side == Direction.UP) {
+      // All input slots for top
+      return new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8};
+    } else if (side == Direction.DOWN) {
+      return new int[]{10};
+    } else {
+      return new int[]{9};
+    }
   }
 
   @Override
   public boolean canPlaceItemThroughFace(int index, ItemStack stack, @Nullable Direction direction) {
-    if (index == 5) return false;
-    if (index == 4) return stack.getBurnTime(RecipeType.SMELTING) > 0;
-    return true;
+    if (index == 10) return false;
+    if (index == 9) return stack.getBurnTime(RecipeType.SMELTING) > 0;
+    return true; // All input slots can accept any item
   }
 
   @Override
   public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-    return index == 5;
+    return index == 10;
   }
 
   // --------------------------------------------------
@@ -404,7 +402,7 @@ public class AlloySmelterBlockEntity extends BaseContainerBlockEntity implements
 
   @Override
   public boolean stillValid(Player player) {
-    if (this.level != null && this.level.getBlockEntity(this.worldPosition) != this) return false;
+    if (this.level.getBlockEntity(this.worldPosition) != this) return false;
     return player.distanceToSqr(
             (double) this.worldPosition.getX() + 0.5D,
             (double) this.worldPosition.getY() + 0.5D,

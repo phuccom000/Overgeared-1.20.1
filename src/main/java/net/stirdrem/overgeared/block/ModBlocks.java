@@ -13,6 +13,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.custom.AlloySmelterBlock;
+import net.stirdrem.overgeared.block.custom.NetherAlloySmelterBlock;
 import net.stirdrem.overgeared.item.ModItems;
 
 import java.util.function.Supplier;
@@ -40,8 +41,13 @@ public class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .strength(3.5F, 6.0F)
                     .lightLevel(litBlockEmission())));
-//    public static final RegistryObject<Block> NETHER_ALLOY_FURNACE = registerBlock("nether_alloy_furnace",
-//            () -> new NetherAlloySmelterBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_BRICKS).noOcclusion().requiresCorrectToolForDrops().strength(3.5F, 6.0F).lightLevel(litBlockEmission(13))));
+    public static final DeferredHolder<Block, Block> NETHER_ALLOY_FURNACE = registerBlock("nether_alloy_furnace",
+            () -> new NetherAlloySmelterBlock(BlockBehaviour.Properties
+                    .ofFullCopy(Blocks.NETHER_BRICKS)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops()
+                    .strength(3.5F, 6.0F)
+                    .lightLevel(litBlockEmission())));
 
     private static ToIntFunction<BlockState> litBlockEmission() {
         return (p_50763_) -> p_50763_.getValue(BlockStateProperties.LIT) ? 13 : 0;

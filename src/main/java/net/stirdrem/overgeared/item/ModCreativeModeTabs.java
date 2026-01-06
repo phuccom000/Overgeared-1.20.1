@@ -128,7 +128,7 @@ public class ModCreativeModeTabs {
                                 output.accept(ModBlocks.STEEL_BLOCK.get());
 //                                output.accept(ModBlocks.DRAFTING_TABLE.get());
                                 output.accept(ModBlocks.ALLOY_FURNACE.get());
-//                                output.accept(ModBlocks.NETHER_ALLOY_FURNACE.get());
+                                output.accept(ModBlocks.NETHER_ALLOY_FURNACE.get());
                             })
                             .build());
 

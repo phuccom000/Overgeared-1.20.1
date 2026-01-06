@@ -135,7 +135,7 @@ public class NetherAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRec
                 Ingredient.CODEC.listOf(0, 9).fieldOf("ingredients").forGetter(r -> r.ingredients),
                 ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
                 Codec.FLOAT.optionalFieldOf("experience", 0.0F).forGetter(r -> r.experience),
-                Codec.INT.optionalFieldOf("cooking_time", 200).forGetter(r -> r.cookingTime)
+                Codec.INT.optionalFieldOf("cookingtime", 200).forGetter(r -> r.cookingTime)
         ).apply(i, NetherAlloySmeltingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, NetherAlloySmeltingRecipe> STREAM_CODEC = StreamCodec.composite(

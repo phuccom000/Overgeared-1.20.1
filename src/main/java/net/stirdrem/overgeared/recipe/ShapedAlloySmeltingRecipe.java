@@ -108,25 +108,36 @@ public class ShapedAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRec
     }
 
     public static class Serializer implements RecipeSerializer<ShapedAlloySmeltingRecipe> {
-        private static final Codec<NonNullList<Ingredient>> INGREDIENTS_CODEC =
-                Ingredient.CODEC.listOf()
-                        .flatXmap(
-                                list -> list.size() == 4
-                                        ? DataResult.success(NonNullList.of(Ingredient.EMPTY, list.toArray(Ingredient[]::new)))
-                                        : DataResult.error(() -> "Shaped alloy smelting requires exactly 4 ingredients (2x2)"),
-                                DataResult::success
-                        );
-
         @Override
         public MapCodec<ShapedAlloySmeltingRecipe> codec() {
             return RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    Codec.STRING.fieldOf("group").forGetter(ShapedAlloySmeltingRecipe::getGroup),
-                    CraftingBookCategory.CODEC.fieldOf("category").forGetter(ShapedAlloySmeltingRecipe::getCraftingBookCategory),
-                    INGREDIENTS_CODEC.fieldOf("ingredients").forGetter(ShapedAlloySmeltingRecipe::getPattern),
-                    ItemStack.CODEC.fieldOf("output").forGetter(ShapedAlloySmeltingRecipe::getResultItem),
-                    Codec.FLOAT.fieldOf("experience").forGetter(ShapedAlloySmeltingRecipe::getExperience),
-                    Codec.INT.fieldOf("cookingtime").forGetter(ShapedAlloySmeltingRecipe::getCookingTime)
-            ).apply(instance, ShapedAlloySmeltingRecipe::new));
+                    Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedAlloySmeltingRecipe::getGroup),
+                    CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC).forGetter(ShapedAlloySmeltingRecipe::getCraftingBookCategory),
+                    Codec.list(Codec.STRING).fieldOf("pattern").forGetter(r -> List.of("AA", "AA")),
+                    Codec.unboundedMap(Codec.STRING, Ingredient.CODEC).fieldOf("key").forGetter(r -> java.util.Map.of()),
+                    ItemStack.CODEC.fieldOf("result").forGetter(ShapedAlloySmeltingRecipe::getResultItem),
+                    Codec.FLOAT.optionalFieldOf("experience", 0.0F).forGetter(ShapedAlloySmeltingRecipe::getExperience),
+                    Codec.INT.optionalFieldOf("cookingtime", 200).forGetter(ShapedAlloySmeltingRecipe::getCookingTime)
+            ).apply(instance, (group, category, pattern, key, result, exp, time) -> {
+                // Parse the pattern using the key map
+                if (pattern.size() != 2) {
+                    throw new IllegalArgumentException("2x2 pattern must have exactly 2 rows");
+                }
+                
+                NonNullList<Ingredient> ingredients = NonNullList.withSize(4, Ingredient.EMPTY);
+                for (int y = 0; y < 2; y++) {
+                    String row = pattern.get(y);
+                    if (row.length() != 2) {
+                        throw new IllegalArgumentException("Each row must have exactly 2 characters");
+                    }
+                    for (int x = 0; x < 2; x++) {
+                        char c = row.charAt(x);
+                        String keyStr = String.valueOf(c);
+                        ingredients.set(y * 2 + x, key.getOrDefault(keyStr, Ingredient.EMPTY));
+                    }
+                }
+                return new ShapedAlloySmeltingRecipe(group, category, ingredients, result, exp, time);
+            }));
         }
 
         @Override

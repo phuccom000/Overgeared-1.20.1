@@ -42,9 +42,10 @@ public class ModMenuTypes {
 //
     public static final DeferredHolder<MenuType<?>, MenuType<?>> ALLOY_SMELTER_MENU =
             registerMenuType("alloy_smelter_menu", AlloySmelterMenu::new);
-//
-//    public static final RegistryObject<MenuType<NetherAlloySmelterMenu>> NETHER_ALLOY_SMELTER_MENU =
-//            registerMenuType("nether_alloy_smelter_menu", NetherAlloySmelterMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<?>> NETHER_ALLOY_SMELTER_MENU =
+            registerMenuType("nether_alloy_smelter_menu", NetherAlloySmelterMenu::new);
+
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<?>> registerMenuType(String name, IContainerFactory<T> factory) {
         return MENUS.register(name, () -> IMenuTypeExtension.create(factory));
     }

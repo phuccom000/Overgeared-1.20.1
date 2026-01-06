@@ -11,9 +11,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.stirdrem.overgeared.block.ModBlocks;
-import net.stirdrem.overgeared.block.entity.AlloySmelterBlockEntity;
+import net.stirdrem.overgeared.block.entity.NetherAlloySmelterBlockEntity;
 
-public class AlloySmelterMenu extends AbstractContainerMenu {
+public class NetherAlloySmelterMenu extends AbstractContainerMenu {
 
     private static final int HOTBAR_SLOT_COUNT = 9;
     private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
@@ -22,21 +22,22 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
     private static final int VANILLA_SLOT_COUNT = HOTBAR_SLOT_COUNT + PLAYER_INVENTORY_SLOT_COUNT;
     private static final int VANILLA_FIRST_SLOT_INDEX = 0;
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
-    private static final int TE_INVENTORY_SLOT_COUNT = 6;
-    private final AlloySmelterBlockEntity blockEntity;
+    // THIS YOU HAVE TO DEFINE!
+    private static final int TE_INVENTORY_SLOT_COUNT = 11;  // must be the number of slots you have!
+    private final NetherAlloySmelterBlockEntity blockEntity;
     private final ContainerData data;
     private final Level level;
 
 
     // Default constructor for client-side (read from packet)
-    public AlloySmelterMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        this(id, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(6));
+    public NetherAlloySmelterMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
+        this(id, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(11));
     }
 
-    public AlloySmelterMenu(int id, Inventory playerInv, BlockEntity blockEntity, ContainerData data) {
-        super(ModMenuTypes.ALLOY_SMELTER_MENU.get(), id);
-        checkContainerSize(playerInv, 6);
-        this.blockEntity = (AlloySmelterBlockEntity) blockEntity;
+    public NetherAlloySmelterMenu(int id, Inventory playerInv, BlockEntity blockEntity, ContainerData data) {
+        super(ModMenuTypes.NETHER_ALLOY_SMELTER_MENU.get(), id);
+        checkContainerSize(playerInv, 11);
+        this.blockEntity = (NetherAlloySmelterBlockEntity) blockEntity;
         this.data = data;
         this.level = playerInv.player.level();
         this.addDataSlots(data);
@@ -46,17 +47,24 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
 
         IItemHandler iItemHandler = this.blockEntity.getItemHandler();
 
-        this.addSlot(new SlotItemHandler(iItemHandler, 0, 39, 26)); // Input 1
-        this.addSlot(new SlotItemHandler(iItemHandler, 1, 57, 26)); // Input 2
-        this.addSlot(new SlotItemHandler(iItemHandler, 2, 39, 44)); // Input 3
-        this.addSlot(new SlotItemHandler(iItemHandler, 3, 57, 44)); // Input 4
-        this.addSlot(new SlotItemHandler(iItemHandler, 4, 8, 53)); // Fuel
-        this.addSlot(new SlotItemHandler(iItemHandler, 5, 124, 35) { // Output
+        // Input slots (3x3 grid)
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                this.addSlot(new SlotItemHandler(iItemHandler, j + i * 3, 30 + j * 18, 17 + i * 18) {
+                    @Override
+                    public boolean mayPickup(Player player) {
+                        return true; // This is crucial for JEI transfers
+                    }
+                });
+            }
+        }
+        this.addSlot(new SlotItemHandler(iItemHandler, 9, 8, 53)); // Fuel
+        this.addSlot(new SlotItemHandler(iItemHandler, 10, 124, 35) { // Output
             @Override
             public void onTake(Player player, ItemStack stack) {
                 super.onTake(player, stack);
                 this.checkTakeAchievements(stack);
-                ((AlloySmelterBlockEntity) blockEntity).awardStoredExperience(player);
+                ((NetherAlloySmelterBlockEntity) blockEntity).awardStoredExperience(player);
             }
 
             @Override
@@ -85,7 +93,7 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player pPlayer) {
         return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
-                pPlayer, ModBlocks.ALLOY_FURNACE.get());
+                pPlayer, ModBlocks.NETHER_ALLOY_FURNACE.get());
     }
 
     @Override
@@ -102,12 +110,12 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
         int startPlayer = VANILLA_FIRST_SLOT_INDEX;                           // 0
         int endPlayer = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;        // 36 (0–35)
         int startTE = TE_INVENTORY_FIRST_SLOT_INDEX;                          // 36
-        int endTE = TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT;  // 42 (36–41)
+        int endTE = TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT;  // 47 (36–46)
 
-      // slots 36–39
-      int inputEnd = startTE + 4;       // exclusive (40)
-        int fuelSlot = startTE + 4;       // slot 40
-        int outputSlot = startTE + 5;     // slot 41
+        int inputStart = startTE;         // slots 36–44
+        int inputEnd = startTE + 9;       // exclusive (45)
+        int fuelSlot = startTE + 9;       // slot 45
+        int outputSlot = startTE + 10;     // slot 46
 
         // --- CASE 1: From TE (machine) to player inventory ---
         if (index >= startTE && index < endTE) {
@@ -132,13 +140,13 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
                 // First try fuel slot
                 if (!moveItemStackTo(sourceStack, fuelSlot, fuelSlot + 1, false)) {
                     // If fuel slot is occupied, try input slots as fallback
-                    if (!moveItemStackTo(sourceStack, startTE, inputEnd, false)) {
+                    if (!moveItemStackTo(sourceStack, inputStart, inputEnd, false)) {
                         return ItemStack.EMPTY;
                     }
                 }
             }
             // Otherwise try to move to input slots
-            else if (!moveItemStackTo(sourceStack, startTE, inputEnd, false)) {
+            else if (!moveItemStackTo(sourceStack, inputStart, inputEnd, false)) {
                 return ItemStack.EMPTY;
             }
         }
