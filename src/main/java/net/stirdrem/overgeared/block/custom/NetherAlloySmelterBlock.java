@@ -66,7 +66,8 @@ public class NetherAlloySmelterBlock extends BaseEntityBlock {
 
     @Override
     public BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+        Rotation rotation = mirror.getRotation(state.getValue(FACING));
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
