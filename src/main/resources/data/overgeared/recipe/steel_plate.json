@@ -13,7 +13,6 @@
     }
   },
   "result": {
-    "item": "overgeared:steel_plate"
-  },
-  "show_notification": true
+    "id": "overgeared:steel_plate"
+  }
 }

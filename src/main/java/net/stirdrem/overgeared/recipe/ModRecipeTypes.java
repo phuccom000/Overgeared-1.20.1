@@ -12,8 +12,8 @@ public class ModRecipeTypes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES =
             DeferredRegister.create(Registries.RECIPE_TYPE, OvergearedMod.MOD_ID);
 
-//    public static final RegistryObject<RecipeType<ForgingRecipe>> FORGING =
-//            RECIPE_TYPES.register(ForgingRecipe.Type.ID, () -> ForgingRecipe.Type.INSTANCE);
+    public static final Supplier<RecipeType<ForgingRecipe>> FORGING =
+            RECIPE_TYPES.register("forging", () -> RecipeType.simple(OvergearedMod.loc("forging")));
     public static final Supplier<RecipeType<RockKnappingRecipe>> KNAPPING =
             RECIPE_TYPES.register("rock_knapping", () -> RecipeType.simple(OvergearedMod.loc("rock_knapping")));
 //    public static final RegistryObject<RecipeType<FletchingRecipe>> FLETCHING =

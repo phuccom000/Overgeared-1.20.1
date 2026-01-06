@@ -12,8 +12,8 @@ public class ModRecipeSerializers {
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, OvergearedMod.MOD_ID);
 
-//    public static final RegistryObject<RecipeSerializer<ForgingRecipe>> FORGING_SERIALIZER =
-//            SERIALIZERS.register("forging", () -> ForgingRecipe.Serializer.INSTANCE);
+    public static final Supplier<RecipeSerializer<ForgingRecipe>> FORGING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("forging", () -> ForgingRecipe.Serializer.INSTANCE);
     public static final Supplier<RecipeSerializer<RockKnappingRecipe>> ROCK_KNAPPING_SERIALIZER =
             RECIPE_SERIALIZERS.register("rock_knapping", RockKnappingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<OvergearedShapelessRecipe>> CRAFTING_SHAPELESS =

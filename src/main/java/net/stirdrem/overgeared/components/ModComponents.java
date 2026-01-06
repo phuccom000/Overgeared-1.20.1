@@ -32,6 +32,12 @@ public class ModComponents {
                     .networkSynchronized(CastData.STREAM_CODEC)
                     .build());
 
+    public static final Supplier<DataComponentType<BlueprintData>> BLUEPRINT_DATA =
+            COMPONENTS.register("blueprint_data", () -> DataComponentType.<BlueprintData>builder()
+                    .persistent(BlueprintData.CODEC)
+                    .networkSynchronized(BlueprintData.STREAM_CODEC)
+                    .build());
+
     public static void register(IEventBus eventBus) {
         COMPONENTS.register(eventBus);
     }
