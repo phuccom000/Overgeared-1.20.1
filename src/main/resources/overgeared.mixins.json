@@ -10,6 +10,7 @@
 //    "BrewingStandBlockEntityMixin",
 //    "ItemStackMixin",
 //    "PotionItemMixin"
+    "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1
