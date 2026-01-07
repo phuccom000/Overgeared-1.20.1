@@ -111,13 +111,6 @@ public class AlloySmelterBlock extends BaseEntityBlock {
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
-    @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                           Player player, InteractionHand hand, BlockHitResult hit) {
-        useWithoutItem(state, level, pos, player, hit);
-        return ItemInteractionResult.sidedSuccess(level.isClientSide());
-    }
-
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

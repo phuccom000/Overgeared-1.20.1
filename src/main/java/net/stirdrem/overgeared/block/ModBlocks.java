@@ -12,12 +12,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.custom.AlloySmelterBlock;
-import net.stirdrem.overgeared.block.custom.NetherAlloySmelterBlock;
-import net.stirdrem.overgeared.block.custom.SteelSmithingAnvil;
-import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
-import net.stirdrem.overgeared.block.custom.TierASmithingAnvil;
-import net.stirdrem.overgeared.block.custom.TierBSmithingAnvil;
+import net.stirdrem.overgeared.block.custom.*;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.AnvilTier;
 
@@ -41,8 +36,8 @@ public class ModBlocks {
             () -> new StoneSmithingAnvil(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).noOcclusion()));
     public static final DeferredHolder<Block, Block> STEEL_BLOCK = registerBlock("steel_block",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)));
-//    public static final RegistryObject<Block> DRAFTING_TABLE = registerBlock("drafting_table",
-//            () -> new BlueprintWorkbenchBlock(BlockBehaviour.Properties.copy(Blocks.CRAFTING_TABLE)));
+    public static final DeferredHolder<Block, BlueprintWorkbenchBlock> DRAFTING_TABLE = registerBlock("drafting_table",
+            () -> new BlueprintWorkbenchBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE)));
     public static final DeferredHolder<Block, AlloySmelterBlock> ALLOY_FURNACE = registerBlock("alloy_furnace",
             () -> new AlloySmelterBlock(BlockBehaviour.Properties
                     .ofFullCopy(Blocks.BRICKS)

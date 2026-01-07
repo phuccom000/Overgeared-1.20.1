@@ -64,6 +64,12 @@ public class ModNetworkHandler {
         );
 
         registrar.playToServer(
+                SelectToolTypeC2SPacket.TYPE,
+                SelectToolTypeC2SPacket.STREAM_CODEC,
+                SelectToolTypeC2SPacket::handle
+        );
+
+        registrar.playToServer(
                 SetMinigameVisibleC2SPacket.TYPE,
                 SetMinigameVisibleC2SPacket.STREAM_CODEC,
                 SetMinigameVisibleC2SPacket::handle

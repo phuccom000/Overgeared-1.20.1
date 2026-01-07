@@ -33,10 +33,10 @@ public class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<RockKnappingMenu>> ROCK_KNAPPING_MENU =
             registerMenuType("rock_knapping_menu", RockKnappingMenu::new);
 
-//    public static final RegistryObject<MenuType<BlueprintWorkbenchMenu>> BLUEPRINT_WORKBENCH_MENU =
-//            MENUS.register("blueprint_workbench",
-//                    () -> new MenuType<>(BlueprintWorkbenchMenu::new, FeatureFlagSet.of()));
-//
+    public static final DeferredHolder<MenuType<?>, MenuType<BlueprintWorkbenchMenu>> BLUEPRINT_WORKBENCH_MENU =
+            MENUS.register("blueprint_workbench",
+                    () -> new MenuType<>(BlueprintWorkbenchMenu::new, FeatureFlagSet.of()));
+
     public static final DeferredHolder<MenuType<?>, MenuType<FletchingStationMenu>> FLETCHING_STATION_MENU =
             MENUS.register("fletching_station",
                     () -> new MenuType<>(FletchingStationMenu::new, FeatureFlagSet.of()));
