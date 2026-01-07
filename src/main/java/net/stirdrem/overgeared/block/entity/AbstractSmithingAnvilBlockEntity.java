@@ -37,7 +37,7 @@ import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvil;
 import net.stirdrem.overgeared.components.BlueprintData;
 import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.config.ServerConfig;
-// import net.stirdrem.overgeared.event.ModEvents;
+import net.stirdrem.overgeared.event.ModEvents;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
 import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
@@ -56,9 +56,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
-            if (!level.isClientSide()) {
-                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-            }
+            if (level == null || level.isClientSide()) return;
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
     };
     protected final ContainerData data;
@@ -109,7 +108,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     }
 
     public static void applyForgingQuality(ItemStack stack, ForgingQuality quality) {
-        stack.set(ModComponents.FORGING_QUALITY.get(), quality.getDisplayName());
+        stack.set(ModComponents.FORGING_QUALITY.get(), quality);
     }
 
     public ItemStack getRenderStack(int index) {
@@ -222,9 +221,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         progress = 0;
         maxProgress = 0;
         lastRecipe = null;
-        if (!level.isClientSide()) {
-            // TODO: Port ModEvents
-            // ModEvents.resetMinigameForPlayer((ServerPlayer) player);
+        if (level != null && !level.isClientSide()) {
+            ModEvents.resetMinigameForPlayer((ServerPlayer) player);
         }
         player = null;
     }
@@ -242,12 +240,9 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         ForgingQuality maxIngredientQuality = null;
         for (int i = 0; i < 9; i++) {
             ItemStack ingredient = itemHandler.getStackInSlot(i);
-            String qualityStr = ingredient.get(ModComponents.FORGING_QUALITY.get());
-            if (qualityStr != null) {
-                ForgingQuality q = ForgingQuality.fromString(qualityStr);
-                if (q != null && (maxIngredientQuality == null || q.ordinal() > maxIngredientQuality.ordinal())) {
-                    maxIngredientQuality = q;
-                }
+            ForgingQuality quality = ingredient.get(ModComponents.FORGING_QUALITY);
+            if (quality != null && (maxIngredientQuality == null || quality.ordinal() > maxIngredientQuality.ordinal())) {
+                maxIngredientQuality = quality;
             }
         }
 
@@ -276,7 +271,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                                 quality = ForgingQuality.MASTER;
                             }
                         }
-                        result.set(ModComponents.FORGING_QUALITY.get(), quality.getDisplayName());
+                        result.set(ModComponents.FORGING_QUALITY, quality);
 
                         // TODO: Port ModAdvancementTriggers
                         // if (player instanceof ServerPlayer serverPlayer) {
@@ -691,8 +686,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                     for (int i = 0; i < this.itemHandler.getSlots(); i++) {
                         if (i == OUTPUT_SLOT || i == BLUEPRINT_SLOT) continue; // skip output + blueprint
                         ItemStack stack = this.itemHandler.getStackInSlot(i);
-                        String ingQuality = stack.get(ModComponents.FORGING_QUALITY.get());
-                        if (!stack.isEmpty() && ingQuality != null && "master".equals(ingQuality.toLowerCase())) {
+                        ForgingQuality ingQuality = stack.get(ModComponents.FORGING_QUALITY);
+                        if (!stack.isEmpty() && ingQuality == ForgingQuality.MASTER) {
                             hasMasterIngredient = true;
                             break;
                         }
@@ -803,18 +798,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
-        // Ensure any players are reset
-        /*ServerPlayer user = ModItemInteractEvents.getUsingPlayer(getBlockPos());
-        if (user != null) {
-            user.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-                //minigame.resetNBTData();
-                minigame.reset(user);
-                //minigame.setIsVisible(false, user);
-                progress = 0;
-                ModItemInteractEvents.releaseAnvil(user, getBlockPos());
-                //ModMessages.sendToPlayer(new MinigameSyncS2CPacket(new CompoundTag().putBoolean("isVisible", false)), user);
-            });
-        }*/
     }
 
     public void setOwner(UUID uuid) {

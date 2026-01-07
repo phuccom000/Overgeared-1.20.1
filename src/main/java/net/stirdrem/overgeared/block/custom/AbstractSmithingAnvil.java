@@ -37,13 +37,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
-// TODO: Port these classes
-// import net.stirdrem.overgeared.event.AnvilMinigameEvents;
-// import net.stirdrem.overgeared.event.ModEvents;
-// import net.stirdrem.overgeared.event.ModItemInteractEvents;
-// import net.stirdrem.overgeared.networking.ModMessages;
-// import net.stirdrem.overgeared.networking.packet.PacketSendCounterC2SPacket;
-// import net.stirdrem.overgeared.networking.packet.ResetMinigameS2CPacket;
+import net.stirdrem.overgeared.event.AnvilMinigameEvents;
+import net.stirdrem.overgeared.event.ModEvents;
+import net.stirdrem.overgeared.event.ModItemInteractEvents;
+import net.stirdrem.overgeared.networking.packet.PacketSendCounterC2SPacket;
+import net.stirdrem.overgeared.networking.packet.ResetMinigameS2CPacket;
 import net.stirdrem.overgeared.sound.ModSounds;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +62,6 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock implements F
         tier = anvilTier;
     }
 
-    // In your SmithingAnvil class, ensure getQuality() never returns null:
     public String getQuality() {
         // Return current quality or default if null
         return quality != null ? quality : "none";
@@ -88,10 +85,9 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock implements F
             if (blockEntity instanceof AbstractSmithingAnvilBlockEntity) {
                 ((AbstractSmithingAnvilBlockEntity) blockEntity).drops();
 
-                // TODO: Port ModEvents.resetMinigameForAnvil
-                // if (!pLevel.isClientSide()) {
-                //     ModEvents.resetMinigameForAnvil(pLevel, pPos);
-                // }
+                 if (!pLevel.isClientSide()) {
+                     ModEvents.resetMinigameForAnvil(pLevel, pPos);
+                 }
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
@@ -191,10 +187,6 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock implements F
                 double velocityY = random.nextFloat() * 0.1;
                 double velocityZ = (random.nextFloat() - 0.5) * 0.1;
 
-                // For orange-colored dust particles
-                /*serverLevel.sendParticles(ParticleTypes.FLAME,
-                        pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ,
-                        velocityX, velocityY, velocityZ);*/
                 serverLevel.sendParticles(new DustParticleOptions(new Vector3f(1.0f, 0.5f, 0.0f), 1.0f),
                         pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, 1,
                         velocityX, velocityY, velocityZ, 1);
@@ -223,10 +215,9 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock implements F
     // TODO: onBlockExploded may have changed in NeoForge 1.21 - verify this compiles
     @Override
     public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
-        // TODO: Port ModEvents.resetMinigameForAnvil
-        // if (!level.isClientSide()) {
-        //     ModEvents.resetMinigameForAnvil(level, pos);
-        // }
+         if (!level.isClientSide()) {
+             ModEvents.resetMinigameForAnvil(level, pos);
+         }
         super.onBlockExploded(state, level, pos, explosion);
     }
 
@@ -282,6 +273,4 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock implements F
         pLevel.scheduleTick(pPos, this, 2);
         return super.updateShape(pState, pDirection, pNeighborState, pLevel, pPos, pNeighborPos);
     }
-
-
 }

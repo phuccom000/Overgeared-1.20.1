@@ -25,16 +25,17 @@ public record KnappingChipC2SPacket(int index) implements CustomPacketPayload {
 
     public static void handle(KnappingChipC2SPacket payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer player) {
-                if (player.containerMenu instanceof RockKnappingMenu menu) {
-                    // Validate the index is within bounds
-                    if (payload.index() >= 0 && payload.index() < 9) {
-                        menu.setChip(payload.index());
-                        OvergearedMod.LOGGER.debug("Player {} chipped spot {} in knapping grid",
-                                player.getName().getString(), payload.index());
-                    }
-                }
+            if (!(context.player() instanceof ServerPlayer player)) return;
+            if (!(player.containerMenu instanceof RockKnappingMenu menu)) return;
+            // Validate the index is within bounds
+            if (!(payload.index() >= 0 && payload.index() < 9)) {
+                OvergearedMod.LOGGER.error("Invalid index received in KnappingChipC2SPacket from {} at {}",
+                        player.getName().getString(), payload.index());
+                return;
             }
+            menu.setChip(payload.index());
+            OvergearedMod.LOGGER.debug("Player {} chipped spot {} in knapping grid",
+                    player.getName().getString(), payload.index());
         });
     }
 }

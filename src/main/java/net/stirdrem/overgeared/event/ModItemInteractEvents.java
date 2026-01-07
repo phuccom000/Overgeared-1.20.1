@@ -1,43 +1,82 @@
 package net.stirdrem.overgeared.event;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.stirdrem.overgeared.OvergearedMod;
 //import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
-//import net.stirdrem.overgeared.block.ModBlocks;
-//import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
-//import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
-//import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
+import net.stirdrem.overgeared.block.ModBlocks;
+import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
+import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
+import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
 import net.stirdrem.overgeared.config.ServerConfig;
 //import net.stirdrem.overgeared.datapack.GrindingBlacklistReloadListener;
 //import net.stirdrem.overgeared.heatedtem.HeatedItemProvider;
 import net.stirdrem.overgeared.item.ModItems;
+import net.stirdrem.overgeared.networking.ModNetworkHandler;
 //import net.stirdrem.overgeared.item.custom.ToolCastItem;
-//import net.stirdrem.overgeared.networking.ModMessages;
-//import net.stirdrem.overgeared.recipe.CoolingRecipe;
-//import net.stirdrem.overgeared.recipe.ForgingRecipe;
-//import net.stirdrem.overgeared.recipe.GrindingRecipe;
-//import net.stirdrem.overgeared.recipe.ModRecipeTypes;
+import net.stirdrem.overgeared.networking.packet.HideMinigameS2CPacket;
+import net.stirdrem.overgeared.networking.packet.MinigameSetStartedC2SPacket;
+import net.stirdrem.overgeared.networking.packet.MinigameSyncS2CPacket;
+import net.stirdrem.overgeared.networking.packet.SetMinigameVisibleC2SPacket;
+import net.stirdrem.overgeared.recipe.CoolingRecipe;
+import net.stirdrem.overgeared.recipe.ForgingRecipe;
+import net.stirdrem.overgeared.recipe.GrindingRecipe;
+import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 //import net.stirdrem.overgeared.screen.FletchingStationMenu;
-//import net.stirdrem.overgeared.util.ModTags;
+import net.stirdrem.overgeared.util.ModTags;
+import org.jetbrains.annotations.NotNull;
 //import net.stirdrem.overgeared.util.QualityHelper;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 //import static net.stirdrem.overgeared.OvergearedMod.getCooledItem;
 
@@ -49,20 +88,18 @@ public class ModItemInteractEvents {
     private static final Set<ItemEntity> trackedEntities = ConcurrentHashMap.newKeySet();
 
     private static final ConcurrentMap<ItemEntity, Long> trackedSinceMs = new ConcurrentHashMap<>();
-    // timeout for pruning tracked entities that never went to water (milliseconds).
-    // 2 minutes chosen as safe default (adjust as needed).
     private static final long TRACKED_PRUNE_MS = 2 * 60 * 1000L;
     private static final Random RANDOM = new Random();
 
-//    @SubscribeEvent
-//    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-//        ItemStack heldStack = event.getItemStack();
-//        Level level = event.getLevel();
-//        BlockPos pos = event.getPos();
-//        Player player = event.getEntity();
-//        BlockState state = level.getBlockState(pos);
-//
-//        // Check if the item is heated either by tag or NBT
+    @SubscribeEvent
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        ItemStack heldStack = event.getItemStack();
+        Level level = event.getLevel();
+        BlockPos pos = event.getPos();
+        Player player = event.getEntity();
+        BlockState state = level.getBlockState(pos);
+
+        // Check if the item is heated either by tag or NBT
 //        boolean isHeatedItem = heldStack.is(ModTags.Items.HEATED_METALS)
 //                || (heldStack.hasTag() && heldStack.getTag().getBoolean("Heated"));
 //
@@ -79,40 +116,40 @@ public class ModItemInteractEvents {
 //            event.setCancellationResult(InteractionResult.SUCCESS);
 //            event.setCanceled(true);
 //        }
-//
-//    }
-//
-//    @SubscribeEvent
-//    public static void onUseSmithingHammer(PlayerInteractEvent.RightClickBlock event) {
-//        Player player = event.getEntity();
-//        Level level = event.getLevel();
-//        BlockPos pos = event.getPos();
-//        ItemStack heldItem = event.getItemStack();
-//
-//        if (!heldItem.is(ModTags.Items.SMITHING_HAMMERS)) return;
-//        if (event.getHand() != InteractionHand.MAIN_HAND) return;
-//
-//        BlockEntity be = level.getBlockEntity(pos);
-//        BlockState clickedState = level.getBlockState(pos);
-//
-//        // Shift-right-click to convert stone into smithing anvil
-//        if (!level.isClientSide && player.isCrouching() && clickedState.is(ModTags.Blocks.ANVIL_BASES)
-//                && ServerConfig.ENABLE_STONE_TO_ANVIL.get()) {
-//            BlockState newState = ModBlocks.STONE_SMITHING_ANVIL.get()
-//                    .defaultBlockState()
-//                    .setValue(StoneSmithingAnvil.FACING, player.getDirection().getClockWise());
-//            level.setBlock(pos, newState, 3);
-//            level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.0f, 1.0f);
-//            if (player instanceof ServerPlayer serverPlayer) {
+
+    }
+
+    @SubscribeEvent
+    public static void onUseSmithingHammer(PlayerInteractEvent.RightClickBlock event) {
+        Player player = event.getEntity();
+        Level level = event.getLevel();
+        BlockPos pos = event.getPos();
+        ItemStack heldItem = event.getItemStack();
+
+        if (!heldItem.is(ModTags.Items.SMITHING_HAMMERS)) return;
+        if (event.getHand() != InteractionHand.MAIN_HAND) return;
+
+        BlockEntity be = level.getBlockEntity(pos);
+        BlockState clickedState = level.getBlockState(pos);
+
+        // Shift-right-click to convert stone into smithing anvil
+        if (!level.isClientSide && player.isCrouching() && clickedState.is(ModTags.Blocks.ANVIL_BASES)
+                && ServerConfig.ENABLE_STONE_TO_ANVIL.get()) {
+            BlockState newState = ModBlocks.STONE_SMITHING_ANVIL.get()
+                    .defaultBlockState()
+                    .setValue(StoneSmithingAnvil.FACING, player.getDirection().getClockWise());
+            level.setBlock(pos, newState, 3);
+            level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.0f, 1.0f);
+            if (player instanceof ServerPlayer serverPlayer) {
 //                ModAdvancementTriggers.MAKE_SMITHING_ANVIL
 //                        .trigger(serverPlayer, "stone");
-//            }
-//
-//            event.setCancellationResult(InteractionResult.SUCCESS);
-//            event.setCanceled(true);
-//            return;
-//        }
-//
+            }
+
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
+
 //        if (!level.isClientSide && player.isCrouching() && clickedState.is(Blocks.ANVIL)
 //                && ServerConfig.ENABLE_ANVIL_TO_SMITHING.get()) {
 //            BlockState newState = ModBlocks.SMITHING_ANVIL.get()
@@ -128,428 +165,404 @@ public class ModItemInteractEvents {
 //            event.setCanceled(true);
 //            return;
 //        }
-//
-//        if (!level.isClientSide()) {
-//            if (!(be instanceof AbstractSmithingAnvilBlockEntity)) {
-//                hideMinigame((ServerPlayer) player);
-//                ;
-//            }
-//        }
-//
-//        if (!(be instanceof
-//                AbstractSmithingAnvilBlockEntity anvilBE)) return;
-//        UUID playerUUID = player.getUUID();
-//
-//        if (!player.isCrouching()) return;
-//
-//        if (!level.isClientSide) {
-//            if (!(player instanceof ServerPlayer serverPlayer)) return;
-//            // Server-side ownership logic
-//            if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
-//                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
-//                return;
-//            }
-//            if (!anvilBE.hasRecipe()) {
-//                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.no_recipe").withStyle(ChatFormatting.RED), true);
-//                return;
-//            }
-//
-//            if (!anvilBE.hasQuality() && !anvilBE.needsMinigame()) {
-//                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.item_has_no_quality").withStyle(ChatFormatting.RED), true);
-//                return;
-//            }
-//
-//            UUID currentOwner = anvilBE.getOwnerUUID();
-//            if (currentOwner != null && !currentOwner.equals(playerUUID)) {
-//                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED), true);
-//                return;
-//            }
-//
-//            if (currentOwner == null && !playerAnvilPositions.containsKey(player.getUUID())) {
-//                anvilBE.setOwner(playerUUID);
-//
-//                // ADD SERVER-SIDE TRACKING
-//                playerAnvilPositions.put(playerUUID, pos);
-//                playerMinigameVisibility.put(playerUUID, true);
-//
-//                CompoundTag sync = new CompoundTag();
-//                sync.putUUID("anvilOwner", playerUUID);
-//                sync.putLong("anvilPos", pos.asLong());
-//                ModMessages.sendToAll(new MinigameSyncS2CPacket(sync));
-//                return;
-//            }
-//
-//            if (playerAnvilPositions.get(player.getUUID()) != null && !pos.equals(playerAnvilPositions.get(player.getUUID()))) {
-//                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED), true);
-//                return;
-//            }
-//        } else {
-//            if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
-//                //player.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
-//                return;
-//            }
-//            if (!anvilBE.hasRecipe()) {
-//                //player.sendSystemMessage(Component.translatable("message.overgeared.no_recipe").withStyle(ChatFormatting.RED));
-//                return;
-//            }
-//
-//            if (!anvilBE.hasQuality() && !anvilBE.needsMinigame()) {
-//                //player.sendSystemMessage(Component.translatable("message.overgeared.item_has_no_quality").withStyle(ChatFormatting.RED));
-//                return;
-//            }
-//
-//            // Client should trust the server's sync data in ClientAnvilMinigameData
-//            UUID currentOwner = ClientAnvilMinigameData.getOccupiedAnvil(pos);
-//            if (currentOwner != null && !currentOwner.equals(player.getUUID())) {
-//                //player.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED));
-//                return;
-//            }
-//
-//            if (player.getUUID().equals(currentOwner)
-//                    || currentOwner == null
-//                    && ClientAnvilMinigameData.getPendingMinigamePos() == null) {
-//                BlockPos pos1 = pos;
-//                BlockPos anvilPos = playerAnvilPositions.get(player.getUUID());
-//                if (playerAnvilPositions.get(player.getUUID()) != null && !pos.equals(playerAnvilPositions.get(player.getUUID()))) {
-//                    //player.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED));
-//                    event.setCanceled(true);
-//                    event.setCancellationResult(InteractionResult.PASS);
-//                    return;
-//                }
-//                if (anvilBE.hasRecipe() || anvilBE.needsMinigame()) {
-//                    anvilBE.setOwner(playerUUID);
-//                    AtomicReference<String> quality = new AtomicReference<>("perfect");
-//                    Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
-//                    recipeOpt.ifPresent(recipe -> {
-//                        //ItemStack result = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());
-//                        //int progress = anvilBE.getRequiredProgress();
-//                        //ModMessages.sendToServer(new StartMinigameC2SPacket(result, progress, pos));
-//                        if (AnvilMinigameEvents.minigameStarted) {
-//                            boolean isVisible = AnvilMinigameEvents.isIsVisible();
-//                            AnvilMinigameEvents.setIsVisible(pos, !isVisible);
-//                            ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, !isVisible));
-//                            playerMinigameVisibility.put(player.getUUID(), !isVisible);
-//                        } else {
-//                            quality.set(anvilBE.minigameQuality());
-//                            AnvilMinigameEvents.reset(quality.get());
-//                            playerAnvilPositions.put(player.getUUID(), pos);
-//                            playerMinigameVisibility.put(player.getUUID(), true);
-//                            AnvilMinigameEvents.setMinigameStarted(pos, true);
-//                            //AnvilMinigameEvents.setIsVisible(pos, true);
-//                            ModMessages.sendToServer(new MinigameSetStartedC2SPacket(pos));
-//                            //AnvilMinigameEvents.setMinigameStarted(pos, true);
-//                            ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, true));
-//                            AnvilMinigameEvents.setHitsRemaining(anvilBE.getRequiredProgress());
-//                        }
-//                    });
-//                }
-//                event.setCanceled(true);
-//                event.setCancellationResult(InteractionResult.PASS);
-//                return;
-//            }
-//
-//            ClientAnvilMinigameData.setPendingMinigame(pos);
-//            return;
-//        }
-//
-//        event.setCanceled(true);
-//        event.setCancellationResult(InteractionResult.SUCCESS);
-//    }
-//
-//    public static void handleAnvilOwnershipSync(CompoundTag syncData) {
-//        UUID owner = null;
-//        if (syncData.contains("anvilOwner")) {
-//            owner = syncData.getUUID("anvilOwner");
-//            if (owner.getMostSignificantBits() == 0 && owner.getLeastSignificantBits() == 0) {
-//                owner = null;
-//            }
-//        }
-//        BlockPos pos = BlockPos.of(syncData.getLong("anvilPos"));
-//        ClientAnvilMinigameData.putOccupiedAnvil(pos, owner);
-//
-//        // ✅ Only start minigame if this client is the new owner and it was waiting
-//        if (Minecraft.getInstance().player != null
-//                && Minecraft.getInstance().player.getUUID().equals(owner)
-//                && pos.equals(ClientAnvilMinigameData.getPendingMinigamePos())) {
-//
-//            BlockEntity be = Minecraft.getInstance().level.getBlockEntity(pos);
-//            if (be instanceof AbstractSmithingAnvilBlockEntity anvilBE && anvilBE.hasRecipe()) {
-//                Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
-//                recipeOpt.ifPresent(recipe -> {
-//                    ClientAnvilMinigameData.clearPendingMinigame(); // ✅ Done
-//                });
-//            }
-//        }
-//    }
-//
-//    public static void releaseAnvil(ServerPlayer player, BlockPos pos) {
-//        UUID playerId = player.getUUID();
-//        if (playerMinigameVisibility.get(playerId) != null)
-//            playerMinigameVisibility.remove(playerId);
-//        if (playerAnvilPositions.get(playerId) != null
-//                && pos.equals(playerAnvilPositions.get(playerId))
-//        ) {
-//            playerAnvilPositions.remove(playerId);
-//
-//
-//            // 1. Clear ownership from the block entity (server-side)
-//            BlockEntity be = player.level().getBlockEntity(pos);
-//            String quality = "perfect";
-//            if (be instanceof AbstractSmithingAnvilBlockEntity anvilBE) {
-//                anvilBE.clearOwner();
-//                quality = anvilBE.minigameQuality();
-//            }
-//            // 3. Clear client-side state
-//            ClientAnvilMinigameData.putOccupiedAnvil(pos, null);
-//            AnvilMinigameEvents.reset(quality);
-//            // 4. Sync null ownership to all clients
-//            CompoundTag syncData = new CompoundTag();
-//            syncData.putLong("anvilPos", pos.asLong());
-//            syncData.putUUID("anvilOwner", new UUID(0, 0)); // special "no owner" UUID
-//            ModMessages.sendToAll(new MinigameSyncS2CPacket(syncData));
-//        }
-//
-//    }
-//
-//    public static ServerPlayer getUsingPlayer(BlockPos pos) {
-//        // Get the server instance
-//        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-//        if (server == null) return null;
-//
-//        // Iterate through all online players
-//        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-//            UUID playerId = player.getUUID();
-//
-//            // Check if this player is using the specified anvil
-//            if (playerAnvilPositions.containsKey(playerId) &&
-//                    playerAnvilPositions.get(playerId).equals(pos)) {
-//                return player;
-//            }
-//        }
-//
-//        return null;
-//    }
-//
-//    @SubscribeEvent
-//    public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
-//        Player player = event.getEntity();
-//        Level world = event.getLevel();
-//        if (world.isClientSide()) return;
-//
-//        hideMinigame((ServerPlayer) player);
-//    }
-//
-//    public static void hideMinigame(ServerPlayer player) {
-//       /* if (!player.isCrouching()) {
-//            player.getCapability(AnvilMinigameProvider.ANVIL_MINIGAME).ifPresent(minigame -> {
-//                if (minigame.getVisible()) {
-//                    minigame.setIsVisible(false, (ServerPlayer) player);
-//                }
-//            });
-//        }*/
-//        //AnvilMinigameEvents.hideMinigame(player.getUUID());
-//        ModMessages.sendToPlayer(new HideMinigameS2CPacket(), player);
-//    }
-//
-//    @SubscribeEvent
-//    public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-//        ItemStack stack = event.getItemStack();
-//        Player player = event.getEntity();
-//        Level world = event.getLevel();
-//        if (world.isClientSide()) return;
-//
-//        // 🔹 Check if the player is holding a heated metal and targeting water
-//        if (stack.is(ModTags.Items.HEATED_METALS)) {
-//            HitResult hit = player.pick(5.0D, 0.0F, false);
-//            if (hit.getType() == HitResult.Type.BLOCK) {
-//                BlockPos pos = ((BlockHitResult) hit).getBlockPos();
-//                BlockState state = world.getBlockState(pos);
+
+        if (!level.isClientSide()) {
+            if (!(be instanceof AbstractSmithingAnvilBlockEntity)) {
+                hideMinigame((ServerPlayer) player);
+                ;
+            }
+        }
+
+        if (!(be instanceof
+                AbstractSmithingAnvilBlockEntity anvilBE)) return;
+        UUID playerUUID = player.getUUID();
+
+        if (!player.isCrouching()) return;
+
+        if (!level.isClientSide) {
+            if (!(player instanceof ServerPlayer serverPlayer)) return;
+            // Server-side ownership logic
+            if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
+                return;
+            }
+            if (!anvilBE.hasRecipe()) {
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.no_recipe").withStyle(ChatFormatting.RED), true);
+                return;
+            }
+
+            if (!anvilBE.hasQuality() && !anvilBE.needsMinigame()) {
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.item_has_no_quality").withStyle(ChatFormatting.RED), true);
+                return;
+            }
+
+            UUID currentOwner = anvilBE.getOwnerUUID();
+            if (currentOwner != null && !currentOwner.equals(playerUUID)) {
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED), true);
+                return;
+            }
+
+            if (currentOwner == null && !playerAnvilPositions.containsKey(player.getUUID())) {
+                anvilBE.setOwner(playerUUID);
+
+                // ADD SERVER-SIDE TRACKING
+                playerAnvilPositions.put(playerUUID, pos);
+                playerMinigameVisibility.put(playerUUID, true);
+
+                CompoundTag sync = new CompoundTag();
+                sync.putUUID("anvilOwner", playerUUID);
+                sync.putLong("anvilPos", pos.asLong());
+                PacketDistributor.sendToAllPlayers(new MinigameSyncS2CPacket(sync));
+                return;
+            }
+
+            if (playerAnvilPositions.get(player.getUUID()) != null && !pos.equals(playerAnvilPositions.get(player.getUUID()))) {
+                serverPlayer.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED), true);
+                return;
+            }
+        } else {
+            if (anvilBE.hasRecipe() && !ServerConfig.ENABLE_MINIGAME.get()) {
+                //player.sendSystemMessage(Component.translatable("message.overgeared.no_minigame").withStyle(ChatFormatting.RED), true);
+                return;
+            }
+            if (!anvilBE.hasRecipe()) {
+                //player.sendSystemMessage(Component.translatable("message.overgeared.no_recipe").withStyle(ChatFormatting.RED));
+                return;
+            }
+
+            if (!anvilBE.hasQuality() && !anvilBE.needsMinigame()) {
+                //player.sendSystemMessage(Component.translatable("message.overgeared.item_has_no_quality").withStyle(ChatFormatting.RED));
+                return;
+            }
+
+            // Client should trust the server's sync data in ClientAnvilMinigameData
+            UUID currentOwner = ClientAnvilMinigameData.getOccupiedAnvil(pos);
+            if (currentOwner != null && !currentOwner.equals(player.getUUID())) {
+                //player.sendSystemMessage(Component.translatable("message.overgeared.anvil_in_use_by_another").withStyle(ChatFormatting.RED));
+                return;
+            }
+
+            if (player.getUUID().equals(currentOwner)
+                    || currentOwner == null
+                    && ClientAnvilMinigameData.getPendingMinigamePos() == null) {
+                BlockPos pos1 = pos;
+                BlockPos anvilPos = playerAnvilPositions.get(player.getUUID());
+                if (playerAnvilPositions.get(player.getUUID()) != null && !pos.equals(playerAnvilPositions.get(player.getUUID()))) {
+                    //player.sendSystemMessage(Component.translatable("message.overgeared.another_anvil_in_use").withStyle(ChatFormatting.RED));
+                    event.setCanceled(true);
+                    event.setCancellationResult(InteractionResult.PASS);
+                    return;
+                }
+                if (anvilBE.hasRecipe() || anvilBE.needsMinigame()) {
+                    anvilBE.setOwner(playerUUID);
+                    AtomicReference<String> quality = new AtomicReference<>("perfect");
+                    Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
+                    recipeOpt.ifPresent(recipe -> {
+                        //ItemStack result = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());
+                        //int progress = anvilBE.getRequiredProgress();
+                        //ModMessages.sendToServer(new StartMinigameC2SPacket(result, progress, pos));
+                        if (AnvilMinigameEvents.minigameStarted) {
+                            boolean isVisible = AnvilMinigameEvents.isIsVisible();
+                            AnvilMinigameEvents.setIsVisible(pos, !isVisible);
+                            PacketDistributor.sendToServer(new SetMinigameVisibleC2SPacket(!isVisible, pos));
+                            playerMinigameVisibility.put(player.getUUID(), !isVisible);
+                        } else {
+                            quality.set(anvilBE.minigameQuality());
+                            AnvilMinigameEvents.reset(quality.get());
+                            playerAnvilPositions.put(player.getUUID(), pos);
+                            playerMinigameVisibility.put(player.getUUID(), true);
+                            AnvilMinigameEvents.setMinigameStarted(pos, true);
+                            //AnvilMinigameEvents.setIsVisible(pos, true);
+                            PacketDistributor.sendToServer(new MinigameSetStartedC2SPacket(pos));
+                            //AnvilMinigameEvents.setMinigameStarted(pos, true);
+                            PacketDistributor.sendToServer(new SetMinigameVisibleC2SPacket(true, pos));
+                            AnvilMinigameEvents.setHitsRemaining(anvilBE.getRequiredProgress());
+                        }
+                    });
+                }
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.PASS);
+                return;
+            }
+
+            ClientAnvilMinigameData.setPendingMinigame(pos);
+            return;
+        }
+
+        event.setCanceled(true);
+        event.setCancellationResult(InteractionResult.SUCCESS);
+    }
+
+    public static void handleAnvilOwnershipSync(CompoundTag syncData) {
+        UUID owner = null;
+        if (syncData.contains("anvilOwner")) {
+            owner = syncData.getUUID("anvilOwner");
+            if (owner.getMostSignificantBits() == 0 && owner.getLeastSignificantBits() == 0) {
+                owner = null;
+            }
+        }
+        BlockPos pos = BlockPos.of(syncData.getLong("anvilPos"));
+        ClientAnvilMinigameData.putOccupiedAnvil(pos, owner);
+
+        // ✅ Only start minigame if this client is the new owner and it was waiting
+        if (Minecraft.getInstance().player != null
+                && Minecraft.getInstance().player.getUUID().equals(owner)
+                && pos.equals(ClientAnvilMinigameData.getPendingMinigamePos())) {
+
+            BlockEntity be = Minecraft.getInstance().level.getBlockEntity(pos);
+            if (be instanceof AbstractSmithingAnvilBlockEntity anvilBE && anvilBE.hasRecipe()) {
+                Optional<ForgingRecipe> recipeOpt = anvilBE.getCurrentRecipe();
+                recipeOpt.ifPresent(recipe -> {
+                    ClientAnvilMinigameData.clearPendingMinigame(); // ✅ Done
+                });
+            }
+        }
+    }
+
+    public static void releaseAnvil(ServerPlayer player, BlockPos pos) {
+        UUID playerId = player.getUUID();
+        if (playerMinigameVisibility.get(playerId) != null)
+            playerMinigameVisibility.remove(playerId);
+        if (playerAnvilPositions.get(playerId) != null
+                && pos.equals(playerAnvilPositions.get(playerId))
+        ) {
+            playerAnvilPositions.remove(playerId);
+
+
+            // 1. Clear ownership from the block entity (server-side)
+            BlockEntity be = player.level().getBlockEntity(pos);
+            String quality = "perfect";
+            if (be instanceof AbstractSmithingAnvilBlockEntity anvilBE) {
+                anvilBE.clearOwner();
+                quality = anvilBE.minigameQuality();
+            }
+            // 3. Clear client-side state
+            ClientAnvilMinigameData.putOccupiedAnvil(pos, null);
+            AnvilMinigameEvents.reset(quality);
+            // 4. Sync null ownership to all clients
+            CompoundTag syncData = new CompoundTag();
+            syncData.putLong("anvilPos", pos.asLong());
+            syncData.putUUID("anvilOwner", new UUID(0, 0)); // special "no owner" UUID
+            PacketDistributor.sendToAllPlayers(new MinigameSyncS2CPacket(syncData));
+        }
+    }
+
+    public static ServerPlayer getUsingPlayer(BlockPos pos) {
+        // Get the server instance
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return null;
+
+        // Iterate through all online players
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            UUID playerId = player.getUUID();
+
+            // Check if this player is using the specified anvil
+            if (playerAnvilPositions.containsKey(playerId) &&
+                    playerAnvilPositions.get(playerId).equals(pos)) {
+                return player;
+            }
+        }
+
+        return null;
+    }
+
+    @SubscribeEvent
+    public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
+        Player player = event.getEntity();
+        Level world = event.getLevel();
+        if (world.isClientSide()) return;
+
+        hideMinigame((ServerPlayer) player);
+    }
+
+    public static void hideMinigame(ServerPlayer player) {
+        PacketDistributor.sendToPlayer(player, new HideMinigameS2CPacket());
+    }
+
+    @SubscribeEvent
+    public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        ItemStack stack = event.getItemStack();
+        Player player = event.getEntity();
+        Level world = event.getLevel();
+        if (world.isClientSide()) return;
+
+        // 🔹 Check if the player is holding a heated metal and targeting water
+        if (stack.is(ModTags.Items.HEATED_METALS)) {
+            HitResult hit = player.pick(5.0D, 0.0F, false);
+            if (hit.getType() == HitResult.Type.BLOCK) {
+                BlockPos pos = ((BlockHitResult) hit).getBlockPos();
+                BlockState state = world.getBlockState(pos);
 //                if (state.getFluidState().isSource() && state.getBlock() == Blocks.WATER) {
 //                    coolItem(player, stack);
 //                    event.setCancellationResult(InteractionResult.SUCCESS);
 //                    event.setCanceled(true);
 //                }
+            }
+        }
+        if (world.isClientSide()) return;
+
+        HitResult hit = player.pick(5.0D, 0.0F, false);
+        BlockPos pos = ((BlockHitResult) hit).getBlockPos();
+        BlockState state = world.getBlockState(pos);
+//        if (player.isCrouching() && state.is(ModTags.Blocks.GRINDSTONES)) {
+//
+//            if (player.getMainHandItem() != stack) {
+//                return;
 //            }
-//        }
 //
+//            if (hasGrindingRecipe(stack.getItem(), event.getLevel())) {
+//                grindItem(player, stack);
+//                world.playSound(null, player.blockPosition(),
+//                        SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS,
+//                        1.0f, 1.2f); // Higher pitch for polishing sound
+//                spawnGrindParticles(world, pos);
+//                event.setCancellationResult(InteractionResult.SUCCESS);
+//                event.setCanceled(true);
+//                return;
+//            }
+//            if (stack.hasTag() && stack.getTag().contains("Polished") && !stack.getTag().getBoolean("Polished")) {
+//                // Only convert 1 item in the stack
+//                if (stack.getCount() > 1) {
+//                    // Split 1 item from the stack
+//                    ItemStack polishedItem = stack.copy();
+//                    polishedItem.setCount(1);
+//                    polishedItem.getOrCreateTag().putBoolean("Polished", true);
 //
-//        if (!world.isClientSide()) {
-//            HitResult hit = player.pick(5.0D, 0.0F, false);
-//            BlockPos pos = ((BlockHitResult) hit).getBlockPos();
-//            BlockState state = world.getBlockState(pos);
-//            if (player.isCrouching() && state.is(ModTags.Blocks.GRINDSTONES)) {
+//                    // Reduce held stack by 1
+//                    stack.shrink(1);
 //
-//                if (player.getMainHandItem() != stack) {
-//                    return;
+//                    // Try to add the polished item to player's inventory
+//                    if (!player.getInventory().add(polishedItem)) {
+//                        // If inventory is full, drop the item in the world
+//                        player.drop(polishedItem, false);
+//                    }
+//                } else {
+//                    // Only one item in stack, just polish it directly
+//                    stack.getOrCreateTag().putBoolean("Polished", true);
 //                }
 //
-//                if (hasGrindingRecipe(stack.getItem(), event.getLevel())) {
-//                    grindItem(player, stack);
-//                    world.playSound(null, player.blockPosition(),
-//                            SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS,
-//                            1.0f, 1.2f); // Higher pitch for polishing sound
-//                    spawnGrindParticles(world, pos);
+//                world.playSound(null, player.blockPosition(),
+//                        SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS,
+//                        1.0f, 1.2f); // Higher pitch for polishing sound
+//                spawnGrindParticles(world, pos);
+//                event.setCancellationResult(InteractionResult.SUCCESS);
+//                event.setCanceled(true);
+//                return;
+//            }
+//
+//            if (stack.isDamageableItem() && stack.getDamageValue() > 0) {
+//                if (!ServerConfig.GRINDING_RESTORE_DURABILITY.get()) {
 //                    event.setCancellationResult(InteractionResult.SUCCESS);
 //                    event.setCanceled(true);
 //                    return;
 //                }
-//                if (stack.hasTag() && stack.getTag().contains("Polished") && !stack.getTag().getBoolean("Polished")) {
-//                    // Only convert 1 item in the stack
-//                    if (stack.getCount() > 1) {
-//                        // Split 1 item from the stack
-//                        ItemStack polishedItem = stack.copy();
-//                        polishedItem.setCount(1);
-//                        polishedItem.getOrCreateTag().putBoolean("Polished", true);
+//                Item item = stack.getItem();
+//                // Check blacklist
+//                ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
+//                List<? extends String> blacklist = ServerConfig.GRINDING_BLACKLIST.get();
 //
-//                        // Reduce held stack by 1
-//                        stack.shrink(1);
-//
-//                        // Try to add the polished item to player's inventory
-//                        if (!player.getInventory().add(polishedItem)) {
-//                            // If inventory is full, drop the item in the world
-//                            player.drop(polishedItem, false);
+//                for (String entry : blacklist) {
+//                    if (entry.startsWith("#")) {
+//                        // Handle tag-based blacklist entries
+//                        ResourceLocation tagId = ResourceLocation.parse(entry.substring(1));
+//                        TagKey<Item> tag = TagKey.create(Registries.ITEM, tagId);
+//                        if (stack.is(tag)) {
+//                            event.setCancellationResult(InteractionResult.PASS);
+//                            event.setCanceled(true);
+//                            return;
 //                        }
 //                    } else {
-//                        // Only one item in stack, just polish it directly
-//                        stack.getOrCreateTag().putBoolean("Polished", true);
+//                        // Handle direct item blacklist entries
+//                        if (itemId.equals(ResourceLocation.parse(entry))) {
+//                            event.setCancellationResult(InteractionResult.PASS);
+//                            event.setCanceled(true);
+//                            return;
+//                        }
 //                    }
-//
-//                    world.playSound(null, player.blockPosition(),
-//                            SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS,
-//                            1.0f, 1.2f); // Higher pitch for polishing sound
-//                    spawnGrindParticles(world, pos);
-//                    event.setCancellationResult(InteractionResult.SUCCESS);
+//                }
+//                boolean isBlacklisted = GrindingBlacklistReloadListener.isBlacklisted(stack);
+//                if (isBlacklisted) {
+//                    event.setCancellationResult(InteractionResult.PASS);
 //                    event.setCanceled(true);
 //                    return;
 //                }
 //
-//                if (stack.isDamageableItem() && stack.getDamageValue() > 0) {
-//                    if (!ServerConfig.GRINDING_RESTORE_DURABILITY.get()) {
-//                        event.setCancellationResult(InteractionResult.SUCCESS);
-//                        event.setCanceled(true);
-//                        return;
-//                    }
-//                    Item item = stack.getItem();
-//                    // Check blacklist
-//                    ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
-//                    List<? extends String> blacklist = ServerConfig.GRINDING_BLACKLIST.get();
+//                CompoundTag tag = stack.getOrCreateTag();
+//                int reducedCount = tag.getInt("ReducedMaxDurability");
 //
-//                    for (String entry : blacklist) {
-//                        if (entry.startsWith("#")) {
-//                            // Handle tag-based blacklist entries
-//                            ResourceLocation tagId = new ResourceLocation(entry.substring(1));
-//                            TagKey<Item> tag = TagKey.create(Registries.ITEM, tagId);
-//                            if (stack.is(tag)) {
-//                                event.setCancellationResult(InteractionResult.PASS);
-//                                event.setCanceled(true);
-//                                return;
-//                            }
-//                        } else {
-//                            // Handle direct item blacklist entries
-//                            if (itemId != null && itemId.equals(new ResourceLocation(entry))) {
-//                                event.setCancellationResult(InteractionResult.PASS);
-//                                event.setCanceled(true);
-//                                return;
-//                            }
-//                        }
-//                    }
-//                    boolean isBlacklisted = GrindingBlacklistReloadListener.isBlacklisted(stack);
-//                    if (isBlacklisted) {
-//                        event.setCancellationResult(InteractionResult.PASS);
-//                        event.setCanceled(true);
-//                        return;
-//                    }
+//                // Base vanilla durability
+//                int originalDurability = stack.getItem().getMaxDamage();
+//                // Config multipliers
+//                float baseMultiplier = ServerConfig.BASE_DURABILITY_MULTIPLIER.get().floatValue();
+//                float grindReduction = ServerConfig.DURABILITY_REDUCE_PER_GRIND.get().floatValue();
 //
-//                    CompoundTag tag = stack.getOrCreateTag();
-//                    int reducedCount = tag.getInt("ReducedMaxDurability");
+//                // Quality multiplier (if any)
+//                float qualityMultiplier = 1.0f;
+//                if (tag.contains("ForgingQuality")) {
+//                    qualityMultiplier = QualityHelper.getQualityMultiplier(stack);
+//                }
+//                int newOriginalDurability = (int) (originalDurability * baseMultiplier * qualityMultiplier);
 //
-//                    // Base vanilla durability
-//                    int originalDurability = stack.getItem().getMaxDamage();
-//                    // Config multipliers
-//                    float baseMultiplier = ServerConfig.BASE_DURABILITY_MULTIPLIER.get().floatValue();
-//                    float grindReduction = ServerConfig.DURABILITY_REDUCE_PER_GRIND.get().floatValue();
+//                // Final durability multiplier, clamped to 10% minimum
+//                float penaltyMultiplier = Math.max(0.1f, 1.0f - (reducedCount * grindReduction));
 //
-//                    // Quality multiplier (if any)
-//                    float qualityMultiplier = 1.0f;
-//                    if (tag.contains("ForgingQuality")) {
-//                        qualityMultiplier = QualityHelper.getQualityMultiplier(stack);
-//                    }
-//                    int newOriginalDurability = (int) (originalDurability * baseMultiplier * qualityMultiplier);
+//                int effectiveMaxDurability = (int) (newOriginalDurability * penaltyMultiplier);
+//                effectiveMaxDurability = Math.max(1, effectiveMaxDurability); // Clamp to avoid zero
 //
-//                    // Final durability multiplier, clamped to 10% minimum
-//                    float penaltyMultiplier = Math.max(0.1f, 1.0f - (reducedCount * grindReduction));
+//                int currentDamage = stack.getDamageValue();
 //
-//                    int effectiveMaxDurability = (int) (newOriginalDurability * penaltyMultiplier);
-//                    effectiveMaxDurability = Math.max(1, effectiveMaxDurability); // Clamp to avoid zero
-//
-//                    int currentDamage = stack.getDamageValue();
-//
-//                    // If already fully repaired relative to reduced max, skip
-//                    if (currentDamage <= (newOriginalDurability - effectiveMaxDurability)) {
-//                        tag.putInt("ReducedMaxDurability", reducedCount + 1);
-//                        stack.setDamageValue(0);
-//                        event.getLevel().playSound(null, pos, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1.0f, 1.0f);
-//                        spawnGrindParticles(world, pos);
-//                        event.setCancellationResult(InteractionResult.SUCCESS);
-//                        event.setCanceled(true);
-//                        return;
-//                    }
-//
-//                    float restorePercent = ServerConfig.DAMAGE_RESTORE_PER_GRIND.get().floatValue(); // e.g., 0.05F for 5%
-//                    int theoreticalMaxDurability = (int) (originalDurability * baseMultiplier * qualityMultiplier);
-//                    int repairAmount = Math.max(1, (int) (theoreticalMaxDurability * restorePercent));
-//
-//                    // Respect effective max cap
-//                    int newDamage = Math.max(theoreticalMaxDurability - effectiveMaxDurability, currentDamage - repairAmount);
-//
-//                    stack.setDamageValue(newDamage);
+//                // If already fully repaired relative to reduced max, skip
+//                if (currentDamage <= (newOriginalDurability - effectiveMaxDurability)) {
 //                    tag.putInt("ReducedMaxDurability", reducedCount + 1);
+//                    stack.setDamageValue(0);
 //                    event.getLevel().playSound(null, pos, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1.0f, 1.0f);
 //                    spawnGrindParticles(world, pos);
 //                    event.setCancellationResult(InteractionResult.SUCCESS);
 //                    event.setCanceled(true);
+//                    return;
 //                }
 //
+//                float restorePercent = ServerConfig.DAMAGE_RESTORE_PER_GRIND.get().floatValue(); // e.g., 0.05F for 5%
+//                int theoreticalMaxDurability = (int) (originalDurability * baseMultiplier * qualityMultiplier);
+//                int repairAmount = Math.max(1, (int) (theoreticalMaxDurability * restorePercent));
+//
+//                // Respect effective max cap
+//                int newDamage = Math.max(theoreticalMaxDurability - effectiveMaxDurability, currentDamage - repairAmount);
+//
+//                stack.setDamageValue(newDamage);
+//                tag.putInt("ReducedMaxDurability", reducedCount + 1);
+//                event.getLevel().playSound(null, pos, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1.0f, 1.0f);
+//                spawnGrindParticles(world, pos);
+//                event.setCancellationResult(InteractionResult.SUCCESS);
+//                event.setCanceled(true);
 //            }
-//        }
-//        if (!world.isClientSide()) {
-//            ItemStack mainHand = player.getMainHandItem();
-//            HitResult hit = player.pick(5.0D, 0.0F, false);
-//            BlockPos pos = ((BlockHitResult) hit).getBlockPos();
-//            BlockState state = world.getBlockState(pos);
-//            // Only hide if MAIN HAND is not a hammer
-//            if (!mainHand.is(ModTags.Items.SMITHING_HAMMERS) || !state.is(ModTags.Blocks.SMITHING_ANVIL)) {
-//                hideMinigame((ServerPlayer) player);
-//            }
-//        }
-//    }
 //
-//    private static void spawnGrindParticles(Level level, BlockPos pos) {
-//        if (level instanceof ServerLevel serverLevel) {
-//            serverLevel.sendParticles(ParticleTypes.CRIT,
-//                    pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5,
-//                    10, 0.2, 0.2, 0.2, 0.1);
 //        }
-//    }
-//
-//    private static void handleCauldronInteraction(Level level, BlockPos pos, Player player,
-//                                                  ItemStack heldStack, BlockState state) {
-//        IntegerProperty levelProperty = LayeredCauldronBlock.LEVEL;
-//        int waterLevel = state.getValue(levelProperty);
-//
-//        if (waterLevel > 0) {
-//            // Update water level
-//            /*if (waterLevel == 1) {
-//                level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
-//            } else {
-//                level.setBlockAndUpdate(pos, state.setValue(levelProperty, waterLevel - 1));
-//            }
-//            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);*/
-//
-//            // Cool the ingot
-//            coolItem(player, heldStack);
-//        }
-//    }
+        ItemStack mainHand = player.getMainHandItem();
+        // Only hide if MAIN HAND is not a hammer
+        if (!mainHand.is(ModTags.Items.SMITHING_HAMMERS) || !state.is(ModTags.Blocks.SMITHING_ANVIL)) {
+            hideMinigame((ServerPlayer) player);
+        }
+    }
+
+    private static void spawnGrindParticles(Level level, BlockPos pos) {
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(ParticleTypes.CRIT,
+                    pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5,
+                    10, 0.2, 0.2, 0.2, 0.1);
+        }
+    }
+
+    private static void handleCauldronInteraction(Level level, BlockPos pos, Player player,
+                                                  ItemStack heldStack, BlockState state) {
+        IntegerProperty levelProperty = LayeredCauldronBlock.LEVEL;
+        int waterLevel = state.getValue(levelProperty);
+
+        if (waterLevel > 0) {
+            // Cool the ingot
+            coolItem(player, heldStack);
+        }
+    }
 //
 //    private static ItemStack coolSingleStack(ItemStack stack, Level level) {
 //        Item cooled = getCooledItem(stack.getItem(), level);
@@ -571,7 +584,7 @@ public class ModItemInteractEvents {
 //        return cooledStack;
 //    }
 //
-//    private static void coolItem(Player player, ItemStack stack) {
+    private static void coolItem(Player player, ItemStack stack) {
 //        Item cooled = getCooledItem(stack.getItem(), player.level());
 //        if (cooled == null) return;
 //        if (stack.getCount() <= 0) return;
@@ -612,7 +625,7 @@ public class ModItemInteractEvents {
 //        }
 //
 //        player.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
-//    }
+    }
 //
 //
 //    private static void coolItemEntity(ItemEntity entity) {
@@ -670,77 +683,75 @@ public class ModItemInteractEvents {
 //                }
 //            }
 //
-//            if (player != null) {
-//                player.playSound(SoundEvents.GRINDSTONE_USE, 1.0F, 1.0F);
-//            }
+//          player.playSound(SoundEvents.GRINDSTONE_USE, 1.0F, 1.0F);
 //        }
 //    }
 //
-//    private static Item getGrindable(@Nullable Item heatedItem, @NotNull Level level) {
-//        if (heatedItem == null || level == null) return null;
-//
-//        // Wrap the single item in a container for recipe matching
-//        SimpleContainer container = new SimpleContainer(new ItemStack(heatedItem));
-//
-//        // Find the first matching GrindingRecipe
-//        Optional<GrindingRecipe> recipeOpt = level.getRecipeManager()
-//                .getAllRecipesFor(ModRecipeTypes.GRINDING_RECIPE.get())
-//                .stream()
-//                .filter(r -> r.matches(container, level))
-//                .findFirst();
-//
-//        if (recipeOpt.isEmpty()) {
-//            return heatedItem; // no grinding recipe found
-//        }
-//
-//        // Return the result item from the recipe
-//        GrindingRecipe recipe = recipeOpt.get();
-//        ItemStack result = recipe.getResultItem(level.registryAccess());
-//        return result.isEmpty() ? heatedItem : result.getItem();
-//    }
-//
-//    public static boolean hasCoolingRecipe(@Nullable Item heatedItem, @NotNull Level level) {
-//        if (heatedItem == null) return false;
-//
-//        // Wrap the item in a container for recipe matching
-//        SimpleContainer container = new SimpleContainer(new ItemStack(heatedItem));
-//
-//        // Find the first matching CoolingRecipe
-//        Optional<CoolingRecipe> recipeOpt = level.getRecipeManager()
-//                .getAllRecipesFor(ModRecipeTypes.COOLING_RECIPE.get())
-//                .stream()
-//                .filter(r -> r.matches(container, level))
-//                .findFirst();
-//
-//        // Return true if a recipe exists and produces a non-empty result
-//        return recipeOpt.map(recipe -> !recipe.getResultItem(level.registryAccess()).isEmpty())
-//                .orElse(false);
-//    }
-//
-//    public static boolean hasGrindingRecipe(@Nullable Item heatedItem, @NotNull Level level) {
-//        if (heatedItem == null) return false;
-//
-//        // Wrap the item in a container for recipe matching
-//        SimpleContainer container = new SimpleContainer(new ItemStack(heatedItem));
-//
-//        // Find the first matching GrindingRecipe
-//        Optional<GrindingRecipe> recipeOpt = level.getRecipeManager()
-//                .getAllRecipesFor(ModRecipeTypes.GRINDING_RECIPE.get())
-//                .stream()
-//                .filter(r -> r.matches(container, level))
-//                .findFirst();
-//
-//        // Return true if a recipe exists and produces a non-empty result
-//        return recipeOpt.map(recipe -> !recipe.getResultItem(level.registryAccess()).isEmpty())
-//                .orElse(false);
-//    }
-//
-//    private static final Map<ServerLevel, List<ItemEntity>> trackedEntitiesPerWorld = new HashMap<>();
-//
-//    @SubscribeEvent
-//    public static void onEntityJoin(EntityJoinLevelEvent event) {
-//        if (!(event.getEntity() instanceof ItemEntity itemEntity)) return;
-//
+    private static Item getGrindable(Item heatedItem, Level level) {
+        if (heatedItem == null || level == null) return null;
+
+        // Wrap the single item in a container for recipe matching
+        SingleRecipeInput container = new SingleRecipeInput(new ItemStack(heatedItem));
+
+        // Find the first matching GrindingRecipe
+        Optional<RecipeHolder<GrindingRecipe>> recipeOpt = level.getRecipeManager()
+                .getAllRecipesFor(ModRecipeTypes.GRINDING_RECIPE.get())
+                .stream()
+                .filter(r -> r.value().matches(container, level))
+                .findFirst();
+
+        if (recipeOpt.isEmpty()) {
+            return heatedItem; // no grinding recipe found
+        }
+
+        // Return the result item from the recipe
+        GrindingRecipe recipe = recipeOpt.get().value();
+        ItemStack result = recipe.getResultItem(level.registryAccess());
+        return result.isEmpty() ? heatedItem : result.getItem();
+    }
+
+    public static boolean hasCoolingRecipe(@Nullable Item heatedItem, @NotNull Level level) {
+        if (heatedItem == null) return false;
+
+        // Wrap the item in a container for recipe matching
+        SingleRecipeInput container = new SingleRecipeInput(new ItemStack(heatedItem));
+
+        // Find the first matching CoolingRecipe
+        Optional<RecipeHolder<CoolingRecipe>> recipeOpt = level.getRecipeManager()
+                .getAllRecipesFor(ModRecipeTypes.COOLING_RECIPE.get())
+                .stream()
+                .filter(r -> r.value().matches(container, level))
+                .findFirst();
+
+        // Return true if a recipe exists and produces a non-empty result
+        return recipeOpt.map(recipe -> !recipe.value().getResultItem(level.registryAccess()).isEmpty())
+                .orElse(false);
+    }
+
+    public static boolean hasGrindingRecipe(@Nullable Item heatedItem, @NotNull Level level) {
+        if (heatedItem == null) return false;
+
+        // Wrap the item in a container for recipe matching
+        SingleRecipeInput container = new SingleRecipeInput(new ItemStack(heatedItem));
+
+        // Find the first matching GrindingRecipe
+        Optional<RecipeHolder<GrindingRecipe>> recipeOpt = level.getRecipeManager()
+                .getAllRecipesFor(ModRecipeTypes.GRINDING_RECIPE.get())
+                .stream()
+                .filter(r -> r.value().matches(container, level))
+                .findFirst();
+
+        // Return true if a recipe exists and produces a non-empty result
+        return recipeOpt.map(recipe -> !recipe.value().getResultItem(level.registryAccess()).isEmpty())
+                .orElse(false);
+    }
+
+    private static final Map<ServerLevel, List<ItemEntity>> trackedEntitiesPerWorld = new HashMap<>();
+
+    @SubscribeEvent
+    public static void onEntityJoin(EntityJoinLevelEvent event) {
+        if (!(event.getEntity() instanceof ItemEntity itemEntity)) return;
+
 //        ItemStack stack = itemEntity.getItem();
 //        boolean isHeatedItem = stack.hasTag() && stack.getTag().getBoolean("Heated");
 //        Item cooled = getCooledItem(stack.getItem(), event.getLevel());
@@ -760,37 +771,35 @@ public class ModItemInteractEvents {
 //                trackedSinceMs.put(itemEntity, heatedSince);
 //            }
 //        }
-//    }
-//
-//    @SubscribeEvent
-//    public static void onEntityPickupItem(EntityItemPickupEvent event) {
-//        if (!(event.getItem().level instanceof ServerLevel serverLevel)) return;
-//
-//        List<ItemEntity> tracked = trackedEntitiesPerWorld.get(serverLevel);
-//        if (tracked != null) {
-//            tracked.remove(event.getItem());
-//            if (tracked.isEmpty()) trackedEntitiesPerWorld.remove(serverLevel);
-//        }
-//
-//        trackedSinceMs.remove(event.getItem());
-//    }
-//
-//    private static final Map<Item, Boolean> COOLING_CACHE = new HashMap<>();
-//
-//    private static boolean hasCoolingRecipeCached(Item item, Level level) {
-//        return COOLING_CACHE.computeIfAbsent(item, (i) ->
-//                hasCoolingRecipe(i, level)   // your existing function
-//        );
-//    }
-//
-//    @SubscribeEvent
-//    public static void onServerTick(TickEvent.ServerTickEvent event) {
-//        if (event.phase != TickEvent.Phase.END) return;
-//
-//        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-//        if (server == null) return;
-//
-//        // Iterate over all loaded worlds
+    }
+
+    @SubscribeEvent
+    public static void onEntityPickupItem(ItemEntityPickupEvent.Post event) {
+        if (!(event.getItemEntity().level() instanceof ServerLevel serverLevel)) return;
+
+        List<ItemEntity> tracked = trackedEntitiesPerWorld.get(serverLevel);
+        if (tracked != null) {
+            tracked.remove(event.getItemEntity());
+            if (tracked.isEmpty()) trackedEntitiesPerWorld.remove(serverLevel);
+        }
+
+        trackedSinceMs.remove(event.getItemEntity());
+    }
+
+    private static final Map<Item, Boolean> COOLING_CACHE = new HashMap<>();
+
+    private static boolean hasCoolingRecipeCached(Item item, Level level) {
+        return COOLING_CACHE.computeIfAbsent(item, (i) ->
+                hasCoolingRecipe(i, level)   // your existing function
+        );
+    }
+
+    @SubscribeEvent
+    public static void onServerTick(ServerTickEvent.Post event) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return;
+
+        // Iterate over all loaded worlds
 //        for (ServerLevel level : server.getAllLevels()) {
 //            long now = level.getGameTime();
 //
@@ -858,11 +867,11 @@ public class ModItemInteractEvents {
 //                trackedEntitiesPerWorld.remove(level);
 //            }
 //        }
-//    }
-//
-//
+    }
+
+// TODO: this should be replaced with DataAttachments
 //    @SubscribeEvent
-//    public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
+//    public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
 //        if (event.getObject() instanceof ItemEntity) {
 //            event.addCapability(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "heated_item"),
 //                    new HeatedItemProvider());
@@ -937,24 +946,25 @@ public class ModItemInteractEvents {
         }
     }
 
-//    @SubscribeEvent
-//    public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-//        Player player = event.getEntity();
-//        if (!player.level().isClientSide()) {
-//            hideMinigame((ServerPlayer) player);
-//        }
-//    }
-//
-//    @SubscribeEvent
-//    public static void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
-//        Player player = event.getEntity();
-//        if (!player.level().isClientSide()) {
-//            hideMinigame((ServerPlayer) player);
-//        }
-//    }
-//
-//    @SubscribeEvent
-//    public static void onArrowTipping(PlayerInteractEvent.RightClickItem event) {
+    @SubscribeEvent
+    public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        Player player = event.getEntity();
+        if (!player.level().isClientSide()) {
+            hideMinigame((ServerPlayer) player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
+        Player player = event.getEntity();
+        if (!player.level().isClientSide()) {
+            hideMinigame((ServerPlayer) player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onArrowTipping(PlayerInteractEvent.RightClickItem event) {
+// TODO: arrow tipping
 //        Player player = event.getEntity();
 //        Level level = event.getLevel();
 //        InteractionHand hand = event.getHand();
@@ -1039,33 +1049,29 @@ public class ModItemInteractEvents {
 //                0.6F,
 //                1.2F
 //        );
-//
-//        event.setCanceled(true);
-//        event.setCancellationResult(InteractionResult.SUCCESS);
-//    }
-//
-//    @SubscribeEvent
-//    public static void onRightClickFletching(PlayerInteractEvent.RightClickBlock event) {
-//        Level level = event.getLevel();
-//        BlockPos pos = event.getPos();
-//        Player player = event.getEntity();
-//        if (!ServerConfig.ENABLE_FLETCHING_RECIPES.get()) return;
-//        // Only respond to main-hand to avoid double-open with offhand
-//        if (event.getHand() != InteractionHand.MAIN_HAND) return;
-//
-//        BlockState state = level.getBlockState(pos);
-//        if (!state.is(Blocks.FLETCHING_TABLE)) return;
-//
-//        // Optional: sneak to bypass opening (let players interact as normal)
-//        // if (player.isShiftKeyDown()) return;
-//
-//        // Client: mark success so the hand anim plays; open screen ONLY on server
-//        if (level.isClientSide) {
-//            event.setCancellationResult(InteractionResult.SUCCESS);
-//            event.setCanceled(true);
-//            return;
-//        }
-//
+
+        event.setCanceled(true);
+        event.setCancellationResult(InteractionResult.SUCCESS);
+    }
+
+    @SubscribeEvent
+    public static void onRightClickFletching(PlayerInteractEvent.RightClickBlock event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        Level level = event.getLevel();
+        BlockPos pos = event.getPos();
+        if (!ServerConfig.ENABLE_FLETCHING_RECIPES.get()) return;
+        // Only respond to main-hand to avoid double-open with offhand
+        if (event.getHand() != InteractionHand.MAIN_HAND) return;
+
+        BlockState state = level.getBlockState(pos);
+        if (!state.is(Blocks.FLETCHING_TABLE)) return;
+
+        if (level.isClientSide) {
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
+// TODO: implement fletching menu
 //        // Server: open our custom menu via a SimpleMenuProvider (vanilla table has no BE)
 //        SimpleMenuProvider provider = new SimpleMenuProvider(
 //                (windowId, playerInv, p) ->
@@ -1073,8 +1079,8 @@ public class ModItemInteractEvents {
 //                Component.translatable("container.overgeared.fletching_table")
 //        );
 //
-//        NetworkHooks.openScreen((ServerPlayer) player, provider, pos);
-//        event.setCancellationResult(InteractionResult.sidedSuccess(false));
-//        event.setCanceled(true);
-//    }
+//        player.openMenu(provider, pos);
+        event.setCancellationResult(InteractionResult.sidedSuccess(false));
+        event.setCanceled(true);
+    }
 }

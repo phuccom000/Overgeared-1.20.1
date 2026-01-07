@@ -4,8 +4,11 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.StringRepresentable;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 
 import java.util.function.Supplier;
@@ -38,11 +41,11 @@ public class ModComponents {
                     .networkSynchronized(BlueprintData.STREAM_CODEC)
                     .build());
 
-    // Forging quality stored on crafted items (sword, armor, etc.)
-    public static final Supplier<DataComponentType<String>> FORGING_QUALITY =
-            COMPONENTS.register("forging_quality", () -> DataComponentType.<String>builder()
-                    .persistent(Codec.STRING)
-                    .networkSynchronized(ByteBufCodecs.STRING_UTF8)
+    // Forging quality stored on crafted items (sword, armor, etc.) - stored as enum
+    public static final Supplier<DataComponentType<ForgingQuality>> FORGING_QUALITY =
+            COMPONENTS.register("forging_quality", () -> DataComponentType.<ForgingQuality>builder()
+                    .persistent(ForgingQuality.CODEC)
+                    .networkSynchronized(ForgingQuality.STREAM_CODEC)
                     .build());
 
     // Creator name for items
@@ -55,6 +58,20 @@ public class ModComponents {
     // Whether item needs polishing
     public static final Supplier<DataComponentType<Boolean>> POLISHED =
             COMPONENTS.register("polished", () -> DataComponentType.<Boolean>builder()
+                    .persistent(Codec.BOOL)
+                    .networkSynchronized(ByteBufCodecs.BOOL)
+                    .build());
+
+    // Track how many times a potion has been used for arrow tipping
+    public static final Supplier<DataComponentType<Integer>> TIPPED_USES =
+            COMPONENTS.register("tipped_uses", () -> DataComponentType.<Integer>builder()
+                    .persistent(Codec.INT)
+                    .networkSynchronized(ByteBufCodecs.VAR_INT)
+                    .build());
+
+    // Marks an item as a failed crafting result (used for JEI display)
+    public static final Supplier<DataComponentType<Boolean>> FAILED_RESULT =
+            COMPONENTS.register("failed_result", () -> DataComponentType.<Boolean>builder()
                     .persistent(Codec.BOOL)
                     .networkSynchronized(ByteBufCodecs.BOOL)
                     .build());

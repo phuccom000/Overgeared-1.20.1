@@ -8,7 +8,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SmithingTemplateItem;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -288,7 +287,6 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
     public int getRemainingHits() {
         int progress = this.data.get(0);
         int maxProgress = this.data.get(1);
-        //ModMessages.sendToServer(new UpdateAnvilProgressC2SPacket(maxProgress - progress));
         return maxProgress - progress;
     }
 
