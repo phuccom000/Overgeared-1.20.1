@@ -6,9 +6,8 @@
   "client": [
   ],
   "mixins": [
-//    "AbstractContainerMenuMixin",
+   "AbstractContainerMenuMixin",
 //    "BrewingStandBlockEntityMixin",
-//    "ItemStackMixin",
 //    "PotionItemMixin"
     "ItemStackMixin"
   ],
