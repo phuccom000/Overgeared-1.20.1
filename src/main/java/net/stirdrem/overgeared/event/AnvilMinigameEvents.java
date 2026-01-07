@@ -11,7 +11,6 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.networking.ModNetworkHandler;
 import net.stirdrem.overgeared.networking.packet.SetMinigameVisibleC2SPacket;
 
 import java.util.Collections;
@@ -57,7 +56,7 @@ public class AnvilMinigameEvents {
     // Popup system
     // ===============================
     private static final java.util.List<Popup> POPUPS = new java.util.ArrayList<>();
-    private static final float POPUP_DURATION_MS = 10000f;
+    private static final float POPUP_DURATION_MS = 1500f;
     private static int lastPerfect = 0;
     private static int lastGood = 0;
     private static int lastMiss = 0;
@@ -153,7 +152,7 @@ public class AnvilMinigameEvents {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         if (!mc.isPaused()) updatePopups();
-        if (mc.isPaused() || !isIsVisible()) return;
+        if (mc.isPaused() || !isVisible()) return;
 
         tickAccumulator++;
         if (tickAccumulator < TICKS_PER_PRINT) return;
@@ -175,10 +174,10 @@ public class AnvilMinigameEvents {
     }
 
     private static void updatePopups() {
-        // Age existing popups
+        // Age existing popups - each tick is 50ms (20 TPS)
         for (int i = 0; i < POPUPS.size(); i++) {
             Popup popup = POPUPS.get(i);
-            popup.age += Minecraft.getInstance().getTimer().getRealtimeDeltaTicks() * 1000f;
+            popup.age += 50f; // 50ms per tick
             if (popup.age >= POPUP_DURATION_MS) {
                 POPUPS.remove(i--);
             }
@@ -201,7 +200,7 @@ public class AnvilMinigameEvents {
         return arrowPosition;
     }
 
-    public static boolean isIsVisible() {
+    public static boolean isVisible() {
         return isVisible;
     }
 

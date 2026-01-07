@@ -17,7 +17,7 @@ public class PopupOverlay implements LayeredDraw.Layer {
     public static final PopupOverlay INSTANCE = new PopupOverlay();
     public static final ResourceLocation ID = OvergearedMod.loc("popup");
 
-    private static final float POPUP_DURATION_MS = 10000f;
+    private static final float POPUP_DURATION_MS = 1500f;
 
     @Override
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
@@ -59,11 +59,12 @@ public class PopupOverlay implements LayeredDraw.Layer {
             );
             guiGraphics.pose().scale(scale, scale, 1f);
 
+            // Draw at origin since we've already translated
             guiGraphics.drawString(
                     font,
                     popup.text,
                     -textWidth / 2,
-                    screenHeight / 2 - 18 - ClientConfig.MINIGAME_OVERLAY_HEIGHT.get(),
+                    0,
                     color,
                     false
             );

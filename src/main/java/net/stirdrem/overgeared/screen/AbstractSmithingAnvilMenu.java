@@ -175,9 +175,10 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
             protected void checkTakeAchievements(ItemStack stack) {
                 if (this.removeCount > 0)
                     stack.onCraftedBy(AbstractSmithingAnvilMenu.this.player.level(), AbstractSmithingAnvilMenu.this.player, this.removeCount);
-                // TODO: Recipe advancement awarding - RecipeHolder interface changed in 1.21
-                // The old Container-based RecipeHolder interface was removed
-                // Need to manually trigger recipe unlocks if desired
+                // Award recipe to player for recipe book integration
+                AbstractSmithingAnvilMenu.this.blockEntity.getCurrentRecipeHolder().ifPresent(holder ->
+                    AbstractSmithingAnvilMenu.this.player.awardRecipes(List.of(holder))
+                );
                 this.removeCount = 0;
             }
         };

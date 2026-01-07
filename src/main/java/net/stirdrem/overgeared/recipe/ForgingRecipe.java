@@ -61,11 +61,14 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
     }
 
     public static Optional<ForgingRecipe> findBestMatch(Level world, RecipeInput recipeInput) {
+        return findBestMatchHolder(world, recipeInput).map(RecipeHolder::value);
+    }
+
+    public static Optional<RecipeHolder<ForgingRecipe>> findBestMatchHolder(Level world, RecipeInput recipeInput) {
         return world.getRecipeManager().getAllRecipesFor(ModRecipeTypes.FORGING.get())
                 .stream()
-                .map(RecipeHolder::value)
-                .filter(recipe -> recipe.matches(recipeInput, world))
-                .max(Comparator.comparingInt(ForgingRecipe::getRecipeSize));
+                .filter(holder -> holder.value().matches(recipeInput, world))
+                .max(Comparator.comparingInt(holder -> holder.value().getRecipeSize()));
     }
 
     private boolean checkBlueprint(RecipeInput recipeInput) {

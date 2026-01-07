@@ -4,8 +4,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -424,7 +422,7 @@ public class ModEvents {
         Player player = event.getEntity();
         if (!(player instanceof ServerPlayer serverPlayer)) return;
 
-        if (AnvilMinigameEvents.isIsVisible() && AnvilMinigameEvents.hasAnvilPosition(player.getUUID())) {
+        if (AnvilMinigameEvents.isVisible() && AnvilMinigameEvents.hasAnvilPosition(player.getUUID())) {
             BlockPos pos = AnvilMinigameEvents.getAnvilPos(player.getUUID());
             if (pos != null) {
                 resetMinigameForPlayer(serverPlayer);

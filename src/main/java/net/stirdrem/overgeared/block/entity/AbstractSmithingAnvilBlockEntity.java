@@ -9,22 +9,19 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.stirdrem.overgeared.AnvilTier;
@@ -46,8 +43,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-// TODO: Port getCooledItem to OvergearedMod
-// import static net.stirdrem.overgeared.OvergearedMod.getCooledItem;
+import static net.stirdrem.overgeared.util.ItemUtils.getCooledItem;
 
 public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
     protected static final int INPUT_SLOT = 0;
@@ -470,6 +466,10 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     }
 
     public Optional<ForgingRecipe> getCurrentRecipe() {
+        return getCurrentRecipeHolder().map(RecipeHolder::value);
+    }
+
+    public Optional<RecipeHolder<ForgingRecipe>> getCurrentRecipeHolder() {
         // Create a wrapper that only exposes the slots needed for recipe matching
         ItemStackHandler recipeHandler = new ItemStackHandler(12);
         for (int i = 0; i < 9; i++) {
@@ -478,8 +478,8 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         recipeHandler.setStackInSlot(11, itemHandler.getStackInSlot(11));
 
         RecipeWrapper recipeInput = new RecipeWrapper(recipeHandler);
-        return ForgingRecipe.findBestMatch(level, recipeInput)
-                .filter(this::matchesRecipeExactly)
+        return ForgingRecipe.findBestMatchHolder(level, recipeInput)
+                .filter(holder -> matchesRecipeExactly(holder.value()))
                 //.filter(this::hasEnoughIngredients)
                 ;
     }
@@ -875,13 +875,11 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         setChanged(); // mark dirty for save
     }
 
-    private static final String HEATED_TIME_TAG = "HeatedSince";
-
-    // TODO: Migrate tickHeatedIngredients to use Data Components instead of NBT
-    // This requires adding a HeatedTime component or rethinking the heated item cooldown system
+    /**
+     * Ticks heated ingredients in the anvil slots and cools them down after the configured time.
+     * Uses HEATED_TIME data component to track when items were heated.
+     */
     public void tickHeatedIngredients(Level level) {
-        // Temporarily disabled until Data Component migration is complete
-        /*
         if (level.isClientSide) return;
         long tick = level.getGameTime();
         int cooldownTicks = ServerConfig.HEATED_ITEM_COOLDOWN_TICKS.get();
@@ -891,11 +889,23 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             if (stack.isEmpty()) continue;
             if (!stack.is(ModTags.Items.HEATED_METALS)) continue;
 
-            // TODO: Use a HeatedTime component instead of NBT
-            // CompoundTag tag = stack.getOrCreateTag();
-            // long heatedSince = tag.getLong(HEATED_TIME_TAG);
-            // ...
+            // Check if item has HEATED_TIME component
+            Long heatedSince = stack.get(ModComponents.HEATED_TIME);
+            if (heatedSince == null) {
+                // Item is heated but doesn't have a timestamp - set it now
+                stack.set(ModComponents.HEATED_TIME, tick);
+                continue;
+            }
+
+            // Check if enough time has passed to cool down
+            if (tick - heatedSince >= cooldownTicks) {
+                // Cool down the item - replace with cooled version
+                ItemStack cooledItem = getCooledItem(stack, level);
+                if (!cooledItem.isEmpty()) {
+                    itemHandler.setStackInSlot(slot, cooledItem);
+                    setChanged();
+                }
+            }
         }
-        */
     }
 }

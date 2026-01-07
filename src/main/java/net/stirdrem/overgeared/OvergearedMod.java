@@ -42,7 +42,7 @@ public final class OvergearedMod {
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
     }
 
-    public static ResourceLocation loc (String name) {
+    public static ResourceLocation loc(String name) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
     }
 }

@@ -253,7 +253,7 @@ public class ModItemInteractEvents {
                         //int progress = anvilBE.getRequiredProgress();
                         //ModMessages.sendToServer(new StartMinigameC2SPacket(result, progress, pos));
                         if (AnvilMinigameEvents.minigameStarted) {
-                            boolean isVisible = AnvilMinigameEvents.isIsVisible();
+                            boolean isVisible = AnvilMinigameEvents.isVisible();
                             AnvilMinigameEvents.setIsVisible(pos, !isVisible);
                             PacketDistributor.sendToServer(new SetMinigameVisibleC2SPacket(!isVisible, pos));
                             playerMinigameVisibility.put(player.getUUID(), !isVisible);

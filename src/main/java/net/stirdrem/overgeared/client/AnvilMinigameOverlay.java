@@ -5,7 +5,6 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -29,7 +28,7 @@ public class AnvilMinigameOverlay implements LayeredDraw.Layer {
 
     @Override
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        boolean showMainOverlay = AnvilMinigameEvents.isIsVisible();
+        boolean showMainOverlay = AnvilMinigameEvents.isVisible();
         if (!showMainOverlay) return; // Early return if not visible
 
         int screenWidth = guiGraphics.guiWidth();

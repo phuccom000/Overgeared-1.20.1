@@ -76,6 +76,13 @@ public class ModComponents {
                     .networkSynchronized(ByteBufCodecs.BOOL)
                     .build());
 
+    // Track when an item was heated (game tick when heated)
+    public static final Supplier<DataComponentType<Long>> HEATED_TIME =
+            COMPONENTS.register("heated_time", () -> DataComponentType.<Long>builder()
+                    .persistent(Codec.LONG)
+                    .networkSynchronized(ByteBufCodecs.VAR_LONG)
+                    .build());
+
     public static void register(IEventBus eventBus) {
         COMPONENTS.register(eventBus);
     }
