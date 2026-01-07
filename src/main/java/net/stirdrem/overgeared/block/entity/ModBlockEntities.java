@@ -13,24 +13,24 @@ public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, OvergearedMod.MOD_ID);
 
-//    public static final RegistryObject<BlockEntityType<SteelSmithingAnvilBlockEntity>> STEEL_SMITHING_ANVIL_BE =
-//            BLOCK_ENTITIES.register("smithing_table_be", () ->
-//                    BlockEntityType.Builder.of(SteelSmithingAnvilBlockEntity::new,
-//                                    ModBlocks.SMITHING_ANVIL.get()).
-//                            build(null));
-//
-//    public static final RegistryObject<BlockEntityType<TierASmithingAnvilBlockEntity>> TIER_A_SMITHING_ANVIL_BE =
-//            BLOCK_ENTITIES.register("tier_a_smithing_table_be", () ->
-//                    BlockEntityType.Builder.of(TierASmithingAnvilBlockEntity::new,
-//                                    ModBlocks.TIER_A_SMITHING_ANVIL.get()).
-//                            build(null));
-//
-//    public static final RegistryObject<BlockEntityType<TierBSmithingAnvilBlockEntity>> TIER_B_SMITHING_ANVIL_BE =
-//            BLOCK_ENTITIES.register("tier_b_smithing_table_be", () ->
-//                    BlockEntityType.Builder.of(TierBSmithingAnvilBlockEntity::new,
-//                                    ModBlocks.TIER_B_SMITHING_ANVIL.get()).
-//                            build(null));
-//
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SteelSmithingAnvilBlockEntity>> STEEL_SMITHING_ANVIL_BE =
+            BLOCK_ENTITIES.register("smithing_table_be", () ->
+                    BlockEntityType.Builder.of(SteelSmithingAnvilBlockEntity::new,
+                                    ModBlocks.SMITHING_ANVIL.get()).
+                            build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TierASmithingAnvilBlockEntity>> TIER_A_SMITHING_ANVIL_BE =
+            BLOCK_ENTITIES.register("tier_a_smithing_table_be", () ->
+                    BlockEntityType.Builder.of(TierASmithingAnvilBlockEntity::new,
+                                    ModBlocks.TIER_A_SMITHING_ANVIL.get()).
+                            build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TierBSmithingAnvilBlockEntity>> TIER_B_SMITHING_ANVIL_BE =
+            BLOCK_ENTITIES.register("tier_b_smithing_table_be", () ->
+                    BlockEntityType.Builder.of(TierBSmithingAnvilBlockEntity::new,
+                                    ModBlocks.TIER_B_SMITHING_ANVIL.get()).
+                            build(null));
+
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StoneSmithingAnvilBlockEntity>> STONE_SMITHING_ANVIL_BE =
             BLOCK_ENTITIES.register("stone_smithing_table_be", () ->
                     BlockEntityType.Builder.of(StoneSmithingAnvilBlockEntity::new,

@@ -21,20 +21,22 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pProvider) {
-//        this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
-//                .add(ModBlocks.STEEL_BLOCK.get(),
-//                        ModBlocks.SMITHING_ANVIL.get(),
-//                        ModBlocks.STONE_SMITHING_ANVIL.get(),
-//                        ModBlocks.ALLOY_FURNACE.get(),
-//                        ModBlocks.NETHER_ALLOY_FURNACE.get()
-//                );
-//
+        this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                .add(ModBlocks.STEEL_BLOCK.get(),
+                        ModBlocks.SMITHING_ANVIL.get(),
+                        ModBlocks.TIER_A_SMITHING_ANVIL.get(),
+                        ModBlocks.TIER_B_SMITHING_ANVIL.get(),
+                        ModBlocks.STONE_SMITHING_ANVIL.get(),
+                        ModBlocks.ALLOY_FURNACE.get(),
+                        ModBlocks.NETHER_ALLOY_FURNACE.get()
+                );
+
         this.tag(ModTags.Blocks.SMITHING_ANVIL)
                 .add(
-//                        ModBlocks.SMITHING_ANVIL.get(),
-                        ModBlocks.STONE_SMITHING_ANVIL.get()
-//                        ModBlocks.TIER_A_SMITHING_ANVIL.get(),
-//                        ModBlocks.TIER_B_SMITHING_ANVIL.get()
+                        ModBlocks.SMITHING_ANVIL.get(),
+                        ModBlocks.STONE_SMITHING_ANVIL.get(),
+                        ModBlocks.TIER_A_SMITHING_ANVIL.get(),
+                        ModBlocks.TIER_B_SMITHING_ANVIL.get()
                 );
 
         this.tag(ModTags.Blocks.NEEDS_STEEL_TOOL)

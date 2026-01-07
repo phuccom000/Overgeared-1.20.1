@@ -14,8 +14,12 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.custom.AlloySmelterBlock;
 import net.stirdrem.overgeared.block.custom.NetherAlloySmelterBlock;
+import net.stirdrem.overgeared.block.custom.SteelSmithingAnvil;
 import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
+import net.stirdrem.overgeared.block.custom.TierASmithingAnvil;
+import net.stirdrem.overgeared.block.custom.TierBSmithingAnvil;
 import net.stirdrem.overgeared.item.ModItems;
+import net.stirdrem.overgeared.AnvilTier;
 
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
@@ -23,12 +27,16 @@ import java.util.function.ToIntFunction;
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(Registries.BLOCK, OvergearedMod.MOD_ID);
-//    public static final RegistryObject<Block> SMITHING_ANVIL = registerBlock("smithing_anvil",
-//            () -> new SteelSmithingAnvil(AnvilTier.IRON, BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
-//    public static final RegistryObject<Block> TIER_A_SMITHING_ANVIL = registerBlock("tier_a_smithing_anvil",
-//            () -> new TierASmithingAnvil(AnvilTier.ABOVE_A, BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
-//    public static final RegistryObject<Block> TIER_B_SMITHING_ANVIL = registerBlock("tier_b_smithing_anvil",
-//            () -> new TierBSmithingAnvil(AnvilTier.ABOVE_B, BlockBehaviour.Properties.copy(Blocks.ANVIL).noOcclusion()));
+
+    public static final DeferredHolder<Block, SteelSmithingAnvil> SMITHING_ANVIL = registerBlock("smithing_anvil",
+            () -> new SteelSmithingAnvil(AnvilTier.IRON, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
+
+    public static final DeferredHolder<Block, TierASmithingAnvil> TIER_A_SMITHING_ANVIL = registerBlock("tier_a_smithing_anvil",
+            () -> new TierASmithingAnvil(AnvilTier.ABOVE_A, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
+
+    public static final DeferredHolder<Block, TierBSmithingAnvil> TIER_B_SMITHING_ANVIL = registerBlock("tier_b_smithing_anvil",
+            () -> new TierBSmithingAnvil(AnvilTier.ABOVE_B, BlockBehaviour.Properties.ofFullCopy(Blocks.ANVIL).noOcclusion()));
+
     public static final DeferredHolder<Block, StoneSmithingAnvil> STONE_SMITHING_ANVIL = registerBlock("stone_anvil",
             () -> new StoneSmithingAnvil(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).noOcclusion()));
     public static final DeferredHolder<Block, Block> STEEL_BLOCK = registerBlock("steel_block",

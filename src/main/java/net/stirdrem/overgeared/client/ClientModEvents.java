@@ -97,15 +97,15 @@ public class ClientModEvents {
     @SuppressWarnings("unchecked")
     @SubscribeEvent
     public static void onRegisterMenuScreens(RegisterMenuScreensEvent event) {
-        // event.register(ModMenuTypes.STEEL_SMITHING_ANVIL_MENU.get(), SteelSmithingAnvilScreen::new);
-        // event.register(ModMenuTypes.TIER_A_SMITHING_ANVIL_MENU.get(), TierASmithingAnvilScreen::new);
-        // event.register(ModMenuTypes.TIER_B_SMITHING_ANVIL_MENU.get(), TierBSmithingAnvilScreen::new);
-        event.register((MenuType<StoneSmithingAnvilMenu>)ModMenuTypes.STONE_SMITHING_ANVIL_MENU.get(), StoneSmithingAnvilScreen::new);
-        event.register((MenuType<RockKnappingMenu>)ModMenuTypes.ROCK_KNAPPING_MENU.get(), RockKnappingScreen::new);
+        event.register(ModMenuTypes.STEEL_SMITHING_ANVIL_MENU.get(), SteelSmithingAnvilScreen::new);
+        event.register(ModMenuTypes.TIER_A_SMITHING_ANVIL_MENU.get(), TierASmithingAnvilScreen::new);
+        event.register(ModMenuTypes.TIER_B_SMITHING_ANVIL_MENU.get(), TierBSmithingAnvilScreen::new);
+        event.register(ModMenuTypes.STONE_SMITHING_ANVIL_MENU.get(), StoneSmithingAnvilScreen::new);
+        event.register(ModMenuTypes.ROCK_KNAPPING_MENU.get(), RockKnappingScreen::new);
         // event.register(ModMenuTypes.BLUEPRINT_WORKBENCH_MENU.get(), BlueprintWorkbenchScreen::new);
         // event.register(ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingStationScreen::new);
-        event.register((MenuType<AlloySmelterMenu>)ModMenuTypes.ALLOY_SMELTER_MENU.get(), AlloySmelterScreen::new);
-        event.register((MenuType<NetherAlloySmelterMenu>)ModMenuTypes.NETHER_ALLOY_SMELTER_MENU.get(), NetherAlloySmelterScreen::new);
+        event.register(ModMenuTypes.ALLOY_SMELTER_MENU.get(), AlloySmelterScreen::new);
+        event.register(ModMenuTypes.NETHER_ALLOY_SMELTER_MENU.get(), NetherAlloySmelterScreen::new);
     }
 
     @SubscribeEvent
@@ -149,7 +149,7 @@ public class ClientModEvents {
     /**
      * MOD bus events for client-side registration
      */
-    @EventBusSubscriber(modid = OvergearedMod.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = OvergearedMod.MOD_ID, value = Dist.CLIENT)
     public static class ModBusEvents {
         @SubscribeEvent
         public static void registerGuiLayers(RegisterGuiLayersEvent event) {

@@ -23,12 +23,12 @@ public class ModBlockStateProvider extends BlockStateProvider {
   protected void registerStatesAndModels() {
     blockWithItem(ModBlocks.STEEL_BLOCK);
 
-//    horizontalBlock(ModBlocks.SMITHING_ANVIL.get(),
-//            new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
-//    horizontalBlock(ModBlocks.TIER_A_SMITHING_ANVIL.get(),
-//            new ModelFile.UncheckedModelFile(modLoc("block/tier_a_smithing_anvil")));
-//    horizontalBlock(ModBlocks.TIER_B_SMITHING_ANVIL.get(),
-//            new ModelFile.UncheckedModelFile(modLoc("block/tier_b_smithing_anvil")));
+    horizontalBlock(ModBlocks.SMITHING_ANVIL.get(),
+            new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
+    horizontalBlock(ModBlocks.TIER_A_SMITHING_ANVIL.get(),
+            new ModelFile.UncheckedModelFile(modLoc("block/tier_a_smithing_anvil")));
+    horizontalBlock(ModBlocks.TIER_B_SMITHING_ANVIL.get(),
+            new ModelFile.UncheckedModelFile(modLoc("block/tier_b_smithing_anvil")));
     horizontalBlock(ModBlocks.STONE_SMITHING_ANVIL.get(),
             new ModelFile.UncheckedModelFile(modLoc("block/stone_anvil")));
 
