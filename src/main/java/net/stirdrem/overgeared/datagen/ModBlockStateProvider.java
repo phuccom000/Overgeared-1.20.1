@@ -32,6 +32,16 @@ public class ModBlockStateProvider extends BlockStateProvider {
     horizontalBlock(ModBlocks.STONE_SMITHING_ANVIL.get(),
             new ModelFile.UncheckedModelFile(modLoc("block/stone_anvil")));
 
+    // Register item models for anvils using their block models
+    simpleBlockItem(ModBlocks.SMITHING_ANVIL.get(),
+            new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
+    simpleBlockItem(ModBlocks.TIER_A_SMITHING_ANVIL.get(),
+            new ModelFile.UncheckedModelFile(modLoc("block/tier_a_smithing_anvil")));
+    simpleBlockItem(ModBlocks.TIER_B_SMITHING_ANVIL.get(),
+            new ModelFile.UncheckedModelFile(modLoc("block/tier_b_smithing_anvil")));
+    simpleBlockItem(ModBlocks.STONE_SMITHING_ANVIL.get(),
+            new ModelFile.UncheckedModelFile(modLoc("block/stone_anvil")));
+
     facingLitBlock(ModBlocks.ALLOY_FURNACE.get(), "alloy_furnace", "alloy_furnace_on");
     facingLitBlock(ModBlocks.NETHER_ALLOY_FURNACE.get(), "nether_alloy_furnace", "nether_alloy_furnace_on");
   }
