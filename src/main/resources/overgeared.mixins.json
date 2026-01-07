@@ -8,8 +8,8 @@
   "mixins": [
    "AbstractContainerMenuMixin",
 //    "BrewingStandBlockEntityMixin",
-//    "PotionItemMixin"
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "PotionItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1
