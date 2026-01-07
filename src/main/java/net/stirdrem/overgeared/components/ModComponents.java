@@ -83,6 +83,13 @@ public class ModComponents {
                     .networkSynchronized(ByteBufCodecs.VAR_LONG)
                     .build());
 
+    // Track how many times an item has been ground (reduces max durability)
+    public static final Supplier<DataComponentType<Integer>> REDUCED_GRIND_COUNT =
+            COMPONENTS.register("reduced_grind_count", () -> DataComponentType.<Integer>builder()
+                    .persistent(Codec.INT)
+                    .networkSynchronized(ByteBufCodecs.VAR_INT)
+                    .build());
+
     public static void register(IEventBus eventBus) {
         COMPONENTS.register(eventBus);
     }
