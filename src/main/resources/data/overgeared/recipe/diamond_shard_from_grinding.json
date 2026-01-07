@@ -4,6 +4,6 @@
     "item": "minecraft:diamond"
   },
   "output": {
-    "item": "overgeared:diamond_shard"
+    "id": "overgeared:diamond_shard"
   }
 }

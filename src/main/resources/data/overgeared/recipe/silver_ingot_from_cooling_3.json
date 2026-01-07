@@ -4,6 +4,6 @@
     "item": "overgeared:heated_silver_ingot"
   },
   "output": {
-    "item": "caverns_and_chasms:silver_ingot"
+    "id": "caverns_and_chasms:silver_ingot"
   }
 }

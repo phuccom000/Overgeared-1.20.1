@@ -50,8 +50,8 @@ public class GrindingRecipe implements Recipe<SingleRecipeInput> {
 
     public static class Serializer implements RecipeSerializer<GrindingRecipe> {
         public static final MapCodec<GrindingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-               Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(r -> r.ingredient),
-               ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result)
+               Ingredient.CODEC_NONEMPTY.fieldOf("input").forGetter(r -> r.ingredient),
+               ItemStack.CODEC.fieldOf("output").forGetter(r -> r.result)
         ).apply(i, GrindingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, GrindingRecipe> STREAM_CODEC = StreamCodec.composite(

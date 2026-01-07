@@ -4,6 +4,6 @@
     "item": "overgeared:heated_steel_ingot"
   },
   "output": {
-    "item": "overgeared:steel_ingot"
+    "id": "overgeared:steel_ingot"
   }
 }

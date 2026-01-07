@@ -4,6 +4,6 @@
     "item": "overgeared:heated_silver_ingot"
   },
   "output": {
-    "item": "galosphere:silver_ingot"
+    "id": "galosphere:silver_ingot"
   }
 }

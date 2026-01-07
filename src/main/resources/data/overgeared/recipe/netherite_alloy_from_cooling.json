@@ -4,6 +4,6 @@
     "item": "overgeared:heated_netherite_alloy"
   },
   "output": {
-    "item": "overgeared:netherite_alloy"
+    "id": "overgeared:netherite_alloy"
   }
 }

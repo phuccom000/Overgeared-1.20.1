@@ -4,6 +4,6 @@
     "item": "overgeared:heated_iron_ingot"
   },
   "output": {
-    "item": "minecraft:iron_ingot"
+    "id": "minecraft:iron_ingot"
   }
 }

@@ -4,6 +4,6 @@
     "item": "overgeared:heated_silver_ingot"
   },
   "output": {
-    "item": "oreganized:silver_ingot"
+    "id": "oreganized:silver_ingot"
   }
 }

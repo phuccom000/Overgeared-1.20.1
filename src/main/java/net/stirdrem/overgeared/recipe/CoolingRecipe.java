@@ -50,8 +50,8 @@ public class CoolingRecipe implements Recipe<SingleRecipeInput> {
 
     public static class Serializer implements RecipeSerializer<CoolingRecipe> {
         public static final MapCodec<CoolingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(r -> r.ingredient),
-                ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result)
+                Ingredient.CODEC_NONEMPTY.fieldOf("input").forGetter(r -> r.ingredient),
+                ItemStack.CODEC.fieldOf("output").forGetter(r -> r.result)
         ).apply(i, CoolingRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, CoolingRecipe> STREAM_CODEC = StreamCodec.composite(

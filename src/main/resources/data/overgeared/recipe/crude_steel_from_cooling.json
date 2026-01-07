@@ -4,6 +4,6 @@
     "item": "overgeared:heated_crude_steel"
   },
   "output": {
-    "item": "overgeared:crude_steel"
+    "id": "overgeared:crude_steel"
   }
 }
