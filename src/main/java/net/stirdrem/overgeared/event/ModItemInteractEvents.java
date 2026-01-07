@@ -3,29 +3,23 @@ package net.stirdrem.overgeared.event;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
@@ -38,7 +32,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -51,13 +44,11 @@ import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
-import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
-import net.stirdrem.overgeared.client.ClientAnvilMinigameData;
+import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.config.ServerConfig;
 //import net.stirdrem.overgeared.datapack.GrindingBlacklistReloadListener;
 //import net.stirdrem.overgeared.heatedtem.HeatedItemProvider;
 import net.stirdrem.overgeared.item.ModItems;
-import net.stirdrem.overgeared.networking.ModNetworkHandler;
 //import net.stirdrem.overgeared.item.custom.ToolCastItem;
 import net.stirdrem.overgeared.networking.packet.HideMinigameS2CPacket;
 import net.stirdrem.overgeared.networking.packet.MinigameSetStartedC2SPacket;
@@ -964,91 +955,78 @@ public class ModItemInteractEvents {
 
     @SubscribeEvent
     public static void onArrowTipping(PlayerInteractEvent.RightClickItem event) {
-// TODO: arrow tipping
-//        Player player = event.getEntity();
-//        Level level = event.getLevel();
-//        InteractionHand hand = event.getHand();
-//
-//        if (level.isClientSide()) return;
-//
-//        // Get items in both hands
-//        ItemStack usedHand = player.getItemInHand(hand);
-//        InteractionHand otherHand = hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
-//        ItemStack otherStack = player.getItemInHand(otherHand);
-//
-//        // Check if we're dealing with arrow + potion combination
-//        boolean isVanillaArrow = usedHand.is(Items.ARROW) && otherStack.is(Items.POTION);
-//        boolean isCustomArrow = ServerConfig.UPGRADE_ARROW_POTION_TOGGLE.get() && (usedHand.is(ModItems.IRON_UPGRADE_ARROW.get()) ||
-//                usedHand.is(ModItems.STEEL_UPGRADE_ARROW.get()) ||
-//                usedHand.is(ModItems.DIAMOND_UPGRADE_ARROW.get())) &&
-//                otherStack.is(Items.POTION);
-//
-//        if (!isVanillaArrow && !isCustomArrow) {
-//            return;
-//        }
-//
-//        CompoundTag potionTag = otherStack.getOrCreateTag();
-//        int used = potionTag.getInt("TippedUsed");
-//        int maxUse = ServerConfig.MAX_POTION_TIPPING_USE.get();
-//        Potion basePotion = PotionUtils.getPotion(otherStack);
-//
-//        // Create the appropriate tipped arrow BEFORE consuming
-//        ItemStack resultArrow;
-//        if (isVanillaArrow) {
-//            resultArrow = PotionUtils.setPotion(new ItemStack(Items.TIPPED_ARROW), basePotion);
-//        } else {
-//            resultArrow = usedHand.copy();
-//            resultArrow.setCount(1);
-//
-//            CompoundTag arrowTag = resultArrow.getOrCreateTag();
-//            arrowTag.putString("Potion", basePotion.getName(""));
-//
-//            if (potionTag.contains("CustomPotionEffects", 9)) {
-//                arrowTag.put("CustomPotionEffects", potionTag.getList("CustomPotionEffects", 10));
-//            }
-//            if (potionTag.contains("CustomPotionColor", 3)) {
-//                arrowTag.putInt("CustomPotionColor", potionTag.getInt("CustomPotionColor"));
-//            }
-//        }
-//
-//        // Only consume arrow after we've successfully created the tipped version
-//        if (usedHand.getCount() == 1) {
-//            // For single arrow, replace it with the tipped version
-//            player.setItemInHand(hand, resultArrow);
-//        } else {
-//            // For stack, shrink and add new tipped arrow
-//            usedHand.shrink(1);
-//            player.setItemInHand(hand, usedHand);
-//            if (!player.getInventory().add(resultArrow)) {
-//                player.drop(resultArrow, false);
-//            }
-//        }
-//
-//        // Handle potion stack
-//        if (otherStack.getCount() > 1) {
-//            ItemStack onePotion = otherStack.split(1);
-//            CompoundTag oneTag = onePotion.getOrCreateTag();
-//            oneTag.putInt("TippedUsed", used + 1);
-//            PotionUtils.setPotion(onePotion, basePotion);
-//            player.setItemInHand(otherHand, otherStack);
-//        } else {
-//            used++;
-//            if (used >= maxUse) {
-//                player.setItemInHand(otherHand, new ItemStack(Items.GLASS_BOTTLE));
-//            } else {
-//                potionTag.putInt("TippedUsed", used);
-//                PotionUtils.setPotion(otherStack, basePotion);
-//                player.setItemInHand(otherHand, otherStack);
-//            }
-//        }
-//
-//        level.playSound(null,
-//                player.blockPosition(),
-//                SoundEvents.BREWING_STAND_BREW,
-//                SoundSource.PLAYERS,
-//                0.6F,
-//                1.2F
-//        );
+        Player player = event.getEntity();
+        Level level = event.getLevel();
+        InteractionHand hand = event.getHand();
+
+        if (level.isClientSide()) return;
+
+        // Get items in both hands
+        ItemStack usedHand = player.getItemInHand(hand);
+        InteractionHand otherHand = hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        ItemStack otherStack = player.getItemInHand(otherHand);
+
+        // Check if we're dealing with arrow + potion combination
+        boolean isVanillaArrow = usedHand.is(Items.ARROW) && otherStack.is(Items.POTION);
+        boolean isCustomArrow = ServerConfig.UPGRADE_ARROW_POTION_TOGGLE.get() && (usedHand.is(ModItems.IRON_UPGRADE_ARROW.get()) ||
+                usedHand.is(ModItems.STEEL_UPGRADE_ARROW.get()) ||
+                usedHand.is(ModItems.DIAMOND_UPGRADE_ARROW.get())) &&
+                otherStack.is(Items.POTION);
+
+        if (!isVanillaArrow && !isCustomArrow) {
+            return;
+        }
+
+        // Get potion contents from the potion item (1.21 API uses data components)
+        PotionContents potionContents = otherStack.get(DataComponents.POTION_CONTENTS);
+        if (potionContents == null) return;
+
+        // Track usage via data component
+        int used = otherStack.getOrDefault(ModComponents.TIPPED_USES.get(), 0);
+        int maxUse = ServerConfig.MAX_POTION_TIPPING_USE.get();
+
+        // Create the appropriate tipped arrow BEFORE consuming
+        ItemStack resultArrow;
+        if (isVanillaArrow) {
+            resultArrow = new ItemStack(Items.TIPPED_ARROW);
+            resultArrow.set(DataComponents.POTION_CONTENTS, potionContents);
+        } else {
+            resultArrow = usedHand.copy();
+            resultArrow.setCount(1);
+            // Apply potion contents to custom arrow
+            resultArrow.set(DataComponents.POTION_CONTENTS, potionContents);
+        }
+
+        // Only consume arrow after we've successfully created the tipped version
+        if (usedHand.getCount() == 1) {
+            // For single arrow, replace it with the tipped version
+            player.setItemInHand(hand, resultArrow);
+        } else {
+            // For stack, shrink and add new tipped arrow
+            usedHand.shrink(1);
+            player.setItemInHand(hand, usedHand);
+            if (!player.getInventory().add(resultArrow)) {
+                player.drop(resultArrow, false);
+            }
+        }
+
+        // Handle potion usage tracking
+        used++;
+        if (used >= maxUse) {
+            // Potion is exhausted, replace with empty bottle
+            player.setItemInHand(otherHand, new ItemStack(Items.GLASS_BOTTLE));
+        } else {
+            // Update the usage count on the potion using data component
+            otherStack.set(ModComponents.TIPPED_USES.get(), used);
+        }
+
+        level.playSound(null,
+                player.blockPosition(),
+                SoundEvents.BREWING_STAND_BREW,
+                SoundSource.PLAYERS,
+                0.6F,
+                1.2F
+        );
 
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
