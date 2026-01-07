@@ -25,6 +25,8 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.stirdrem.overgeared.OvergearedMod;
+import net.stirdrem.overgeared.block.entity.ModBlockEntities;
+import net.stirdrem.overgeared.block.entity.renderer.SmithingAnvilBlockEntityRenderer;
 import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.entity.ModEntities;
 import net.stirdrem.overgeared.entity.renderer.LingeringArrowEntityRenderer;
@@ -144,6 +146,14 @@ public class ClientModEvents {
                 return new HumanoidModel<>(new ModelPart(Collections.emptyList(), parts));
             }
         }, ModItems.COPPER_LEGGINGS);
+    }
+
+    @SubscribeEvent
+    public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(ModBlockEntities.STEEL_SMITHING_ANVIL_BE.get(), SmithingAnvilBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.STONE_SMITHING_ANVIL_BE.get(), SmithingAnvilBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.TIER_A_SMITHING_ANVIL_BE.get(), SmithingAnvilBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.TIER_B_SMITHING_ANVIL_BE.get(), SmithingAnvilBlockEntityRenderer::new);
     }
 
     /**
