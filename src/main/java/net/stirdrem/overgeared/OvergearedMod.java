@@ -9,6 +9,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.components.ModComponents;
+import net.stirdrem.overgeared.config.ClientConfig;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.entity.ModEntities;
 import net.stirdrem.overgeared.item.ModCreativeModeTabs;
@@ -38,7 +39,7 @@ public final class OvergearedMod {
         ModSounds.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
-        //ModLoadingContext.get().registerExtensionPoint(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
     }
 
     public static ResourceLocation loc (String name) {

@@ -18,10 +18,12 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.entity.ModEntities;
@@ -142,6 +144,20 @@ public class ClientModEvents {
                 return new HumanoidModel<>(new ModelPart(Collections.emptyList(), parts));
             }
         }, ModItems.COPPER_LEGGINGS);
+    }
+
+    /**
+     * MOD bus events for client-side registration
+     */
+    @EventBusSubscriber(modid = OvergearedMod.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static class ModBusEvents {
+        @SubscribeEvent
+        public static void registerGuiLayers(RegisterGuiLayersEvent event) {
+            // Register anvil minigame overlay below the hotbar
+            event.registerBelow(VanillaGuiLayers.HOTBAR, AnvilMinigameOverlay.ID, AnvilMinigameOverlay.INSTANCE);
+            // Register popup overlay above the minigame overlay
+            event.registerAbove(AnvilMinigameOverlay.ID, PopupOverlay.ID, PopupOverlay.INSTANCE);
+        }
     }
 }
 
