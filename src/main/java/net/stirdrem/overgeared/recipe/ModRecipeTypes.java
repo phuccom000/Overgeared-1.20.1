@@ -16,8 +16,8 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register("forging", () -> RecipeType.simple(OvergearedMod.loc("forging")));
     public static final Supplier<RecipeType<RockKnappingRecipe>> KNAPPING =
             RECIPE_TYPES.register("rock_knapping", () -> RecipeType.simple(OvergearedMod.loc("rock_knapping")));
-//    public static final RegistryObject<RecipeType<FletchingRecipe>> FLETCHING =
-//            RECIPE_TYPES.register(FletchingRecipe.Type.ID, () -> FletchingRecipe.Type.INSTANCE);
+    public static final Supplier<RecipeType<FletchingRecipe>> FLETCHING =
+            RECIPE_TYPES.register("fletching", () -> RecipeType.simple(OvergearedMod.loc("fletching")));
     public static final Supplier<RecipeType<AlloySmeltingRecipe>> ALLOY_SMELTING =
             RECIPE_TYPES.register("alloy_smelting", () -> RecipeType.simple(OvergearedMod.loc("alloy_smelting")));
     public static final Supplier<RecipeType<NetherAlloySmeltingRecipe>> NETHER_ALLOY_SMELTING =

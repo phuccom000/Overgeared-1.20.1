@@ -18,8 +18,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -64,6 +66,7 @@ import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.GrindingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 //import net.stirdrem.overgeared.screen.FletchingStationMenu;
+import net.stirdrem.overgeared.screen.FletchingStationMenu;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 
@@ -1021,15 +1024,15 @@ public class ModItemInteractEvents {
             event.setCanceled(true);
             return;
         }
-// TODO: implement fletching menu
-//        // Server: open our custom menu via a SimpleMenuProvider (vanilla table has no BE)
-//        SimpleMenuProvider provider = new SimpleMenuProvider(
-//                (windowId, playerInv, p) ->
-//                        new FletchingStationMenu(windowId, playerInv, ContainerLevelAccess.create(level, pos)),
-//                Component.translatable("container.overgeared.fletching_table")
-//        );
-//
-//        player.openMenu(provider, pos);
+
+        // Server: open our custom menu via a SimpleMenuProvider (vanilla table has no BE)
+        SimpleMenuProvider provider = new SimpleMenuProvider(
+                (windowId, playerInv, p) ->
+                        new FletchingStationMenu(windowId, playerInv, ContainerLevelAccess.create(level, pos)),
+                Component.translatable("container.overgeared.fletching_table")
+        );
+
+        player.openMenu(provider, pos);
         event.setCancellationResult(InteractionResult.sidedSuccess(false));
         event.setCanceled(true);
     }

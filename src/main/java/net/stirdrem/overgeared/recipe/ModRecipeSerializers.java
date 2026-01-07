@@ -24,8 +24,8 @@ public class ModRecipeSerializers {
 //            SERIALIZERS.register("crafting_cast", () -> new SimpleCraftingRecipeSerializer<>(DynamicToolCastRecipe::new));
 //    public static final RegistryObject<RecipeSerializer<ClayToolCastRecipe>> CLAY_TOOL_CAST =
 //            SERIALIZERS.register("crafting_initial_cast", () -> new SimpleCraftingRecipeSerializer<>(ClayToolCastRecipe::new));
-//    public static final RegistryObject<RecipeSerializer<FletchingRecipe>> FLETCHING_SERIALIZER =
-//            SERIALIZERS.register("fletching", () -> FletchingRecipe.Serializer.INSTANCE);
+    public static final Supplier<RecipeSerializer<FletchingRecipe>> FLETCHING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("fletching", FletchingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<NBTKeepingSmeltingRecipe>> NBT_SMELTING =
 //            SERIALIZERS.register("nbt_smelting", () -> NBTKeepingSmeltingRecipe.Serializer.INSTANCE);
 //    public static final RegistryObject<RecipeSerializer<NBTKeepingBlastingRecipe>> NBT_BLASTING =
