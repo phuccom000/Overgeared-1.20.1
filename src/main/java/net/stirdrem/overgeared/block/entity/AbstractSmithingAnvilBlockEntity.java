@@ -104,7 +104,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     }
 
     public static void applyForgingQuality(ItemStack stack, ForgingQuality quality) {
-        stack.set(ModComponents.FORGING_QUALITY.get(), quality);
+        stack.set(ModComponents.FORGING_QUALITY, quality);
     }
 
     public ItemStack getRenderStack(int index) {
@@ -243,7 +243,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         }
 
         if (recipe.hasQuality() && player != null && ServerConfig.PLAYER_AUTHOR_TOOLTIPS.get()) {
-            result.set(ModComponents.CREATOR.get(), player.getName().getString());
+            result.set(ModComponents.CREATOR, player.getName().getString());
         }
 
         if (recipe.hasQuality()) {
@@ -277,10 +277,10 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                         if (!(result.getItem() instanceof ArmorItem) &&
                                 !(result.getItem() instanceof ShieldItem) &&
                                 recipe.hasPolishing()) {
-                            result.set(ModComponents.POLISHED.get(), false);
+                            result.set(ModComponents.POLISHED, false);
                         }
                         if (recipe.needQuenching() && (!result.is(ModTags.Items.HEATED_METALS) || !result.is(ModTags.Items.HOT_ITEMS))) {
-                            result.set(ModComponents.HEATED_COMPONENT.get(), true);
+                            result.set(ModComponents.HEATED_COMPONENT, true);
                         }
                     }
                 }
@@ -353,7 +353,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
 
         // Handle blueprint progression (slot 11)
         ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
-        BlueprintData blueprintData = blueprint.get(ModComponents.BLUEPRINT_DATA.get());
+        BlueprintData blueprintData = blueprint.get(ModComponents.BLUEPRINT_DATA);
         if (!blueprint.isEmpty() && blueprintData != null) {
             String currentQualityStr = blueprintData.quality();
             int uses = blueprintData.uses();
@@ -383,7 +383,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                                 .withQuality(nextQuality.getDisplayName())
                                 .withUses(0)
                                 .withUsesToLevel(nextQuality.getUse());
-                        blueprint.set(ModComponents.BLUEPRINT_DATA.get(), newData);
+                        blueprint.set(ModComponents.BLUEPRINT_DATA, newData);
                         // TODO: Port ModAdvancementTriggers
                         // if (player instanceof ServerPlayer serverPlayer) {
                         //     if (nextQuality.equals(BlueprintQuality.PERFECT) || nextQuality.equals(BlueprintQuality.MASTER))
@@ -391,10 +391,10 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                         //     ModAdvancementTriggers.BLUEPRINT_QUALITY.trigger(serverPlayer, nextQuality.getDisplayName());
                         // }
                     } else {
-                        blueprint.set(ModComponents.BLUEPRINT_DATA.get(), blueprintData.withUses(usesToLevel)); // Clamp
+                        blueprint.set(ModComponents.BLUEPRINT_DATA, blueprintData.withUses(usesToLevel)); // Clamp
                     }
                 } else {
-                    blueprint.set(ModComponents.BLUEPRINT_DATA.get(), blueprintData.withUses(uses)); // Just increment
+                    blueprint.set(ModComponents.BLUEPRINT_DATA, blueprintData.withUses(uses)); // Just increment
                 }
 
                 this.itemHandler.setStackInSlot(BLUEPRINT_SLOT, blueprint);
@@ -438,7 +438,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         }
 
         ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
-        BlueprintData blueprintData = blueprint.get(ModComponents.BLUEPRINT_DATA.get());
+        BlueprintData blueprintData = blueprint.get(ModComponents.BLUEPRINT_DATA);
 
         if (recipe.requiresBlueprint()) {
             // Must have a valid matching blueprint
@@ -645,7 +645,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         if (!recipe.getBlueprintTypes().isEmpty()) {
 
             ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
-            BlueprintData blueprintData = blueprint.get(ModComponents.BLUEPRINT_DATA.get());
+            BlueprintData blueprintData = blueprint.get(ModComponents.BLUEPRINT_DATA);
 
             // Define tool quality tiers in order of strength
             List<String> qualityTiers = List.of("poor", "well", "expert", "perfect", "master");
@@ -754,7 +754,7 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             String poor = quality.equalsIgnoreCase("poor")
                     ? ForgingQuality.POOR.getDisplayName()
                     : ForgingQuality.NONE.getDisplayName();
-            BlueprintData blueprintData = blueprint.get(ModComponents.BLUEPRINT_DATA.get());
+            BlueprintData blueprintData = blueprint.get(ModComponents.BLUEPRINT_DATA);
             if (blueprint.isEmpty() || blueprintData == null) {
                 return poor;
             }

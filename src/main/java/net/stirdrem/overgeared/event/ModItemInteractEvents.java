@@ -478,7 +478,7 @@ public class ModItemInteractEvents {
                      return;
                  }
 
-                int reducedCount = stack.getOrDefault(ModComponents.REDUCED_GRIND_COUNT.get(), 0);
+                int reducedCount = stack.getOrDefault(ModComponents.REDUCED_GRIND_COUNT, 0);
 
                 // Base vanilla durability
                 int originalDurability = stack.getItem().getMaxDamage(stack);
@@ -488,7 +488,7 @@ public class ModItemInteractEvents {
 
                 // Quality multiplier (if any)
                 float qualityMultiplier = 1.0f;
-                ForgingQuality quality = stack.get(ModComponents.FORGING_QUALITY.get());
+                ForgingQuality quality = stack.get(ModComponents.FORGING_QUALITY);
                 if (quality != null) {
                     qualityMultiplier = quality.getDamageMultiplier();
                 }
@@ -504,7 +504,7 @@ public class ModItemInteractEvents {
 
                 // If already fully repaired relative to reduced max, skip
                 if (currentDamage <= (newOriginalDurability - effectiveMaxDurability)) {
-                    stack.set(ModComponents.REDUCED_GRIND_COUNT.get(), reducedCount + 1);
+                    stack.set(ModComponents.REDUCED_GRIND_COUNT, reducedCount + 1);
                     stack.setDamageValue(0);
                     event.getLevel().playSound(null, pos, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1.0f, 1.0f);
                     spawnGrindParticles(world, pos);
@@ -521,7 +521,7 @@ public class ModItemInteractEvents {
                 int newDamage = Math.max(theoreticalMaxDurability - effectiveMaxDurability, currentDamage - repairAmount);
 
                 stack.setDamageValue(newDamage);
-                stack.set(ModComponents.REDUCED_GRIND_COUNT.get(), reducedCount + 1);
+                stack.set(ModComponents.REDUCED_GRIND_COUNT, reducedCount + 1);
                 event.getLevel().playSound(null, pos, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1.0f, 1.0f);
                 spawnGrindParticles(world, pos);
                 event.setCancellationResult(InteractionResult.SUCCESS);
@@ -573,11 +573,11 @@ public class ModItemInteractEvents {
 
         // === Tool Cast special handling ===
         if (stack.getItem() instanceof ToolCastItem) {
-            CastData data = stack.getOrDefault(ModComponents.CAST_DATA.get(), CastData.EMPTY);
+            CastData data = stack.getOrDefault(ModComponents.CAST_DATA, CastData.EMPTY);
             if (data.hasOutput()) {
                 ItemStack output = data.output();
                 ItemStack cooledOutput = coolSingleStack(output, player.level());
-                stack.set(ModComponents.CAST_DATA.get(), data.withOutput(cooledOutput).withHeated(false));
+                stack.set(ModComponents.CAST_DATA, data.withOutput(cooledOutput).withHeated(false));
             }
         }
 
@@ -615,11 +615,11 @@ public class ModItemInteractEvents {
 
         // === Tool Cast special handling ===
         if (stack.getItem() instanceof ToolCastItem) {
-            CastData data = stack.getOrDefault(ModComponents.CAST_DATA.get(), CastData.EMPTY);
+            CastData data = stack.getOrDefault(ModComponents.CAST_DATA, CastData.EMPTY);
             if (data.hasOutput()) {
                 ItemStack output = data.output();
                 ItemStack cooledOutput = coolSingleStack(output, level);
-                stack.set(ModComponents.CAST_DATA.get(), data.withOutput(cooledOutput).withHeated(false));
+                stack.set(ModComponents.CAST_DATA, data.withOutput(cooledOutput).withHeated(false));
             }
         }
 
@@ -639,7 +639,7 @@ public class ModItemInteractEvents {
             ItemStack cooledIngot = new ItemStack(cooledItem);
             // Copy all components for mod compatibility, then set polished
             copyComponentsExceptHeated(heldStack, cooledIngot);
-            cooledIngot.set(ModComponents.POLISHED.get(), true);
+            cooledIngot.set(ModComponents.POLISHED, true);
             heldStack.shrink(1);
 
             if (heldStack.isEmpty()) {
@@ -720,7 +720,7 @@ public class ModItemInteractEvents {
         if (!(event.getEntity() instanceof ItemEntity itemEntity)) return;
 
         ItemStack stack = itemEntity.getItem();
-        boolean isHeatedItem = Boolean.TRUE.equals(stack.get(ModComponents.HEATED_COMPONENT.get()));
+        boolean isHeatedItem = Boolean.TRUE.equals(stack.get(ModComponents.HEATED_COMPONENT));
 
         if (hasCoolingRecipe(stack.getItem(), event.getLevel()) || isHeatedItem) {
             // Only track if cooled ingot exists or item is heated
@@ -732,7 +732,7 @@ public class ModItemInteractEvents {
                     .add(itemEntity);
 
             // Only track items that already have HeatedTime
-            Long heatedTime = stack.get(ModComponents.HEATED_TIME.get());
+            Long heatedTime = stack.get(ModComponents.HEATED_TIME);
             if (heatedTime != null) {
                 trackedSinceMs.put(itemEntity, heatedTime);
             }
@@ -788,7 +788,7 @@ public class ModItemInteractEvents {
                 ItemStack stack = entity.getItem();
 
                 // --- Check if heated ---
-                boolean isHeated = Boolean.TRUE.equals(stack.get(ModComponents.HEATED_COMPONENT.get()))
+                boolean isHeated = Boolean.TRUE.equals(stack.get(ModComponents.HEATED_COMPONENT))
                         || hasCoolingRecipeCached(stack.getItem(), level);
 
                 if (!isHeated) {
@@ -957,7 +957,7 @@ public class ModItemInteractEvents {
         if (potionContents == null) return;
 
         // Track usage via data component
-        int used = otherStack.getOrDefault(ModComponents.TIPPED_USES.get(), 0);
+        int used = otherStack.getOrDefault(ModComponents.TIPPED_USES, 0);
         int maxUse = ServerConfig.MAX_POTION_TIPPING_USE.get();
 
         // Create the appropriate tipped arrow BEFORE consuming
@@ -992,7 +992,7 @@ public class ModItemInteractEvents {
             player.setItemInHand(otherHand, new ItemStack(Items.GLASS_BOTTLE));
         } else {
             // Update the usage count on the potion using data component
-            otherStack.set(ModComponents.TIPPED_USES.get(), used);
+            otherStack.set(ModComponents.TIPPED_USES, used);
         }
 
         level.playSound(null,

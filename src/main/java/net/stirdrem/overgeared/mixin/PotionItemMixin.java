@@ -44,7 +44,7 @@ public abstract class PotionItemMixin {
     )
     private void onFinishUsing(ItemStack stack, Level level, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir) {
         if (stack.isEmpty()) return;
-        Integer tippedUsed = stack.get(ModComponents.TIPPED_USES.get());
+        Integer tippedUsed = stack.get(ModComponents.TIPPED_USES);
         if (tippedUsed == null) return;
 
         float scale = overgeared$calculateDurationScale(tippedUsed);

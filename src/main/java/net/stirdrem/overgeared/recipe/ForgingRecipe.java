@@ -82,7 +82,7 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
         // Blueprint required, but slot empty
         if (blueprintStack.isEmpty()) return false;
 
-        BlueprintData data = blueprintStack.get(ModComponents.BLUEPRINT_DATA.get());
+        BlueprintData data = blueprintStack.get(ModComponents.BLUEPRINT_DATA);
         if (data == null) return false;
         
         String toolType = data.toolType();

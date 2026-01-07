@@ -75,7 +75,7 @@ public final class ItemUtils {
         // Apply all component changes from source
         target.applyComponents(source.getComponentsPatch());
         // Remove heated-related components (we're cooling the item)
-        target.remove(ModComponents.HEATED_COMPONENT.get());
-        target.remove(ModComponents.HEATED_TIME.get());
+        target.remove(ModComponents.HEATED_COMPONENT);
+        target.remove(ModComponents.HEATED_TIME);
     }
 }

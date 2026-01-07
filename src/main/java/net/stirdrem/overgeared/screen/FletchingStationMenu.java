@@ -278,7 +278,7 @@ public class FletchingStationMenu extends AbstractContainerMenu {
                         lingeringArrows.set(DataComponents.POTION_CONTENTS, potionContents);
                     }
                     if (isUpgradeableArrow(input.getItem(slotNumber))) {
-                        lingeringArrows.set(ModComponents.LINGERING_STATUS.get(), true);
+                        lingeringArrows.set(ModComponents.LINGERING_STATUS, true);
                     }
                     resultStack = lingeringArrows;
                 }
@@ -315,7 +315,7 @@ public class FletchingStationMenu extends AbstractContainerMenu {
                     resultStack = recipe.getLingeringResult().copy();
 
                     if (isUpgradeableArrow(resultStack)) {
-                        resultStack.set(ModComponents.LINGERING_STATUS.get(), true);
+                        resultStack.set(ModComponents.LINGERING_STATUS, true);
                     }
 
                     // Transfer potion contents to result

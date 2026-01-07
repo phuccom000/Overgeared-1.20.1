@@ -45,7 +45,7 @@ public abstract class ItemStackMixin {
         ItemStack stack = (ItemStack) (Object) this;
         float baseSpeed = cir.getReturnValueF();
 
-        ForgingQuality quality = stack.get(ModComponents.FORGING_QUALITY.get());
+        ForgingQuality quality = stack.get(ModComponents.FORGING_QUALITY);
         if (quality != null) {
             float multiplier = quality.getDamageMultiplier();
             cir.setReturnValue(baseSpeed * multiplier);
@@ -65,10 +65,10 @@ public abstract class ItemStackMixin {
             if (stack.isEmpty()) continue;
             if (!stack.is(ModTags.Items.HEATED_METALS)) continue;
 
-            Long heatedSince = stack.get(ModComponents.HEATED_TIME.get());
+            Long heatedSince = stack.get(ModComponents.HEATED_TIME);
             if (heatedSince == null) {
                 // Initialize the timestamp
-                stack.set(ModComponents.HEATED_TIME.get(), tick);
+                stack.set(ModComponents.HEATED_TIME, tick);
             } else if (tick - heatedSince >= cooldownTicks) {
                 // Time to cool down
                 Item cooled = getCooledItem(stack.getItem(), level);
@@ -97,7 +97,7 @@ public abstract class ItemStackMixin {
         // Check if player has any heated items
         boolean hasHotItem = player.getInventory().items.stream()
                 .anyMatch(s -> !s.isEmpty() && (s.is(ModTags.Items.HEATED_METALS) || s.is(ModTags.Items.HOT_ITEMS))
-                        || Boolean.TRUE.equals(s.get(ModComponents.HEATED_COMPONENT.get())))
+                        || Boolean.TRUE.equals(s.get(ModComponents.HEATED_COMPONENT)))
                 || player.getMainHandItem().is(ModTags.Items.HEATED_METALS) || player.getMainHandItem().is(ModTags.Items.HOT_ITEMS)
                 || player.getOffhandItem().is(ModTags.Items.HEATED_METALS) || player.getOffhandItem().is(ModTags.Items.HOT_ITEMS);
 

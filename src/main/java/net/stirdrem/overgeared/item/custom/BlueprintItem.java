@@ -24,7 +24,7 @@ public class BlueprintItem extends Item {
                                 List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
 
-        BlueprintData data = stack.get(ModComponents.BLUEPRINT_DATA.get());
+        BlueprintData data = stack.get(ModComponents.BLUEPRINT_DATA);
         if (data == null) return;
 
         // Show quality
@@ -55,13 +55,13 @@ public class BlueprintItem extends Item {
     }
 
     public static BlueprintQuality getQuality(ItemStack stack) {
-        BlueprintData data = stack.get(ModComponents.BLUEPRINT_DATA.get());
+        BlueprintData data = stack.get(ModComponents.BLUEPRINT_DATA);
         if (data == null) return BlueprintQuality.POOR;
         return data.getQualityEnum();
     }
 
     public static int getUses(ItemStack stack) {
-        BlueprintData data = stack.get(ModComponents.BLUEPRINT_DATA.get());
+        BlueprintData data = stack.get(ModComponents.BLUEPRINT_DATA);
         return data == null ? 0 : data.uses();
     }
 
@@ -70,7 +70,7 @@ public class BlueprintItem extends Item {
     }
 
     public static ToolType getToolType(ItemStack stack) {
-        BlueprintData data = stack.get(ModComponents.BLUEPRINT_DATA.get());
+        BlueprintData data = stack.get(ModComponents.BLUEPRINT_DATA);
         if (data == null || data.toolType().isEmpty()) {
             List<ToolType> types = ToolTypeRegistry.getRegisteredTypesAll();
             return !types.isEmpty() ? types.getFirst() : ToolType.SWORD;
@@ -89,7 +89,7 @@ public class BlueprintItem extends Item {
                 getUsesToNextLevel(BlueprintQuality.POOR),
                 false
         );
-        stack.set(ModComponents.BLUEPRINT_DATA.get(), data);
+        stack.set(ModComponents.BLUEPRINT_DATA, data);
     }
 
     public static void cycleToolType(ItemStack stack) {
@@ -100,8 +100,8 @@ public class BlueprintItem extends Item {
         int currentIndex = available.indexOf(current);
         int nextIndex = (currentIndex + 1) % available.size();
 
-        BlueprintData data = stack.getOrDefault(ModComponents.BLUEPRINT_DATA.get(), BlueprintData.createDefault());
-        stack.set(ModComponents.BLUEPRINT_DATA.get(), data.withToolType(available.get(nextIndex).getId()));
+        BlueprintData data = stack.getOrDefault(ModComponents.BLUEPRINT_DATA, BlueprintData.createDefault());
+        stack.set(ModComponents.BLUEPRINT_DATA, data.withToolType(available.get(nextIndex).getId()));
     }
 
     private static int getUsesToNextLevel(BlueprintQuality quality) {
