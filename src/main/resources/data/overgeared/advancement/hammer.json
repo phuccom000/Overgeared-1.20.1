@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "overgeared:smithing_hammers"
+            "items": "#overgeared:smithing_hammers"
           }
         ]
       }

@@ -17,9 +17,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "overgeared:clay_tool_cast"
-            ]
+            "items": "overgeared:clay_tool_cast"
           }
         ]
       }

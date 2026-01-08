@@ -17,9 +17,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "overgeared:diamond_upgrade_smithing_template"
-            ]
+            "items": "overgeared:diamond_upgrade_smithing_template"
           }
         ]
       }
