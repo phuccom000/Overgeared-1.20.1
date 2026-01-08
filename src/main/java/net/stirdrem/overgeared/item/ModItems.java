@@ -133,7 +133,6 @@ public class ModItems {
     public static final RegistryObject<Item> BLUEPRINT = ITEMS.register("blueprint",
             () -> new BlueprintItem(new Item.Properties()));
 
-    // Add these inside your ModItems class
     public static final RegistryObject<Item> STONE_SWORD_BLADE = ITEMS.register("stone_sword_blade",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> IRON_SWORD_BLADE = ITEMS.register("iron_sword_blade",
@@ -144,10 +143,6 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> COPPER_SWORD_BLADE = ITEMS.register("copper_sword_blade",
             () -> new Item(new Item.Properties()));
-/*
-    public static final RegistryObject<Item> DIAMOND_SWORD_BLADE = ITEMS.register("diamond_sword_blade",
-            () -> new Item(new Item.Properties()));
-*/
 
     public static final RegistryObject<Item> STONE_PICKAXE_HEAD = ITEMS.register("stone_pickaxe_head",
             () -> new Item(new Item.Properties()));
@@ -159,10 +154,6 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> COPPER_PICKAXE_HEAD = ITEMS.register("copper_pickaxe_head",
             () -> new Item(new Item.Properties()));
-/*
-    public static final RegistryObject<Item> DIAMOND_PICKAXE_HEAD = ITEMS.register("diamond_pickaxe_head",
-            () -> new Item(new Item.Properties()));
-*/
 
 
     public static final RegistryObject<Item> STONE_AXE_HEAD = ITEMS.register("stone_axe_head",
@@ -175,8 +166,6 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> COPPER_AXE_HEAD = ITEMS.register("copper_axe_head",
             () -> new Item(new Item.Properties()));
-/*    public static final RegistryObject<Item> DIAMOND_AXE_HEAD = ITEMS.register("diamond_axe_head",
-            () -> new Item(new Item.Properties()));*/
 
 
     public static final RegistryObject<Item> STONE_SHOVEL_HEAD = ITEMS.register("stone_shovel_head",
@@ -189,8 +178,7 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> COPPER_SHOVEL_HEAD = ITEMS.register("copper_shovel_head",
             () -> new Item(new Item.Properties()));
-/*    public static final RegistryObject<Item> DIAMOND_SHOVEL_HEAD = ITEMS.register("diamond_shovel_head",
-            () -> new Item(new Item.Properties()));*/
+
 
     public static final RegistryObject<Item> STONE_HOE_HEAD = ITEMS.register("stone_hoe_head",
             () -> new Item(new Item.Properties()));
@@ -202,10 +190,7 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> COPPER_HOE_HEAD = ITEMS.register("copper_hoe_head",
             () -> new Item(new Item.Properties()));
-/*
-    public static final RegistryObject<Item> DIAMOND_HOE_HEAD = ITEMS.register("diamond_hoe_head",
-            () -> new Item(new Item.Properties()));
-*/
+
 
     public static final RegistryObject<Item> STEEL_SWORD = ITEMS.register("steel_sword",
             () -> new SwordItem(ModToolTiers.STEEL, 3, -2.4f, new Item.Properties()));

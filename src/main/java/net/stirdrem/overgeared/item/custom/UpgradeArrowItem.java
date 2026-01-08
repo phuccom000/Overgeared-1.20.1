@@ -57,10 +57,6 @@ public class UpgradeArrowItem extends ArrowItem {
 
     }
 
-    public static void addPotionTooltip(ItemStack pStack, List<Component> pTooltips, float pDurationFactor) {
-        PotionUtils.addPotionTooltip(getMobEffects(pStack), pTooltips, pDurationFactor);
-    }
-
     @Override
     public String getDescriptionId(ItemStack stack) {
         CompoundTag tag = stack.getTag();
@@ -119,43 +115,10 @@ public class UpgradeArrowItem extends ArrowItem {
         return list;
     }
 
-    public static void getCustomEffects(@Nullable CompoundTag pCompoundTag, List<MobEffectInstance> pEffectList) {
-        if (pCompoundTag != null && pCompoundTag.contains("CustomPotionEffects", 9)) {
-            ListTag listtag = pCompoundTag.getList("CustomPotionEffects", 10);
-
-            for (int i = 0; i < listtag.size(); ++i) {
-                CompoundTag compoundtag = listtag.getCompound(i);
-                MobEffectInstance mobeffectinstance = MobEffectInstance.load(compoundtag);
-                if (mobeffectinstance != null) {
-                    pEffectList.add(mobeffectinstance);
-                }
-            }
-        }
-
-    }
-
-    /*@Override
-    public Component getName(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
-        if (tag != null) {
-            Potion potion = getPotion(tag);
-            if (potion != Potions.EMPTY) {
-                // Build your own key: "item.overgeared.arrow.effect.swiftness"
-                String effectKey = "item.overgeared.arrow.effect." + potion.getName("").replace("effect.minecraft.", "");
-
-                Component effectComponent = Component.translatable(effectKey); // Translatable potion name
-
-                return Component.translatable(getDescriptionId(stack), effectComponent);
-            }
-        }
-
-        return super.getName(stack);
-    }*/
-
     @Override
     public Component getName(ItemStack stack) {
         CompoundTag tag = stack.getTag();
-        if (tag != null) {
+        if (tag != null && !tag.isEmpty()) {
             Potion potion = getPotion(tag);
             if (potion != Potions.EMPTY) {
                 String potionId = potion.getName("").replace("effect.minecraft.", "");

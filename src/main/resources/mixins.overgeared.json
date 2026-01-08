@@ -5,7 +5,6 @@
   "package": "net.stirdrem.overgeared.mixin",
   "refmap": "mixins.overgeared.refmap.json",
   "mixins": [
-    "AbstractContainerMenuMixin",
     "BrewingStandBlockEntityMixin",
     "ItemStackMixin",
     "PotionItemMixin"

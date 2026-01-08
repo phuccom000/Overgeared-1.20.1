@@ -50,20 +50,18 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         // Check if player has a knappable rock in either hand
         ItemStack mainHandItem = player.getMainHandItem();
         ItemStack offHandItem = player.getOffhandItem();
+        boolean valid = false;
 
         if (mainHandItem.is(ModTags.Items.KNAPPABLE)) {
             this.inputRock = mainHandItem.copy();
+            valid = true;
         } else if (offHandItem.is(ModTags.Items.KNAPPABLE)) {
             this.inputRock = offHandItem.copy();
-        } else {
-            // No knappable item found – close the menu
-            playerInv.player.closeContainer();
-            return;
+            valid = true;
         }
-        if (!mainHandItem.is(ModTags.Items.KNAPPABLE)
-                || !ItemStack.isSameItemSameTags(mainHandItem, offHandItem)) {
-            playerInv.player.closeContainer();
-            return;
+
+        if (!valid) {
+            this.inputRock = ItemStack.EMPTY; // dummy
         }
 
         // Add player inventory slots
@@ -354,4 +352,5 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         }
         return grid;
     }
+
 }

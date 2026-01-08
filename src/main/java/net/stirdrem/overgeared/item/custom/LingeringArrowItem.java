@@ -91,28 +91,10 @@ public class LingeringArrowItem extends ArrowItem {
 
     }
 
-    /*@Override
-    public Component getName(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
-        if (tag != null) {
-            Potion potion = getPotion(tag);
-            if (potion != Potions.EMPTY) {
-                // Build your own key: "item.overgeared.arrow.effect.swiftness"
-                String effectKey = "item.overgeared.arrow.effect." + potion.getName("").replace("effect.minecraft.", "");
-
-                Component effectComponent = Component.translatable(effectKey); // Translatable potion name
-
-                return Component.translatable(getDescriptionId(stack), effectComponent);
-            }
-        }
-
-        return super.getName(stack);
-    }*/
-
     @Override
     public Component getName(ItemStack stack) {
         CompoundTag tag = stack.getTag();
-        if (tag != null) {
+        if (tag != null && !tag.isEmpty()) {
             // Use getAllEffects to check for both regular potions and custom effects
             List<MobEffectInstance> effects = getAllEffects(tag);
             boolean hasEffects = !effects.isEmpty();

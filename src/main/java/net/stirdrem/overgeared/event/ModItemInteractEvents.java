@@ -24,7 +24,9 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -879,6 +881,14 @@ public class ModItemInteractEvents {
 
             // Only run every 10 ticks
             if (now % 10 != 0) continue;
+            // Check all online players
+
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                // Also check any open container
+                if (player.containerMenu != null && player.containerMenu != player.inventoryMenu) {
+                    checkContainerMenu(player, player.containerMenu);
+                }
+            }
 
             List<ItemEntity> tracked = trackedEntitiesPerWorld.get(level);
             if (tracked == null || tracked.isEmpty()) continue;
@@ -943,6 +953,76 @@ public class ModItemInteractEvents {
         }
     }
 
+    private static void checkContainerMenu(ServerPlayer player, AbstractContainerMenu menu) {
+        long gameTime = player.level().getGameTime();
+        int cooldown = ServerConfig.HEATED_ITEM_COOLDOWN_TICKS.get();
+        boolean playedSound = false;
+
+        for (Slot slot : menu.slots) {
+            ItemStack stack = slot.getItem();
+            if (stack.isEmpty()) continue;
+
+            if (stack.hasTag() && stack.getTag().contains("HeatedSince")) {
+                long heatedAt = stack.getTag().getLong("HeatedSince");
+                if (gameTime - heatedAt >= cooldown) {
+                    coolItemInContainerSlot(player, slot);
+
+                    if (!playedSound) {
+                        player.level().playSound(null, player.blockPosition(),
+                                SoundEvents.FIRE_EXTINGUISH,
+                                SoundSource.PLAYERS, 0.5F, 1.0F);
+                        playedSound = true;
+                    }
+                }
+            }
+        }
+    }
+
+    private static void coolItemInContainerSlot(ServerPlayer player, Slot slot) {
+        ItemStack stack = slot.getItem();
+        if (stack.isEmpty()) return;
+
+        Item cooled = getCooledItem(stack.getItem(), player.level());
+        if (cooled == null) return;
+
+        // === Tool Cast special handling ===
+        if (stack.getItem() instanceof ToolCastItem && stack.hasTag()) {
+            CompoundTag tag = stack.getTag();
+            if (tag != null && tag.contains("Output", Tag.TAG_COMPOUND)) {
+                ItemStack output = ItemStack.of(tag.getCompound("Output"));
+
+                // Create cooled output
+                Item cooledOutputItem = getCooledItem(output.getItem(), player.level());
+                if (cooledOutputItem != null) {
+                    ItemStack cooledOutput = new ItemStack(cooledOutputItem, output.getCount());
+                    if (output.hasTag()) {
+                        cooledOutput.setTag(output.getTag().copy());
+                    }
+                    tag.put("Output", cooledOutput.save(new CompoundTag()));
+                }
+            }
+        }
+
+        // Create cooled stack
+        ItemStack cooledStack = new ItemStack(cooled, stack.getCount());
+
+        // Copy and clean NBT
+        if (stack.hasTag()) {
+            CompoundTag newTag = stack.getTag().copy();
+            newTag.remove("HeatedSince");
+            newTag.remove("Heated");
+
+            // Remove empty NBT
+            if (newTag.isEmpty()) {
+                cooledStack.setTag(null);
+            } else {
+                cooledStack.setTag(newTag);
+            }
+        }
+
+        // Update the slot
+        slot.set(cooledStack);
+    }
 
     @SubscribeEvent
     public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
@@ -1073,8 +1153,8 @@ public class ModItemInteractEvents {
             resultArrow = usedHand.copy();
             resultArrow.setCount(1);
 
-            CompoundTag arrowTag = resultArrow.getOrCreateTag();
-            arrowTag.putString("Potion", basePotion.getName(""));
+            CompoundTag arrowTag = new CompoundTag();
+            arrowTag.putString("Potion", BuiltInRegistries.POTION.getKey(basePotion).toString());
 
             if (potionTag.contains("CustomPotionEffects", 9)) {
                 arrowTag.put("CustomPotionEffects", potionTag.getList("CustomPotionEffects", 10));
@@ -1082,6 +1162,8 @@ public class ModItemInteractEvents {
             if (potionTag.contains("CustomPotionColor", 3)) {
                 arrowTag.putInt("CustomPotionColor", potionTag.getInt("CustomPotionColor"));
             }
+
+            resultArrow.setTag(arrowTag);
         }
 
         // Only consume arrow after we've successfully created the tipped version

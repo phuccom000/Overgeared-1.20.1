@@ -226,7 +226,7 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:lionfish-api-1001614:5922047")
 
     runtimeOnly fg.deobf("curse.maven:lendercataclysm-551586:6906993")
-    //runtimeOnly fg.deobf("curse.maven:item-nbt-viewer-514135:4578522")
+    runtimeOnly fg.deobf("curse.maven:item-nbt-viewer-514135:4578522")
     //implementation fg.deobf("curse.maven:no-tree-punching-289043:4599926")
     implementation fg.deobf("curse.maven:ytech-917366:6616815")
     //implementation fg.deobf("curse.maven:max-health-fix-492246:5378283")
@@ -247,7 +247,7 @@ dependencies {
     //implementation fg.deobf("curse.maven:polymorph-388800:6450982")
     implementation fg.deobf("curse.maven:cupboard-326652:5470032")
     implementation fg.deobf("curse.maven:recipe-essentials-forge-fabric-907856:6165709")
-
+    //implementation fg.deobf("curse.maven:ewewukeks-musket-mod-354562:5805565")
     implementation fg.deobf("curse.maven:irons-spells-n-spellbooks-855414:6970299")
     implementation fg.deobf("curse.maven:caelus-308989:5281700")
     implementation fg.deobf("curse.maven:attribute-setter-1064034:7196879")

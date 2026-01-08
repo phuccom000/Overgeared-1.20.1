@@ -90,6 +90,14 @@ public abstract class ItemStackMixin {
     private void onInventoryTick(Level level, Entity entity, int slot, boolean selected, CallbackInfo ci) {
         if (level.isClientSide) return;
         if (!(entity instanceof Player player)) return;
+        boolean hasHotItem = player.getInventory().items.stream()
+                .anyMatch(s -> !s.isEmpty() && (s.is(ModTags.Items.HEATED_METALS) || s.is(ModTags.Items.HOT_ITEMS))
+                        || (s.hasTag() && s.getTag().contains("Heated")))
+                || player.getMainHandItem().is(ModTags.Items.HEATED_METALS) || player.getMainHandItem().is(ModTags.Items.HOT_ITEMS)
+                || player.getOffhandItem().is(ModTags.Items.HEATED_METALS) || player.getOffhandItem().is(ModTags.Items.HOT_ITEMS);
+
+        if (!hasHotItem) return;
+
         //if (slot != 0) return; // Only process once per player per tick
 
         long tick = level.getGameTime();
@@ -97,7 +105,8 @@ public abstract class ItemStackMixin {
 
         for (ItemStack stack : player.getInventory().items) {
             if (stack.isEmpty()) continue;
-            if (!stack.is(ModTags.Items.HEATED_METALS)) continue;
+            if (!stack.is(ModTags.Items.HEATED_METALS) && !(stack.hasTag() && stack.getTag().contains("Heated")))
+                continue;
 
             CompoundTag tag = stack.getOrCreateTag();
             long heatedSince = tag.getLong(HEATED_TIME_TAG);
@@ -107,7 +116,17 @@ public abstract class ItemStackMixin {
                 Item cooled = getCooledItem(stack.getItem(), level);
                 if (cooled != null) {
                     ItemStack newStack = new ItemStack(cooled, stack.getCount());
+                    if (stack.hasTag()) {
+                        CompoundTag newtag = stack.getTag().copy();
 
+                        // Remove heated-related tags
+                        newtag.remove("Heated");
+                        newtag.remove(HEATED_TIME_TAG);
+
+                        if (!newtag.isEmpty()) {
+                            newStack.setTag(newtag);
+                        }
+                    }
                     boolean isMain = stack == player.getMainHandItem();
                     boolean isOff = stack == player.getOffhandItem();
 
@@ -126,13 +145,6 @@ public abstract class ItemStackMixin {
             }
         }
 
-        boolean hasHotItem = player.getInventory().items.stream()
-                .anyMatch(s -> !s.isEmpty() && (s.is(ModTags.Items.HEATED_METALS) || s.is(ModTags.Items.HOT_ITEMS))
-                        || (s.hasTag() && s.getTag().contains("Heated")))
-                || player.getMainHandItem().is(ModTags.Items.HEATED_METALS) || player.getMainHandItem().is(ModTags.Items.HOT_ITEMS)
-                || player.getOffhandItem().is(ModTags.Items.HEATED_METALS) || player.getOffhandItem().is(ModTags.Items.HOT_ITEMS);
-
-        if (!hasHotItem) return;
 
         UUID uuid = player.getUUID();
         ItemStack main = player.getMainHandItem();

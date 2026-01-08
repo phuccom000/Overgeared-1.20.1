@@ -24,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.recipe.ExplanationRecipe;
+import net.stirdrem.overgeared.util.ModTags;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,15 +46,14 @@ public class StoneAnvilCategory implements IRecipeCategory<ExplanationRecipe> {
     private static final int CYCLE_TIME = 60; // 3 seconds at 20 ticks/second
 
     public StoneAnvilCategory(IGuiHelper guiHelper, RegistryAccess registryAccess) {
-        this.background = guiHelper.drawableBuilder(BACKGROUND_LOCATION, 0, 0, 150, 200)
-                .setTextureSize(150, 200) // This ensures the texture isn't stretched
+        this.background = guiHelper.drawableBuilder(BACKGROUND_LOCATION, 0, 0, 150, 120)
+                .setTextureSize(150, 120) // This ensures the texture isn't stretched
                 .build();
         this.icon = guiHelper.createDrawableItemStack(new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()));
         this.title = Component.translatable("jei.overgeared.category.stone_anvil");
 
         // Get all items from the smithing hammers tag
-        TagKey<Item> hammerTag = TagKey.create(BuiltInRegistries.ITEM.key(),
-                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "smithing_hammers"));
+        TagKey<Item> hammerTag = ModTags.Items.SMITHING_HAMMERS;
         this.hammerItems = registryAccess.registryOrThrow(Registries.ITEM)
                 .getTag(hammerTag)
                 .stream()
@@ -85,11 +85,11 @@ public class StoneAnvilCategory implements IRecipeCategory<ExplanationRecipe> {
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ExplanationRecipe recipe, IFocusGroup focuses) {
         // Add input slot for tagged hammers
-        builder.addSlot(RecipeIngredientRole.INPUT, 72, 18)
+        builder.addSlot(RecipeIngredientRole.INPUT, 21, 18)
                 .addItemStacks(hammerItems);
 
         // Add output slot (result)
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 72, 60)
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 113, 18)
                 .addItemStack(recipe.getResultItem());
     }
 
@@ -98,7 +98,7 @@ public class StoneAnvilCategory implements IRecipeCategory<ExplanationRecipe> {
         // Draw explanatory text
         int textWidth = 140;
         int textX = 5;
-        int textY = 85;
+        int textY = 43;
 
         // First paragraph
         renderWrappedText(
@@ -109,11 +109,6 @@ public class StoneAnvilCategory implements IRecipeCategory<ExplanationRecipe> {
                 ChatFormatting.DARK_GRAY.getColor(), // White color
                 false
         );
-        /*guiGraphics.drawString(
-                Minecraft.getInstance().font,
-                Component.translatable("jei.overgeared.stone_anvil.description2"),
-                10, 100, 0xFFFFFF, false
-        );*/
     }
 
     public static void renderWrappedText(GuiGraphics guiGraphics, Component text, int x, int y, int width, int color, boolean shadow) {

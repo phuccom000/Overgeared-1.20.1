@@ -37,8 +37,8 @@ public class FlintKnappingCategory implements IRecipeCategory<ExplanationRecipe>
     private final Component title;
 
     public FlintKnappingCategory(IGuiHelper guiHelper) {
-        this.background = guiHelper.drawableBuilder(BACKGROUND_LOCATION, 0, 0, 150, 200)
-                .setTextureSize(150, 200) // This ensures the texture isn't stretched
+        this.background = guiHelper.drawableBuilder(BACKGROUND_LOCATION, 0, 0, 150, 120)
+                .setTextureSize(150, 120) // This ensures the texture isn't stretched
                 .build();
         this.icon = guiHelper.createDrawableItemStack(new ItemStack(Items.FLINT));
         this.title = Component.translatable("jei.overgeared.category.flint_knapping");
@@ -67,21 +67,13 @@ public class FlintKnappingCategory implements IRecipeCategory<ExplanationRecipe>
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ExplanationRecipe recipe, IFocusGroup focuses) {
         // Add input slot (flint)
-        builder.addSlot(RecipeIngredientRole.INPUT, 72, 18)
+        builder.addSlot(RecipeIngredientRole.INPUT, 21, 18)
                 .addItemStack(new ItemStack(Items.FLINT))
-                /*.addRichTooltipCallback((recipeSlotView, tooltip) -> {
-                    tooltip.add(Component.translatable("jei.overgeared.flint_knapping.input_tooltip"));
-                })*/
         ;
 
         // Add output slot (result)
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 72, 60)
-                .addItemStack(recipe.getResultItem())
-                /*.addRichTooltipCallback((recipeSlotView, tooltip) -> {
-                    tooltip.add(Component.translatable("jei.overgeared.flint_knapping.output_tooltip1"));
-                    tooltip.add(Component.translatable("jei.overgeared.flint_knapping.output_tooltip2"));
-                })*/
-        ;
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 113, 18)
+                .addItemStack(recipe.getResultItem());
     }
 
     @Override
@@ -90,7 +82,7 @@ public class FlintKnappingCategory implements IRecipeCategory<ExplanationRecipe>
         // For example, draw text explanations
         int textWidth = 140;
         int textX = 5;
-        int textY = 85;
+        int textY = 43;
         renderWrappedText(
                 guiGraphics,
                 Component.translatable("jei.overgeared.flint_knapping.description"),
@@ -108,10 +100,5 @@ public class FlintKnappingCategory implements IRecipeCategory<ExplanationRecipe>
         for (int i = 0; i < lines.size(); i++) {
             guiGraphics.drawString(font, lines.get(i), x, y + (i * font.lineHeight), color, shadow);
         }
-    }
-
-    public static int calculateTextHeight(Component text, int width) {
-        Font font = Minecraft.getInstance().font;
-        return font.split(text, width).size() * font.lineHeight;
     }
 }

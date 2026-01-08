@@ -186,20 +186,22 @@ public class JEIOvergearedModPlugin implements IModPlugin {
                 new ExplanationRecipe(new ItemStack(ModItems.ROCK.get()))
                 // Add more recipes as needed
         );
-        registration.addRecipes(FlintKnappingCategory.FLINT_KNAPPING, recipes);
-
-        List<ExplanationRecipe> StoneAnvilRecipes = List.of(
-                new ExplanationRecipe(new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()))
-                // Add more recipes as needed
-        );
-
-        List<ExplanationRecipe> SteelAnvilRecipes = List.of(
-                new ExplanationRecipe(new ItemStack(ModBlocks.SMITHING_ANVIL.get()))
-                // Add more recipes as needed
-        );
-        registration.addRecipes(StoneAnvilCategory.STONE_ANVIL_GET, StoneAnvilRecipes);
-        registration.addRecipes(SteelAnvilCategory.STEEL_ANVIL_GET, SteelAnvilRecipes);
-
+        if (ServerConfig.GET_ROCK_USING_FLINT.get())
+            registration.addRecipes(FlintKnappingCategory.FLINT_KNAPPING, recipes);
+        if (ServerConfig.ENABLE_STONE_TO_ANVIL.get()) {
+            List<ExplanationRecipe> StoneAnvilRecipes = List.of(
+                    new ExplanationRecipe(new ItemStack(ModBlocks.STONE_SMITHING_ANVIL.get()))
+                    // Add more recipes as needed
+            );
+            registration.addRecipes(StoneAnvilCategory.STONE_ANVIL_GET, StoneAnvilRecipes);
+        }
+        if (ServerConfig.ENABLE_ANVIL_TO_SMITHING.get()) {
+            List<ExplanationRecipe> SteelAnvilRecipes = List.of(
+                    new ExplanationRecipe(new ItemStack(ModBlocks.SMITHING_ANVIL.get()))
+                    // Add more recipes as needed
+            );
+            registration.addRecipes(SteelAnvilCategory.STEEL_ANVIL_GET, SteelAnvilRecipes);
+        }
         registration.addRecipes(RecipeTypes.ANVIL,
                 OvergearedAnvilRecipes.getOvergearedAnvilRecipes(
                         registration.getVanillaRecipeFactory(),
