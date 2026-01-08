@@ -28,8 +28,7 @@ import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
-// TODO: Port these classes
-// import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
+import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
 import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvil;
 import net.stirdrem.overgeared.components.BlueprintData;
 import net.stirdrem.overgeared.components.ModComponents;
@@ -269,11 +268,10 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                         }
                         result.set(ModComponents.FORGING_QUALITY, quality);
 
-                        // TODO: Port ModAdvancementTriggers
-                        // if (player instanceof ServerPlayer serverPlayer) {
-                        //     ModAdvancementTriggers.FORGING_QUALITY
-                        //             .trigger(serverPlayer, quality.getDisplayName());
-                        // }
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            ModAdvancementTriggers.FORGING_QUALITY.get()
+                                    .trigger(serverPlayer, quality.getDisplayName());
+                        }
                         if (!(result.getItem() instanceof ArmorItem) &&
                                 !(result.getItem() instanceof ShieldItem) &&
                                 recipe.hasPolishing()) {
@@ -308,7 +306,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                 }
             }
         }
-
 
         // Extract ingredients
         for (int i = 0; i < 9; i++) {
@@ -374,7 +371,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                     };
                 }
 
-
                 // Level up if threshold reached
                 if (uses >= usesToLevel) {
                     BlueprintQuality nextQuality = BlueprintQuality.getNext(currentQuality);
@@ -384,12 +380,13 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
                                 .withUses(0)
                                 .withUsesToLevel(nextQuality.getUse());
                         blueprint.set(ModComponents.BLUEPRINT_DATA, newData);
-                        // TODO: Port ModAdvancementTriggers
-                        // if (player instanceof ServerPlayer serverPlayer) {
-                        //     if (nextQuality.equals(BlueprintQuality.PERFECT) || nextQuality.equals(BlueprintQuality.MASTER))
-                        //         ModAdvancementTriggers.MAX_LEVEL_BLUEPRINT.trigger(serverPlayer);
-                        //     ModAdvancementTriggers.BLUEPRINT_QUALITY.trigger(serverPlayer, nextQuality.getDisplayName());
-                        // }
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            if (nextQuality.equals(BlueprintQuality.PERFECT)
+                                    || nextQuality.equals(BlueprintQuality.MASTER))
+                                ModAdvancementTriggers.MAX_LEVEL_BLUEPRINT.get().trigger(serverPlayer);
+                            ModAdvancementTriggers.BLUEPRINT_QUALITY.get().trigger(serverPlayer,
+                                    nextQuality.getDisplayName());
+                        }
                     } else {
                         blueprint.set(ModComponents.BLUEPRINT_DATA, blueprintData.withUses(usesToLevel)); // Clamp
                     }
@@ -512,7 +509,6 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             data.set(2, hitRemains);
         }
     }
-
 
     public boolean isBusy(long currentGameTime) {
         return currentGameTime < busyUntilGameTime;

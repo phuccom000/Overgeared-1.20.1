@@ -1,25 +1,23 @@
 {
   "display": {
     "icon": {
-      "item": "overgeared:nether_tool_cast"
+      "id": "overgeared:copper_smithing_hammer"
     },
-    "title": "Hyper Cast Off!",
-    "description": "Obtain a Nether Tool Cast",
-    "frame": "goal",
+    "title": "Hammerin' Time!",
+    "description": "Obtain your first smithing hammer",
+    "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
   "parent": "overgeared:casting",
   "criteria": {
-    "knapped_item": {
+    "smithing_hammer": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": [
-              "overgeared:nether_tool_cast"
-            ]
+            "tag": "overgeared:smithing_hammers"
           }
         ]
       }

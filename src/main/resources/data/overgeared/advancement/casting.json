@@ -1,24 +1,24 @@
 {
   "display": {
     "icon": {
-      "item": "overgeared:steel_pickaxe"
+      "id": "overgeared:clay_tool_cast"
     },
-    "title": "Steel Yourself",
-    "description": "Upgrade your Pickaxe again",
+    "title": "Cast Off!",
+    "description": "Obtain a Clay Tool Cast",
     "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "overgeared:making_anvil",
+  "parent": "overgeared:rock_knapping",
   "criteria": {
-    "smithing_hammer": {
+    "knapped_item": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
             "items": [
-              "overgeared:steel_pickaxe"
+              "overgeared:clay_tool_cast"
             ]
           }
         ]

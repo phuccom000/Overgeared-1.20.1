@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "minecraft:netherite_pickaxe"
+      "id": "minecraft:netherite_pickaxe"
     },
     "title": "Master Taste!",
     "description": "Obtain your first masterwork item",

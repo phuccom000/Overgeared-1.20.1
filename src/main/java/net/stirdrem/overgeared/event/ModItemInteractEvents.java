@@ -45,7 +45,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.stirdrem.overgeared.OvergearedMod;
-//import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
+import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
@@ -137,8 +137,8 @@ public class ModItemInteractEvents {
             level.setBlock(pos, newState, 3);
             level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.0f, 1.0f);
             if (player instanceof ServerPlayer serverPlayer) {
-//                ModAdvancementTriggers.MAKE_SMITHING_ANVIL
-//                        .trigger(serverPlayer, "stone");
+                ModAdvancementTriggers.MAKE_SMITHING_ANVIL.get()
+                        .trigger(serverPlayer, "stone");
             }
 
             event.setCancellationResult(InteractionResult.SUCCESS);
@@ -154,8 +154,8 @@ public class ModItemInteractEvents {
             level.setBlock(pos, newState, 3);
             level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1.0f, 1.0f);
             if (player instanceof ServerPlayer serverPlayer) {
-//                ModAdvancementTriggers.MAKE_SMITHING_ANVIL
-//                        .trigger(serverPlayer, "iron");
+                ModAdvancementTriggers.MAKE_SMITHING_ANVIL.get()
+                        .trigger(serverPlayer, "iron");
             }
             event.setCancellationResult(InteractionResult.SUCCESS);
             event.setCanceled(true);
@@ -314,10 +314,8 @@ public class ModItemInteractEvents {
         if (playerMinigameVisibility.get(playerId) != null)
             playerMinigameVisibility.remove(playerId);
         if (playerAnvilPositions.get(playerId) != null
-                && pos.equals(playerAnvilPositions.get(playerId))
-        ) {
+                && pos.equals(playerAnvilPositions.get(playerId))) {
             playerAnvilPositions.remove(playerId);
-
 
             // 1. Clear ownership from the block entity (server-side)
             BlockEntity be = player.level().getBlockEntity(pos);
@@ -471,12 +469,12 @@ public class ModItemInteractEvents {
                     }
                 }
 
-                 boolean isBlacklisted = GrindingBlacklistReloadListener.isBlacklisted(stack);
-                 if (isBlacklisted) {
-                     event.setCancellationResult(InteractionResult.PASS);
-                     event.setCanceled(true);
-                     return;
-                 }
+                boolean isBlacklisted = GrindingBlacklistReloadListener.isBlacklisted(stack);
+                if (isBlacklisted) {
+                    event.setCancellationResult(InteractionResult.PASS);
+                    event.setCanceled(true);
+                    return;
+                }
 
                 int reducedCount = stack.getOrDefault(ModComponents.REDUCED_GRIND_COUNT, 0);
 
@@ -545,7 +543,7 @@ public class ModItemInteractEvents {
     }
 
     private static void handleCauldronInteraction(Level level, BlockPos pos, Player player,
-                                                  ItemStack heldStack, BlockState state) {
+            ItemStack heldStack, BlockState state) {
         IntegerProperty levelProperty = LayeredCauldronBlock.LEVEL;
         int waterLevel = state.getValue(levelProperty);
 
@@ -605,7 +603,6 @@ public class ModItemInteractEvents {
         player.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
     }
 
-
     private static void coolItemEntity(ItemEntity entity) {
         ItemStack stack = entity.getItem();
         Level level = entity.level();
@@ -631,7 +628,6 @@ public class ModItemInteractEvents {
         entity.setItem(cooledStack);
         entity.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
     }
-
 
     private static void grindItem(Player player, ItemStack heldStack) {
         Item cooledItem = getGrindable(heldStack.getItem(), player.level());
@@ -755,8 +751,7 @@ public class ModItemInteractEvents {
     private static final Map<Item, Boolean> COOLING_CACHE = new HashMap<>();
 
     private static boolean hasCoolingRecipeCached(Item item, Level level) {
-        return COOLING_CACHE.computeIfAbsent(item, (i) ->
-                hasCoolingRecipe(i, level)   // your existing function
+        return COOLING_CACHE.computeIfAbsent(item, (i) -> hasCoolingRecipe(i, level) // your existing function
         );
     }
 
@@ -866,7 +861,7 @@ public class ModItemInteractEvents {
 
                 /* spawn at block centre, slightly above */
                 double sx = pos.getX() + 0.5;
-                double sy = pos.getY() + 0.9;   // a bit above
+                double sy = pos.getY() + 0.9; // a bit above
                 double sz = pos.getZ() + 0.5;
 
                 /* vector from block to player */

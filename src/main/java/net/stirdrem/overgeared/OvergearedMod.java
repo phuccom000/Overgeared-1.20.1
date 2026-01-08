@@ -6,6 +6,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.components.ModComponents;
@@ -26,6 +27,7 @@ public final class OvergearedMod {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public OvergearedMod(IEventBus modEventBus, ModContainer modContainer) {
+        ModAdvancementTriggers.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModCapabilities.register(modEventBus);

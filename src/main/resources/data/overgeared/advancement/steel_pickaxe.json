@@ -1,24 +1,24 @@
 {
   "display": {
     "icon": {
-      "item": "overgeared:diamond_upgrade_smithing_template"
+      "id": "overgeared:steel_pickaxe"
     },
-    "title": "Chekhov's Template",
-    "description": "Obtain a Smithing Template for Diamond gears",
+    "title": "Steel Yourself",
+    "description": "Upgrade your Pickaxe again",
     "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "overgeared:root",
+  "parent": "overgeared:making_anvil",
   "criteria": {
-    "knapped_item": {
+    "smithing_hammer": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
             "items": [
-              "overgeared:diamond_upgrade_smithing_template"
+              "overgeared:steel_pickaxe"
             ]
           }
         ]

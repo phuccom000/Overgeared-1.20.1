@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "overgeared:smithing_hammer"
+      "id": "overgeared:smithing_hammer"
     },
     "title": "Overgeared",
     "description": "The beginning of a master blacksmith's journey",

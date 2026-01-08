@@ -13,7 +13,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
-//import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
+import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
@@ -98,7 +98,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
                 knappingFinished = true;
                 resultCollected = true;
                 if (player instanceof ServerPlayer serverPlayer) {
-                    //ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+                    ModAdvancementTriggers.KNAPPING.get().trigger(serverPlayer);
                 }
             }
 
@@ -178,7 +178,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
 
                     // Trigger advancement when taking result via shift-click
                     if (player instanceof ServerPlayer serverPlayer) {
-                        //ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+                        ModAdvancementTriggers.KNAPPING.get().trigger(serverPlayer);
                     }
                 } else {
                     slot.setChanged();
@@ -305,7 +305,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         ItemStack result = resultContainer.getItem(0);
         if (!result.isEmpty() && !resultCollected) {
             if (player instanceof ServerPlayer serverPlayer) {
-                //ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+                ModAdvancementTriggers.KNAPPING.get().trigger(serverPlayer);
             }
             if (!player.getInventory().add(result.copy())) {
                 // Drop if inventory is full

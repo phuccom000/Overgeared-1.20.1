@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "overgeared:blueprint"
+      "id": "overgeared:blueprint"
     },
     "title": "Forged to Draft",
     "description": "Max out a smithing blueprint",
@@ -13,7 +13,8 @@
   "parent": "overgeared:blueprint",
   "criteria": {
     "max_blueprint": {
-      "trigger": "overgeared:max_level_blueprint"
+      "trigger": "overgeared:max_level_blueprint",
+      "conditions": {}
     }
   }
 }
