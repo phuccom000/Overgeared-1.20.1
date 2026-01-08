@@ -8,9 +8,11 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.UpgradeArrowDispenseBehavior;
+import net.stirdrem.overgeared.commands.ModCommands;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.ToolTypeRegistry;
@@ -39,5 +41,10 @@ public class CommonModEvents {
               new ItemStack(Items.DRAGON_BREATH)
       ));
     }
+  }
+
+  @SubscribeEvent
+  private static void registerCommands(RegisterCommandsEvent event) {
+      ModCommands.register(event.getDispatcher());
   }
 }
