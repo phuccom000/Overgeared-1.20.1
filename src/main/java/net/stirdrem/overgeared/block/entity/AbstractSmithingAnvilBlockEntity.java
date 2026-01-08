@@ -351,52 +351,50 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         // Handle blueprint progression (slot 11)
         ItemStack blueprint = this.itemHandler.getStackInSlot(BLUEPRINT_SLOT);
         BlueprintData blueprintData = blueprint.get(ModComponents.BLUEPRINT_DATA);
-        if (!blueprint.isEmpty() && blueprintData != null) {
-            String currentQualityStr = blueprintData.quality();
-            int uses = blueprintData.uses();
-            int usesToLevel = blueprintData.usesToLevel();
+        if (blueprint.isEmpty() || blueprintData == null) return;
+        String currentQualityStr = blueprintData.quality();
+        int uses = blueprintData.uses();
+        int usesToLevel = blueprintData.usesToLevel();
 
-            BlueprintQuality currentQuality = BlueprintQuality.fromString(currentQualityStr);
+        BlueprintQuality currentQuality = BlueprintQuality.fromString(currentQualityStr);
 
-            // Attempt to read the ForgingQuality from result
-            String forgingQualityStr = anvilBlock.getQuality();
-            ForgingQuality resultQuality = ForgingQuality.fromString(forgingQualityStr);
+        // Attempt to read the ForgingQuality from result
+        String forgingQualityStr = anvilBlock.getQuality();
+        ForgingQuality resultQuality = ForgingQuality.fromString(forgingQualityStr);
 
-            if (currentQuality != null && currentQuality != BlueprintQuality.PERFECT && currentQuality != BlueprintQuality.MASTER) {
-                if (!ServerConfig.EXPERT_ABOVE_INCREASE_BLUEPRINT.get() || resultQuality.ordinal() >= ForgingQuality.EXPERT.ordinal()) {
-                    uses += switch (resultQuality) {
-                        case PERFECT -> 2;
-                        case MASTER -> 3;
-                        default -> 1;
-                    };
-                }
-
-                // Level up if threshold reached
-                if (uses >= usesToLevel) {
-                    BlueprintQuality nextQuality = BlueprintQuality.getNext(currentQuality);
-                    if (nextQuality != null) {
-                        BlueprintData newData = blueprintData
-                                .withQuality(nextQuality.getDisplayName())
-                                .withUses(0)
-                                .withUsesToLevel(nextQuality.getUse());
-                        blueprint.set(ModComponents.BLUEPRINT_DATA, newData);
-                        if (player instanceof ServerPlayer serverPlayer) {
-                            if (nextQuality.equals(BlueprintQuality.PERFECT)
-                                    || nextQuality.equals(BlueprintQuality.MASTER))
-                                ModAdvancementTriggers.MAX_LEVEL_BLUEPRINT.get().trigger(serverPlayer);
-                            ModAdvancementTriggers.BLUEPRINT_QUALITY.get().trigger(serverPlayer,
-                                    nextQuality.getDisplayName());
-                        }
-                    } else {
-                        blueprint.set(ModComponents.BLUEPRINT_DATA, blueprintData.withUses(usesToLevel)); // Clamp
-                    }
-                } else {
-                    blueprint.set(ModComponents.BLUEPRINT_DATA, blueprintData.withUses(uses)); // Just increment
-                }
-
-                this.itemHandler.setStackInSlot(BLUEPRINT_SLOT, blueprint);
-            }
+        if (currentQuality == null
+                || currentQuality == BlueprintQuality.PERFECT
+                || currentQuality == BlueprintQuality.MASTER) return;
+        if (!ServerConfig.EXPERT_ABOVE_INCREASE_BLUEPRINT.get() || resultQuality.ordinal() >= ForgingQuality.EXPERT.ordinal()) {
+            uses += switch (resultQuality) {
+                case PERFECT -> 2;
+                case MASTER -> 3;
+                default -> 1;
+            };
         }
+
+        // Level up if threshold reached
+        if (uses >= usesToLevel) {
+            BlueprintQuality nextQuality = BlueprintQuality.getNext(currentQuality);
+            if (nextQuality != null) {
+                BlueprintData newData = blueprintData
+                        .withQuality(nextQuality.getDisplayName())
+                        .withUses(0)
+                        .withUsesToLevel(nextQuality.getUse());
+                blueprint.set(ModComponents.BLUEPRINT_DATA, newData);
+                if (player instanceof ServerPlayer serverPlayer) {
+                    if (nextQuality.equals(BlueprintQuality.PERFECT) || nextQuality.equals(BlueprintQuality.MASTER))
+                        ModAdvancementTriggers.MAX_LEVEL_BLUEPRINT.get().trigger(serverPlayer);
+                    ModAdvancementTriggers.BLUEPRINT_QUALITY.get().trigger(serverPlayer, nextQuality.getDisplayName());
+                }
+            } else {
+                blueprint.set(ModComponents.BLUEPRINT_DATA, blueprintData.withUses(usesToLevel)); // Clamp
+            }
+        } else {
+            blueprint.set(ModComponents.BLUEPRINT_DATA, blueprintData.withUses(uses)); // Just increment
+        }
+
+        this.itemHandler.setStackInSlot(BLUEPRINT_SLOT, blueprint);
     }
 
     public boolean isFailedResult() {
