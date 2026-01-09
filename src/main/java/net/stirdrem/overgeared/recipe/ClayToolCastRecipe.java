@@ -125,7 +125,7 @@ public class ClayToolCastRecipe extends CustomRecipe {
         // Keep the center item (slot 4)
         ItemStack centerItem = input.getItem(4);
         if (!centerItem.isEmpty()) {
-            remaining.set(4, centerItem.copy());
+            remaining.set(4, centerItem.copyWithCount(1));
         }
 
         // Clay balls / nether bricks are consumed
