@@ -206,6 +206,15 @@ public class ToolCastItem extends Item {
     }
 
     @Override
+    public int getMaxStackSize(ItemStack stack) {
+        // Casts that hold materials (Clay, Nether) should never stack
+        if (this.allowMaterialInsert) {
+            return 1;
+        }
+        return super.getMaxStackSize(stack);
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
 
