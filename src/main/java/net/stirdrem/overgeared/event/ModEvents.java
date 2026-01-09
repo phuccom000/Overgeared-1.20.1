@@ -497,6 +497,8 @@ public class ModEvents {
                     });
                 }
             }
+            event.getTrades().get(1).add(new SteelEmeraldTrade(true));   // 1 steel → 2 emerald
+            event.getTrades().get(1).add(new SteelEmeraldTrade(false));  // 2 steel → 1 emerald
         }
 
         // Add profession-specific forged trades
@@ -520,7 +522,6 @@ public class ModEvents {
         event.getGenericTrades().add(
                 new BlueprintWanderingTrade(
                         new ItemStack(ModItems.BLUEPRINT.get()),
-                        24,   // emerald cost
                         1,    // max uses
                         5     // trader XP
                 )
@@ -530,7 +531,6 @@ public class ModEvents {
         event.getRareTrades().add(
                 new BlueprintWanderingTrade(
                         new ItemStack(ModItems.BLUEPRINT.get()),
-                        32,
                         1,
                         10
                 )
