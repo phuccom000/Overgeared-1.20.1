@@ -66,9 +66,10 @@ public class ClayToolCastRecipe extends CustomRecipe {
         ItemStack center = input.getItem(4);
         if (center.isEmpty()) return ItemStack.EMPTY;
 
-        // Get the tool type from config - we pass null for level but ConfigHelper should handle it
-        // In 1.21.1, we need to get level from somewhere else or make ConfigHelper work without it
-        String toolType = ConfigHelper.getToolTypeForItem(null, center);
+        // Extract tool type directly from the center item's metadata/ID
+        // We can't use ConfigHelper.getToolTypeForItem here because we don't have Level access
+        // Instead, use a fallback method or extract from item properties
+        String toolType = ConfigHelper.getToolTypeFromItemDirect(center);
         if ("none".equals(toolType) || toolType.isBlank()) return ItemStack.EMPTY;
 
         // detect if nether bricks were used

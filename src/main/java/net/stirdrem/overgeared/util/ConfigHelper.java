@@ -1,5 +1,5 @@
 package net.stirdrem.overgeared.util;
-
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -12,7 +12,9 @@ import net.stirdrem.overgeared.datapack.MaterialSettingsReloadListener;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ConfigHelper {
 
@@ -53,17 +55,36 @@ public class ConfigHelper {
         return "material.overgeared." + materialId.toLowerCase();
     }
 
-    // -----------------------
-    // Tool Head → Tool Type
-    // -----------------------
+
+
+    // Cache for tool type mappings (populated from RecipeManager)
+    private static final Map<Item, String> toolTypeCache = new ConcurrentHashMap<>();
+
+    /**
+     * Get tool type from item using cached recipe data.
+     * The cache is populated by getToolTypeForItem(Level, ItemStack) calls.
+     * This allows recipes without Level access to still use datapack-driven mappings.
+     */
+    public static String getToolTypeFromItemDirect(ItemStack stack) {
+        if (stack.isEmpty()) return "none";
+        return toolTypeCache.getOrDefault(stack.getItem(), "none");
+    }
+
     public static String getToolTypeForItem(Level level, ItemStack stack) {
-        return level.getRecipeManager()
+        String toolType = level.getRecipeManager()
                 .getAllRecipesFor(ModRecipeTypes.ITEM_TO_TOOLTYPE.get())
                 .stream()
                 .filter(r -> r.value().input().test(stack))
                 .map(r -> r.value().toolType())
                 .findFirst()
                 .orElse("none");
+        
+        // Cache the result for use in contexts without Level access
+        if (!"none".equals(toolType)) {
+            toolTypeCache.put(stack.getItem(), toolType);
+        }
+        
+        return toolType;
     }
 
     // -----------------------
