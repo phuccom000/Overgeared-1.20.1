@@ -33,10 +33,16 @@ public class FletchingRecipe implements Recipe<RecipeInput> {
 
     @Override
     public boolean matches(RecipeInput recipeInput, Level level) {
-        return (tip == Ingredient.EMPTY || tip.test(recipeInput.getItem(0))) &&
-                (shaft == Ingredient.EMPTY || shaft.test(recipeInput.getItem(1))) &&
-                (feather == Ingredient.EMPTY || feather.test(recipeInput.getItem(2))) &&
-                (potion == Ingredient.EMPTY || potion.test(recipeInput.getItem(3)));
+        // Tip, Shaft, Feather: STRICT - if ingredient is empty, the slot MUST be empty.
+        boolean tipMatches = tip.isEmpty() ? recipeInput.getItem(0).isEmpty() : tip.test(recipeInput.getItem(0));
+        boolean shaftMatches = shaft.isEmpty() ? recipeInput.getItem(1).isEmpty() : shaft.test(recipeInput.getItem(1));
+        boolean featherMatches = feather.isEmpty() ? recipeInput.getItem(2).isEmpty() : feather.test(recipeInput.getItem(2));
+        
+        // Potion: LENIENT - if ingredient is empty, the slot is OPTIONAL (applied after crafting).
+        // This allows potions to be used as optional modifiers without being part of the recipe match.
+        boolean potionMatches = potion.isEmpty() || potion.test(recipeInput.getItem(3));
+        
+        return tipMatches && shaftMatches && featherMatches && potionMatches;
     }
 
     @Override

@@ -256,7 +256,8 @@ public class FletchingStationMenu extends AbstractContainerMenu {
                     broadcastChanges();
                     return;
                 }
-                if (potion.is(Items.POTION)) {
+                if (potion.is(Items.POTION) || potion.is(Items.SPLASH_POTION)) {
+                    // Regular and splash potions produce tipped arrows
                     ItemStack tippedArrows;
                     if (isUpgradeableArrow(input.getItem(slotNumber)))
                         tippedArrows = input.getItem(slotNumber).copy();
@@ -267,6 +268,7 @@ public class FletchingStationMenu extends AbstractContainerMenu {
                     }
                     resultStack = tippedArrows;
                 } else if (potion.is(Items.LINGERING_POTION)) {
+                    // Lingering potions produce lingering arrows
                     ItemStack lingeringArrows;
                     if (isUpgradeableArrow(input.getItem(slotNumber))) {
                         lingeringArrows = input.getItem(slotNumber).copy();
@@ -304,13 +306,14 @@ public class FletchingStationMenu extends AbstractContainerMenu {
                 }
                 PotionContents potionContents = potion.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
 
+                // Regular and splash potions produce tipped arrows
                 if ((potion.is(Items.POTION) || potion.is(Items.SPLASH_POTION)) && !recipe.getTippedResult().isEmpty()) {
                     resultStack = recipe.getTippedResult().copy();
                     // Transfer potion contents to result
                     if (potionContents != PotionContents.EMPTY) {
                         resultStack.set(DataComponents.POTION_CONTENTS, potionContents);
                     }
-
+                // Lingering potions produce lingering arrows
                 } else if (potion.is(Items.LINGERING_POTION) && !recipe.getLingeringResult().isEmpty()) {
                     resultStack = recipe.getLingeringResult().copy();
 
