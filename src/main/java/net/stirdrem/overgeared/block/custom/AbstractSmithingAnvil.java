@@ -259,18 +259,6 @@ public abstract class AbstractSmithingAnvil extends BaseEntityBlock implements F
     @Override
     public abstract BlockEntity newBlockEntity(BlockPos pPos, BlockState pState);
 
-    // TODO: onDestroyedByPlayer was removed in NeoForge 1.21 - use playerWillDestroy or onRemove instead
-    // Consider moving this logic to onRemove() or playerWillDestroy() when ModEvents is ported
-    /*
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
-            ModEvents.resetMinigameForPlayer(serverPlayer, pos);
-        }
-        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
-    }
-    */
-
-    // TODO: onBlockExploded may have changed in NeoForge 1.21 - verify this compiles
     @Override
     public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
          if (!level.isClientSide()) {

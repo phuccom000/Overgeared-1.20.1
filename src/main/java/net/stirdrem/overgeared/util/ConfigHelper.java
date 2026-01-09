@@ -9,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.datapack.MaterialSettingsReloadListener;
-import net.stirdrem.overgeared.recipe.ItemToToolTypeRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 
 import java.util.List;

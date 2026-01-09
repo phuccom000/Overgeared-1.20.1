@@ -46,7 +46,6 @@ import java.util.UUID;
 @EventBusSubscriber(modid = OvergearedMod.MOD_ID)
 public class ModEvents {
     private static final int HEATED_ITEM_CHECK_INTERVAL = 20; // 1 second
-    private static final float BURN_DAMAGE = 1.0f;
 
     private static int serverTick = 0;
 

@@ -58,10 +58,6 @@ public class StoneSmithingAnvil extends AbstractSmithingAnvil {
     private static final VoxelShape SHAPE_Z = Shapes.or(Z1, Z2);
     private static final VoxelShape SHAPE_X = Shapes.or(X1, X2);
 
-    // Z-axis oriented shape
-    private static final int HAMMER_SOUND_DURATION_TICKS = 6; // adjust to match your sound
-
-
     public StoneSmithingAnvil(BlockBehaviour.Properties properties) {
         super(AnvilTier.STONE, properties);
     }
@@ -89,8 +85,9 @@ public class StoneSmithingAnvil extends AbstractSmithingAnvil {
     }
 
     @Override
-    public BlockState mirror(BlockState pState, Mirror pMirror) {
-        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        Rotation rotation = mirror.getRotation(state.getValue(FACING));
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package net.stirdrem.overgeared.networking.packet;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -14,7 +13,6 @@ import net.stirdrem.overgeared.item.ToolTypeRegistry;
 import net.stirdrem.overgeared.screen.BlueprintWorkbenchMenu;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public record SelectToolTypeC2SPacket(String toolTypeId, int containerId) implements CustomPacketPayload {
     public static final ResourceLocation ID = OvergearedMod.loc("select_tool_type");

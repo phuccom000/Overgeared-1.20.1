@@ -65,7 +65,6 @@ import net.stirdrem.overgeared.recipe.CoolingRecipe;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.GrindingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
-//import net.stirdrem.overgeared.screen.FletchingStationMenu;
 import net.stirdrem.overgeared.screen.FletchingStationMenu;
 import net.stirdrem.overgeared.util.ModTags;
 import org.jetbrains.annotations.NotNull;
