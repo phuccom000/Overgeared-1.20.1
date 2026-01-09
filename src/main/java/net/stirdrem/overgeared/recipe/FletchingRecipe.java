@@ -133,8 +133,8 @@ public class FletchingRecipe implements Recipe<RecipeInput> {
                 Ingredient feather = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
                 Ingredient potion = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
                 ItemStack result = ItemStack.STREAM_CODEC.decode(buffer);
-                ItemStack resultTipped = ItemStack.STREAM_CODEC.decode(buffer);
-                ItemStack resultLingering = ItemStack.STREAM_CODEC.decode(buffer);
+                ItemStack resultTipped = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
+                ItemStack resultLingering = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
                 String tippedTag = buffer.readUtf();
                 String lingeringTag = buffer.readUtf();
                 return new FletchingRecipe(tip, shaft, feather, potion, result, resultTipped, resultLingering, tippedTag, lingeringTag);
@@ -147,8 +147,8 @@ public class FletchingRecipe implements Recipe<RecipeInput> {
                 Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.feather);
                 Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.potion);
                 ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
-                ItemStack.STREAM_CODEC.encode(buffer, recipe.resultTipped);
-                ItemStack.STREAM_CODEC.encode(buffer, recipe.resultLingering);
+                ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.resultTipped);
+                ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.resultLingering);
                 buffer.writeUtf(recipe.tippedTag);
                 buffer.writeUtf(recipe.lingeringTag);
             }
