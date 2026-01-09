@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "galosphere"
+    }
+  ],
   "type": "overgeared:cooling",
   "input": {
     "item": "overgeared:heated_silver_ingot"
