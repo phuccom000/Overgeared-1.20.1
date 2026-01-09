@@ -30,6 +30,10 @@ public class ModRecipeSerializers {
             RECIPE_SERIALIZERS.register("cast_smelting", CastSmeltingRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<CastBlastingRecipe>> CAST_BLASTING =
             RECIPE_SERIALIZERS.register("cast_blasting", CastBlastingRecipe.Serializer::new);
+    public static final Supplier<RecipeSerializer<NBTKeepingSmeltingRecipe>> NBT_SMELTING =
+            RECIPE_SERIALIZERS.register("nbt_smelting", NBTKeepingSmeltingRecipe.Serializer::new);
+    public static final Supplier<RecipeSerializer<NBTKeepingBlastingRecipe>> NBT_BLASTING =
+            RECIPE_SERIALIZERS.register("nbt_blasting", NBTKeepingBlastingRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<AlloySmeltingRecipe>> ALLOY_SMELTING =
             RECIPE_SERIALIZERS.register("alloy_smelting", AlloySmeltingRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
