@@ -81,7 +81,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     }
 
     public static boolean isToolPart(Item item) {
-        return item.builtInRegistryHolder().is(ModTags.Items.TOOL_PARTS);
+        return new ItemStack(item).is(ModTags.Items.TOOL_PARTS);
     }
 
 
@@ -219,7 +219,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         this.criteria.forEach(advBuilder::addCriterion);
 
         // Pattern parsing logic
-        int width = this.rows.get(0).length();
+        int width = this.rows.getFirst().length();
         int height = this.rows.size();
         NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
 
