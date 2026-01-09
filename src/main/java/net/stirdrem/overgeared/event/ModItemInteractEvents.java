@@ -564,9 +564,14 @@ public class ModItemInteractEvents {
     }
 
     private static void coolItem(Player player, ItemStack stack) {
-        Item cooled = getCooledItem(stack.getItem(), player.level());
-        if (cooled == null) return;
         if (stack.getCount() <= 0) return;
+        
+        Item cooled = getCooledItem(stack.getItem(), player.level());
+        boolean hasCoolingRecipe = (cooled != null);
+        boolean isHeated = stack.getOrDefault(ModComponents.HEATED_COMPONENT, false);
+        
+        // If neither has cooling recipe nor is heated, nothing to do
+        if (!hasCoolingRecipe && !isHeated) return;
 
         // === Tool Cast special handling ===
         if (stack.getItem() instanceof ToolCastItem) {
@@ -578,27 +583,35 @@ public class ModItemInteractEvents {
                 // Remove HEATED_COMPONENT from the cast itself so players stop taking damage
                 stack.remove(ModComponents.HEATED_COMPONENT);
             }
+            player.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
+            return; // Don't process further for casts
         }
 
-        // === Create cooled stack and transfer components ===
-        ItemStack cooledStack = new ItemStack(cooled, 1);
-        // Copy all components except heated ones for mod compatibility
-        copyComponentsExceptHeated(stack, cooledStack);
+        if (hasCoolingRecipe) {
+            // Create cooled stack and transfer components
+            ItemStack cooledStack = new ItemStack(cooled, 1);
+            // Copy all components except heated ones for mod compatibility
+            copyComponentsExceptHeated(stack, cooledStack);
 
-        stack.shrink(1);
+            stack.shrink(1);
 
-        if (stack.isEmpty()) {
-            if (player.getMainHandItem() == stack) {
-                player.setItemInHand(InteractionHand.MAIN_HAND, cooledStack);
-            } else if (player.getOffhandItem() == stack) {
-                player.setItemInHand(InteractionHand.OFF_HAND, cooledStack);
-            } else if (!player.getInventory().add(cooledStack)) {
-                player.drop(cooledStack, false);
+            if (stack.isEmpty()) {
+                if (player.getMainHandItem() == stack) {
+                    player.setItemInHand(InteractionHand.MAIN_HAND, cooledStack);
+                } else if (player.getOffhandItem() == stack) {
+                    player.setItemInHand(InteractionHand.OFF_HAND, cooledStack);
+                } else if (!player.getInventory().add(cooledStack)) {
+                    player.drop(cooledStack, false);
+                }
+            } else {
+                if (!player.getInventory().add(cooledStack)) {
+                    player.drop(cooledStack, false);
+                }
             }
         } else {
-            if (!player.getInventory().add(cooledStack)) {
-                player.drop(cooledStack, false);
-            }
+            // Just remove the heated component and heated time e.g. for quenching
+            stack.remove(ModComponents.HEATED_COMPONENT);
+            stack.remove(ModComponents.HEATED_TIME);
         }
 
         player.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
