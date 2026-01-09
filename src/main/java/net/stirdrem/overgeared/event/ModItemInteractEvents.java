@@ -620,9 +620,15 @@ public class ModItemInteractEvents {
     private static void coolItemEntity(ItemEntity entity) {
         ItemStack stack = entity.getItem();
         Level level = entity.level();
+        
+        if (stack.getCount() <= 0) return;
 
         Item cooled = getCooledItem(stack.getItem(), level);
-        if (cooled == null || stack.getCount() <= 0) return;
+        boolean hasCoolingRecipe = (cooled != null);
+        boolean isHeated = stack.getOrDefault(ModComponents.HEATED_COMPONENT, false);
+        
+        // If neither has cooling recipe nor is heated, nothing to do
+        if (!hasCoolingRecipe && !isHeated) return;
 
         // === Tool Cast special handling ===
         if (stack.getItem() instanceof ToolCastItem) {
@@ -631,15 +637,26 @@ public class ModItemInteractEvents {
                 ItemStack output = data.output();
                 ItemStack cooledOutput = coolSingleStack(output, level);
                 stack.set(ModComponents.CAST_DATA, data.withOutput(cooledOutput).withHeated(false));
+                // Remove HEATED_COMPONENT from the cast itself
+                stack.remove(ModComponents.HEATED_COMPONENT);
             }
+            entity.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
+            return; // Don't process further for casts
         }
 
-        // === Create cooled stack and transfer components ===
-        ItemStack cooledStack = new ItemStack(cooled, stack.getCount());
-        // Copy all components except heated ones for mod compatibility
-        copyComponentsExceptHeated(stack, cooledStack);
+        if (hasCoolingRecipe) {
+            // === Create cooled stack and transfer components ===
+            ItemStack cooledStack = new ItemStack(cooled, stack.getCount());
+            // Copy all components except heated ones for mod compatibility
+            copyComponentsExceptHeated(stack, cooledStack);
 
-        entity.setItem(cooledStack);
+            entity.setItem(cooledStack);
+        } else {
+            // Just remove the heated component and heated time (quenching without recipe)
+            stack.remove(ModComponents.HEATED_COMPONENT);
+            stack.remove(ModComponents.HEATED_TIME);
+        }
+        
         entity.playSound(SoundEvents.FIRE_EXTINGUISH, 1.0F, 1.0F);
     }
 
