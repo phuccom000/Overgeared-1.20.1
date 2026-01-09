@@ -575,6 +575,8 @@ public class ModItemInteractEvents {
                 ItemStack output = data.output();
                 ItemStack cooledOutput = coolSingleStack(output, player.level());
                 stack.set(ModComponents.CAST_DATA, data.withOutput(cooledOutput).withHeated(false));
+                // Remove HEATED_COMPONENT from the cast itself so players stop taking damage
+                stack.remove(ModComponents.HEATED_COMPONENT);
             }
         }
 

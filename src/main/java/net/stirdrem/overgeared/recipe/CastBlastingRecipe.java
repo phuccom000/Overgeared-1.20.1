@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -122,11 +123,8 @@ public class CastBlastingRecipe extends BlastingRecipe {
             result.set(ModComponents.POLISHED, false);
         }
 
-        // Heated result
-        result.set(ModComponents.HEATED_COMPONENT, true);
-
         // Creator (transfer custom name from cast to output tool)
-        if (inputStack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME)) {
+        if (inputStack.has(DataComponents.CUSTOM_NAME)) {
             result.set(ModComponents.CREATOR, inputStack.getHoverName().getString());
         }
 
@@ -142,6 +140,9 @@ public class CastBlastingRecipe extends BlastingRecipe {
                 true       // Mark as heated
         );
         cast.set(ModComponents.CAST_DATA, updatedData);
+        
+        // Set HEATED_COMPONENT on the cast itself so players take damage when holding it
+        cast.set(ModComponents.HEATED_COMPONENT, true);
 
         // Handle cast durability
         if (cast.isDamageableItem()) {

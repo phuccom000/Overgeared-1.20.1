@@ -61,9 +61,15 @@ public class ToolCastItem extends Item {
 
     private InteractionResultHolder<ItemStack> calculateAndReturnMaterials(ItemStack castStack, Player player, InteractionHand hand) {
         CastData data = castStack.getOrDefault(ModComponents.CAST_DATA, CastData.EMPTY);
+        boolean heated = castStack.getOrDefault(ModComponents.HEATED_COMPONENT, false);
+
 
         if (data.hasOutput()) {
             ItemStack output = data.output();
+            if (heated) {
+                output.set(ModComponents.HEATED_COMPONENT, true);
+                castStack.set(ModComponents.HEATED_COMPONENT, false);
+            }
 
             if (!player.getInventory().add(output.copy())) {
                 player.drop(output.copy(), false);
