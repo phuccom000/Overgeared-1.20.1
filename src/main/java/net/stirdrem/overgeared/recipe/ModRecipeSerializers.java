@@ -20,10 +20,10 @@ public class ModRecipeSerializers {
             RECIPE_SERIALIZERS.register("crafting_shapeless", OvergearedShapelessRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<BlueprintCloningRecipe>> CRAFTING_BLUEPRINTCLONING =
             RECIPE_SERIALIZERS.register("crafting_cloning", BlueprintCloningRecipe.Serializer::new);
-//    public static final RegistryObject<RecipeSerializer<DynamicToolCastRecipe>> CRAFTING_DYNAMIC_TOOL_CAST =
-//            SERIALIZERS.register("crafting_cast", () -> new SimpleCraftingRecipeSerializer<>(DynamicToolCastRecipe::new));
-//    public static final RegistryObject<RecipeSerializer<ClayToolCastRecipe>> CLAY_TOOL_CAST =
-//            SERIALIZERS.register("crafting_initial_cast", () -> new SimpleCraftingRecipeSerializer<>(ClayToolCastRecipe::new));
+    public static final Supplier<RecipeSerializer<DynamicToolCastRecipe>> CRAFTING_DYNAMIC_TOOL_CAST =
+            RECIPE_SERIALIZERS.register("crafting_cast", DynamicToolCastRecipe.Serializer::new);
+    public static final Supplier<RecipeSerializer<ClayToolCastRecipe>> CLAY_TOOL_CAST =
+            RECIPE_SERIALIZERS.register("crafting_initial_cast", ClayToolCastRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<FletchingRecipe>> FLETCHING_SERIALIZER =
             RECIPE_SERIALIZERS.register("fletching", FletchingRecipe.Serializer::new);
 //    public static final RegistryObject<RecipeSerializer<NBTKeepingSmeltingRecipe>> NBT_SMELTING =
