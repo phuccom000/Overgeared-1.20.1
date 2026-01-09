@@ -26,14 +26,10 @@ public class ModRecipeSerializers {
             RECIPE_SERIALIZERS.register("crafting_initial_cast", ClayToolCastRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<FletchingRecipe>> FLETCHING_SERIALIZER =
             RECIPE_SERIALIZERS.register("fletching", FletchingRecipe.Serializer::new);
-//    public static final RegistryObject<RecipeSerializer<NBTKeepingSmeltingRecipe>> NBT_SMELTING =
-//            SERIALIZERS.register("nbt_smelting", () -> NBTKeepingSmeltingRecipe.Serializer.INSTANCE);
-//    public static final RegistryObject<RecipeSerializer<NBTKeepingBlastingRecipe>> NBT_BLASTING =
-//            SERIALIZERS.register("nbt_blasting", () -> NBTKeepingBlastingRecipe.Serializer.INSTANCE);
-//    public static final RegistryObject<RecipeSerializer<CastSmeltingRecipe>> CAST_SMELTING =
-//            SERIALIZERS.register("cast_smelting", () -> CastSmeltingRecipe.Serializer.INSTANCE);
-//    public static final RegistryObject<RecipeSerializer<CastBlastingRecipe>> CAST_BLASTING =
-//            SERIALIZERS.register("cast_blasting", () -> CastBlastingRecipe.Serializer.INSTANCE);
+    public static final Supplier<RecipeSerializer<CastSmeltingRecipe>> CAST_SMELTING =
+            RECIPE_SERIALIZERS.register("cast_smelting", CastSmeltingRecipe.Serializer::new);
+    public static final Supplier<RecipeSerializer<CastBlastingRecipe>> CAST_BLASTING =
+            RECIPE_SERIALIZERS.register("cast_blasting", CastBlastingRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<AlloySmeltingRecipe>> ALLOY_SMELTING =
             RECIPE_SERIALIZERS.register("alloy_smelting", AlloySmeltingRecipe.Serializer::new);
     public static final Supplier<RecipeSerializer<ShapedAlloySmeltingRecipe>> SHAPED_ALLOY_SMELTING =
