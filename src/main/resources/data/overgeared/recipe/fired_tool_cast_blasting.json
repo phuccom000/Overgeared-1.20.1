@@ -5,7 +5,7 @@
     "item": "overgeared:unfired_tool_cast"
   },
   "result": {
-    "item": "overgeared:clay_tool_cast"
+    "id": "overgeared:clay_tool_cast"
   },
   "experience": 0.5,
   "cookingtime": 100

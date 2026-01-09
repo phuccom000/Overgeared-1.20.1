@@ -182,7 +182,7 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return Serializer.INSTANCE;
+        return ModRecipeSerializers.CRAFTING_SHAPELESS.get();
     }
 
     // Custom ingredient class with remainder support
@@ -249,11 +249,6 @@ public class OvergearedShapelessRecipe extends ShapelessRecipe {
                         IngredientWithRemainder::getDurabilityDecrease,
                         IngredientWithRemainder::new
                 );
-    }
-
-    public static class Type implements RecipeType<OvergearedShapelessRecipe> {
-        public static final Type INSTANCE = new Type();
-        public static final String ID = "crafting_shapeless";
     }
 
     public static class Serializer implements RecipeSerializer<OvergearedShapelessRecipe> {

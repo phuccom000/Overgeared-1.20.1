@@ -44,8 +44,8 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.STONE_AXE_HEAD.get(),
                         ModItems.STONE_SHOVEL_HEAD.get(),
                         ModItems.STONE_HOE_HEAD.get(),
-
-                        // Copper
+                        
+                       // Copper
                         ModItems.COPPER_HAMMER_HEAD.get(),
                         ModItems.COPPER_SWORD_BLADE.get(),
                         ModItems.COPPER_PICKAXE_HEAD.get(),

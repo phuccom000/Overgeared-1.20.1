@@ -430,7 +430,7 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
                     ForgingQuality qualityDifficulty = FORGING_QUALITY_STREAM_CODEC.decode(buffer);
                     NonNullList<Ingredient> ingredients = INGREDIENTS_STREAM_CODEC.decode(buffer);
                     ItemStack result = ItemStack.STREAM_CODEC.decode(buffer);
-                    ItemStack failedResult = ItemStack.STREAM_CODEC.decode(buffer);
+                    ItemStack failedResult = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
                     
                     return new ForgingRecipe(group, requiresBlueprint, blueprintTypes, tier, ingredients,
                             result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing,
@@ -455,7 +455,7 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
                     FORGING_QUALITY_STREAM_CODEC.encode(buffer, recipe.qualityDifficulty);
                     INGREDIENTS_STREAM_CODEC.encode(buffer, recipe.ingredients);
                     ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
-                    ItemStack.STREAM_CODEC.encode(buffer, recipe.failedResult);
+                    ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.failedResult);
                 }
             };
         }
