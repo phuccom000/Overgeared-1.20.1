@@ -24,19 +24,21 @@ public final class ItemUtils {
 
     /**
      * Gets the cooled Item for a heated Item.
+     *
      * @param heatedItem The heated item
-     * @param level The level for recipe lookup
+     * @param level      The level for recipe lookup
      * @return The cooled item, or null if no recipe found
      */
     @Nullable
     public static Item getCooledItem(@Nullable Item heatedItem, @NotNull Level level) {
         if (heatedItem == null || level == null) return null;
         ItemStack result = getCooledItem(new ItemStack(heatedItem), level);
-        return result.isEmpty() ? null : result.getItem();
+        return result.isEmpty() ? heatedItem : result.getItem();
     }
 
     /**
      * Converts a heated item to its cooled version using CoolingRecipe.
+     *
      * @param stack The heated item stack
      * @param level The level for recipe lookup
      * @return The cooled item stack, or empty if no recipe found
@@ -68,6 +70,7 @@ public final class ItemUtils {
     /**
      * Copies all data components from source to target, except heated-related components.
      * This preserves components added by other mods for better compatibility.
+     *
      * @param source The source item stack to copy components from
      * @param target The target item stack to copy components to
      */

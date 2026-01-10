@@ -59,41 +59,58 @@ public abstract class ItemStackMixin {
         long tick = level.getGameTime();
         int cooldownTicks = ServerConfig.HEATED_ITEM_COOLDOWN_TICKS.get();
 
+
+        // Process heated items in inventory - cool them down after time
         // Process heated items in inventory - cool them down after time
         for (ItemStack stack : player.getInventory().items) {
             if (stack.isEmpty()) continue;
-            if (!stack.is(ModTags.Items.HEATED_METALS)) continue;
+
+            // Check heated state by tag OR component
+            boolean isHeated =
+                    stack.is(ModTags.Items.HEATED_METALS)
+                            || Boolean.TRUE.equals(stack.get(ModComponents.HEATED_COMPONENT));
+
+            if (!isHeated) continue;
 
             Long heatedSince = stack.get(ModComponents.HEATED_TIME);
+
+            // Start timer if missing
             if (heatedSince == null) {
-                // Initialize the timestamp
                 stack.set(ModComponents.HEATED_TIME, tick);
-            } else if (tick - heatedSince >= cooldownTicks) {
-                // Time to cool down
-                Item cooled = getCooledItem(stack.getItem(), level);
-                if (cooled != null) {
-                    ItemStack newStack = new ItemStack(cooled, stack.getCount());
-                    copyComponentsExceptHeated(stack, newStack);
-
-                    boolean isMain = stack == player.getMainHandItem();
-                    boolean isOff = stack == player.getOffhandItem();
-
-                    stack.setCount(0); // Remove old heated item
-
-                    if (isMain) {
-                        player.setItemInHand(InteractionHand.MAIN_HAND, newStack);
-                    } else if (isOff) {
-                        player.setItemInHand(InteractionHand.OFF_HAND, newStack);
-                    } else if (!player.getInventory().add(newStack)) {
-                        player.drop(newStack, false); // Drop if inventory is full
-                    }
-
-                    level.playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.7f, 1.0f);
-                }
+                continue;
             }
+
+            // Still cooling
+            if (tick - heatedSince < cooldownTicks) continue;
+
+            // Time to cool down
+            Item cooled = getCooledItem(stack.getItem(), level);
+            if (cooled == null) continue;
+
+            ItemStack newStack = new ItemStack(cooled, stack.getCount());
+            copyComponentsExceptHeated(stack, newStack);
+
+            boolean isMain = stack == player.getMainHandItem();
+            boolean isOff = stack == player.getOffhandItem();
+
+            stack.setCount(0); // Remove old heated item
+
+            if (isMain) {
+                player.setItemInHand(InteractionHand.MAIN_HAND, newStack);
+            } else if (isOff) {
+                player.setItemInHand(InteractionHand.OFF_HAND, newStack);
+            } else if (!player.getInventory().add(newStack)) {
+                player.drop(newStack, false);
+            }
+
+            level.playSound(null, player.blockPosition(),
+                    SoundEvents.FIRE_EXTINGUISH,
+                    SoundSource.PLAYERS,
+                    0.7f, 1.0f);
+
+            break; // Only cool one per tick (prevents lag spikes)
         }
 
-        // Check if player has any heated items
         boolean hasHotItem = player.getInventory().items.stream()
                 .anyMatch(s -> !s.isEmpty() && (s.is(ModTags.Items.HEATED_METALS) || s.is(ModTags.Items.HOT_ITEMS))
                         || Boolean.TRUE.equals(s.get(ModComponents.HEATED_COMPONENT)))
@@ -122,8 +139,8 @@ public abstract class ItemStackMixin {
             long last = lastTongsHit.getOrDefault(uuid, -1L);
             if (last != tick) {
                 // Determine correct hand for break animation
-                EquipmentSlot equipSlot = tongsStack == player.getMainHandItem() 
-                        ? EquipmentSlot.MAINHAND 
+                EquipmentSlot equipSlot = tongsStack == player.getMainHandItem()
+                        ? EquipmentSlot.MAINHAND
                         : EquipmentSlot.OFFHAND;
                 tongsStack.hurtAndBreak(1, player, equipSlot);
                 lastTongsHit.put(uuid, tick);
