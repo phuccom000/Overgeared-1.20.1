@@ -30,7 +30,7 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     private final int count;
     private final int hammering;
     private final List<String> rows = Lists.newArrayList();
-    private final Map<Character, Ingredient> key = new LinkedHashMap<>();
+    private final Map<Character, ForgingRecipe.ForgingIngredient> key = new LinkedHashMap<>();
     private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
     private final Advancement.Builder advancement = Advancement.Builder.recipeAdvancement();
 
@@ -85,8 +85,6 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
     }
 
 
-
-
     public static ShapedForgingRecipeBuilder shaped(RecipeCategory category, ItemLike result, int hammering) {
         return new ShapedForgingRecipeBuilder(category, result, 1, hammering);
     }
@@ -103,16 +101,23 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         return this.define(symbol, Ingredient.of(item));
     }
 
-    public ShapedForgingRecipeBuilder define(Character pSymbol, Ingredient pIngredient) {
-        if (this.key.containsKey(pSymbol)) {
-            throw new IllegalArgumentException("Symbol '" + pSymbol + "' is already defined!");
-        } else if (pSymbol == ' ') {
+    public ShapedForgingRecipeBuilder define(Character symbol, Ingredient ingredient) {
+        return define(symbol, ingredient, false, false);
+    }
+
+    public ShapedForgingRecipeBuilder define(Character symbol, Ingredient ingredient,
+                                             boolean requiresHeated,
+                                             boolean transferNBT) {
+        if (this.key.containsKey(symbol)) {
+            throw new IllegalArgumentException("Symbol '" + symbol + "' is already defined!");
+        } else if (symbol == ' ') {
             throw new IllegalArgumentException("Symbol ' ' (whitespace) is reserved and cannot be defined");
         } else {
-            this.key.put(pSymbol, pIngredient);
+            this.key.put(symbol, new ForgingRecipe.ForgingIngredient(ingredient, requiresHeated, transferNBT));
             return this;
         }
     }
+
 
     public ShapedForgingRecipeBuilder pattern(String pPattern) {
         if (!this.rows.isEmpty() && pPattern.length() != this.rows.get(0).length()) {
@@ -218,41 +223,48 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 .requirements(AdvancementRequirements.Strategy.OR);
         this.criteria.forEach(advBuilder::addCriterion);
 
-        // Pattern parsing logic
+        // Pattern parsing
         int width = this.rows.getFirst().length();
         int height = this.rows.size();
-        NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
 
-        for (int i = 0; i < height; ++i) {
-            String patternLine = this.rows.get(i);
-            for (int j = 0; j < width; ++j) {
-                char symbol = patternLine.charAt(j);
-                Ingredient ingredient = this.key.getOrDefault(symbol, Ingredient.EMPTY);
-                ingredients.set(i * width + j, ingredient);
+        NonNullList<ForgingRecipe.ForgingIngredient> ingredients =
+                NonNullList.withSize(width * height, ForgingRecipe.ForgingIngredient.EMPTY);
+
+        for (int y = 0; y < height; ++y) {
+            String row = this.rows.get(y);
+            for (int x = 0; x < width; ++x) {
+                char symbol = row.charAt(x);
+                ForgingRecipe.ForgingIngredient ingredient = this.key.getOrDefault(symbol, ForgingRecipe.ForgingIngredient.EMPTY);
+                ingredients.set(y * width + x, ingredient);
             }
         }
-        
-        // Resolve booleans and defaults
+
+        // Resolve defaults
         boolean actualHasQuality = this.hasQuality == null || this.hasQuality;
-        boolean actualRequiresBlueprint = this.requiresBlueprint != null ? this.requiresBlueprint : false;
-        boolean actualNeedsMinigame = this.needsMinigame != null ? this.needsMinigame : false;
-        boolean actualHasPolishing = this.hasPolishing != null ? this.hasPolishing : true;
-        boolean actualNeedQuenching = this.needQuenching != null ? this.needQuenching : !(this.result instanceof ArmorItem);
-        
+        boolean actualRequiresBlueprint = this.requiresBlueprint != null && this.requiresBlueprint;
+        boolean actualNeedsMinigame = this.needsMinigame != null && this.needsMinigame;
+        boolean actualHasPolishing = this.hasPolishing == null || this.hasPolishing;
+        boolean actualNeedQuenching = this.needQuenching != null
+                ? this.needQuenching
+                : !(this.result instanceof ArmorItem);
+
         Set<String> actualBlueprintTypes = new LinkedHashSet<>(this.blueprintTypes);
-        
+
         ForgingQuality actualMinQuality = this.minimumQuality != null ? this.minimumQuality : ForgingQuality.POOR;
         ForgingQuality actualQualityDiff = this.qualityDifficulty != null ? this.qualityDifficulty : ForgingQuality.NONE;
         String actualTier = this.tier == null ? AnvilTier.IRON.getDisplayName() : this.tier;
-        ItemStack actualFailedResult = this.failedResult != null ? new ItemStack(this.failedResult, this.failedResultCount) : ItemStack.EMPTY;
 
-        // Convert character key map to string key map for serialization
-        Map<String, Ingredient> stringKeyMap = new LinkedHashMap<>();
-        for (Map.Entry<Character, Ingredient> entry : this.key.entrySet()) {
+        ItemStack actualFailedResult = this.failedResult != null
+                ? new ItemStack(this.failedResult, this.failedResultCount)
+                : ItemStack.EMPTY;
+
+        // Convert char key → string key for JSON
+        Map<String, ForgingRecipe.ForgingIngredient> stringKeyMap = new LinkedHashMap<>();
+        for (Map.Entry<Character, ForgingRecipe.ForgingIngredient> entry : this.key.entrySet()) {
             stringKeyMap.put(String.valueOf(entry.getKey()), entry.getValue());
         }
 
-        // Create the actual ForgingRecipe instance
+        // Build recipe
         ForgingRecipe recipe = new ForgingRecipe(
                 this.group == null ? "" : this.group,
                 actualRequiresBlueprint,
@@ -275,7 +287,8 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
                 height
         );
 
-        output.accept(id, recipe, advBuilder.build(id.withPrefix("recipes/" + this.category.getFolderName() + "/")));
+        output.accept(id, recipe,
+                advBuilder.build(id.withPrefix("recipes/" + this.category.getFolderName() + "/")));
     }
 
 
