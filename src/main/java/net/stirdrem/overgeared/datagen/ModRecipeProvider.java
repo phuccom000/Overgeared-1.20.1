@@ -173,7 +173,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("###")
                 .pattern("###")
                 .define('#', ModItems.STEEL_NUGGET.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .unlockedBy(getHasName(ModItems.STEEL_NUGGET.get()), has(ModItems.STEEL_NUGGET.get()))
                 .save(pWriter, OvergearedMod.MOD_ID + ":steel_ingot_from_nuggets");
 
@@ -182,7 +182,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("###")
                 .pattern("###")
                 .define('#', ModItems.COPPER_NUGGET.get())
-                .unlockedBy("has_copper_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/copper"))))
+                .unlockedBy("has_copper_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/copper"))))
                 .unlockedBy(getHasName(ModItems.COPPER_NUGGET.get()), has(ModItems.COPPER_NUGGET.get()))
                 .save(pWriter, OvergearedMod.MOD_ID + ":copper_ingot_from_nuggets");
 
@@ -191,7 +191,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("###")
                 .pattern("###")
                 .define('#', ModItems.STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WOODEN_TONGS.get())
                 .pattern(" # ")
@@ -393,7 +393,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("###")
                 .pattern("###")
                 .define('#', ModItems.STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter, OvergearedMod.MOD_ID + ":" + getItemName(ModBlocks.STEEL_BLOCK.get()) + "_from_forging_" + getItemName(ModItems.STEEL_INGOT.get()));*/
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_PLATE.get(), 3)
@@ -523,7 +523,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .setBlueprint(ToolType.PICKAXE.getId())
                 .pattern("###")
                 .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_HAMMER_HEAD.get(), 4)
@@ -532,7 +532,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("# ")
                 .pattern(" #")
                 .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_SWORD_BLADE.get(), 4)
@@ -540,21 +540,21 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("#")
                 .pattern("#")
                 .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_SHOVEL_HEAD.get(), 4)
                 .setBlueprint(ToolType.SHOVEL.getId())
                 .pattern("#")
                 .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_HOE_HEAD.get(), 4)
                 .setBlueprint(ToolType.HOE.getId())
                 .pattern("##")
                 .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_AXE_HEAD.get(), 4)
@@ -562,7 +562,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("##")
                 .pattern("# ")
                 .define('#', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);
 
 // Gold Tools
@@ -635,7 +635,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("#  ")
                 .define('#', Items.STICK)
                 .define('x', ModItems.STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);*/
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.IRON_TONG.get(), 2)
@@ -651,7 +651,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.IRON_TONGS.get())
                 .requires(ModItems.IRON_TONG.get())
                 .requires(ModItems.IRON_TONG.get())
-                .unlockedBy("has_iron_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/iron"))))
+                .unlockedBy("has_iron_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/iron"))))
                 .save(pWriter);
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.STEEL_TONG.get(), 2)
@@ -660,13 +660,13 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern(" xx")
                 .pattern("x  ")
                 .define('x', ModItems.HEATED_STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.STEEL_TONGS.get())
                 .requires(ModItems.STEEL_TONG.get())
                 .requires(ModItems.STEEL_TONG.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel"))))
+                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
                 .save(pWriter);
 
        /* ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.CRUDE_STEEL.get(), 3)
@@ -926,7 +926,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         RecipeCategory.COMBAT,
                         Items.DIAMOND_AXE
                 ).unlocks("has_diamond", has(Items.DIAMOND))
-                .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_axe_to_diamond_axe"));
+                .save(pWriter, OvergearedMod.loc("steel_axe_to_diamond_axe"));
 
         // Steel Pickaxe to Diamond Pickaxe
         SmithingTransformRecipeBuilder.smithing(
@@ -936,7 +936,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         RecipeCategory.TOOLS,
                         Items.DIAMOND_PICKAXE
                 ).unlocks("has_diamond", has(Items.DIAMOND))
-                .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_pickaxe_to_diamond_pickaxe"));
+                .save(pWriter, OvergearedMod.loc("steel_pickaxe_to_diamond_pickaxe"));
 
         // Steel Shovel to Diamond Shovel
         SmithingTransformRecipeBuilder.smithing(
@@ -946,7 +946,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         RecipeCategory.TOOLS,
                         Items.DIAMOND_SHOVEL
                 ).unlocks("has_diamond", has(Items.DIAMOND))
-                .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_shovel_to_diamond_shovel"));
+                .save(pWriter, OvergearedMod.loc("steel_shovel_to_diamond_shovel"));
 
         // Steel Hoe to Diamond Hoe
         SmithingTransformRecipeBuilder.smithing(
@@ -956,7 +956,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         RecipeCategory.TOOLS,
                         Items.DIAMOND_HOE
                 ).unlocks("has_diamond", has(Items.DIAMOND))
-                .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_hoe_to_diamond_hoe"));
+                .save(pWriter, OvergearedMod.loc("steel_hoe_to_diamond_hoe"));
 
         // Steel Sword to Diamond Sword
         SmithingTransformRecipeBuilder.smithing(
@@ -966,7 +966,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         RecipeCategory.COMBAT,
                         Items.DIAMOND_SWORD
                 ).unlocks("has_diamond", has(Items.DIAMOND))
-                .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_sword_to_diamond_sword"));
+                .save(pWriter, OvergearedMod.loc("steel_sword_to_diamond_sword"));
 
         // Steel Helmet to Diamond Helmet
         SmithingTransformRecipeBuilder.smithing(
@@ -976,7 +976,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         RecipeCategory.COMBAT,
                         Items.DIAMOND_HELMET
                 ).unlocks("has_diamond", has(Items.DIAMOND))
-                .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_helmet_to_diamond_helmet"));
+                .save(pWriter, OvergearedMod.loc("steel_helmet_to_diamond_helmet"));
 
 // Steel Chestplate to Diamond Chestplate
         SmithingTransformRecipeBuilder.smithing(
@@ -986,7 +986,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         RecipeCategory.COMBAT,
                         Items.DIAMOND_CHESTPLATE
                 ).unlocks("has_diamond", has(Items.DIAMOND))
-                .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_chestplate_to_diamond_chestplate"));
+                .save(pWriter, OvergearedMod.loc("steel_chestplate_to_diamond_chestplate"));
 
 // Steel Leggings to Diamond Leggings
         SmithingTransformRecipeBuilder.smithing(
@@ -996,7 +996,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         RecipeCategory.COMBAT,
                         Items.DIAMOND_LEGGINGS
                 ).unlocks("has_diamond", has(Items.DIAMOND))
-                .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_leggings_to_diamond_leggings"));
+                .save(pWriter, OvergearedMod.loc("steel_leggings_to_diamond_leggings"));
 
         // Steel Boots to Diamond Boots
         SmithingTransformRecipeBuilder.smithing(
@@ -1006,7 +1006,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         RecipeCategory.COMBAT,
                         Items.DIAMOND_BOOTS
                 ).unlocks("has_diamond", has(Items.DIAMOND))
-                .save(pWriter, ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "steel_boots_to_diamond_boots"));
+                .save(pWriter, OvergearedMod.loc("steel_boots_to_diamond_boots"));
 
         /*FletchingRecipeBuilder.fletching(
                         Ingredient.of(Items.FLINT),
