@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "overgeared:block/nether_alloy_furnace_front_on",
+    "side": "overgeared:block/nether_alloy_furnace_side",
+    "top": "overgeared:block/nether_alloy_furnace_side"
+  }
+}

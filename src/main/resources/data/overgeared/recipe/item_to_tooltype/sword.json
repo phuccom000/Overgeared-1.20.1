@@ -1,0 +1,21 @@
+{
+  "type": "overgeared:item_to_tooltype",
+  "item": [
+    {
+      "item": "overgeared:stone_sword_blade"
+    },
+    {
+      "item": "overgeared:iron_sword_blade"
+    },
+    {
+      "item": "overgeared:golden_sword_blade"
+    },
+    {
+      "item": "overgeared:copper_sword_blade"
+    },
+    {
+      "item": "overgeared:steel_sword_blade"
+    }
+  ],
+  "tooltype": "sword"
+}

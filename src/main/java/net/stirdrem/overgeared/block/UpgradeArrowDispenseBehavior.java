@@ -1,7 +1,5 @@
-/*
 package net.stirdrem.overgeared.block;
 
-//import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.BlockSource;
@@ -11,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.stirdrem.overgeared.entity.ArrowTier;
+import net.stirdrem.overgeared.entity.ModEntities;
 import net.stirdrem.overgeared.entity.custom.UpgradeArrowEntity;
 import net.stirdrem.overgeared.item.custom.LingeringArrowItem;
 import net.stirdrem.overgeared.item.custom.UpgradeArrowItem;
@@ -20,7 +19,7 @@ public class UpgradeArrowDispenseBehavior extends DefaultDispenseItemBehavior {
     protected ItemStack execute(BlockSource source, ItemStack stack) {
         Level level = source.level();
         Position position = DispenserBlock.getDispensePosition(source);
-        Direction direction = source.blockEntity().getBlockState().getValue(DispenserBlock.FACING);
+        Direction direction = source.state().getValue(DispenserBlock.FACING);
 
         if (stack.getItem() instanceof UpgradeArrowItem arrowItem) {
             createAndShootArrow(arrowItem.getTier(), level, position, direction, stack);
@@ -34,12 +33,14 @@ public class UpgradeArrowDispenseBehavior extends DefaultDispenseItemBehavior {
 
     private void createAndShootArrow(ArrowTier tier, Level level, Position position, Direction direction, ItemStack stack) {
         UpgradeArrowEntity arrow = new UpgradeArrowEntity(
+                ModEntities.UPGRADE_ARROW.get(),
                 tier,
                 level,
                 position.x(),
                 position.y(),
                 position.z(),
-                stack.copy()
+                stack.copy(),
+                null
         );
 
         arrow.shoot(
@@ -57,4 +58,4 @@ public class UpgradeArrowDispenseBehavior extends DefaultDispenseItemBehavior {
     protected void playSound(BlockSource source) {
         source.level().levelEvent(1002, source.pos(), 0);
     }
-}*/
+}

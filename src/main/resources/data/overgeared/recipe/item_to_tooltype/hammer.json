@@ -1,0 +1,15 @@
+{
+  "type": "overgeared:item_to_tooltype",
+  "item": [
+    {
+      "item": "overgeared:stone_hammer_head"
+    },
+    {
+      "item": "overgeared:copper_hammer_head"
+    },
+    {
+      "item": "overgeared:steel_hammer_head"
+    }
+  ],
+  "tooltype": "hammer"
+}

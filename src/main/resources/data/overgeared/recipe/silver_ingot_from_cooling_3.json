@@ -1,0 +1,15 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "caverns_and_chasms"
+    }
+  ],
+  "type": "overgeared:cooling",
+  "input": {
+    "item": "overgeared:heated_silver_ingot"
+  },
+  "output": {
+    "id": "caverns_and_chasms:silver_ingot"
+  }
+}

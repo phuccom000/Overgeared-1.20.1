@@ -18,11 +18,12 @@ build
 .gradle
 
 # other
+1.20.1
 eclipse
+minecraftoriginalasset
 run
-runs
 run-data
+src/generated
 
-repo
-/1.20.1
-/src/generated/resources/.cache
+# Files from Forge MDK
+forge*changelog.txt

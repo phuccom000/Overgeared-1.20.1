@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "x",
+    "#",
+    "a"
+  ],
+  "key": {
+    "x": {
+      "item": "overgeared:diamond_shard"
+    },
+    "#": {
+      "item": "minecraft:stick"
+    },
+    "a": {
+      "item": "minecraft:feather"
+    }
+  },
+  "result": {
+    "id": "overgeared:diamond_arrow",
+    "count": 4
+  }
+}

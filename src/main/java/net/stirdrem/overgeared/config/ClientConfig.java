@@ -7,7 +7,7 @@ public class ClientConfig {
     public static final ModConfigSpec CLIENT_CONFIG;
 
     public static final ModConfigSpec.IntValue MINIGAME_OVERLAY_HEIGHT;
-    public static final ModConfigSpec.BooleanValue PLAYER_HUD_TOGGLE;
+    public static final ModConfigSpec.BooleanValue POP_UP_TOGGLE;
 
     static {
         final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -16,9 +16,9 @@ public class ClientConfig {
         MINIGAME_OVERLAY_HEIGHT = builder
                 .comment("Vertical position of the minigame overlay")
                 .defineInRange("overlayHeight", 55, -10000, 10000);
-        PLAYER_HUD_TOGGLE = builder
-                .comment("If player's vanilla HUD is visible during minigame. May not work with modded HUD.")
-                .define("HUDVisible", true);
+        POP_UP_TOGGLE = builder
+                .comment("If minigame's pop up appear during minigame.")
+                .define("PopupVisible", true);
 
         builder.pop();
 

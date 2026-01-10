@@ -1,0 +1,25 @@
+{
+  "type": "overgeared:nether_alloy_smelting",
+  "category": "misc",
+  "group": "misc",
+  "experience": 0.5,
+  "cookingtime": 150,
+  "ingredients": [
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:coal"
+    }
+  ],
+  "result": {
+    "id": "overgeared:crude_steel",
+    "count": 4
+  }
+}

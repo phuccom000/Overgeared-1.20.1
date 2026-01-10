@@ -99,9 +99,7 @@
   "message.overgeared.another_anvil_in_use": "Você já está usando outra bigorna!",
   "message.overgeared.anvil_in_use_by_another": "Esta bigorna esta em uso por outro jogador!",
   "message.overgeared.item_has_no_quality": "Esta receita não possui um modificador de qualidade",
-  "message.overgeared.no_recipe": "Não há receita válida!"
-  "tooltip.overgeared.knappable_rock.tooltip": "Segure uma pedra em cada mão para começar à lascar"
-  "tooltip.overgeared.flint_flavor": "Aperte botão direito em uma pedra para lascar um pedaço de rocha. Há uma chance de quebrar.",
+  "message.overgeared.no_recipe": "Não há receita válida!""tooltip.overgeared.knappable_rock.tooltip": "Segure uma pedra em cada mão para começar à lascar""tooltip.overgeared.flint_flavor": "Aperte botão direito em uma pedra para lascar um pedaço de rocha. Há uma chance de quebrar.",
   "tooltip.overgeared.polished": "Polido",
   "tooltip.overgeared.unpolished": "Não Polido",
   "message.overgeared.no_minigame": "Minigame Desabilitado!",
@@ -117,11 +115,11 @@
   "tooltip.overgeared.blueprint.maxlevel": "Qualidade Máxima",
   "tooltip.overgeared.blueprint.tool_type": "Tipo: ",
   "tooltip.overgeared.blueprint.instructions": "Use em forjaria para certas receitas. Limita a qualidade máxima de um resultado baseado na do projeto.",
-  "tooltype.minecraft.sword": "Espada",
-  "tooltype.minecraft.axe": "Machado",
-  "tooltype.minecraft.pickaxe": "Picareta",
-  "tooltype.minecraft.hoe": "Enxada",
-  "tooltype.minecraft.shovel": "Pá",
+  "tooltype.overgeared.sword": "Espada",
+  "tooltype.overgeared.axe": "Machado",
+  "tooltype.overgeared.pickaxe": "Picareta",
+  "tooltype.overgeared.hoe": "Enxada",
+  "tooltype.overgeared.shovel": "Pá",
   "tooltype.overgeared.hammer": "Martelo",
   "button.overgeared.select": "Selecionar",
   "tooltip.overgeared.previous_tool": "Ferramenta Anterior",
@@ -152,5 +150,3 @@
   "jei.overgeared.category.steel_anvil": "Como fazer uma Bigorna de Ferreiro",
   "jei.overgeared.steel_anvil.description": "Agache e Clique o Botão Direito em uma Bigorna Padrão com um Martelo de Ferreiro para convertê-lo para uma Bigorna de Ferreiro."
 }
-
-

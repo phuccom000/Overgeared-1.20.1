@@ -1,0 +1,12 @@
+{
+  "type": "overgeared:rock_knapping",
+  "pattern": [
+    "x ",
+    " x"
+  ],
+  "result": {
+    "id": "overgeared:stone_hammer_head",
+    "Count": 1
+  },
+  "show_notification": true
+}
