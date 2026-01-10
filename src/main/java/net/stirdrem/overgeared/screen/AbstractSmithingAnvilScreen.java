@@ -70,6 +70,12 @@ public abstract class AbstractSmithingAnvilScreen<T extends AbstractSmithingAnvi
     }
 
     private void renderGhostResult(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
+        // If the result slot already has an item, don't show the ghost result
+        // This prevents double rendering and double tooltips
+        if (menu.getResultSlot().hasItem()) {
+            return;
+        }
+
         ItemStack ghostResult = menu.getGhostResult();
         if (!ghostResult.isEmpty()) {
             int itemX = x + 124;

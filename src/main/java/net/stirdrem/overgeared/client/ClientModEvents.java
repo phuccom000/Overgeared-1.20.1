@@ -37,6 +37,7 @@ import net.stirdrem.overgeared.item.armor.model.CopperLeggings;
 import net.stirdrem.overgeared.item.custom.LingeringArrowItem;
 import net.stirdrem.overgeared.item.custom.UpgradeArrowItem;
 import net.stirdrem.overgeared.screen.*;
+import net.stirdrem.overgeared.compat.ModCompat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -53,6 +54,9 @@ public class ClientModEvents {
                         IConfigScreenFactory.class,
                         (container, parent) -> new OvergearedConfigScreen(parent));
 
+        // Initialize client-side mod compatibility
+        ModCompat.initClient();
+
         event.enqueueWork(() -> {
             // Register item properties for arrow potion type variants
             // For LINGERING_ARROW, always show lingering variant when potion is present
@@ -64,28 +68,28 @@ public class ClientModEvents {
                         }
                         return 0.0f; // Base model
                     });
-
+            
             // For upgrade arrows, check LINGERING_STATUS to differentiate tipped vs lingering
             registerArrowProperties(ModItems.IRON_UPGRADE_ARROW.get());
             registerArrowProperties(ModItems.STEEL_UPGRADE_ARROW.get());
             registerArrowProperties(ModItems.DIAMOND_UPGRADE_ARROW.get());
-
+            
             // Register arrow color handlers
             ItemColors itemColors = Minecraft.getInstance().getItemColors();
             itemColors.register(LingeringArrowItem::getColor, ModItems.LINGERING_ARROW.get());
-            itemColors.register(UpgradeArrowItem::getColor,
-                    ModItems.IRON_UPGRADE_ARROW.get(),
-                    ModItems.STEEL_UPGRADE_ARROW.get(),
-                    ModItems.DIAMOND_UPGRADE_ARROW.get());
+            itemColors.register(UpgradeArrowItem::getColor, 
+                ModItems.IRON_UPGRADE_ARROW.get(),
+                ModItems.STEEL_UPGRADE_ARROW.get(),
+                ModItems.DIAMOND_UPGRADE_ARROW.get());
         });
     }
-
+    
     private static void registerArrowProperties(Item item) {
         ItemProperties.register(item, OvergearedMod.loc("potion_type"),
                 (stack, level, entity, seed) -> {
                     PotionContents potionContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
                     boolean isLingering = stack.getOrDefault(ModComponents.LINGERING_STATUS, false);
-
+                    
                     if (isLingering && (potionContents.potion().isPresent() || potionContents.hasEffects())) {
                         return 2.0f; // Lingering potion model
                     } else if (potionContents.potion().isPresent() || potionContents.hasEffects()) {
@@ -106,7 +110,6 @@ public class ClientModEvents {
         event.register(ModMenuTypes.FLETCHING_STATION_MENU.get(), FletchingStationScreen::new);
         event.register(ModMenuTypes.ALLOY_SMELTER_MENU.get(), AlloySmelterScreen::new);
         event.register(ModMenuTypes.NETHER_ALLOY_SMELTER_MENU.get(), NetherAlloySmelterScreen::new);
-        event.register(ModMenuTypes.CASTING_SMELTER_MENU.get(), CastingSmelterScreen::new);
     }
 
     @SubscribeEvent
