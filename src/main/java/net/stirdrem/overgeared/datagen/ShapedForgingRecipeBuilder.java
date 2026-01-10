@@ -246,12 +246,20 @@ public class ShapedForgingRecipeBuilder implements RecipeBuilder {
         String actualTier = this.tier == null ? AnvilTier.IRON.getDisplayName() : this.tier;
         ItemStack actualFailedResult = this.failedResult != null ? new ItemStack(this.failedResult, this.failedResultCount) : ItemStack.EMPTY;
 
+        // Convert character key map to string key map for serialization
+        Map<String, Ingredient> stringKeyMap = new LinkedHashMap<>();
+        for (Map.Entry<Character, Ingredient> entry : this.key.entrySet()) {
+            stringKeyMap.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+
         // Create the actual ForgingRecipe instance
         ForgingRecipe recipe = new ForgingRecipe(
                 this.group == null ? "" : this.group,
                 actualRequiresBlueprint,
                 actualBlueprintTypes,
                 actualTier,
+                new ArrayList<>(this.rows),
+                stringKeyMap,
                 ingredients,
                 new ItemStack(this.result, this.count),
                 actualFailedResult,

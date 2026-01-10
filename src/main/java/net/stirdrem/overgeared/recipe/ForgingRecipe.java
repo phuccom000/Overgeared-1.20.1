@@ -26,6 +26,8 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
     private final String group;
     private final Set<String> blueprintTypes;
     private final String tier;
+    private final List<String> pattern;
+    private final Map<String, Ingredient> key;
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack result;
     private final ItemStack failedResult;
@@ -39,11 +41,14 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
     private final ForgingQuality minimumQuality;
     private final ForgingQuality qualityDifficulty;
 
-    public ForgingRecipe(String group, boolean requireBlueprint, Set<String> blueprintTypes, String tier, NonNullList<Ingredient> ingredients,
+    public ForgingRecipe(String group, boolean requireBlueprint, Set<String> blueprintTypes, String tier, 
+                         List<String> pattern, Map<String, Ingredient> key, NonNullList<Ingredient> ingredients,
                          ItemStack result, ItemStack failedResult, int hammering, boolean hasQuality, boolean needsMinigame, boolean hasPolishing, boolean needQuenching, boolean showNotification, ForgingQuality minimumQuality, ForgingQuality qualityDifficulty, int width, int height) {
         this.group = group;
         this.blueprintTypes = blueprintTypes;
         this.tier = tier;
+        this.pattern = pattern;
+        this.key = key;
         this.ingredients = ingredients;
         this.result = result;
         this.failedResult = failedResult;
@@ -268,6 +273,14 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
         return needQuenching;
     }
 
+    public List<String> getPattern() {
+        return pattern;
+    }
+
+    public Map<String, Ingredient> getKey() {
+        return key;
+    }
+
     private int getRecipeSize() {
         return width * height;
     }
@@ -359,8 +372,8 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
                     Codec.BOOL.optionalFieldOf("requires_blueprint", false).forGetter(ForgingRecipe::requiresBlueprint),
                     BLUEPRINT_TYPES_CODEC.optionalFieldOf("blueprint", Set.of()).forGetter(ForgingRecipe::getBlueprintTypes),
                     Codec.STRING.optionalFieldOf("tier", AnvilTier.IRON.getDisplayName()).forGetter(ForgingRecipe::getAnvilTier),
-                    Codec.list(Codec.STRING).fieldOf("pattern").forGetter(r -> List.of()),
-                    Codec.unboundedMap(Codec.STRING, Ingredient.CODEC).fieldOf("key").forGetter(r -> Map.of()),
+                    Codec.list(Codec.STRING).fieldOf("pattern").forGetter(ForgingRecipe::getPattern),
+                    Codec.unboundedMap(Codec.STRING, Ingredient.CODEC).fieldOf("key").forGetter(ForgingRecipe::getKey),
                     ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
                     ItemStack.CODEC.optionalFieldOf("result_failed", ItemStack.EMPTY).forGetter(r -> r.failedResult),
                     Codec.INT.optionalFieldOf("hammering", 1).forGetter(ForgingRecipe::getHammeringRequired),
@@ -403,7 +416,8 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
                 
                 ItemStack actualFailedResult = failedResult.isEmpty() ? result.copy() : failedResult;
                 
-                return new ForgingRecipe(group, requiresBlueprint, new LinkedHashSet<>(blueprintTypes), tier, ingredients,
+                return new ForgingRecipe(group, requiresBlueprint, new LinkedHashSet<>(blueprintTypes), tier, 
+                        new ArrayList<>(pattern), new LinkedHashMap<>(key), ingredients,
                         result, actualFailedResult, hammering, hasQuality, needsMinigame, hasPolishing, actualNeedQuenching,
                         showNotification, minimumQuality, qualityDifficulty, width, height);
             }));
@@ -432,7 +446,9 @@ public class ForgingRecipe implements Recipe<RecipeInput> {
                     ItemStack result = ItemStack.STREAM_CODEC.decode(buffer);
                     ItemStack failedResult = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
                     
-                    return new ForgingRecipe(group, requiresBlueprint, blueprintTypes, tier, ingredients,
+                    // Pattern and key are not synced over network - only ingredients are needed at runtime
+                    return new ForgingRecipe(group, requiresBlueprint, blueprintTypes, tier, 
+                            List.of(), Map.of(), ingredients,
                             result, failedResult, hammering, hasQuality, needsMinigame, hasPolishing,
                             needQuenching, showNotification, minimumQuality, qualityDifficulty, width, height);
                 }
