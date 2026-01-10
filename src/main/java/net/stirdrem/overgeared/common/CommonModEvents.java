@@ -12,7 +12,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.UpgradeArrowDispenseBehavior;
-import net.stirdrem.overgeared.commands.ModCommands;
+import net.stirdrem.overgeared.command.ModCommands;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.ToolTypeRegistry;
