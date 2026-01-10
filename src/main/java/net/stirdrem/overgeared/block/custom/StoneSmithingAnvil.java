@@ -1,27 +1,27 @@
 package net.stirdrem.overgeared.block.custom;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.FallingBlockEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -31,7 +31,7 @@ import net.stirdrem.overgeared.block.entity.StoneSmithingAnvilBlockEntity;
 import net.stirdrem.overgeared.config.ServerConfig;
 import org.jetbrains.annotations.Nullable;
 
-public class StoneSmithingAnvil extends AbstractSmithingAnvilNew {
+public class StoneSmithingAnvil extends AbstractSmithingAnvil {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
@@ -58,12 +58,13 @@ public class StoneSmithingAnvil extends AbstractSmithingAnvilNew {
     private static final VoxelShape SHAPE_Z = Shapes.or(Z1, Z2);
     private static final VoxelShape SHAPE_X = Shapes.or(X1, X2);
 
-    // Z-axis oriented shape
-    private static final int HAMMER_SOUND_DURATION_TICKS = 6; // adjust to match your sound
-
-
-    public StoneSmithingAnvil(Properties properties) {
+    public StoneSmithingAnvil(BlockBehaviour.Properties properties) {
         super(AnvilTier.STONE, properties);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return null;
     }
 
 
@@ -84,8 +85,9 @@ public class StoneSmithingAnvil extends AbstractSmithingAnvilNew {
     }
 
     @Override
-    public BlockState mirror(BlockState pState, Mirror pMirror) {
-        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        Rotation rotation = mirror.getRotation(state.getValue(FACING));
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override

@@ -1,11 +1,12 @@
 package net.stirdrem.overgeared.recipe;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.SimpleContainer;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -13,36 +14,33 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NetherAlloySmeltingRecipe implements Recipe<SimpleContainer>, INetherAlloyRecipe {
-    private final ResourceLocation id;
+//TODO: make this extend AlloySmeltingRecipe to cut down on duplicate code
+public class NetherAlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRecipe {
     private final String group;
     private final CraftingBookCategory category;
-    private final List<Ingredient> inputs;
-    private final ItemStack output;
+    private final List<Ingredient> ingredients;
+    private final ItemStack result;
     private final float experience;
     private final int cookingTime;
 
-    public NetherAlloySmeltingRecipe(ResourceLocation id, String group, CraftingBookCategory category, List<Ingredient> inputs, ItemStack output, float experience, int cookingTime) {
-        this.id = id;
+    public NetherAlloySmeltingRecipe(String group, CraftingBookCategory category, List<Ingredient> ingredients, ItemStack result, float experience, int cookingTime) {
         this.group = group;
         this.category = category;
-        this.inputs = inputs;
-        this.output = output;
+        this.ingredients = ingredients;
+        this.result = result;
         this.experience = experience;
         this.cookingTime = cookingTime;
     }
 
     @Override
-    public boolean matches(SimpleContainer inv, Level level) {
-        // Don't bother checking on client side for performance reasons
+    public boolean matches(RecipeInput input, Level level) {
         if (level.isClientSide) return false;
 
-        // Create a list of non-empty ingredient-item pairs to match
         List<Ingredient> remainingIngredients = new ArrayList<>();
         List<ItemStack> remainingItems = new ArrayList<>();
 
         // Collect all recipe ingredients (skip empty ingredients if any)
-        for (Ingredient ingredient : inputs) {
+        for (Ingredient ingredient : ingredients) {
             if (!ingredient.isEmpty()) {
                 remainingIngredients.add(ingredient);
             }
@@ -50,7 +48,7 @@ public class NetherAlloySmeltingRecipe implements Recipe<SimpleContainer>, INeth
 
         // Collect all non-empty items from the input slots
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = inv.getItem(i);
+            ItemStack stack = input.getItem(i);
             if (!stack.isEmpty()) {
                 remainingItems.add(stack);
             }
@@ -82,30 +80,47 @@ public class NetherAlloySmeltingRecipe implements Recipe<SimpleContainer>, INeth
         return remainingIngredients.isEmpty();
     }
 
-
     @Override
-    public ItemStack assemble(SimpleContainer container, net.minecraft.core.RegistryAccess registryAccess) {
-        return output.copy();
+    public ItemStack assemble(RecipeInput input, HolderLookup.Provider provider) {
+        return result.copy();
     }
 
     @Override
-    public boolean canCraftInDimensions(int w, int h) {
+    public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 
     @Override
-    public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess) {
-        return output;
+    public List<Ingredient> getIngredientsList() {
+        return ingredients;
     }
 
     @Override
-    public ResourceLocation getId() {
-        return id;
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
+        return result;
+    }
+
+    @Override
+    public float getExperience() {
+        return experience;
+    }
+
+    @Override
+    public String getGroup() {
+        return group;
+    }
+
+    public CraftingBookCategory getCraftingBookCategory() {
+        return category;
+    }
+
+    public int getCookingTime() {
+        return cookingTime;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.NETHER_ALLOY_SMELTING.get();
+        return ModRecipeSerializers.NETHER_ALLOY_SMELTING.get();
     }
 
     @Override
@@ -113,85 +128,34 @@ public class NetherAlloySmeltingRecipe implements Recipe<SimpleContainer>, INeth
         return ModRecipeTypes.NETHER_ALLOY_SMELTING.get();
     }
 
-    public String getGroup() {
-        return group;
-    }
-
-    public CraftingBookCategory category() {
-        return category;
-    }
-
-    public float getExperience() {
-        return experience;
-    }
-
-    public int getCookingTime() {
-        return cookingTime;
-    }
-
-    public List<Ingredient> getIngredientsList() {
-        return inputs;
-    }
-
-    // ---------------------------------------------------------------------------------------
-    // Type & Serializer
-    // ---------------------------------------------------------------------------------------
-    public static class Type implements RecipeType<NetherAlloySmeltingRecipe> {
-        public static final Type INSTANCE = new Type();
-        public static final String ID = "nether_alloy_smelting";
-    }
-
     public static class Serializer implements RecipeSerializer<NetherAlloySmeltingRecipe> {
-        public static final Serializer INSTANCE = new Serializer();
+        public static final MapCodec<NetherAlloySmeltingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Codec.STRING.optionalFieldOf("group", "").forGetter(r -> r.group),
+                CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC).forGetter(r -> r.category),
+                Ingredient.CODEC.listOf(0, 9).fieldOf("ingredients").forGetter(r -> r.ingredients),
+                ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
+                Codec.FLOAT.optionalFieldOf("experience", 0.0F).forGetter(r -> r.experience),
+                Codec.INT.optionalFieldOf("cookingtime", 200).forGetter(r -> r.cookingTime)
+        ).apply(i, NetherAlloySmeltingRecipe::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, NetherAlloySmeltingRecipe> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, r -> r.group,
+                CraftingBookCategory.STREAM_CODEC, r -> r.category,
+                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(9)), r -> r.ingredients,
+                ItemStack.STREAM_CODEC, r -> r.result,
+                ByteBufCodecs.FLOAT, r -> r.experience,
+                ByteBufCodecs.INT, r -> r.cookingTime,
+                NetherAlloySmeltingRecipe::new
+        );
 
         @Override
-        public NetherAlloySmeltingRecipe fromJson(ResourceLocation id, JsonObject json) {
-            String group = json.has("group") ? json.get("group").getAsString() : "";
-            CraftingBookCategory category = json.has("category")
-                    ? CraftingBookCategory.CODEC.byName(json.get("category").getAsString(), CraftingBookCategory.MISC)
-                    : CraftingBookCategory.MISC;
-
-            JsonArray ingredients = json.getAsJsonArray("ingredients");
-            List<Ingredient> inputList = new ArrayList<>();
-            for (int i = 0; i < ingredients.size(); i++) {
-                inputList.add(Ingredient.fromJson(ingredients.get(i)));
-            }
-            if (ingredients.size() > 9) {
-                throw new JsonSyntaxException("Alloy smelting recipe cannot have more than 9 ingredients: found " + ingredients.size());
-            }
-
-            ItemStack result = ShapedRecipe.itemStackFromJson(json.getAsJsonObject("result"));
-            float experience = json.has("experience") ? json.get("experience").getAsFloat() : 0.0F;
-            int cookingTime = json.has("cookingtime") ? json.get("cookingtime").getAsInt() : 200;
-
-            return new NetherAlloySmeltingRecipe(id, group, category, inputList, result, experience, cookingTime);
+        public MapCodec<NetherAlloySmeltingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public NetherAlloySmeltingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            String group = buf.readUtf();
-            CraftingBookCategory category = buf.readEnum(CraftingBookCategory.class);
-
-            int count = buf.readVarInt();
-            List<Ingredient> inputs = new ArrayList<>();
-            for (int i = 0; i < count; i++) inputs.add(Ingredient.fromNetwork(buf));
-
-            ItemStack result = buf.readItem();
-            float experience = buf.readFloat();
-            int cookingTime = buf.readVarInt();
-
-            return new NetherAlloySmeltingRecipe(id, group, category, inputs, result, experience, cookingTime);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, NetherAlloySmeltingRecipe recipe) {
-            buf.writeUtf(recipe.group);
-            buf.writeEnum(recipe.category);
-            buf.writeVarInt(recipe.inputs.size());
-            recipe.inputs.forEach(i -> i.toNetwork(buf));
-            buf.writeItem(recipe.output);
-            buf.writeFloat(recipe.experience);
-            buf.writeVarInt(recipe.cookingTime);
+        public StreamCodec<RegistryFriendlyByteBuf, NetherAlloySmeltingRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

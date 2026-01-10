@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "overgeared:steel_pickaxe"
+    },
+    "title": "Steel Yourself",
+    "description": "Upgrade your Pickaxe again",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "overgeared:making_anvil",
+  "criteria": {
+    "smithing_hammer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "overgeared:steel_pickaxe"
+          }
+        ]
+      }
+    }
+  }
+}

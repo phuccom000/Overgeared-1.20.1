@@ -27,5 +27,4 @@ public class TooltipButton extends Button {
     public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
         // Provide narration for accessibility if needed
     }
-
 }

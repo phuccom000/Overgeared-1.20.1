@@ -1,14 +1,17 @@
 package net.stirdrem.overgeared.screen;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.BlueprintQuality;
+import net.stirdrem.overgeared.components.BlueprintData;
+import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.item.ToolType;
 
@@ -71,13 +74,13 @@ public class BlueprintWorkbenchMenu extends AbstractContainerMenu {
 
         // Create new blueprint if output is empty or doesn't match
         if (output.isEmpty()) {
-            ItemStack newOutput = new ItemStack(ModItems.BLUEPRINT.get());
-            CompoundTag tag = newOutput.getOrCreateTag();
-            BlueprintQuality quality = BlueprintQuality.WELL;
-            tag.putString("ToolType", toolType.getId());
-            tag.putString("Quality", quality.getDisplayName());
-            tag.putInt("Uses", 0);
-            tag.putInt("UsesToLevel", quality.getUse());
+            ItemStack newOutput = new ItemStack(ModItems.BLUEPRINT);
+            newOutput.set(ModComponents.BLUEPRINT_DATA, new BlueprintData(
+                    BlueprintQuality.WELL.name(),
+                    toolType.getId(),
+                    0,
+                    BlueprintQuality.WELL.getUse(),
+                    false));
 
             // Set output and consume 1 input item
             this.outputContainer.setItem(0, newOutput);

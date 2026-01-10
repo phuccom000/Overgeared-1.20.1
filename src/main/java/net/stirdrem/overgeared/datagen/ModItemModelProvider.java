@@ -4,17 +4,17 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.armortrim.TrimMaterial;
 import net.minecraft.world.item.armortrim.TrimMaterials;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ModItems;
 
@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 
 public class ModItemModelProvider extends ItemModelProvider {
-    private static LinkedHashMap<ResourceKey<TrimMaterial>, Float> trimMaterials = new LinkedHashMap<>();
+    private static final LinkedHashMap<ResourceKey<TrimMaterial>, Float> trimMaterials = new LinkedHashMap<>();
 
     static {
         trimMaterials.put(TrimMaterials.QUARTZ, 0.1F);
@@ -56,6 +56,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.UNFIRED_TOOL_CAST);
         simpleItem(ModItems.CLAY_TOOL_CAST);
         simpleItem(ModItems.NETHER_TOOL_CAST);
+        upgradeArrowModel(ModItems.LINGERING_ARROW);
         upgradeArrowModel(ModItems.IRON_UPGRADE_ARROW);
         upgradeArrowModel(ModItems.STEEL_UPGRADE_ARROW);
         upgradeArrowModel(ModItems.DIAMOND_UPGRADE_ARROW);
@@ -144,96 +145,86 @@ public class ModItemModelProvider extends ItemModelProvider {
 
 
     // Shoutout to El_Redstoniano for making this
-    private void trimmedArmorItem(RegistryObject<Item> itemRegistryObject) {
-        final String MOD_ID = OvergearedMod.MOD_ID; // Change this to your mod id
-
+    private void trimmedArmorItem(DeferredHolder<Item, Item> itemRegistryObject) {
         if (itemRegistryObject.get() instanceof ArmorItem armorItem) {
-            trimMaterials.entrySet().forEach(entry -> {
+            trimMaterials.forEach((trimMaterial, value) -> {
 
-                ResourceKey<TrimMaterial> trimMaterial = entry.getKey();
-                float trimValue = entry.getValue();
+              float trimValue = value;
 
-                String armorType = switch (armorItem.getEquipmentSlot()) {
-                    case HEAD -> "helmet";
-                    case CHEST -> "chestplate";
-                    case LEGS -> "leggings";
-                    case FEET -> "boots";
-                    default -> "";
-                };
+              String armorType = getEquipmentTypeFromSlot(armorItem.getEquipmentSlot());
 
-                String armorItemPath = "item/" + armorItem;
-                String trimPath = "trims/items/" + armorType + "_trim_" + trimMaterial.location().getPath();
-                String currentTrimName = armorItemPath + "_" + trimMaterial.location().getPath() + "_trim";
-                ResourceLocation armorItemResLoc = ResourceLocation.tryBuild(MOD_ID, armorItemPath);
-                ResourceLocation trimResLoc = ResourceLocation.tryParse(trimPath); // minecraft namespace
-                ResourceLocation trimNameResLoc = ResourceLocation.tryBuild(MOD_ID, currentTrimName);
+              String armorItemPath = "item/" + ResourceLocation.parse(armorItem.toString()).getPath();
+              String trimPath = "trims/items/" + armorType + "_trim_" + trimMaterial.location().getPath();
+              String currentTrimName = armorItemPath + "_" + trimMaterial.location().getPath() + "_trim";
+              ResourceLocation armorItemResLoc = OvergearedMod.loc(armorItemPath);
+              ResourceLocation trimResLoc = ResourceLocation.tryParse(trimPath); // minecraft namespace
+              ResourceLocation trimNameResLoc = OvergearedMod.loc(currentTrimName);
 
-                // This is used for making the ExistingFileHelper acknowledge that this texture exist, so this will
-                // avoid an IllegalArgumentException
-                existingFileHelper.trackGenerated(trimResLoc, PackType.CLIENT_RESOURCES, ".png", "textures");
+              // This is used for making the ExistingFileHelper acknowledge that this texture exist, so this will
+              // avoid an IllegalArgumentException
+              existingFileHelper.trackGenerated(trimResLoc, PackType.CLIENT_RESOURCES, ".png", "textures");
 
-                // Trimmed armorItem files
-                getBuilder(currentTrimName)
-                        .parent(new ModelFile.UncheckedModelFile("item/generated"))
-                        .texture("layer0", armorItemResLoc)
-                        .texture("layer1", trimResLoc);
+              // Trimmed armorItem files
+              getBuilder(currentTrimName)
+                      .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                      .texture("layer0", armorItemResLoc)
+                      .texture("layer1", trimResLoc);
 
-                // Non-trimmed armorItem file (normal variant)
-                this.withExistingParent(itemRegistryObject.getId().getPath(),
-                                mcLoc("item/generated"))
-                        .override()
-                        .model(new ModelFile.UncheckedModelFile(trimNameResLoc))
-                        .predicate(mcLoc("trim_type"), trimValue).end()
-                        .texture("layer0",
-                                ResourceLocation.tryBuild(MOD_ID,
-                                        "item/" + itemRegistryObject.getId().getPath()));
+              // Non-trimmed armorItem file (normal variant)
+              this.withExistingParent(itemRegistryObject.getId().getPath(),
+                              mcLoc("item/generated"))
+                      .override()
+                      .model(new ModelFile.UncheckedModelFile(trimNameResLoc))
+                      .predicate(mcLoc("trim_type"), trimValue).end()
+                      .texture("layer0", OvergearedMod.loc("item/" + itemRegistryObject.getId().getPath()));
             });
         }
     }
 
-    private void trimmedArmorItemWithOverlay(RegistryObject<Item> itemRegistryObject) {
-        final String MOD_ID = OvergearedMod.MOD_ID;
+    private String getEquipmentTypeFromSlot(EquipmentSlot slot) {
+      return switch (slot) {
+        case HEAD -> "helmet";
+        case CHEST -> "chestplate";
+        case LEGS -> "leggings";
+        case FEET -> "boots";
+        default -> "";
+      };
+    }
 
+    private void trimmedArmorItemWithOverlay(DeferredHolder<Item, Item> itemRegistryObject) {
         if (itemRegistryObject.get() instanceof ArmorItem armorItem) {
-            trimMaterials.entrySet().forEach(entry -> {
-                ResourceKey<TrimMaterial> trimMaterial = entry.getKey();
-                float trimValue = entry.getValue();
+            trimMaterials.forEach((trimMaterial, value) -> {
+              float trimValue = value;
 
-                String armorType = switch (armorItem.getEquipmentSlot()) {
-                    case HEAD -> "helmet";
-                    case CHEST -> "chestplate";
-                    case LEGS -> "leggings";
-                    case FEET -> "boots";
-                    default -> "";
-                };
+              String armorType = getEquipmentTypeFromSlot(armorItem.getEquipmentSlot());
 
-                String armorItemPath = "item/" + itemRegistryObject.getId().getPath();
-                String trimPath = "trims/items/" + armorType + "_trim_" + trimMaterial.location().getPath();
-                String currentTrimName = armorItemPath + "_" + trimMaterial.location().getPath() + "_trim";
+              String armorItemPath = "item/" + itemRegistryObject.getId().getPath();
+              String trimPath = "trims/items/" + armorType + "_trim_" + trimMaterial.location().getPath();
+              String currentTrimName = armorItemPath + "_" + trimMaterial.location().getPath() + "_trim";
 
-                ResourceLocation armorItemResLoc = ResourceLocation.tryBuild(MOD_ID, armorItemPath);
-                ResourceLocation overlayResLoc = ResourceLocation.tryBuild(MOD_ID, armorItemPath + "_overlay");
-                ResourceLocation trimResLoc = ResourceLocation.tryParse(trimPath); // "minecraft" namespace
-                ResourceLocation trimNameResLoc = ResourceLocation.tryBuild(MOD_ID, currentTrimName);
+              ResourceLocation armorItemResLoc = OvergearedMod.loc(armorItemPath);
+              ResourceLocation overlayResLoc = OvergearedMod.loc(armorItemPath + "_overlay");
+              ResourceLocation trimResLoc = mcLoc(trimPath);
+              ResourceLocation trimNameResLoc = OvergearedMod.loc(currentTrimName);
 
-                existingFileHelper.trackGenerated(trimResLoc, PackType.CLIENT_RESOURCES, ".png", "textures");
+              existingFileHelper.trackGenerated(trimResLoc, PackType.CLIENT_RESOURCES, ".png", "textures");
 
-                // 🔷 Trimmed variant: layer0 = base, layer1 = overlay, layer2 = trim
-                getBuilder(currentTrimName)
-                        .parent(new ModelFile.UncheckedModelFile("item/generated"))
-                        .texture("layer0", armorItemResLoc)
-                        .texture("layer1", trimResLoc)
-                        .texture("layer2", overlayResLoc);
+              // 🔷 Trimmed variant: layer0 = base, layer1 = overlay, layer2 = trim
+              getBuilder(currentTrimName)
+                      .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                      .texture("layer0", armorItemResLoc)
+                      .texture("layer1", trimResLoc)
+                      .texture("layer2", overlayResLoc);
 
-                // 🔷 Base item model (untrimmed)
-                this.withExistingParent(itemRegistryObject.getId().getPath(),
-                                mcLoc("item/generated"))
-                        .texture("layer0", armorItemResLoc)
-                        .texture("layer1", overlayResLoc) // overlay always included
-                        .override()
-                        .model(new ModelFile.UncheckedModelFile(trimNameResLoc))
-                        .predicate(mcLoc("trim_type"), trimValue)
-                        .end();
+              // 🔷 Base item model (untrimmed)
+              this.withExistingParent(itemRegistryObject.getId().getPath(),
+                              mcLoc("item/generated"))
+                      .texture("layer0", armorItemResLoc)
+                      .texture("layer1", overlayResLoc) // overlay always included
+                      .override()
+                      .model(new ModelFile.UncheckedModelFile(trimNameResLoc))
+                      .predicate(mcLoc("trim_type"), trimValue)
+                      .end();
             });
         }
     }
@@ -248,16 +239,13 @@ public class ModItemModelProvider extends ItemModelProvider {
         return "generic";
     }
 
-    private void polishItem(RegistryObject<Item> itemRegistryObject) {
-        final String MOD_ID = OvergearedMod.MOD_ID;
-        Item item = itemRegistryObject.get();
-
-        String itemPath = itemRegistryObject.getId().getPath(); // e.g. "steel_pickaxe_head"
+    private void polishItem(DeferredHolder<Item, Item> itemRegistryObject) {
+      String itemPath = itemRegistryObject.getId().getPath(); // e.g. "steel_pickaxe_head"
         String toolType = getToolTypeFromName(itemPath);        // → "pickaxe"
 
-        ResourceLocation baseTexture = ResourceLocation.tryBuild(MOD_ID, "item/" + itemPath);
-        ResourceLocation overlayTexture = ResourceLocation.tryBuild(MOD_ID, "item/unpolished_overlay/" + toolType);
-        ResourceLocation unpolishedModelLoc = ResourceLocation.tryBuild(MOD_ID, "item/" + itemPath + "_unpolished");
+        ResourceLocation baseTexture = OvergearedMod.loc("item/" + itemPath);
+        ResourceLocation overlayTexture = OvergearedMod.loc("item/unpolished_overlay/" + toolType);
+        ResourceLocation unpolishedModelLoc = OvergearedMod.loc("item/" + itemPath + "_unpolished");
 
         // Ensure texture is tracked to avoid missing resource errors during datagen
         existingFileHelper.trackGenerated(overlayTexture, PackType.CLIENT_RESOURCES, ".png", "textures");
@@ -274,95 +262,121 @@ public class ModItemModelProvider extends ItemModelProvider {
                 .texture("layer0", baseTexture)
                 .override()
                 .model(new ModelFile.UncheckedModelFile(unpolishedModelLoc))
-                .predicate(ResourceLocation.tryBuild(MOD_ID, "polished"), 0.0f)
+                .predicate(OvergearedMod.loc("polished"), 0.0f)
                 .end();
     }
 
 
-    private ItemModelBuilder simpleItem(RegistryObject<Item> item) {
+    private void simpleItem(DeferredHolder<Item, Item> item) {
+        withExistingParent(item.getId().getPath(),
+                mcLoc("item/generated")).texture("layer0",
+                OvergearedMod.loc("item/" + item.getId().getPath()));
+    }
+
+    private void simpleHandheld(DeferredHolder<Item, Item> item) {
+        withExistingParent(item.getId().getPath(),
+                mcLoc("item/handheld")).texture("layer0",
+                OvergearedMod.loc("item/" + item.getId().getPath()));
+    }
+
+    public void evenSimplerBlockItem(DeferredHolder<Block, Block> block) {
+        this.withExistingParent(OvergearedMod.MOD_ID + ":" + block.getRegisteredName(),
+                modLoc("block/" + block.getRegisteredName()));
+    }
+
+    public void trapdoorItem(DeferredHolder<Block, Block> block) {
+        this.withExistingParent(block.getRegisteredName(),
+                modLoc("block/" + block.getRegisteredName() + "_bottom"));
+    }
+
+    public void fenceItem(DeferredHolder<Block, Block> block, DeferredHolder<Block, Block> baseBlock) {
+        this.withExistingParent(block.getRegisteredName(), mcLoc("block/fence_inventory"))
+                .texture("texture", OvergearedMod.loc("block/" + baseBlock.getRegisteredName()));
+    }
+
+    public void buttonItem(DeferredHolder<Block, Block> block, DeferredHolder<Block, Block> baseBlock) {
+        this.withExistingParent(block.getRegisteredName(), mcLoc("block/button_inventory"))
+                .texture("texture", OvergearedMod.loc("block/" + baseBlock.getRegisteredName()));
+    }
+
+    public void wallItem(DeferredHolder<Block, Block> block, DeferredHolder<Block, Block> baseBlock) {
+        this.withExistingParent(block.getRegisteredName(), mcLoc("block/wall_inventory"))
+                .texture("wall", OvergearedMod.loc("block/" + baseBlock.getRegisteredName()));
+    }
+
+    private ItemModelBuilder handheldItem(DeferredHolder<Item, Item> item) {
         return withExistingParent(item.getId().getPath(),
-                ResourceLocation.tryParse("item/generated")).texture("layer0",
-                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "item/" + item.getId().getPath()));
+                mcLoc("item/handheld")).texture("layer0",
+                OvergearedMod.loc("item/" + item.getId().getPath()));
     }
 
-    private ItemModelBuilder simpleHandheld(RegistryObject<Item> item) {
+    private ItemModelBuilder simpleBlockItem(DeferredHolder<Block, Block> item) {
         return withExistingParent(item.getId().getPath(),
-                ResourceLocation.tryParse("item/handheld")).texture("layer0",
-                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "item/" + item.getId().getPath()));
+                mcLoc("item/generated")).texture("layer0",
+                OvergearedMod.loc("item/" + item.getId().getPath()));
     }
 
-    public void evenSimplerBlockItem(RegistryObject<Block> block) {
-        this.withExistingParent(OvergearedMod.MOD_ID + ":" + ForgeRegistries.BLOCKS.getKey(block.get()).getPath(),
-                modLoc("block/" + ForgeRegistries.BLOCKS.getKey(block.get()).getPath()));
-    }
-
-    public void trapdoorItem(RegistryObject<Block> block) {
-        this.withExistingParent(ForgeRegistries.BLOCKS.getKey(block.get()).getPath(),
-                modLoc("block/" + ForgeRegistries.BLOCKS.getKey(block.get()).getPath() + "_bottom"));
-    }
-
-    public void fenceItem(RegistryObject<Block> block, RegistryObject<Block> baseBlock) {
-        this.withExistingParent(ForgeRegistries.BLOCKS.getKey(block.get()).getPath(), mcLoc("block/fence_inventory"))
-                .texture("texture", ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(baseBlock.get()).getPath()));
-    }
-
-    public void buttonItem(RegistryObject<Block> block, RegistryObject<Block> baseBlock) {
-        this.withExistingParent(ForgeRegistries.BLOCKS.getKey(block.get()).getPath(), mcLoc("block/button_inventory"))
-                .texture("texture", ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(baseBlock.get()).getPath()));
-    }
-
-    public void wallItem(RegistryObject<Block> block, RegistryObject<Block> baseBlock) {
-        this.withExistingParent(ForgeRegistries.BLOCKS.getKey(block.get()).getPath(), mcLoc("block/wall_inventory"))
-                .texture("wall", ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(baseBlock.get()).getPath()));
-    }
-
-    private ItemModelBuilder handheldItem(RegistryObject<Item> item) {
+    private ItemModelBuilder simpleBlockItemBlockTexture(DeferredHolder<Block, Block> item) {
         return withExistingParent(item.getId().getPath(),
-                ResourceLocation.tryParse("item/handheld")).texture("layer0",
-                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "item/" + item.getId().getPath()));
+                mcLoc("item/generated")).texture("layer0",
+                OvergearedMod.loc("block/" + item.getId().getPath()));
     }
 
-    private ItemModelBuilder simpleBlockItem(RegistryObject<Block> item) {
-        return withExistingParent(item.getId().getPath(),
-                ResourceLocation.tryParse("item/generated")).texture("layer0",
-                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "item/" + item.getId().getPath()));
-    }
-
-    private ItemModelBuilder simpleBlockItemBlockTexture(RegistryObject<Block> item) {
-        return withExistingParent(item.getId().getPath(),
-                ResourceLocation.tryParse("item/generated")).texture("layer0",
-                ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "block/" + item.getId().getPath()));
-    }
-
-    private void upgradeArrowModel(RegistryObject<Item> item) {
+    private void upgradeArrowModel(DeferredHolder<Item, Item> item) {
         String baseName = item.getId().getPath();
+        boolean isLingeringArrow = baseName.startsWith("lingering_");
 
-        String head = "item/" + baseName;
+        // For lingering arrows, get the base arrow name (without "lingering_" prefix)
+        String baseArrowName = isLingeringArrow ? baseName.substring(10) : baseName;
+        
+        // For lingering arrows, use the base arrow texture
+        ResourceLocation headLoc;
+        if (isLingeringArrow) {
+            if (baseArrowName.equals("arrow")) {
+                // Use vanilla arrow texture
+                headLoc = ResourceLocation.withDefaultNamespace("item/arrow");
+            } else {
+                // Use mod's arrow texture (e.g., iron_arrow, steel_arrow)
+                headLoc = modLoc("item/" + baseArrowName);
+            }
+        } else {
+            headLoc = modLoc("item/" + baseName);
+        }
 
-        String tippedHead = "item/tipped_" + baseName + "_head";
-        String tippedBase = "item/tipped_" + baseName + "_base";
+        String tippedHead = "item/tipped_" + baseArrowName + "_head";
+        String tippedBase = "item/tipped_" + baseArrowName + "_base";
 
-        String lingeringHead = "item/lingering_" + baseName + "_head";
-        String lingeringBase = "item/lingering_" + baseName + "_base";
+        String lingeringHead = "item/lingering_" + baseArrowName + "_head";
+        String lingeringBase = "item/lingering_" + baseArrowName + "_base";
 
         // Base arrow (no potion) — only layer0
-        getBuilder(baseName)
+        ItemModelBuilder baseBuilder = getBuilder(baseName)
                 .parent(new ModelFile.UncheckedModelFile("item/generated"))
-                .texture("layer0", modLoc(head))
+                .texture("layer0", headLoc);
+
+        // Only add tipped override for non-lingering arrows
+        if (!isLingeringArrow) {
+            baseBuilder
+                    .override()
+                    .predicate(OvergearedMod.loc("potion_type"), 1f)
+                    .model(new ModelFile.UncheckedModelFile(modLoc("item/" + baseName + "_tipped")))
+                    .end();
+        }
+
+        // Add lingering override for all arrows
+        baseBuilder
                 .override()
-                .predicate(new ResourceLocation("overgeared", "potion_type"), 1f)
-                .model(new ModelFile.UncheckedModelFile(modLoc("item/" + baseName + "_tipped")))
-                .end()
-                .override()
-                .predicate(new ResourceLocation("overgeared", "potion_type"), 2f)
+                .predicate(OvergearedMod.loc("potion_type"), 2f)
                 .model(new ModelFile.UncheckedModelFile(modLoc("item/" + baseName + "_lingering")))
                 .end();
 
-        // Tipped arrow — 2 layers
-        getBuilder(baseName + "_tipped")
-                .parent(new ModelFile.UncheckedModelFile("item/generated"))
-                .texture("layer0", modLoc(tippedHead))
-                .texture("layer1", modLoc(tippedBase));
+        // Tipped arrow — 2 layers (only for non-lingering arrows)
+        if (!isLingeringArrow) {
+            getBuilder(baseName + "_tipped")
+                    .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                    .texture("layer0", modLoc(tippedHead))
+                    .texture("layer1", modLoc(tippedBase));
+        }
 
         // Lingering arrow — 2 layers
         getBuilder(baseName + "_lingering")
@@ -370,5 +384,4 @@ public class ModItemModelProvider extends ItemModelProvider {
                 .texture("layer0", modLoc(lingeringHead))
                 .texture("layer1", modLoc(lingeringBase));
     }
-
 }

@@ -1,99 +1,85 @@
 package net.stirdrem.overgeared.recipe;
 
-import com.google.gson.JsonObject;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
-import net.minecraft.world.inventory.CraftingContainer;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import org.jetbrains.annotations.Nullable;
 
 public class NBTKeepingSmeltingRecipe extends SmeltingRecipe {
 
-    public NBTKeepingSmeltingRecipe(ResourceLocation pId, String pGroup, CookingBookCategory pCategory, Ingredient pIngredient, ItemStack pResult, float pExperience, int pCookingTime) {
-        super(pId, pGroup, pCategory, pIngredient, pResult, pExperience, pCookingTime);
+    public NBTKeepingSmeltingRecipe(String group, CookingBookCategory category,
+                                    Ingredient ingredient, ItemStack result,
+                                    float experience, int cookingTime) {
+        super(group, category, ingredient, result, experience, cookingTime);
     }
 
     @Override
-    public ItemStack assemble(Container inv, RegistryAccess pRegistryAccesss) {
-        ItemStack input = ItemStack.EMPTY;
+    public ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider registries) {
+        ItemStack inputStack = input.getItem(0);
+        ItemStack output = this.result.copy();
 
-        // Get input item
-        for (int i = 0; i < inv.getContainerSize(); i++) {
-            ItemStack stack = inv.getItem(i);
-            if (!stack.isEmpty() && ingredient.test(stack)) {
-                input = stack.copy();
-                break;
-            }
-        }
-
-        ItemStack output = result.copy();
-
-        // Copy NBT data
-        if (input.hasTag()) {
-            output.setTag(input.getTag().copy());
-        }
+        // Copy all data components from input to output (replaces NBT copying)
+        output.applyComponents(inputStack.getComponents());
 
         return output;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.NBT_SMELTING.get();
+        return ModRecipeSerializers.NBT_SMELTING.get();
     }
 
     public static class Serializer implements RecipeSerializer<NBTKeepingSmeltingRecipe> {
-        public static final Serializer INSTANCE = new Serializer();
+
+        private static final MapCodec<NBTKeepingSmeltingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+                instance.group(
+                        Codec.STRING.optionalFieldOf("group", "").forGetter(r -> r.getGroup()),
+                        CookingBookCategory.CODEC.optionalFieldOf("category", CookingBookCategory.MISC)
+                                .forGetter(r -> r.category()),
+                        Ingredient.CODEC.fieldOf("ingredient").forGetter(r -> r.ingredient),
+                        ItemStack.CODEC.fieldOf("result").forGetter(r -> r.result),
+                        Codec.FLOAT.optionalFieldOf("experience", 0.0f).forGetter(r -> r.getExperience()),
+                        Codec.INT.optionalFieldOf("cookingtime", 200).forGetter(r -> r.getCookingTime())
+                ).apply(instance, NBTKeepingSmeltingRecipe::new)
+        );
+
+        private static final StreamCodec<RegistryFriendlyByteBuf, NBTKeepingSmeltingRecipe> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, recipe) -> {
+                            // Encode
+                            ByteBufCodecs.STRING_UTF8.encode(buf, recipe.getGroup());
+                            ByteBufCodecs.fromCodec(CookingBookCategory.CODEC).encode(buf, recipe.category());
+                            Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.ingredient);
+                            ItemStack.STREAM_CODEC.encode(buf, recipe.result);
+                            buf.writeFloat(recipe.getExperience());
+                            ByteBufCodecs.VAR_INT.encode(buf, recipe.getCookingTime());
+                        },
+                        buf -> {
+                            // Decode
+                            String group = ByteBufCodecs.STRING_UTF8.decode(buf);
+                            CookingBookCategory category = ByteBufCodecs.fromCodec(CookingBookCategory.CODEC).decode(buf);
+                            Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
+                            ItemStack result = ItemStack.STREAM_CODEC.decode(buf);
+                            float xp = buf.readFloat();
+                            int cookTime = ByteBufCodecs.VAR_INT.decode(buf);
+
+                            return new NBTKeepingSmeltingRecipe(group, category, ingredient, result, xp, cookTime);
+                        }
+                );
 
         @Override
-        public NBTKeepingSmeltingRecipe fromJson(ResourceLocation id, JsonObject json) {
-            String group = GsonHelper.getAsString(json, "group", "");
-            CookingBookCategory category = CookingBookCategory.CODEC.byName(
-                    GsonHelper.getAsString(json, "category", null),
-                    CookingBookCategory.MISC
-            );
-
-            Ingredient ingredient = Ingredient.fromJson(
-                    GsonHelper.isArrayNode(json, "ingredient")
-                            ? GsonHelper.getAsJsonArray(json, "ingredient")
-                            : GsonHelper.getAsJsonObject(json, "ingredient")
-            );
-
-            ItemStack result = json.get("result").isJsonObject()
-                    ? ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"))
-                    : new ItemStack(BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(json, "result"))));
-
-            float xp = GsonHelper.getAsFloat(json, "experience", 0.0F);
-            int cookTime = GsonHelper.getAsInt(json, "cookingtime", 200);
-
-            return new NBTKeepingSmeltingRecipe(id, group, category, ingredient, result, xp, cookTime);
+        public MapCodec<NBTKeepingSmeltingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public @Nullable NBTKeepingSmeltingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            String group = buf.readUtf();
-            CookingBookCategory category = buf.readEnum(CookingBookCategory.class);
-            Ingredient ingredient = Ingredient.fromNetwork(buf);
-            ItemStack result = buf.readItem();
-            float xp = buf.readFloat();
-            int cookTime = buf.readVarInt();
-
-            return new NBTKeepingSmeltingRecipe(id, group, category, ingredient, result, xp, cookTime);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, NBTKeepingSmeltingRecipe recipe) {
-            buf.writeUtf(recipe.getGroup());
-            buf.writeEnum(recipe.category());
-            recipe.ingredient.toNetwork(buf);
-            buf.writeItem(recipe.result);
-            buf.writeFloat(recipe.experience);
-            buf.writeVarInt(recipe.cookingTime);
+        public StreamCodec<RegistryFriendlyByteBuf, NBTKeepingSmeltingRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
-
 }

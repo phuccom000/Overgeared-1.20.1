@@ -1,25 +1,29 @@
 package net.stirdrem.overgeared.screen;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
-import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
-import net.stirdrem.overgeared.item.ModItems;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
 import net.stirdrem.overgeared.item.custom.KnappableRockItem;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
 
 public class RockKnappingMenu extends AbstractContainerMenu {
     private final Container craftingGrid = new SimpleContainer(9); // 3x3 grid
+    private final IItemHandler craftingGridHandler = new InvWrapper(craftingGrid);
     private final Container resultContainer = new SimpleContainer(1); // Output slot
     private final Level level;
     private final RecipeManager recipeManager;
@@ -94,7 +98,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
                 knappingFinished = true;
                 resultCollected = true;
                 if (player instanceof ServerPlayer serverPlayer) {
-                    ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+                    ModAdvancementTriggers.KNAPPING.get().trigger(serverPlayer);
                 }
             }
 
@@ -107,11 +111,6 @@ public class RockKnappingMenu extends AbstractContainerMenu {
 
     public boolean isResultCollected() {
         return resultCollected;
-    }
-
-    public void markResultCollected() {
-        this.resultCollected = true;
-        this.knappingFinished = true;
     }
 
     private void addPlayerInventory(Inventory playerInv) {
@@ -144,8 +143,8 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
 
-        boolean hasRock = (ItemStack.isSameItemSameTags(mainHand, inputRock) && mainHand.getCount() > 0) ||
-                (ItemStack.isSameItemSameTags(offHand, inputRock) && offHand.getCount() > 0);
+        boolean hasRock = (ItemStack.isSameItemSameComponents(mainHand, inputRock) && mainHand.getCount() > 0) ||
+                (ItemStack.isSameItemSameComponents(offHand, inputRock) && offHand.getCount() > 0);
 
         if (!hasRock && !player.level().isClientSide) {
             player.closeContainer();
@@ -159,7 +158,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 
-        if (slot != null && slot.hasItem()) {
+        if (slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
 
@@ -179,7 +178,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
 
                     // Trigger advancement when taking result via shift-click
                     if (player instanceof ServerPlayer serverPlayer) {
-                        ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+                        ModAdvancementTriggers.KNAPPING.get().trigger(serverPlayer);
                     }
                 } else {
                     slot.setChanged();
@@ -221,6 +220,15 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         return itemstack;
     }
 
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id >= 0 && id < 9) {
+            setChip(id);
+            return true;
+        }
+        return false;
+    }
+
     public void setChip(int index) {
         if (knappingFinished || resultCollected) return;
 
@@ -249,10 +257,10 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
 
-        if (ItemStack.isSameItemSameTags(mainHand, inputRock) && mainHand.getCount() > 0) {
+        if (ItemStack.isSameItemSameComponents(mainHand, inputRock) && mainHand.getCount() > 0) {
             mainHand.shrink(1);
             player.getInventory().setChanged();
-        } else if (ItemStack.isSameItemSameTags(offHand, inputRock) && offHand.getCount() > 0) {
+        } else if (ItemStack.isSameItemSameComponents(offHand, inputRock) && offHand.getCount() > 0) {
             offHand.shrink(1);
             if (player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.inventoryMenu.broadcastChanges();
@@ -263,11 +271,14 @@ public class RockKnappingMenu extends AbstractContainerMenu {
     private void updateResult() {
         if (level == null || knappingFinished || resultCollected) return;
 
-        RockKnappingRecipe matchingRecipe = recipeManager
-                .getRecipeFor(ModRecipeTypes.KNAPPING.get(), craftingGrid, level)
+        RecipeInput recipeInput = new RecipeWrapper(craftingGridHandler);
+
+        RecipeHolder<RockKnappingRecipe> recipeHolder = recipeManager
+                .getRecipeFor(ModRecipeTypes.KNAPPING.get(), recipeInput, level)
                 .orElse(null);
 
-        if (matchingRecipe != null) {
+        if (recipeHolder != null) {
+            RockKnappingRecipe matchingRecipe = recipeHolder.value();
             resultContainer.setItem(0, matchingRecipe.getResultItem(level.registryAccess()).copy());
         } else {
             resultContainer.setItem(0, ItemStack.EMPTY);
@@ -281,25 +292,8 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         return !craftingGrid.getItem(index).isEmpty();
     }
 
-    public void clearGrid() {
-        for (int i = 0; i < 9; i++) {
-            craftingGrid.setItem(i, ItemStack.EMPTY);
-        }
-        resultContainer.setItem(0, ItemStack.EMPTY);
-        broadcastChanges();
-    }
-
     public boolean isKnappingFinished() {
         return knappingFinished;
-    }
-
-    public boolean hasAnyChippedSpots() {
-        for (int i = 0; i < 9; i++) {
-            if (isChipped(i)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -311,7 +305,7 @@ public class RockKnappingMenu extends AbstractContainerMenu {
         ItemStack result = resultContainer.getItem(0);
         if (!result.isEmpty() && !resultCollected) {
             if (player instanceof ServerPlayer serverPlayer) {
-                ModAdvancementTriggers.KNAPPING.trigger(serverPlayer);
+                ModAdvancementTriggers.KNAPPING.get().trigger(serverPlayer);
             }
             if (!player.getInventory().add(result.copy())) {
                 // Drop if inventory is full
@@ -320,16 +314,5 @@ public class RockKnappingMenu extends AbstractContainerMenu {
             resultContainer.setItem(0, ItemStack.EMPTY);
         }
 
-    }
-
-    // Helper method to get the current grid state as a boolean array
-    public boolean[][] getGridState() {
-        boolean[][] grid = new boolean[3][3];
-        for (int i = 0; i < 9; i++) {
-            int row = i / 3;
-            int col = i % 3;
-            grid[row][col] = isChipped(i);
-        }
-        return grid;
     }
 }

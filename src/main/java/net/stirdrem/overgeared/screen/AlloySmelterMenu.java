@@ -1,8 +1,6 @@
 package net.stirdrem.overgeared.screen;
 
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -10,16 +8,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.AlloySmelterBlockEntity;
-import net.stirdrem.overgeared.block.entity.SteelSmithingAnvilBlockEntity;
-import net.stirdrem.overgeared.recipe.ModRecipeTypes;
-import net.stirdrem.overgeared.screen.ModMenuTypes;
-
-import java.util.List;
 
 public class AlloySmelterMenu extends AbstractContainerMenu {
 
@@ -30,8 +22,7 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
     private static final int VANILLA_SLOT_COUNT = HOTBAR_SLOT_COUNT + PLAYER_INVENTORY_SLOT_COUNT;
     private static final int VANILLA_FIRST_SLOT_INDEX = 0;
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
-    // THIS YOU HAVE TO DEFINE!
-    private static final int TE_INVENTORY_SLOT_COUNT = 6;  // must be the number of slots you have!
+    private static final int TE_INVENTORY_SLOT_COUNT = 6;
     private final AlloySmelterBlockEntity blockEntity;
     private final ContainerData data;
     private final Level level;
@@ -39,7 +30,7 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
 
     // Default constructor for client-side (read from packet)
     public AlloySmelterMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        this(id, inv, (AlloySmelterBlockEntity) inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(6));
+        this(id, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(6));
     }
 
     public AlloySmelterMenu(int id, Inventory playerInv, BlockEntity blockEntity, ContainerData data) {
@@ -52,37 +43,32 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
         // Player inventory slots
         addPlayerInventory(playerInv);
         addPlayerHotbar(playerInv);
-        // Add block entity slots
-        this.blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
 
-            this.addSlot(new SlotItemHandler(iItemHandler, 0, 39, 26)); // Input 1
-            this.addSlot(new SlotItemHandler(iItemHandler, 1, 57, 26)); // Input 2
-            this.addSlot(new SlotItemHandler(iItemHandler, 2, 39, 44)); // Input 3
-            this.addSlot(new SlotItemHandler(iItemHandler, 3, 57, 44)); // Input 4
-            this.addSlot(new SlotItemHandler(iItemHandler, 4, 8, 53)); // Fuel
-            this.addSlot(new SlotItemHandler(iItemHandler, 5, 124, 35) {
-                @Override
-                public void onTake(Player player, ItemStack stack) {
-                    super.onTake(player, stack);
-                    this.checkTakeAchievements(stack);
-                    ((AlloySmelterBlockEntity) blockEntity).awardStoredExperience(player);
+        IItemHandler iItemHandler = this.blockEntity.getItemHandler();
 
-                }
+        this.addSlot(new SlotItemHandler(iItemHandler, 0, 39, 26)); // Input 1
+        this.addSlot(new SlotItemHandler(iItemHandler, 1, 57, 26)); // Input 2
+        this.addSlot(new SlotItemHandler(iItemHandler, 2, 39, 44)); // Input 3
+        this.addSlot(new SlotItemHandler(iItemHandler, 3, 57, 44)); // Input 4
+        this.addSlot(new SlotItemHandler(iItemHandler, 4, 8, 53)); // Fuel
+        this.addSlot(new SlotItemHandler(iItemHandler, 5, 124, 35) { // Output
+            @Override
+            public void onTake(Player player, ItemStack stack) {
+                super.onTake(player, stack);
+                this.checkTakeAchievements(stack);
+                ((AlloySmelterBlockEntity) blockEntity).awardStoredExperience(player);
+            }
 
-                @Override
-                public boolean mayPlace(ItemStack stack) {
-                    return false;
-                }
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return false;
+            }
 
-                @Override
-                public boolean mayPickup(Player player) {
-                    return true; // This is crucial for JEI transfers
-                }
-
-            }); // Output
+            @Override
+            public boolean mayPickup(Player player) {
+                return true; // This is crucial for JEI transfers
+            }
         });
-
-
     }
 
     private void addPlayerInventory(Inventory playerInv) {
@@ -105,7 +91,7 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         Slot sourceSlot = this.slots.get(index);
-        if (sourceSlot == null || !sourceSlot.hasItem()) {
+        if (!sourceSlot.hasItem()) {
             return ItemStack.EMPTY;
         }
 
@@ -118,8 +104,8 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
         int startTE = TE_INVENTORY_FIRST_SLOT_INDEX;                          // 36
         int endTE = TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT;  // 42 (36–41)
 
-        int inputStart = startTE;         // slots 36–39
-        int inputEnd = startTE + 4;       // exclusive (40)
+      // slots 36–39
+      int inputEnd = startTE + 4;       // exclusive (40)
         int fuelSlot = startTE + 4;       // slot 40
         int outputSlot = startTE + 5;     // slot 41
 
@@ -142,17 +128,17 @@ public class AlloySmelterMenu extends AbstractContainerMenu {
         // --- CASE 2: From player inventory to TE ---
         else if (index >= startPlayer && index < endPlayer) {
             // Try to move to fuel slot if it's fuel
-            if (ForgeHooks.getBurnTime(sourceStack, RecipeType.SMELTING) > 0) {
+            if (sourceStack.getBurnTime(RecipeType.SMELTING) > 0) {
                 // First try fuel slot
                 if (!moveItemStackTo(sourceStack, fuelSlot, fuelSlot + 1, false)) {
                     // If fuel slot is occupied, try input slots as fallback
-                    if (!moveItemStackTo(sourceStack, inputStart, inputEnd, false)) {
+                    if (!moveItemStackTo(sourceStack, startTE, inputEnd, false)) {
                         return ItemStack.EMPTY;
                     }
                 }
             }
             // Otherwise try to move to input slots
-            else if (!moveItemStackTo(sourceStack, inputStart, inputEnd, false)) {
+            else if (!moveItemStackTo(sourceStack, startTE, inputEnd, false)) {
                 return ItemStack.EMPTY;
             }
         }

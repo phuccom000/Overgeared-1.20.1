@@ -1,19 +1,20 @@
 package net.stirdrem.overgeared.util;
-
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.datapack.MaterialSettingsReloadListener;
-import net.stirdrem.overgeared.recipe.ItemToToolTypeRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ConfigHelper {
 
@@ -35,9 +36,8 @@ public class ConfigHelper {
      */
     public static int getMaxMaterialAmount(String toolType) {
         for (var e : ServerConfig.CASTING_TOOL_TYPES.get()) {
-            List<?> row = (List<?>) e;
-            if (row.get(0).equals(toolType)) {
-                return ((Number) row.get(1)).intValue();
+          if (e.get(0).equals(toolType)) {
+                return ((Number) e.get(1)).intValue();
             }
         }
         return 0;
@@ -55,17 +55,36 @@ public class ConfigHelper {
         return "material.overgeared." + materialId.toLowerCase();
     }
 
-    // -----------------------
-    // Tool Head → Tool Type
-    // -----------------------
+
+
+    // Cache for tool type mappings (populated from RecipeManager)
+    private static final Map<Item, String> toolTypeCache = new ConcurrentHashMap<>();
+
+    /**
+     * Get tool type from item using cached recipe data.
+     * The cache is populated by getToolTypeForItem(Level, ItemStack) calls.
+     * This allows recipes without Level access to still use datapack-driven mappings.
+     */
+    public static String getToolTypeFromItemDirect(ItemStack stack) {
+        if (stack.isEmpty()) return "none";
+        return toolTypeCache.getOrDefault(stack.getItem(), "none");
+    }
+
     public static String getToolTypeForItem(Level level, ItemStack stack) {
-        return level.getRecipeManager()
+        String toolType = level.getRecipeManager()
                 .getAllRecipesFor(ModRecipeTypes.ITEM_TO_TOOLTYPE.get())
                 .stream()
-                .filter(r -> r.getInput().test(stack))
-                .map(ItemToToolTypeRecipe::getToolType)
+                .filter(r -> r.value().input().test(stack))
+                .map(r -> r.value().toolType())
                 .findFirst()
                 .orElse("none");
+        
+        // Cache the result for use in contexts without Level access
+        if (!"none".equals(toolType)) {
+            toolTypeCache.put(stack.getItem(), toolType);
+        }
+        
+        return toolType;
     }
 
     // -----------------------
@@ -92,10 +111,9 @@ public class ConfigHelper {
 
         // Fallback to config for backward compatibility
         for (var e : ServerConfig.MATERIAL_SETTING.get()) {
-            List<?> row = (List<?>) e;
-            String key = (String) row.get(0);
+          String key = (String) e.get(0);
             if (matchesItemOrTag(item, key)) {
-                return (String) row.get(1);
+                return (String) e.get(1);
             }
         }
         return "none";
@@ -121,10 +139,9 @@ public class ConfigHelper {
 
         // Fallback to config for backward compatibility
         for (var e : ServerConfig.MATERIAL_SETTING.get()) {
-            List<?> row = (List<?>) e;
-            String key = (String) row.get(0);
+          String key = (String) e.get(0);
             if (matchesItemOrTag(item, key)) {
-                return ((Number) row.get(2)).intValue();
+                return ((Number) e.get(2)).intValue();
             }
         }
         return 0;
@@ -148,8 +165,7 @@ public class ConfigHelper {
 
         // Fallback to config for backward compatibility
         for (var e : ServerConfig.MATERIAL_SETTING.get()) {
-            List<?> row = (List<?>) e;
-            String key = (String) row.get(0);
+          String key = (String) e.getFirst();
             if (matchesItemOrTag(item, key)) {
                 return true;
             }
@@ -174,11 +190,10 @@ public class ConfigHelper {
 
         // Add config entries (will override datapack if same material ID)
         for (var e : ServerConfig.MATERIAL_SETTING.get()) {
-            List<?> row = (List<?>) e;
-            String key = (String) row.get(0);
+          String key = (String) e.getFirst();
             if (matchesItemOrTag(item, key)) {
-                String materialId = (String) row.get(1);
-                int value = ((Number) row.get(2)).intValue();
+                String materialId = (String) e.get(1);
+                int value = ((Number) e.get(2)).intValue();
                 result.put(materialId, value);
             }
         }
@@ -196,8 +211,9 @@ public class ConfigHelper {
         // Tag check if the key starts with "#"
         if (key.startsWith("#")) {
             String tagId = key.substring(1); // Remove #
-            TagKey<Item> tag = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), new ResourceLocation(tagId));
-            return item.builtInRegistryHolder().is(tag);
+            TagKey<Item> tag = TagKey.create(Registries.ITEM, ResourceLocation.parse(tagId));
+
+            return new ItemStack(item).is(tag);
         }
 
         return false;
@@ -220,8 +236,7 @@ public class ConfigHelper {
 
         // From config
         for (var e : ServerConfig.MATERIAL_SETTING.get()) {
-            List<?> row = (List<?>) e;
-            materialIds.add((String) row.get(1));
+          materialIds.add((String) e.get(1));
         }
 
         return materialIds;
@@ -230,8 +245,8 @@ public class ConfigHelper {
     /**
      * Get all items for a specific material
      */
-    public static java.util.List<String> getItemsForMaterial(String materialId) {
-        java.util.List<String> items = new java.util.ArrayList<>();
+    public static List<String> getItemsForMaterial(String materialId) {
+        List<String> items = new java.util.ArrayList<>();
 
         // From datapack
         MaterialSettingsReloadListener.getEntriesForMaterial(materialId).stream()
@@ -240,9 +255,8 @@ public class ConfigHelper {
 
         // From config
         for (var e : ServerConfig.MATERIAL_SETTING.get()) {
-            List<?> row = (List<?>) e;
-            if (row.get(1).equals(materialId)) {
-                items.add((String) row.get(0));
+          if (e.get(1).equals(materialId)) {
+                items.add((String) e.getFirst());
             }
         }
 

@@ -1,9 +1,0 @@
-{
-  "type": "overgeared:cooling",
-  "input": {
-    "item": "overgeared:heated_iron_ingot"
-  },
-  "output": {
-    "item": "minecraft:iron_ingot"
-  }
-}

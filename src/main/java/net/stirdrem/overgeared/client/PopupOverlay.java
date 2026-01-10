@@ -1,25 +1,35 @@
 package net.stirdrem.overgeared.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ClientConfig;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 
 @OnlyIn(Dist.CLIENT)
-public class PopupOverlay {
+public class PopupOverlay implements LayeredDraw.Layer {
 
-    private static final float POPUP_DURATION_MS = 10000f;
+    public static final PopupOverlay INSTANCE = new PopupOverlay();
+    public static final ResourceLocation ID = OvergearedMod.loc("popup");
 
-    public static final IGuiOverlay POPUP_OVERLAY = ((gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
+    private static final float POPUP_DURATION_MS = 1500f;
+
+    @Override
+    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         if (!ClientConfig.POP_UP_TOGGLE.get()) return;
+
         // Always render popups regardless of game state
         var popups = AnvilMinigameEvents.getPopups();
         if (popups.isEmpty()) return;
-        int y = screenHeight + 20
-                - ClientConfig.MINIGAME_OVERLAY_HEIGHT.get();
+
+        int screenWidth = guiGraphics.guiWidth();
+        int screenHeight = guiGraphics.guiHeight();
+
         for (int i = 0; i < popups.size(); i++) {
             var popup = popups.get(i);
 
@@ -49,16 +59,17 @@ public class PopupOverlay {
             );
             guiGraphics.pose().scale(scale, scale, 1f);
 
+            // Draw at origin since we've already translated
             guiGraphics.drawString(
                     font,
                     popup.text,
                     -textWidth / 2,
-                    screenHeight / 2 - 18 - ClientConfig.MINIGAME_OVERLAY_HEIGHT.get(),
+                    0,
                     color,
                     false
             );
 
             guiGraphics.pose().popPose();
         }
-    });
+    }
 }

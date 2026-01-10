@@ -2,47 +2,43 @@ package net.stirdrem.overgeared.networking.packet;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
-import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvilNew;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
-import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 import net.stirdrem.overgeared.event.ModItemInteractEvents;
 
-import java.util.function.Supplier;
+public record SetMinigameVisibleC2SPacket (Boolean visible, BlockPos pos) implements CustomPacketPayload {
+    public static final ResourceLocation ID = OvergearedMod.loc("set_minigame_visible");
+    public static final CustomPacketPayload.Type<SetMinigameVisibleC2SPacket> TYPE = new CustomPacketPayload.Type<>(ID);
 
-public class SetMinigameVisibleC2SPacket {
-    private final Boolean visible;
-    private final BlockPos pos;
+    public static final StreamCodec<FriendlyByteBuf, SetMinigameVisibleC2SPacket> STREAM_CODEC = StreamCodec.of(
+            (buffer, packet) -> {
+                ByteBufCodecs.BOOL.encode(buffer, packet.visible);
+                BlockPos.STREAM_CODEC.encode(buffer, packet.pos);
+            },
+            buffer -> new SetMinigameVisibleC2SPacket(
+                    ByteBufCodecs.BOOL.decode(buffer),
+                    BlockPos.STREAM_CODEC.decode(buffer)
+            )
+    );
 
-    public SetMinigameVisibleC2SPacket(BlockPos pos, Boolean visible) {
-        this.visible = visible;
-        this.pos = pos;
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public static void encode(SetMinigameVisibleC2SPacket pkt, FriendlyByteBuf buf) {
-        buf.writeBlockPos(pkt.pos);
-        buf.writeBoolean(pkt.visible);
-    }
+    public static void handle(SetMinigameVisibleC2SPacket payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (!(context.player() instanceof ServerPlayer player)) return;
+            if (!(player.level().getBlockEntity(payload.pos) instanceof AbstractSmithingAnvilBlockEntity anvilBlock)) return;
 
-    public static SetMinigameVisibleC2SPacket decode(FriendlyByteBuf buf) {
-        return new SetMinigameVisibleC2SPacket(buf.readBlockPos(), buf.readBoolean());
-    }
-
-    public Boolean getVisible() {
-        return visible;
-    }
-
-    public static void handle(SetMinigameVisibleC2SPacket msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer sender = ctx.get().getSender();
-            if (sender != null && sender.level().getBlockEntity(msg.pos) instanceof AbstractSmithingAnvilBlockEntity anvilBlock) {
-                anvilBlock.setMinigameOn(msg.getVisible());
-                ModItemInteractEvents.playerMinigameVisibility.put(sender.getUUID(), msg.getVisible());
-            }
+            anvilBlock.setMinigameOn(payload.visible);
+            ModItemInteractEvents.playerMinigameVisibility.put(player.getUUID(), payload.visible);
         });
-        ctx.get().setPacketHandled(true);
     }
-
-
 }

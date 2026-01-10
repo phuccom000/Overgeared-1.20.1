@@ -1,39 +1,28 @@
 package net.stirdrem.overgeared.networking.packet;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
-import net.stirdrem.overgeared.event.ModItemInteractEvents;
 
-import java.util.function.Supplier;
+public record OnlyResetMinigameS2CPacket() implements CustomPacketPayload {
+    public static final ResourceLocation ID = OvergearedMod.loc("only_reset_minigame");
+    public static final CustomPacketPayload.Type<OnlyResetMinigameS2CPacket> TYPE = new CustomPacketPayload.Type<>(ID);
 
-public class OnlyResetMinigameS2CPacket {
+    public static final StreamCodec<FriendlyByteBuf, OnlyResetMinigameS2CPacket> STREAM_CODEC = StreamCodec.of(
+            (buffer, packet) -> {},
+            buffer -> new OnlyResetMinigameS2CPacket()
+    );
 
-    public OnlyResetMinigameS2CPacket() {
-
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public OnlyResetMinigameS2CPacket(FriendlyByteBuf buf) {
-
-    }
-
-    public void toBytes(FriendlyByteBuf buf) {
-
-    }
-
-    public boolean handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            try {
-                // Only reset if the current anvil position matches the one in the packet
-                AnvilMinigameEvents.reset();
-
-            } catch (Exception e) {
-                OvergearedMod.LOGGER.error("Failed to process ResetMinigameS2CPacket for anvil", e);
-            }
-        });
-        return true;
+    public static void handle(OnlyResetMinigameS2CPacket payload, IPayloadContext context) {
+        context.enqueueWork(() -> AnvilMinigameEvents.reset());
     }
 }

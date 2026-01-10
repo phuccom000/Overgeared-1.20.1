@@ -1,23 +1,28 @@
 package net.stirdrem.overgeared;
 
 import net.minecraft.ChatFormatting;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import net.stirdrem.overgeared.config.ServerConfig;
 
+import java.util.function.Supplier;
+
 public enum BlueprintQuality {
-    POOR("poor", ServerConfig.POOR_MAX_USE.get(), ChatFormatting.RED),
-    WELL("well", ServerConfig.WELL_MAX_USE.get(), ChatFormatting.YELLOW),
-    EXPERT("expert", ServerConfig.EXPERT_MAX_USE.get(), ChatFormatting.BLUE),
-    PERFECT("perfect", ServerConfig.PERFECT_MAX_USE.get(), ChatFormatting.GOLD),
-    MASTER("master", ServerConfig.MASTER_MAX_USE.get(), ChatFormatting.LIGHT_PURPLE); // Final tier
+    POOR("poor", 10, ChatFormatting.RED, () -> ServerConfig.POOR_MAX_USE),
+    WELL("well", 15, ChatFormatting.YELLOW, () -> ServerConfig.WELL_MAX_USE),
+    EXPERT("expert", 20, ChatFormatting.BLUE, () -> ServerConfig.EXPERT_MAX_USE),
+    PERFECT("perfect", 25, ChatFormatting.GOLD, () -> ServerConfig.PERFECT_MAX_USE),
+    MASTER("master", 30, ChatFormatting.LIGHT_PURPLE, () -> ServerConfig.MASTER_MAX_USE); // Final tier
 
     private final String id;
-    private final int use;
+    private final int defaultUse;
     private final ChatFormatting color;
+    private final java.util.function.Supplier<ModConfigSpec.IntValue> configSupplier;
 
-    BlueprintQuality(String id, int use, ChatFormatting color) {
+    BlueprintQuality(String id, int defaultUse, ChatFormatting color, Supplier<ModConfigSpec.IntValue> configSupplier) {
         this.id = id;
-        this.use = use;
+        this.defaultUse = defaultUse;
         this.color = color;
+        this.configSupplier = configSupplier;
     }
 
     public static int compare(String q1, String q2) {
@@ -72,7 +77,12 @@ public enum BlueprintQuality {
     }
 
     public int getUse() {
-        return use;
+        try {
+            return configSupplier.get().get();
+        } catch (IllegalStateException e) {
+            // Config not loaded yet, return default
+            return defaultUse;
+        }
     }
 
     public ChatFormatting getColor() {

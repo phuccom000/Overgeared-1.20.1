@@ -1,39 +1,37 @@
 package net.stirdrem.overgeared.recipe;
 
+import com.mojang.serialization.MapCodec;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import net.stirdrem.overgeared.BlueprintQuality;
+import net.stirdrem.overgeared.ForgingQuality;
+import net.stirdrem.overgeared.components.CastData;
+import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.config.ServerConfig;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.util.ConfigHelper;
+
+import java.util.Map;
 
 public class ClayToolCastRecipe extends CustomRecipe {
 
     private static final int[] CLAY_SLOTS = {1, 3, 5, 7}; // N, E, S, W around center
 
-    // store the level between matches() and assemble()
-    private Level lastLevel = null;
-
-    public ClayToolCastRecipe(ResourceLocation id, CraftingBookCategory category) {
-        super(id, category);
+    public ClayToolCastRecipe(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override
-    public boolean matches(CraftingContainer inv, Level level) {
-        if (inv.getContainerSize() != 9) return false;
+    public boolean matches(CraftingInput input, Level level) {
+        if (input.size() != 9) return false;
 
-        // store level reference for assemble()
-        this.lastLevel = level;
-
-        ItemStack center = inv.getItem(4);
+        ItemStack center = input.getItem(4);
         if (center.isEmpty()) return false;
 
         // Must be mapped to a tool type in config
@@ -44,7 +42,7 @@ public class ClayToolCastRecipe extends CustomRecipe {
         boolean netherPattern = true;
 
         for (int slot : CLAY_SLOTS) {
-            ItemStack stack = inv.getItem(slot);
+            ItemStack stack = input.getItem(slot);
             clayPattern &= stack.is(Items.CLAY_BALL);
             netherPattern &= stack.is(Items.NETHER_BRICK);
         }
@@ -55,31 +53,29 @@ public class ClayToolCastRecipe extends CustomRecipe {
         // Other slots must be empty
         for (int i = 0; i < 9; i++) {
             if (i == 4 || i == 1 || i == 3 || i == 5 || i == 7) continue;
-            if (!inv.getItem(i).isEmpty()) return false;
+            if (!input.getItem(i).isEmpty()) return false;
         }
 
         return true;
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
+    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         if (!ServerConfig.ENABLE_CASTING.get()) return ItemStack.EMPTY;
 
-        ItemStack center = inv.getItem(4);
+        ItemStack center = input.getItem(4);
         if (center.isEmpty()) return ItemStack.EMPTY;
 
-        // use the last known level from matches(), fallback to overworld if null
-        Level level = (lastLevel != null)
-                ? lastLevel
-                : ServerLifecycleHooks.getCurrentServer().overworld();
-
-        String toolType = ConfigHelper.getToolTypeForItem(level, center);
+        // Extract tool type directly from the center item's metadata/ID
+        // We can't use ConfigHelper.getToolTypeForItem here because we don't have Level access
+        // Instead, use a fallback method or extract from item properties
+        String toolType = ConfigHelper.getToolTypeFromItemDirect(center);
         if ("none".equals(toolType) || toolType.isBlank()) return ItemStack.EMPTY;
 
         // detect if nether bricks were used
         boolean netherPattern = true;
         for (int slot : CLAY_SLOTS) {
-            ItemStack stack = inv.getItem(slot);
+            ItemStack stack = input.getItem(slot);
             netherPattern &= stack.is(Items.NETHER_BRICK);
         }
 
@@ -88,41 +84,48 @@ public class ClayToolCastRecipe extends CustomRecipe {
                 ? new ItemStack(ModItems.NETHER_TOOL_CAST.get())
                 : new ItemStack(ModItems.UNFIRED_TOOL_CAST.get());
 
-        // Extract forging quality from the center item
-        CompoundTag centerTag = center.getTag();
-        String quality = "none";
-        if (centerTag != null && centerTag.contains("ForgingQuality")) {
-            quality = centerTag.getString("ForgingQuality");
-            if (quality.isEmpty()) quality = "none";
+        // Extract forging quality from the center item using data components
+        ForgingQuality forgingQuality = center.get(ModComponents.FORGING_QUALITY);
+        String quality = "";
+        
+        if (forgingQuality != null && forgingQuality != ForgingQuality.NONE) {
+            // Convert forging quality to blueprint quality and downgrade one level
+            BlueprintQuality blueprintQuality = BlueprintQuality.fromString(forgingQuality.getDisplayName());
+            BlueprintQuality downgraded = BlueprintQuality.getPrevious(blueprintQuality);
+            if (downgraded != null) {
+                quality = downgraded.getId();
+            }
         }
 
         int maxAmount = ConfigHelper.getMaxMaterialAmount(toolType);
         if (maxAmount <= 0) maxAmount = 9;
 
-        // downgrade the quality one level
-        if (!quality.equals("none"))
-            quality = BlueprintQuality.getPrevious(BlueprintQuality.fromString(quality)).getId();
+        // Create CastData with initial values
+        CastData castData = new CastData(
+                quality,
+                toolType,
+                Map.of(),  // Empty materials map
+                0,         // No amount yet
+                maxAmount, // Max amount from config
+                java.util.List.of(),  // Empty input list
+                ItemStack.EMPTY,      // No output yet
+                false      // Not heated
+        );
 
-        // Attach all relevant NBT data
-        CompoundTag tag = result.getOrCreateTag();
-        tag.putString("ToolType", toolType);
-        if (!quality.equalsIgnoreCase("none"))
-            tag.putString("Quality", quality);
-        tag.putInt("Amount", 0);
-        tag.putInt("MaxAmount", maxAmount);
-        tag.put("Materials", new CompoundTag());
+        // Set the cast data component
+        result.set(ModComponents.CAST_DATA, castData);
 
         return result;
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
-        NonNullList<ItemStack> remaining = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
+        NonNullList<ItemStack> remaining = NonNullList.withSize(input.size(), ItemStack.EMPTY);
 
         // Keep the center item (slot 4)
-        ItemStack centerItem = inv.getItem(4);
+        ItemStack centerItem = input.getItem(4);
         if (!centerItem.isEmpty()) {
-            remaining.set(4, centerItem.copy());
+            remaining.set(4, centerItem.copyWithCount(1));
         }
 
         // Clay balls / nether bricks are consumed
@@ -136,6 +139,29 @@ public class ClayToolCastRecipe extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.CLAY_TOOL_CAST.get();
+        return ModRecipeSerializers.CLAY_TOOL_CAST.get();
+    }
+
+    public static class Serializer implements RecipeSerializer<ClayToolCastRecipe> {
+        private static final MapCodec<ClayToolCastRecipe> CODEC = 
+            CraftingBookCategory.CODEC.fieldOf("category")
+                .xmap(ClayToolCastRecipe::new, CustomRecipe::category);
+
+        private static final StreamCodec<RegistryFriendlyByteBuf, ClayToolCastRecipe> STREAM_CODEC = 
+            StreamCodec.composite(
+                net.minecraft.network.codec.ByteBufCodecs.fromCodec(CraftingBookCategory.CODEC),
+                CustomRecipe::category,
+                ClayToolCastRecipe::new
+            );
+
+        @Override
+        public MapCodec<ClayToolCastRecipe> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, ClayToolCastRecipe> streamCodec() {
+            return STREAM_CODEC;
+        }
     }
 }

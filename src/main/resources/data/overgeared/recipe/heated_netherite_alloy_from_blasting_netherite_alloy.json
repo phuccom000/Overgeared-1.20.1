@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:blasting",
+  "group": "netherite_ingot",
+  "category": "misc",
+  "ingredient": {
+    "item": "overgeared:netherite_alloy"
+  },
+  "result": {
+    "id": "overgeared:heated_netherite_alloy"
+  },
+  "experience": 0,
+  "cookingtime": 300
+}

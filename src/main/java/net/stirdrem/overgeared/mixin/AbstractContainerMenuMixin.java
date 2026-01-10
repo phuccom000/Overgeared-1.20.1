@@ -4,7 +4,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.config.ServerConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-import static net.stirdrem.overgeared.OvergearedMod.getCooledItem;
+import static net.stirdrem.overgeared.util.ItemUtils.copyComponentsExceptHeated;
+import static net.stirdrem.overgeared.util.ItemUtils.getCooledItem;
 
 @Mixin(AbstractContainerMenu.class)
 public abstract class AbstractContainerMenuMixin {
@@ -24,7 +27,6 @@ public abstract class AbstractContainerMenuMixin {
     private List<ContainerListener> containerListeners;
 
     @Inject(method = "broadcastChanges", at = @At("HEAD"))
-
     private void overgeared$lazyCool(CallbackInfo ci) {
         AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
 
@@ -36,13 +38,20 @@ public abstract class AbstractContainerMenuMixin {
 
                 for (Slot slot : menu.slots) {
                     ItemStack stack = slot.getItem();
-                    if (stack.isEmpty() || !stack.hasTag() || !stack.getTag().contains("HeatedSince")) continue;
-
-                    long heatedAt = stack.getTag().getLong("HeatedSince");
+                    if (stack.isEmpty()) continue;
+                    
+                    Long heatedAt = stack.get(ModComponents.HEATED_TIME);
+                    if (heatedAt == null) continue;
+                    
                     if (now - heatedAt >= cooldown) {
-                        ItemStack cooled = getCooledItem(stack.getItem(), player.level()).getDefaultInstance();
-                        slot.set(cooled);
-                        menu.broadcastChanges(); // sync change
+                        Item cooledItem = getCooledItem(stack.getItem(), player.level());
+                        if (cooledItem != null) {
+                            ItemStack cooled = new ItemStack(cooledItem, stack.getCount());
+                            copyComponentsExceptHeated(stack, cooled);
+                            slot.set(cooled);
+                            // Don't call broadcastChanges() here - we're already inside it
+                            // The slot.set() will mark it as changed for the next broadcast
+                        }
                     }
                 }
             }

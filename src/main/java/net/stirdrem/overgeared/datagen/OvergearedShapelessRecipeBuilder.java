@@ -1,41 +1,33 @@
 package net.stirdrem.overgeared.datagen;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
-import java.util.List;
-import java.util.function.Consumer;
-import javax.annotation.Nullable;
-
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.CriterionTriggerInstance;
-import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.recipes.CraftingRecipeBuilder;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.stirdrem.overgeared.recipe.ModRecipeTypes;
-import net.stirdrem.overgeared.recipe.ModRecipes;
+import net.stirdrem.overgeared.recipe.OvergearedShapelessRecipe;
 
-import static net.minecraft.data.recipes.RecipeBuilder.ROOT_RECIPE_ADVANCEMENT;
+import javax.annotation.Nullable;
+import java.util.*;
 
-public class OvergearedShapelessRecipeBuilder extends CraftingRecipeBuilder implements RecipeBuilder {
+public class OvergearedShapelessRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category;
     private final Item result;
     private final int count;
     private final List<Ingredient> ingredients = Lists.newArrayList();
-    private final Advancement.Builder advancement = Advancement.Builder.recipeAdvancement();
+    private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
     @Nullable
     private String group;
 
@@ -79,98 +71,63 @@ public class OvergearedShapelessRecipeBuilder extends CraftingRecipeBuilder impl
         return this;
     }
 
-    public OvergearedShapelessRecipeBuilder unlockedBy(String pCriterionName, CriterionTriggerInstance pCriterionTrigger) {
-        this.advancement.addCriterion(pCriterionName, pCriterionTrigger);
+    @Override
+    public OvergearedShapelessRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
+        this.criteria.put(name, criterion);
         return this;
     }
 
+    @Override
     public OvergearedShapelessRecipeBuilder group(@Nullable String pGroupName) {
         this.group = pGroupName;
         return this;
     }
 
+    @Override
     public Item getResult() {
         return this.result;
     }
 
-    public void save(Consumer<FinishedRecipe> pFinishedRecipeConsumer, ResourceLocation pRecipeId) {
-        this.ensureValid(pRecipeId);
-        this.advancement.parent(ROOT_RECIPE_ADVANCEMENT)
-                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(pRecipeId))
-                .rewards(AdvancementRewards.Builder.recipe(pRecipeId))
-                .requirements(RequirementsStrategy.OR);
-        pFinishedRecipeConsumer.accept(new Result(pRecipeId, this.result, this.count,
+    @Override
+    public void save(RecipeOutput output, ResourceLocation recipeId) {
+        this.ensureValid(recipeId);
+        
+        Advancement.Builder advBuilder = Advancement.Builder.recipeAdvancement()
+                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeId))
+                .rewards(AdvancementRewards.Builder.recipe(recipeId))
+                .requirements(AdvancementRequirements.Strategy.OR);
+        this.criteria.forEach(advBuilder::addCriterion);
+
+        // Convert plain Ingredient list to IngredientWithRemainder list
+        NonNullList<OvergearedShapelessRecipe.IngredientWithRemainder> ingredientsWithRemainder = NonNullList.create();
+        for (Ingredient ingredient : this.ingredients) {
+            // Create IngredientWithRemainder with no remainder (false, 0)
+            ingredientsWithRemainder.add(new OvergearedShapelessRecipe.IngredientWithRemainder(ingredient, false, 0));
+        }
+
+        // Create the actual OvergearedShapelessRecipe instance
+        OvergearedShapelessRecipe recipe = new OvergearedShapelessRecipe(
                 this.group == null ? "" : this.group,
                 determineBookCategory(this.category),
-                this.ingredients, this.advancement,
-                pRecipeId.withPrefix("recipes/" + this.category.getFolderName() + "/")));
+                new ItemStack(this.result, this.count),
+                ingredientsWithRemainder
+        );
+
+        output.accept(recipeId, recipe, advBuilder.build(recipeId.withPrefix("recipes/" + this.category.getFolderName() + "/")));
     }
 
     private void ensureValid(ResourceLocation pId) {
-        if (this.advancement.getCriteria().isEmpty()) {
+        if (this.criteria.isEmpty()) {
             throw new IllegalStateException("No way of obtaining recipe " + pId);
         }
     }
 
-    public static class Result implements FinishedRecipe {
-        private final ResourceLocation id;
-        private final Item result;
-        private final int count;
-        private final String group;
-        private final CraftingBookCategory category;
-        private final List<Ingredient> ingredients;
-        private final Advancement.Builder advancement;
-        private final ResourceLocation advancementId;
-
-        public Result(ResourceLocation pId, Item pResult, int pCount, String pGroup,
-                      CraftingBookCategory pCategory, List<Ingredient> pIngredients,
-                      Advancement.Builder pAdvancement, ResourceLocation pAdvancementId) {
-            this.id = pId;
-            this.result = pResult;
-            this.count = pCount;
-            this.group = pGroup;
-            this.category = pCategory;
-            this.ingredients = pIngredients;
-            this.advancement = pAdvancement;
-            this.advancementId = pAdvancementId;
-        }
-
-        public void serializeRecipeData(JsonObject pJson) {
-            if (!this.group.isEmpty()) {
-                pJson.addProperty("group", this.group);
-            }
-            pJson.addProperty("category", this.category.getSerializedName());
-
-            JsonArray jsonarray = new JsonArray();
-            for (Ingredient ingredient : this.ingredients) {
-                jsonarray.add(ingredient.toJson());
-            }
-            pJson.add("ingredients", jsonarray);
-
-            JsonObject jsonobject = new JsonObject();
-            jsonobject.addProperty("item", BuiltInRegistries.ITEM.getKey(this.result).toString());
-            if (this.count > 1) {
-                jsonobject.addProperty("count", this.count);
-            }
-            pJson.add("result", jsonobject);
-        }
-
-        public RecipeSerializer<?> getType() {
-            return ModRecipes.CRAFTING_SHAPELESS.get();
-        }
-
-        public ResourceLocation getId() {
-            return this.id;
-        }
-
-        @Nullable
-        public JsonObject serializeAdvancement() {
-            return this.advancement.serializeToJson();
-        }
-
-        @Nullable
-        public ResourceLocation getAdvancementId() {
-            return this.advancementId;
-        }
+    private static CraftingBookCategory determineBookCategory(RecipeCategory category) {
+        return switch (category) {
+            case BUILDING_BLOCKS -> CraftingBookCategory.BUILDING;
+            case TOOLS, COMBAT -> CraftingBookCategory.EQUIPMENT;
+            case REDSTONE -> CraftingBookCategory.REDSTONE;
+            default -> CraftingBookCategory.MISC;
+        };
     }
 }

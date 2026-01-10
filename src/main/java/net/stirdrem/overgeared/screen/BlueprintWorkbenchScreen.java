@@ -7,17 +7,12 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ToolType;
 import net.stirdrem.overgeared.item.ToolTypeRegistry;
-import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.SelectToolTypeC2SPacket;
-import net.stirdrem.overgeared.screen.BlueprintWorkbenchMenu;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,7 +20,7 @@ public class BlueprintWorkbenchScreen extends AbstractContainerScreen<BlueprintW
     private static final ResourceLocation TEXTURE =
             ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/blueprint_workbench.png");
 
-    private List<ToolType> toolTypes;
+    private final List<ToolType> toolTypes;
     private int selectedIndex = 0;
     private Button prevButton;
     private Button nextButton;
@@ -96,8 +91,7 @@ public class BlueprintWorkbenchScreen extends AbstractContainerScreen<BlueprintW
         selectButton = Button.builder(Component.translatable("button.overgeared.select"), btn -> {
                     if (!toolTypes.isEmpty()) {
                         //menu.createBlueprint(toolTypes.get(selectedIndex));
-                        ModMessages.sendToServer(new SelectToolTypeC2SPacket(toolTypes.get(selectedIndex).getId(), menu.containerId
-                        ));
+                        PacketDistributor.sendToServer(new SelectToolTypeC2SPacket(toolTypes.get(selectedIndex).getId(), menu.containerId));
                     }
                 })
                 .pos(x + imageWidth / 2 - selectButtonWidth / 2, selectButtonY)
@@ -156,7 +150,7 @@ public class BlueprintWorkbenchScreen extends AbstractContainerScreen<BlueprintW
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics);
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }

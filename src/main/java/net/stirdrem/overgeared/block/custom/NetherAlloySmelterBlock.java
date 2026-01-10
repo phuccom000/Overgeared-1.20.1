@@ -1,5 +1,6 @@
 package net.stirdrem.overgeared.block.custom;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -7,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,7 +25,6 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.network.NetworkHooks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 import net.stirdrem.overgeared.block.entity.NetherAlloySmelterBlockEntity;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 public class NetherAlloySmelterBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final MapCodec<NetherAlloySmelterBlock> CODEC = simpleCodec(NetherAlloySmelterBlock::new);
 
     public static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 16, 16);
 
@@ -41,6 +41,11 @@ public class NetherAlloySmelterBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(LIT, false));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     // ----- State and placement -----
@@ -58,7 +63,8 @@ public class NetherAlloySmelterBlock extends BaseEntityBlock {
 
     @Override
     public BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+        Rotation rotation = mirror.getRotation(state.getValue(FACING));
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
@@ -89,12 +95,12 @@ public class NetherAlloySmelterBlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos,
-                                 Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (!level.isClientSide()) {
             BlockEntity entity = level.getBlockEntity(pos);
-            if (entity instanceof NetherAlloySmelterBlockEntity be) {
-                NetworkHooks.openScreen((ServerPlayer) player, be, pos);
+            if (entity instanceof NetherAlloySmelterBlockEntity be
+                    && player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.openMenu(be, pos);
             } else {
                 throw new IllegalStateException("Container provider is missing!");
             }

@@ -2,6 +2,7 @@ package net.stirdrem.overgeared.client;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.stirdrem.overgeared.config.ServerConfig;
@@ -12,7 +13,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ClientAnvilMinigameData {
-    //private static final Map<UUID, PlayerMinigameData> playerData = new HashMap<>();
     public static UUID ownerUUID = null;
     private static boolean isVisible = false;
     public static boolean minigameStarted = false;
@@ -34,14 +34,6 @@ public class ClientAnvilMinigameData {
     public static float zoneShiftAmount = 15.0f;
     public static Map<BlockPos, UUID> occupiedAnvils = Collections.synchronizedMap(new HashMap<>());
     public static int skillLevel = 0;
-
-    /*private static PlayerMinigameData ClientAnvilMinigameData {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null) {
-            return playerData.computeIfAbsent(mc.player.getUUID(), k -> new PlayerMinigameData());
-        }
-        return new PlayerMinigameData(); // Fallback
-    }*/
 
     // Visibility
     public static void setIsVisible(boolean visible) {
@@ -202,7 +194,10 @@ public class ClientAnvilMinigameData {
         minigameStarted = nbt.contains("minigameStarted") && nbt.getBoolean("minigameStarted");
 
         if (nbt.contains("resultItem")) {
-            resultItem = ItemStack.of(nbt.getCompound("resultItem"));
+            resultItem = ItemStack.OPTIONAL_CODEC
+                    .parse(NbtOps.INSTANCE, nbt.get("resultItem"))
+                    .result()
+                    .orElse(ItemStack.EMPTY);
         } else {
             resultItem = ItemStack.EMPTY;
         }
@@ -266,8 +261,4 @@ public class ClientAnvilMinigameData {
     public static int getSkillLevel() {
         return skillLevel;
     }
-
-/*public static void clearData(UUID playerId) {
-        playerData.remove(playerId);
-    }*/
 }

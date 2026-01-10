@@ -1,21 +1,16 @@
 package net.stirdrem.overgeared.block.entity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.stirdrem.overgeared.AnvilTier;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.block.custom.StoneSmithingAnvil;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.StoneSmithingAnvilMenu;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEntity {
     private int craftCount = 0;
@@ -24,13 +19,7 @@ public class StoneSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
         super((StoneSmithingAnvil) pBlockState.getBlock(), AnvilTier.STONE, ModBlockEntities.STONE_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
     }
 
-
-    @Override
-    public Component getDisplayName() {
-        return Component.translatable("gui.overgeared.smithing_anvil");
-    }
-
-    @Nullable
+  @Nullable
     @Override
     public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
         if (!pPlayer.isCrouching()) {

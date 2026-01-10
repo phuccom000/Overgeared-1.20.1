@@ -1,0 +1,20 @@
+{
+  "display": {
+    "icon": {
+      "id": "overgeared:knappable_rock"
+    },
+    "title": "Stone Age Artisan",
+    "description": "Use rock knapping to make stone tool heads",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "overgeared:root",
+  "criteria": {
+    "knapping": {
+      "trigger": "overgeared:finished_knapping",
+      "conditions": {}
+    }
+  }
+}

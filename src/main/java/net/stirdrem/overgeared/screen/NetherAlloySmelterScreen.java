@@ -11,7 +11,7 @@ import net.stirdrem.overgeared.OvergearedMod;
 
 public class NetherAlloySmelterScreen extends AbstractContainerScreen<NetherAlloySmelterMenu> {
     private static final ResourceLocation TEXTURE =
-            new ResourceLocation(OvergearedMod.MOD_ID, "textures/gui/nether_alloy_furnace.png");
+            OvergearedMod.loc("textures/gui/nether_alloy_furnace.png");
 
     public NetherAlloySmelterScreen(NetherAlloySmelterMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -45,7 +45,7 @@ public class NetherAlloySmelterScreen extends AbstractContainerScreen<NetherAllo
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(guiGraphics);
+        this.renderBackground(guiGraphics, mouseX, mouseY, delta);
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }

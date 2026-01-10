@@ -1,7 +1,5 @@
 package net.stirdrem.overgeared.util;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -11,7 +9,6 @@ import net.stirdrem.overgeared.OvergearedMod;
 
 public class ModTags {
     public static class Blocks {
-        /*public static final TagKey<Block> TONGS = tag("tongs");*/
         public static final TagKey<Block> NEEDS_STEEL_TOOL = tag("needs_steel_tool");
         public static final TagKey<Block> NEEDS_COPPER_TOOL = tag("needs_copper_tool");
         public static final TagKey<Block> SMITHING = tag("smithing");
@@ -20,7 +17,7 @@ public class ModTags {
         public static final TagKey<Block> GRINDSTONES = tag("grindstones");
 
         private static TagKey<Block> tag(String name) {
-            return BlockTags.create(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, name));
+            return BlockTags.create(OvergearedMod.loc(name));
         }
     }
 
@@ -32,11 +29,8 @@ public class ModTags {
         public static final TagKey<Item> SMITHING_HAMMERS = tag("smithing_hammers");
         public static final TagKey<Item> TOOL_CAST = tag("tool_casts");
 
-
         private static TagKey<Item> tag(String name) {
-            return ItemTags.create(ResourceLocation.tryBuild(OvergearedMod.MOD_ID, name));
+            return ItemTags.create(OvergearedMod.loc(name));
         }
-
-
     }
 }

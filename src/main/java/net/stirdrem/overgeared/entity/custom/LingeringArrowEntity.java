@@ -1,54 +1,51 @@
 package net.stirdrem.overgeared.entity.custom;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.entity.AreaEffectCloud;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.phys.Vec3;
-import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.entity.ArrowTier;
-
-public class LingeringArrowEntity extends Arrow {
+//TODO: there's tons of duplicate code between this and UpgradeArrowEntity
+public class LingeringArrowEntity extends AbstractArrow {
     private static final EntityDataAccessor<Integer> DATA_POTION_COLOR =
             SynchedEntityData.defineId(LingeringArrowEntity.class, EntityDataSerializers.INT);
     private final ItemStack referenceStack;
 
-    public LingeringArrowEntity(Level level, LivingEntity shooter, ItemStack stack) {
-        super(level, shooter);
+    public LingeringArrowEntity(EntityType<? extends LingeringArrowEntity> type, Level level, LivingEntity shooter, ItemStack stack, @Nullable ItemStack firedFromWeapon) {
+        super(type, shooter, level, stack, firedFromWeapon);
         this.referenceStack = stack;
-        int color = PotionUtils.getColor(stack);
+        PotionContents potionContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        int color = potionContents.getColor();
         this.entityData.set(DATA_POTION_COLOR, color);
     }
 
-    public LingeringArrowEntity(EntityType<? extends Arrow> type, Level level) {
+    public LingeringArrowEntity(EntityType<? extends LingeringArrowEntity> type, Level level) {
         super(type, level);
         this.referenceStack = ItemStack.EMPTY;
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_POTION_COLOR, -1); // Default no color
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_POTION_COLOR, -1); // Default no color
     }
 
     @Override
@@ -66,20 +63,21 @@ public class LingeringArrowEntity extends Arrow {
     }
 
     @Override
+    protected ItemStack getDefaultPickupItem() {
+        return referenceStack;
+    }
+
+    @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
         if (!level().isClientSide) {
-            ItemStack stack = this.referenceStack;
-            Potion potion = PotionUtils.getPotion(stack);
-            List<MobEffectInstance> effects = PotionUtils.getAllEffects(stack.getTag());
+            PotionContents potionContents = this.referenceStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
 
-            if (!effects.isEmpty()) {
-                makeAreaOfEffectCloud(stack, effects, result);
+            if (!potionContents.getAllEffects().iterator().hasNext()) {
+                return;
             }
 
-            int eventId = potion.hasInstantEffects() ? 2007 : 2002;
-            //level().levelEvent(eventId, this.blockPosition(), PotionUtils.getColor(stack));
-            //this.discard();
+            makeAreaOfEffectCloud(this.referenceStack, potionContents, result);
         }
     }
 
@@ -87,21 +85,18 @@ public class LingeringArrowEntity extends Arrow {
     protected void onHitBlock(BlockHitResult pResult) {
         super.onHitBlock(pResult);
         if (!level().isClientSide) {
-            ItemStack stack = this.referenceStack;
-            Potion potion = PotionUtils.getPotion(stack);
-            List<MobEffectInstance> effects = PotionUtils.getMobEffects(stack);
+            PotionContents potionContents = this.referenceStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
 
-            if (!effects.isEmpty()) {
-                makeAreaOfEffectCloud(stack, effects, pResult);
+            if (!potionContents.getAllEffects().iterator().hasNext()) {
+                return;
             }
 
-            int eventId = potion.hasInstantEffects() ? 2007 : 2002;
-            //level().levelEvent(eventId, this.blockPosition(), PotionUtils.getColor(stack));
-            //this.discard();
+            makeAreaOfEffectCloud(this.referenceStack, potionContents, pResult);
         }
     }
 
-    private void makeAreaOfEffectCloud(ItemStack stack, List<MobEffectInstance> effects, HitResult result) {
+    private void makeAreaOfEffectCloud(ItemStack stack, PotionContents potionContents,
+                                       HitResult result) {
         Vec3 hit = result.getLocation();
 
         // Compute vertical motion ratio
@@ -125,24 +120,29 @@ public class LingeringArrowEntity extends Arrow {
         cloud.setRadiusOnUse(-0.5F);
         cloud.setWaitTime(10);
         cloud.setRadiusPerTick(-cloud.getRadius() / cloud.getDuration());
-        cloud.setPotion(potion);
 
-        for (MobEffectInstance inst : effects) {
+        // Create reduced-duration potion contents for the cloud
+        List<MobEffectInstance> reducedEffects = new java.util.ArrayList<>();
+        for (MobEffectInstance inst : potionContents.getAllEffects()) {
             MobEffectInstance reducedEffect = new MobEffectInstance(
                     inst.getEffect(),
-                    Math.max(inst.getDuration() / 8, 1), // 1/4 duration
+                    Math.max(inst.getDuration() / 8, 1), // 1/8 duration
                     inst.getAmplifier(),
                     inst.isAmbient(),
                     inst.isVisible(),
                     inst.showIcon()
             );
-            cloud.addEffect(reducedEffect);
+            reducedEffects.add(reducedEffect);
         }
 
-        CompoundTag compoundtag = stack.getTag();
-        if (compoundtag != null && compoundtag.contains("CustomPotionColor", 99)) {
-            cloud.setFixedColor(compoundtag.getInt("CustomPotionColor"));
-        }
+        // Create new PotionContents with reduced effects
+        PotionContents cloudContents = new PotionContents(
+                potionContents.potion(),
+                potionContents.customColor(),
+                reducedEffects
+        );
+
+        cloud.setPotionContents(cloudContents);
 
         level().addFreshEntity(cloud);
     }
@@ -150,12 +150,14 @@ public class LingeringArrowEntity extends Arrow {
     private void makeParticle(int amount) {
         int color = this.entityData.get(DATA_POTION_COLOR);
         if (color != -1 && amount > 0) {
-            double r = (double) (color >> 16 & 255) / 255.0D;
-            double g = (double) (color >> 8 & 255) / 255.0D;
-            double b = (double) (color & 255) / 255.0D;
-
             for (int j = 0; j < amount; ++j) {
-                this.level().addParticle(ParticleTypes.ENTITY_EFFECT, this.getRandomX(0.5D), this.getRandomY(), this.getRandomZ(0.5D), r, g, b);
+                this.level().addParticle(
+                        ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, color),
+                        this.getRandomX(0.5D),
+                        this.getRandomY(),
+                        this.getRandomZ(0.5D),
+                        0.0D, 0.0D, 0.0D
+                );
             }
         }
     }
@@ -163,7 +165,6 @@ public class LingeringArrowEntity extends Arrow {
     @Override
     public void tick() {
         super.tick();
-        //if (this.level().isClientSide()) {
         if (this.inGround) {
             if (this.inGroundTime % 5 == 0) {
                 this.makeParticle(1);
@@ -171,8 +172,5 @@ public class LingeringArrowEntity extends Arrow {
         } else {
             this.makeParticle(2);
         }
-
-        //}
     }
-
 }

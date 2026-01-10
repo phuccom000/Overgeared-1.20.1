@@ -1,36 +1,31 @@
 package net.stirdrem.overgeared.recipe;
 
-import com.google.gson.JsonObject;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.SimpleContainer;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
-public class CoolingRecipe implements Recipe<SimpleContainer> {
-    private final ResourceLocation id;
-    private final Ingredient input;
-    private final ItemStack output;
+public class CoolingRecipe implements Recipe<SingleRecipeInput> {
+    private final Ingredient ingredient;
+    private final ItemStack result;
 
-    public CoolingRecipe(ResourceLocation id, Ingredient input, ItemStack output) {
-        this.id = id;
-        this.input = input;
-        this.output = output;
+    public CoolingRecipe(Ingredient ingredient, ItemStack result) {
+        this.ingredient = ingredient;
+        this.result = result;
     }
 
     @Override
-    public boolean matches(SimpleContainer container, Level level) {
-        return input.test(container.getItem(0));
+    public boolean matches(SingleRecipeInput input, Level level) {
+        return ingredient.test(input.getItem(0));
     }
 
     @Override
-    public ItemStack assemble(SimpleContainer container, net.minecraft.core.RegistryAccess registryAccess) {
-        return output.copy();
+    public ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider provider) {
+        return result.copy();
     }
 
     @Override
@@ -39,18 +34,13 @@ public class CoolingRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess) {
-        return output.copy();
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return id;
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
+        return result;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.COOLING_SERIALIZER.get();
+        return ModRecipeSerializers.COOLING_SERIALIZER.get();
     }
 
     @Override
@@ -58,38 +48,26 @@ public class CoolingRecipe implements Recipe<SimpleContainer> {
         return ModRecipeTypes.COOLING_RECIPE.get();
     }
 
-    public Ingredient getInput() {
-        return input;
-    }
-
-    public ItemStack getOutput() {
-        return output;
-    }
-
-    public static class Type implements RecipeType<CoolingRecipe> {
-        public static final CoolingRecipe.Type INSTANCE = new CoolingRecipe.Type();
-        public static final String ID = "cooling";
-    }
-
     public static class Serializer implements RecipeSerializer<CoolingRecipe> {
+        public static final MapCodec<CoolingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Ingredient.CODEC_NONEMPTY.fieldOf("input").forGetter(r -> r.ingredient),
+                ItemStack.CODEC.fieldOf("output").forGetter(r -> r.result)
+        ).apply(i, CoolingRecipe::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, CoolingRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC, r -> r.ingredient,
+                ItemStack.STREAM_CODEC, r -> r.result,
+                CoolingRecipe::new
+        );
+
         @Override
-        public CoolingRecipe fromJson(ResourceLocation id, JsonObject json) {
-            Ingredient input = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
-            ItemStack output = net.minecraft.world.item.crafting.ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
-            return new CoolingRecipe(id, input, output);
+        public MapCodec<CoolingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public CoolingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
-            Ingredient input = Ingredient.fromNetwork(buffer);
-            ItemStack output = buffer.readItem();
-            return new CoolingRecipe(id, input, output);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buffer, CoolingRecipe recipe) {
-            recipe.input.toNetwork(buffer);
-            buffer.writeItem(recipe.output);
+        public StreamCodec<RegistryFriendlyByteBuf, CoolingRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

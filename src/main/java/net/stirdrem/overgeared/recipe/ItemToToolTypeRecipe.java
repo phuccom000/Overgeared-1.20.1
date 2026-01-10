@@ -1,50 +1,27 @@
 package net.stirdrem.overgeared.recipe;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
-
-import net.minecraft.world.level.Level;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 
-import java.util.Collection;
 import java.util.List;
 
-public class ItemToToolTypeRecipe implements Recipe<SimpleContainer> {
+public record ItemToToolTypeRecipe(Ingredient input, String toolType) implements Recipe<SingleRecipeInput> {
 
-    private final ResourceLocation id;
-    private final Ingredient input;
-    private final String toolType;
-
-    public ItemToToolTypeRecipe(ResourceLocation id, Ingredient input, String toolType) {
-        this.id = id;
-        this.input = input;
-        this.toolType = toolType;
-    }
-
-    public Ingredient getInput() {
-        return input;
-    }
-
-    public String getToolType() {
-        return toolType;
+    @Override
+    public boolean matches(SingleRecipeInput recipeInput, Level level) {
+        return input.test(recipeInput.getItem(0));
     }
 
     @Override
-    public boolean matches(SimpleContainer container, Level level) {
-        return input.test(container.getItem(0));
-    }
-
-    @Override
-    public ItemStack assemble(SimpleContainer container, net.minecraft.core.RegistryAccess registryAccess) {
+    public ItemStack assemble(SingleRecipeInput recipeInput, HolderLookup.Provider provider) {
         return ItemStack.EMPTY; // purely data-driven recipe
     }
 
@@ -54,18 +31,13 @@ public class ItemToToolTypeRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public ResourceLocation getId() {
-        return id;
-    }
-
-    @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.ITEM_TO_TOOLTYPE.get();
+        return ModRecipeSerializers.ITEM_TO_TOOLTYPE.get();
     }
 
     @Override
@@ -81,32 +53,25 @@ public class ItemToToolTypeRecipe implements Recipe<SimpleContainer> {
     // Serializer
     // ----------------------------------------------------
     public static class Serializer implements RecipeSerializer<ItemToToolTypeRecipe> {
+        public static final MapCodec<ItemToToolTypeRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Ingredient.CODEC.fieldOf("item").forGetter(r -> r.input),
+                Codec.STRING.fieldOf("tooltype").forGetter(r -> r.toolType)
+        ).apply(i, ItemToToolTypeRecipe::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, ItemToToolTypeRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC, r -> r.input,
+                ByteBufCodecs.STRING_UTF8, r -> r.toolType,
+                ItemToToolTypeRecipe::new
+        );
 
         @Override
-        public ItemToToolTypeRecipe fromJson(ResourceLocation id, JsonObject json) {
-            // Allow "item" to be either an object or an array
-            if (!json.has("item")) {
-                throw new JsonSyntaxException("Missing 'item' for item_to_tooltype recipe");
-            }
-
-            JsonElement itemElement = json.get("item");
-            Ingredient input = Ingredient.fromJson(itemElement);
-            String toolType = json.get("tooltype").getAsString();
-
-            return new ItemToToolTypeRecipe(id, input, toolType);
+        public MapCodec<ItemToToolTypeRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public ItemToToolTypeRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            Ingredient input = Ingredient.fromNetwork(buf);
-            String toolType = buf.readUtf();
-            return new ItemToToolTypeRecipe(id, input, toolType);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, ItemToToolTypeRecipe recipe) {
-            recipe.input.toNetwork(buf);
-            buf.writeUtf(recipe.toolType);
+        public StreamCodec<RegistryFriendlyByteBuf, ItemToToolTypeRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

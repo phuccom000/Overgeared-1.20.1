@@ -1,11 +1,12 @@
 package net.stirdrem.overgeared.recipe;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.SimpleContainer;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -13,8 +14,7 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlloySmeltingRecipe implements Recipe<SimpleContainer>, IAlloyRecipe {
-    private final ResourceLocation id;
+public class AlloySmeltingRecipe implements Recipe<RecipeInput>, IAlloyRecipe {
     private final String group;
     private final CraftingBookCategory category;
     private final List<Ingredient> inputs;
@@ -22,8 +22,7 @@ public class AlloySmeltingRecipe implements Recipe<SimpleContainer>, IAlloyRecip
     private final float experience;
     private final int cookingTime;
 
-    public AlloySmeltingRecipe(ResourceLocation id, String group, CraftingBookCategory category, List<Ingredient> inputs, ItemStack output, float experience, int cookingTime) {
-        this.id = id;
+    public AlloySmeltingRecipe(String group, CraftingBookCategory category, List<Ingredient> inputs, ItemStack output, float experience, int cookingTime) {
         this.group = group;
         this.category = category;
         this.inputs = inputs;
@@ -33,7 +32,7 @@ public class AlloySmeltingRecipe implements Recipe<SimpleContainer>, IAlloyRecip
     }
 
     @Override
-    public boolean matches(SimpleContainer inv, Level level) {
+    public boolean matches(RecipeInput input, Level level) {
         // Don't bother checking on client side for performance reasons
         if (level.isClientSide) return false;
 
@@ -50,7 +49,7 @@ public class AlloySmeltingRecipe implements Recipe<SimpleContainer>, IAlloyRecip
 
         // Collect all non-empty items from the input slots
         for (int i = 0; i < 4; i++) {
-            ItemStack stack = inv.getItem(i);
+            ItemStack stack = input.getItem(i);
             if (!stack.isEmpty()) {
                 remainingItems.add(stack);
             }
@@ -82,9 +81,8 @@ public class AlloySmeltingRecipe implements Recipe<SimpleContainer>, IAlloyRecip
         return remainingIngredients.isEmpty();
     }
 
-
     @Override
-    public ItemStack assemble(SimpleContainer container, net.minecraft.core.RegistryAccess registryAccess) {
+    public ItemStack assemble(RecipeInput input, HolderLookup.Provider provider) {
         return output.copy();
     }
 
@@ -94,30 +92,15 @@ public class AlloySmeltingRecipe implements Recipe<SimpleContainer>, IAlloyRecip
     }
 
     @Override
-    public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
         return output;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return id;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.ALLOY_SMELTING.get();
-    }
-
-    @Override
-    public RecipeType<?> getType() {
-        return ModRecipeTypes.ALLOY_SMELTING.get();
     }
 
     public String getGroup() {
         return group;
     }
 
-    public CraftingBookCategory category() {
+    public CraftingBookCategory getCraftingBookCategory() {
         return category;
     }
 
@@ -133,69 +116,48 @@ public class AlloySmeltingRecipe implements Recipe<SimpleContainer>, IAlloyRecip
         return inputs;
     }
 
-    // ---------------------------------------------------------------------------------------
-    // Type & Serializer
-    // ---------------------------------------------------------------------------------------
-    public static class Type implements RecipeType<AlloySmeltingRecipe> {
-        public static final Type INSTANCE = new Type();
-        public static final String ID = "alloy_smelting";
+    public ItemStack getResultItem() {
+        return output;
+    }
+
+    @Override
+    public RecipeSerializer<?> getSerializer() {
+        return ModRecipeSerializers.ALLOY_SMELTING.get();
+    }
+
+    @Override
+    public RecipeType<?> getType() {
+        return ModRecipeTypes.ALLOY_SMELTING.get();
     }
 
     public static class Serializer implements RecipeSerializer<AlloySmeltingRecipe> {
-        public static final Serializer INSTANCE = new Serializer();
+        public static final MapCodec<AlloySmeltingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Codec.STRING.fieldOf("group").forGetter(r -> r.group),
+                CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC).forGetter(r -> r.category),
+                Ingredient.CODEC.listOf(0, 4).fieldOf("ingredients").forGetter(r -> r.inputs),
+                ItemStack.CODEC.fieldOf("result").forGetter(r -> r.output),
+                Codec.FLOAT.optionalFieldOf("experience", 0.0F).forGetter(r -> r.experience),
+                Codec.INT.optionalFieldOf("cooking_time", 200).forGetter(r -> r.cookingTime)
+        ).apply(i, AlloySmeltingRecipe::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, AlloySmeltingRecipe> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, r -> r.group,
+                CraftingBookCategory.STREAM_CODEC, r -> r.category,
+                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(4)), r -> r.inputs,
+                ItemStack.STREAM_CODEC, r -> r.output,
+                ByteBufCodecs.FLOAT, r -> r.experience,
+                ByteBufCodecs.INT, r -> r.cookingTime,
+                AlloySmeltingRecipe::new
+        );
 
         @Override
-        public AlloySmeltingRecipe fromJson(ResourceLocation id, JsonObject json) {
-            String group = json.has("group") ? json.get("group").getAsString() : "";
-            CraftingBookCategory category = json.has("category")
-                    ? CraftingBookCategory.CODEC.byName(json.get("category").getAsString(), CraftingBookCategory.MISC)
-                    : CraftingBookCategory.MISC;
-
-            JsonArray ingredients = json.getAsJsonArray("ingredients");
-
-            // ----- NEW: Check for too many ingredients -----
-            if (ingredients.size() > 4) {
-                throw new JsonSyntaxException("Alloy smelting recipe cannot have more than 4 ingredients: found " + ingredients.size());
-            }
-
-            List<Ingredient> inputList = new ArrayList<>();
-            for (int i = 0; i < ingredients.size(); i++) {
-                inputList.add(Ingredient.fromJson(ingredients.get(i)));
-            }
-
-            ItemStack result = ShapedRecipe.itemStackFromJson(json.getAsJsonObject("result"));
-            float experience = json.has("experience") ? json.get("experience").getAsFloat() : 0.0F;
-            int cookingTime = json.has("cookingtime") ? json.get("cookingtime").getAsInt() : 200;
-
-            return new AlloySmeltingRecipe(id, group, category, inputList, result, experience, cookingTime);
-        }
-
-
-        @Override
-        public AlloySmeltingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            String group = buf.readUtf();
-            CraftingBookCategory category = buf.readEnum(CraftingBookCategory.class);
-
-            int count = buf.readVarInt();
-            List<Ingredient> inputs = new ArrayList<>();
-            for (int i = 0; i < count; i++) inputs.add(Ingredient.fromNetwork(buf));
-
-            ItemStack result = buf.readItem();
-            float experience = buf.readFloat();
-            int cookingTime = buf.readVarInt();
-
-            return new AlloySmeltingRecipe(id, group, category, inputs, result, experience, cookingTime);
+        public MapCodec<AlloySmeltingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf buf, AlloySmeltingRecipe recipe) {
-            buf.writeUtf(recipe.group);
-            buf.writeEnum(recipe.category);
-            buf.writeVarInt(recipe.inputs.size());
-            recipe.inputs.forEach(i -> i.toNetwork(buf));
-            buf.writeItem(recipe.output);
-            buf.writeFloat(recipe.experience);
-            buf.writeVarInt(recipe.cookingTime);
+        public StreamCodec<RegistryFriendlyByteBuf, AlloySmeltingRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

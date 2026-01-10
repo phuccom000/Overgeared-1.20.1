@@ -10,8 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.stirdrem.overgeared.OvergearedMod;
 
 public class AlloySmelterScreen extends AbstractContainerScreen<AlloySmelterMenu> {
-    private static final ResourceLocation TEXTURE =
-            new ResourceLocation(OvergearedMod.MOD_ID, "textures/gui/brick_alloy_furnace.png");
+    private static final ResourceLocation TEXTURE = OvergearedMod.loc("textures/gui/brick_alloy_furnace.png");
 
     public AlloySmelterScreen(AlloySmelterMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -45,7 +44,7 @@ public class AlloySmelterScreen extends AbstractContainerScreen<AlloySmelterMenu
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(guiGraphics);
+        this.renderBackground(guiGraphics, mouseX, mouseY, delta);
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }

@@ -1,45 +1,33 @@
 package net.stirdrem.overgeared.advancement;
 
-import com.google.gson.JsonObject;
-import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.DeserializationContext;
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.stirdrem.overgeared.OvergearedMod;
 
-public class MaxLevelBlueprintAdvancementTrigger extends SimpleCriterionTrigger<MaxLevelBlueprintAdvancementTrigger.TriggerInstance> {
+import java.util.Optional;
 
-    public static final ResourceLocation ID =
-            ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "max_level_blueprint");
-
-    @Override
-    public ResourceLocation getId() {
-        return ID;
-    }
+public class MaxLevelBlueprintAdvancementTrigger
+        extends SimpleCriterionTrigger<MaxLevelBlueprintAdvancementTrigger.TriggerInstance> {
 
     @Override
-    protected TriggerInstance createInstance(JsonObject json,
-                                             ContextAwarePredicate player,
-                                             DeserializationContext context) {
-        return new TriggerInstance(player);
+    public Codec<TriggerInstance> codec() {
+        return TriggerInstance.CODEC;
     }
 
     public void trigger(ServerPlayer player) {
         this.trigger(player, instance -> true);
     }
 
-    // ---------------- Trigger Instance ----------------
-
-    public static class TriggerInstance extends AbstractCriterionTriggerInstance {
-
-        public TriggerInstance(ContextAwarePredicate player) {
-            super(ID, player);
-        }
+    public record TriggerInstance(Optional<ContextAwarePredicate> player)
+            implements SimpleCriterionTrigger.SimpleInstance {
+        public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                ContextAwarePredicate.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player))
+                .apply(instance, TriggerInstance::new));
 
         public static TriggerInstance instance() {
-            return new TriggerInstance(ContextAwarePredicate.ANY);
+            return new TriggerInstance(Optional.empty());
         }
     }
 }

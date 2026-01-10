@@ -1,34 +1,32 @@
 package net.stirdrem.overgeared.networking.packet;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 
-import java.util.function.Supplier;
+public record MinigameSetStartedS2CPacket(BlockPos pos) implements CustomPacketPayload {
+    public static final ResourceLocation ID = OvergearedMod.loc("minigame_set_started_s2c");
+    public static final CustomPacketPayload.Type<MinigameSetStartedS2CPacket> TYPE = new CustomPacketPayload.Type<>(ID);
 
-public class MinigameSetStartedS2CPacket {
-    private final BlockPos pos;
+    public static final StreamCodec<FriendlyByteBuf, MinigameSetStartedS2CPacket> STREAM_CODEC = StreamCodec.of(
+            (buffer, packet) -> buffer.writeBlockPos(packet.pos),
+            buffer -> new MinigameSetStartedS2CPacket(buffer.readBlockPos())
+    );
 
-    public MinigameSetStartedS2CPacket(BlockPos pos) {
-        this.pos = pos;
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeBlockPos(this.pos);
-    }
-
-    public MinigameSetStartedS2CPacket(FriendlyByteBuf buf) {
-        this.pos = buf.readBlockPos();
-    }
-
-    public boolean handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            AnvilMinigameEvents.setMinigameStarted(pos, true);
-            AnvilMinigameEvents.setIsVisible(pos, true);
+    public static void handle(MinigameSetStartedS2CPacket payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            AnvilMinigameEvents.setMinigameStarted(payload.pos, true);
+            AnvilMinigameEvents.setIsVisible(payload.pos, true);
         });
-        ctx.get().setPacketHandled(true);
-        return true;
     }
 }

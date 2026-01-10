@@ -1,146 +1,143 @@
 package net.stirdrem.overgeared.config;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.WritingMode;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
 public class ServerConfig {
 
     public static final int DEFAULT_WOODEN_BUCKET_BREAK_TEMPERATURE = 1000;
-    public static final ForgeConfigSpec SERVER_CONFIG;
-    public static final ForgeConfigSpec.BooleanValue ENABLE_MOD_TOOLTIPS;
+    public static final ModConfigSpec SERVER_CONFIG;
+    public static final ModConfigSpec.BooleanValue ENABLE_MOD_TOOLTIPS;
 
 
     // --- Core Anvil Configs ---
-    public static final ForgeConfigSpec.IntValue MAX_ANVIL_DISTANCE;
-    public static final ForgeConfigSpec.IntValue STONE_ANVIL_MAX_USES;
-    public static final ForgeConfigSpec.BooleanValue ENABLE_STONE_TO_ANVIL;
-    public static final ForgeConfigSpec.BooleanValue ENABLE_ANVIL_TO_SMITHING;
+    public static final ModConfigSpec.IntValue MAX_ANVIL_DISTANCE;
+    public static final ModConfigSpec.IntValue STONE_ANVIL_MAX_USES;
+    public static final ModConfigSpec.BooleanValue ENABLE_STONE_TO_ANVIL;
+    public static final ModConfigSpec.BooleanValue ENABLE_ANVIL_TO_SMITHING;
 
     // --- Heated Items ---
-    public static final ForgeConfigSpec.IntValue HEATED_ITEM_COOLDOWN_TICKS;
+    public static final ModConfigSpec.IntValue HEATED_ITEM_COOLDOWN_TICKS;
 
     // --- Arrow Settings ---
-    public static final ForgeConfigSpec.BooleanValue ENABLE_DRAGON_BREATH_RECIPE;
-    public static final ForgeConfigSpec.BooleanValue UPGRADE_ARROW_POTION_TOGGLE;
-    public static final ForgeConfigSpec.IntValue MAX_POTION_TIPPING_USE;
+    public static final ModConfigSpec.BooleanValue ENABLE_DRAGON_BREATH_RECIPE;
+    public static final ModConfigSpec.BooleanValue UPGRADE_ARROW_POTION_TOGGLE;
+    public static final ModConfigSpec.IntValue MAX_POTION_TIPPING_USE;
 
     // --- Minigame Settings ---
-    public static final ForgeConfigSpec.BooleanValue ENABLE_MINIGAME;
-    public static final ForgeConfigSpec.BooleanValue INGREDIENTS_DEFINE_MAX_QUALITY;
-    public static final ForgeConfigSpec.DoubleValue MASTER_QUALITY_CHANCE;
-    public static final ForgeConfigSpec.DoubleValue MASTER_FROM_INGREDIENT_CHANCE;
+    public static final ModConfigSpec.BooleanValue ENABLE_MINIGAME;
+    public static final ModConfigSpec.BooleanValue INGREDIENTS_DEFINE_MAX_QUALITY;
+    public static final ModConfigSpec.DoubleValue MASTER_QUALITY_CHANCE;
+    public static final ModConfigSpec.DoubleValue MASTER_FROM_INGREDIENT_CHANCE;
 
 
-    public static final ForgeConfigSpec.DoubleValue PERFECT_QUALITY_SCORE;
-    public static final ForgeConfigSpec.DoubleValue EXPERT_QUALITY_SCORE;
-    public static final ForgeConfigSpec.DoubleValue WELL_QUALITY_SCORE;
+    public static final ModConfigSpec.DoubleValue PERFECT_QUALITY_SCORE;
+    public static final ModConfigSpec.DoubleValue EXPERT_QUALITY_SCORE;
+    public static final ModConfigSpec.DoubleValue WELL_QUALITY_SCORE;
 
 
     // --- Durability & Grinding ---
-    public static final ForgeConfigSpec.DoubleValue BASE_DURABILITY_MULTIPLIER;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> BASE_DURABILITY_BLACKLIST;
-    public static final ForgeConfigSpec.BooleanValue GRINDING_RESTORE_DURABILITY;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GRINDING_BLACKLIST;
-    public static final ForgeConfigSpec.DoubleValue DURABILITY_REDUCE_PER_GRIND;
-    public static final ForgeConfigSpec.DoubleValue DAMAGE_RESTORE_PER_GRIND;
+    public static final ModConfigSpec.DoubleValue BASE_DURABILITY_MULTIPLIER;
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> BASE_DURABILITY_BLACKLIST;
+    public static final ModConfigSpec.BooleanValue GRINDING_RESTORE_DURABILITY;
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> GRINDING_BLACKLIST;
+    public static final ModConfigSpec.DoubleValue DURABILITY_REDUCE_PER_GRIND;
+    public static final ModConfigSpec.DoubleValue DAMAGE_RESTORE_PER_GRIND;
     // --- Quality & Failure Chances ---
-    public static final ForgeConfigSpec.DoubleValue FAIL_ON_WELL_QUALITY_CHANCE;
-    public static final ForgeConfigSpec.DoubleValue FAIL_ON_EXPERT_QUALITY_CHANCE;
+    public static final ModConfigSpec.DoubleValue FAIL_ON_WELL_QUALITY_CHANCE;
+    public static final ModConfigSpec.DoubleValue FAIL_ON_EXPERT_QUALITY_CHANCE;
     // --- Tool/Blueprint Settings ---
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> AVAILABLE_TOOL_TYPES;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HIDDEN_TOOL_TYPES;
-    public static final ForgeConfigSpec.IntValue MASTER_MAX_USE;
-    public static final ForgeConfigSpec.IntValue PERFECT_MAX_USE;
-    public static final ForgeConfigSpec.IntValue EXPERT_MAX_USE;
-    public static final ForgeConfigSpec.IntValue WELL_MAX_USE;
-    public static final ForgeConfigSpec.IntValue POOR_MAX_USE;
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> AVAILABLE_TOOL_TYPES;
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> HIDDEN_TOOL_TYPES;
+    public static final ModConfigSpec.IntValue MASTER_MAX_USE;
+    public static final ModConfigSpec.IntValue PERFECT_MAX_USE;
+    public static final ModConfigSpec.IntValue EXPERT_MAX_USE;
+    public static final ModConfigSpec.IntValue WELL_MAX_USE;
+    public static final ModConfigSpec.IntValue POOR_MAX_USE;
     // --- Weapon Bonuses ---
-    public static final ForgeConfigSpec.DoubleValue MASTER_WEAPON_DAMAGE;
-    public static final ForgeConfigSpec.DoubleValue PERFECT_WEAPON_DAMAGE;
-    public static final ForgeConfigSpec.DoubleValue EXPERT_WEAPON_DAMAGE;
-    public static final ForgeConfigSpec.DoubleValue WELL_WEAPON_DAMAGE;
-    public static final ForgeConfigSpec.DoubleValue POOR_WEAPON_DAMAGE;
-    public static final ForgeConfigSpec.DoubleValue MASTER_WEAPON_SPEED;
-    public static final ForgeConfigSpec.DoubleValue PERFECT_WEAPON_SPEED;
-    public static final ForgeConfigSpec.DoubleValue EXPERT_WEAPON_SPEED;
-    public static final ForgeConfigSpec.DoubleValue WELL_WEAPON_SPEED;
-    public static final ForgeConfigSpec.DoubleValue POOR_WEAPON_SPEED;
+    public static final ModConfigSpec.DoubleValue MASTER_WEAPON_DAMAGE;
+    public static final ModConfigSpec.DoubleValue PERFECT_WEAPON_DAMAGE;
+    public static final ModConfigSpec.DoubleValue EXPERT_WEAPON_DAMAGE;
+    public static final ModConfigSpec.DoubleValue WELL_WEAPON_DAMAGE;
+    public static final ModConfigSpec.DoubleValue POOR_WEAPON_DAMAGE;
+    public static final ModConfigSpec.DoubleValue MASTER_WEAPON_SPEED;
+    public static final ModConfigSpec.DoubleValue PERFECT_WEAPON_SPEED;
+    public static final ModConfigSpec.DoubleValue EXPERT_WEAPON_SPEED;
+    public static final ModConfigSpec.DoubleValue WELL_WEAPON_SPEED;
+    public static final ModConfigSpec.DoubleValue POOR_WEAPON_SPEED;
     // --- Armor Bonuses ---
-    public static final ForgeConfigSpec.DoubleValue MASTER_ARMOR_BONUS;
-    public static final ForgeConfigSpec.DoubleValue PERFECT_ARMOR_BONUS;
-    public static final ForgeConfigSpec.DoubleValue EXPERT_ARMOR_BONUS;
-    public static final ForgeConfigSpec.DoubleValue WELL_ARMOR_BONUS;
-    public static final ForgeConfigSpec.DoubleValue POOR_ARMOR_BONUS;
+    public static final ModConfigSpec.DoubleValue MASTER_ARMOR_BONUS;
+    public static final ModConfigSpec.DoubleValue PERFECT_ARMOR_BONUS;
+    public static final ModConfigSpec.DoubleValue EXPERT_ARMOR_BONUS;
+    public static final ModConfigSpec.DoubleValue WELL_ARMOR_BONUS;
+    public static final ModConfigSpec.DoubleValue POOR_ARMOR_BONUS;
     // --- Durability Bonuses ---
-    public static final ForgeConfigSpec.DoubleValue MASTER_DURABILITY_BONUS;
-    public static final ForgeConfigSpec.DoubleValue PERFECT_DURABILITY_BONUS;
-    public static final ForgeConfigSpec.DoubleValue EXPERT_DURABILITY_BONUS;
-    public static final ForgeConfigSpec.DoubleValue WELL_DURABILITY_BONUS;
-    public static final ForgeConfigSpec.DoubleValue POOR_DURABILITY_BONUS;
+    public static final ModConfigSpec.DoubleValue MASTER_DURABILITY_BONUS;
+    public static final ModConfigSpec.DoubleValue PERFECT_DURABILITY_BONUS;
+    public static final ModConfigSpec.DoubleValue EXPERT_DURABILITY_BONUS;
+    public static final ModConfigSpec.DoubleValue WELL_DURABILITY_BONUS;
+    public static final ModConfigSpec.DoubleValue POOR_DURABILITY_BONUS;
     // --- Knapping Settings ---
-    public static final ForgeConfigSpec.BooleanValue GET_ROCK_USING_FLINT;
-    public static final ForgeConfigSpec.DoubleValue ROCK_DROPPING_CHANCE;
-    public static final ForgeConfigSpec.DoubleValue FLINT_BREAKING_CHANCE;
-    public static final ForgeConfigSpec.BooleanValue ENABLE_FLETCHING_RECIPES;
-    public static final ForgeConfigSpec.BooleanValue ENABLE_LOOT_QUALITY;
-    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_POOR;
-    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_WELL;
-    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_EXPERT;
-    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_PERFECT;
-    public static final ForgeConfigSpec.IntValue QUALITY_WEIGHT_MASTER;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> CASTING_TOOL_TYPES;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MATERIAL_TYPES;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends List<?>>> MATERIAL_SETTING;
-    public static final ForgeConfigSpec.BooleanValue ENABLE_CASTING;
-    public static ForgeConfigSpec.IntValue DEFAULT_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue DEFAULT_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue DEFAULT_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue DEFAULT_MAX_ARROW_SPEED;
-    public static final ForgeConfigSpec.IntValue POOR_ZONE_STARTING_SIZE;
-    public static final ForgeConfigSpec.IntValue POOR_MIN_PERFECT_ZONE;
-    public static final ForgeConfigSpec.DoubleValue POOR_ZONE_SHRINK_FACTOR;
-    public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED;
-    public static final ForgeConfigSpec.DoubleValue POOR_ARROW_SPEED_INCREASE;
-    public static final ForgeConfigSpec.DoubleValue POOR_MAX_ARROW_SPEED;
-    public static ForgeConfigSpec.IntValue WELL_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue WELL_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue WELL_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue WELL_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue WELL_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue WELL_MAX_ARROW_SPEED;
-    public static ForgeConfigSpec.IntValue EXPERT_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue EXPERT_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue EXPERT_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue EXPERT_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue EXPERT_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue EXPERT_MAX_ARROW_SPEED;
-    public static ForgeConfigSpec.IntValue PERFECT_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue PERFECT_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue PERFECT_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue PERFECT_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue PERFECT_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue PERFECT_MAX_ARROW_SPEED;
-    public static ForgeConfigSpec.IntValue MASTER_ZONE_STARTING_SIZE;
-    public static ForgeConfigSpec.DoubleValue MASTER_ZONE_SHRINK_FACTOR;
-    public static ForgeConfigSpec.IntValue MASTER_MIN_PERFECT_ZONE;
-    public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED;
-    public static ForgeConfigSpec.DoubleValue MASTER_ARROW_SPEED_INCREASE;
-    public static ForgeConfigSpec.DoubleValue MASTER_MAX_ARROW_SPEED;
+    public static final ModConfigSpec.BooleanValue GET_ROCK_USING_FLINT;
+    public static final ModConfigSpec.DoubleValue ROCK_DROPPING_CHANCE;
+    public static final ModConfigSpec.DoubleValue FLINT_BREAKING_CHANCE;
+    public static final ModConfigSpec.BooleanValue ENABLE_FLETCHING_RECIPES;
+    public static final ModConfigSpec.BooleanValue ENABLE_LOOT_QUALITY;
+    public static final ModConfigSpec.IntValue QUALITY_WEIGHT_POOR;
+    public static final ModConfigSpec.IntValue QUALITY_WEIGHT_WELL;
+    public static final ModConfigSpec.IntValue QUALITY_WEIGHT_EXPERT;
+    public static final ModConfigSpec.IntValue QUALITY_WEIGHT_PERFECT;
+    public static final ModConfigSpec.IntValue QUALITY_WEIGHT_MASTER;
+    public static final ModConfigSpec.ConfigValue<List<? extends List<?>>> CASTING_TOOL_TYPES;
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> MATERIAL_TYPES;
+    public static final ModConfigSpec.ConfigValue<List<? extends List<?>>> MATERIAL_SETTING;
+    public static final ModConfigSpec.BooleanValue ENABLE_CASTING;
+    public static ModConfigSpec.IntValue DEFAULT_ZONE_STARTING_SIZE;
+    public static ModConfigSpec.DoubleValue DEFAULT_ZONE_SHRINK_FACTOR;
+    public static ModConfigSpec.IntValue DEFAULT_MIN_PERFECT_ZONE;
+    public static ModConfigSpec.DoubleValue DEFAULT_ARROW_SPEED;
+    public static ModConfigSpec.DoubleValue DEFAULT_ARROW_SPEED_INCREASE;
+    public static ModConfigSpec.DoubleValue DEFAULT_MAX_ARROW_SPEED;
+    public static final ModConfigSpec.IntValue POOR_ZONE_STARTING_SIZE;
+    public static final ModConfigSpec.IntValue POOR_MIN_PERFECT_ZONE;
+    public static final ModConfigSpec.DoubleValue POOR_ZONE_SHRINK_FACTOR;
+    public static final ModConfigSpec.DoubleValue POOR_ARROW_SPEED;
+    public static final ModConfigSpec.DoubleValue POOR_ARROW_SPEED_INCREASE;
+    public static final ModConfigSpec.DoubleValue POOR_MAX_ARROW_SPEED;
+    public static ModConfigSpec.IntValue WELL_ZONE_STARTING_SIZE;
+    public static ModConfigSpec.DoubleValue WELL_ZONE_SHRINK_FACTOR;
+    public static ModConfigSpec.IntValue WELL_MIN_PERFECT_ZONE;
+    public static ModConfigSpec.DoubleValue WELL_ARROW_SPEED;
+    public static ModConfigSpec.DoubleValue WELL_ARROW_SPEED_INCREASE;
+    public static ModConfigSpec.DoubleValue WELL_MAX_ARROW_SPEED;
+    public static ModConfigSpec.IntValue EXPERT_ZONE_STARTING_SIZE;
+    public static ModConfigSpec.DoubleValue EXPERT_ZONE_SHRINK_FACTOR;
+    public static ModConfigSpec.IntValue EXPERT_MIN_PERFECT_ZONE;
+    public static ModConfigSpec.DoubleValue EXPERT_ARROW_SPEED;
+    public static ModConfigSpec.DoubleValue EXPERT_ARROW_SPEED_INCREASE;
+    public static ModConfigSpec.DoubleValue EXPERT_MAX_ARROW_SPEED;
+    public static ModConfigSpec.IntValue PERFECT_ZONE_STARTING_SIZE;
+    public static ModConfigSpec.DoubleValue PERFECT_ZONE_SHRINK_FACTOR;
+    public static ModConfigSpec.IntValue PERFECT_MIN_PERFECT_ZONE;
+    public static ModConfigSpec.DoubleValue PERFECT_ARROW_SPEED;
+    public static ModConfigSpec.DoubleValue PERFECT_ARROW_SPEED_INCREASE;
+    public static ModConfigSpec.DoubleValue PERFECT_MAX_ARROW_SPEED;
+    public static ModConfigSpec.IntValue MASTER_ZONE_STARTING_SIZE;
+    public static ModConfigSpec.DoubleValue MASTER_ZONE_SHRINK_FACTOR;
+    public static ModConfigSpec.IntValue MASTER_MIN_PERFECT_ZONE;
+    public static ModConfigSpec.DoubleValue MASTER_ARROW_SPEED;
+    public static ModConfigSpec.DoubleValue MASTER_ARROW_SPEED_INCREASE;
+    public static ModConfigSpec.DoubleValue MASTER_MAX_ARROW_SPEED;
 
-    public static ForgeConfigSpec.IntValue FIRED_CAST_DURABILITY;
-    public static ForgeConfigSpec.BooleanValue EXPERT_ABOVE_INCREASE_BLUEPRINT;
-    public static ForgeConfigSpec.BooleanValue PLAYER_AUTHOR_TOOLTIPS;
-    public static ForgeConfigSpec.BooleanValue ENABLE_STONE_ANVIL_BREAKING;
+    public static ModConfigSpec.IntValue FIRED_CAST_DURABILITY;
+    public static ModConfigSpec.BooleanValue EXPERT_ABOVE_INCREASE_BLUEPRINT;
+    public static ModConfigSpec.BooleanValue PLAYER_AUTHOR_TOOLTIPS;
+    public static ModConfigSpec.BooleanValue ENABLE_STONE_ANVIL_BREAKING;
 
     static {
-        final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         builder.push("General Configs");
         ENABLE_MOD_TOOLTIPS = builder.comment("Toggle for the mod's custom tooltips").define("enableModTooltips", true);
         builder.pop();
@@ -247,7 +244,7 @@ public class ServerConfig {
         GRINDING_RESTORE_DURABILITY = builder.comment("Can the grindstone be used for restoring durability or not").define("grindingToggle", true);
         GRINDING_BLACKLIST = builder
                 .comment("Items or tags that cannot be repaired or affected by grinding. " +
-                        "Prefix with '#' to use a tag, e.g. '#forge:ingots/iron'")
+                        "Prefix with '#' to use a tag, e.g. '#c:ingots/iron'")
                 .defineList("grindingBlacklist", List.of("minecraft:elytra", "overgeared:wooden_tongs", "overgeared:fired_tool_cast"), obj -> obj instanceof String);
         DURABILITY_REDUCE_PER_GRIND = builder.comment("How much the item durability reduce per grindstone use").defineInRange("durabilityReduce", 0.05, 0, 1);
         DAMAGE_RESTORE_PER_GRIND = builder.comment("How much the item's durability restore per grindstone use").defineInRange("damageRestore", 0.1, 0, 1);
@@ -404,18 +401,18 @@ public class ServerConfig {
 
                                 // copper
                                 List.of("minecraft:copper_ingot", "copper", 9),
-                                List.of("#forge:nuggets/copper", "copper", 1),
+                                List.of("#c:nuggets/copper", "copper", 1),
                                 List.of("minecraft:copper_block", "copper", 81),
 
                                 // steel
-                                List.of("#forge:ingots/steel", "steel", 9),
-                                List.of("#forge:nuggets/steel", "steel", 1),
-                                List.of("#forge:storage_blocks/steel", "steel", 81),
+                                List.of("#c:ingots/steel", "steel", 9),
+                                List.of("#c:nuggets/steel", "steel", 1),
+                                List.of("#c:storage_blocks/steel", "steel", 81),
 
                                 //silver
-                                List.of("#forge:ingots/silver", "silver", 9),
-                                List.of("#forge:nuggets/silver", "silver", 1),
-                                List.of("#forge:storage_blocks/silver", "silver", 81)
+                                List.of("#c:ingots/silver", "silver", 9),
+                                List.of("#c:nuggets/silver", "silver", 1),
+                                List.of("#c:storage_blocks/silver", "silver", 81)
                         ),
                         entry -> entry instanceof List<?> list &&
                                 list.size() == 3 &&
@@ -427,11 +424,5 @@ public class ServerConfig {
 
         builder.pop();
         SERVER_CONFIG = builder.build();
-    }
-
-    public static void loadConfig(Path path) {
-        final CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave().writingMode(WritingMode.REPLACE).preserveInsertionOrder().build();
-        configData.load();
-        SERVER_CONFIG.setConfig(configData);
     }
 }

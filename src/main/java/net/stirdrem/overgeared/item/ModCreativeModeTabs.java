@@ -1,151 +1,138 @@
 package net.stirdrem.overgeared.item;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
-import net.stirdrem.overgeared.BlueprintQuality;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
+import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.config.ServerConfig;
 
 public class ModCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, OvergearedMod.MOD_ID);
 
-    public static final RegistryObject<CreativeModeTab> OVERGEARED_TAB = CREATIVE_MODE_TABS.register("overgeared_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.IRON_TONGS.get()))
-                    .title(Component.translatable("creativetab.overgeared_tab"))
-                    .displayItems((pParameters, pOutput) -> {
-                        // General materials/tools
-                        pOutput.accept(ModItems.CRUDE_STEEL.get());
-                        pOutput.accept(ModItems.HEATED_CRUDE_STEEL.get());
-                        pOutput.accept(ModItems.ROCK.get());
-                        pOutput.accept(ModItems.COPPER_NUGGET.get());
-                        pOutput.accept(ModItems.STEEL_INGOT.get());
-                        pOutput.accept(ModItems.STEEL_NUGGET.get());
-                        pOutput.accept(ModItems.IRON_ARROW_HEAD.get());
-                        pOutput.accept(ModItems.STEEL_ARROW_HEAD.get());
-                        pOutput.accept(ModItems.DIAMOND_SHARD.get());
-                        pOutput.accept(ModItems.IRON_UPGRADE_ARROW.get());
-                        pOutput.accept(ModItems.STEEL_UPGRADE_ARROW.get());
-                        pOutput.accept(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                        pOutput.accept(ModItems.HEATED_COPPER_INGOT.get());
-                        pOutput.accept(ModItems.HEATED_IRON_INGOT.get());
-                        pOutput.accept(ModItems.HEATED_SILVER_INGOT.get());
-                        pOutput.accept(ModItems.HEATED_STEEL_INGOT.get());
-                        pOutput.accept(ModItems.NETHERITE_ALLOY.get());
-                        pOutput.accept(ModItems.HEATED_NETHERITE_ALLOY.get());
-                        pOutput.accept(ModItems.COPPER_PLATE.get());
-                        pOutput.accept(ModItems.IRON_PLATE.get());
-                        pOutput.accept(ModItems.STEEL_PLATE.get());
-                        pOutput.accept(ModItems.IRON_TONG.get());
-                        pOutput.accept(ModItems.STEEL_TONG.get());
-                        pOutput.accept(ModItems.WOODEN_TONGS.get());
-                        pOutput.accept(ModItems.IRON_TONGS.get());
-                        pOutput.accept(ModItems.STEEL_TONGS.get());
-                        pOutput.accept(ModItems.STONE_HAMMER_HEAD.get());
-                        pOutput.accept(ModItems.COPPER_HAMMER_HEAD.get());
-                        pOutput.accept(ModItems.STEEL_HAMMER_HEAD.get());
-                        pOutput.accept(ModItems.SMITHING_HAMMER.get());
-                        pOutput.accept(ModItems.EMPTY_BLUEPRINT.get());
-                        pOutput.accept(ModItems.BLUEPRINT.get());
-                        pOutput.accept(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get());
-                        pOutput.accept(ModItems.UNFIRED_TOOL_CAST.get());
-                        pOutput.accept(ModItems.CLAY_TOOL_CAST.get());
-                        pOutput.accept(ModItems.NETHER_TOOL_CAST.get());
-                        //pOutput.accept(ModItems.WOODEN_BUCKET.get());
-                        pOutput.accept(ModItems.COPPER_HELMET.get());
-                        pOutput.accept(ModItems.COPPER_CHESTPLATE.get());
-                        pOutput.accept(ModItems.COPPER_LEGGINGS.get());
-                        pOutput.accept(ModItems.COPPER_BOOTS.get());
+    public static final net.neoforged.neoforge.registries.DeferredHolder<CreativeModeTab, CreativeModeTab> OVERGEARED_TAB =
+            CREATIVE_MODE_TABS.register("overgeared_tab",
+                    () -> CreativeModeTab.builder()
+                            .icon(() -> new ItemStack(ModItems.IRON_TONGS.get()))
+                            .title(Component.translatable("creativetab.overgeared_tab"))
+                            .displayItems((parameters, output) -> {
+                                // General materials/tools
+                                output.accept(ModItems.CRUDE_STEEL.get());
+                                output.accept(ModItems.HEATED_CRUDE_STEEL.get());
+                                output.accept(ModItems.ROCK.get());
+                                output.accept(ModItems.COPPER_NUGGET.get());
+                                output.accept(ModItems.STEEL_INGOT.get());
+                                output.accept(ModItems.STEEL_NUGGET.get());
+                                output.accept(ModItems.IRON_ARROW_HEAD.get());
+                                output.accept(ModItems.STEEL_ARROW_HEAD.get());
+                                output.accept(ModItems.DIAMOND_SHARD.get());
+                                output.accept(ModItems.IRON_UPGRADE_ARROW.get());
+                                output.accept(ModItems.STEEL_UPGRADE_ARROW.get());
+                                output.accept(ModItems.DIAMOND_UPGRADE_ARROW.get());
+                                output.accept(ModItems.HEATED_COPPER_INGOT.get());
+                                output.accept(ModItems.HEATED_IRON_INGOT.get());
+                                output.accept(ModItems.HEATED_SILVER_INGOT.get());
+                                output.accept(ModItems.HEATED_STEEL_INGOT.get());
+                                output.accept(ModItems.NETHERITE_ALLOY.get());
+                                output.accept(ModItems.HEATED_NETHERITE_ALLOY.get());
+                                output.accept(ModItems.COPPER_PLATE.get());
+                                output.accept(ModItems.IRON_PLATE.get());
+                                output.accept(ModItems.STEEL_PLATE.get());
+                                output.accept(ModItems.IRON_TONG.get());
+                                output.accept(ModItems.STEEL_TONG.get());
+                                output.accept(ModItems.WOODEN_TONGS.get());
+                                output.accept(ModItems.IRON_TONGS.get());
+                                output.accept(ModItems.STEEL_TONGS.get());
+                                output.accept(ModItems.STONE_HAMMER_HEAD.get());
+                                output.accept(ModItems.COPPER_HAMMER_HEAD.get());
+                                output.accept(ModItems.STEEL_HAMMER_HEAD.get());
+                                output.accept(ModItems.SMITHING_HAMMER.get());
+                                output.accept(ModItems.EMPTY_BLUEPRINT.get());
+                                output.accept(ModItems.BLUEPRINT.get());
+                                output.accept(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get());
+                                output.accept(ModItems.UNFIRED_TOOL_CAST.get());
+                                output.accept(ModItems.CLAY_TOOL_CAST.get());
+                                output.accept(ModItems.NETHER_TOOL_CAST.get());
+                                output.accept(ModItems.COPPER_HELMET.get());
+                                output.accept(ModItems.COPPER_CHESTPLATE.get());
+                                output.accept(ModItems.COPPER_LEGGINGS.get());
+                                output.accept(ModItems.COPPER_BOOTS.get());
 
-                        pOutput.accept(ModItems.STEEL_HELMET.get());
-                        pOutput.accept(ModItems.STEEL_CHESTPLATE.get());
-                        pOutput.accept(ModItems.STEEL_LEGGINGS.get());
-                        pOutput.accept(ModItems.STEEL_BOOTS.get());
+                                output.accept(ModItems.STEEL_HELMET.get());
+                                output.accept(ModItems.STEEL_CHESTPLATE.get());
+                                output.accept(ModItems.STEEL_LEGGINGS.get());
+                                output.accept(ModItems.STEEL_BOOTS.get());
 
-                        pOutput.accept(ModItems.COPPER_SWORD.get());
-                        pOutput.accept(ModItems.COPPER_PICKAXE.get());
-                        pOutput.accept(ModItems.COPPER_AXE.get());
-                        pOutput.accept(ModItems.COPPER_SHOVEL.get());
-                        pOutput.accept(ModItems.COPPER_HOE.get());
+                                output.accept(ModItems.COPPER_SWORD.get());
+                                output.accept(ModItems.COPPER_PICKAXE.get());
+                                output.accept(ModItems.COPPER_AXE.get());
+                                output.accept(ModItems.COPPER_SHOVEL.get());
+                                output.accept(ModItems.COPPER_HOE.get());
 
-                        pOutput.accept(ModItems.STEEL_SWORD.get());
-                        pOutput.accept(ModItems.STEEL_PICKAXE.get());
-                        pOutput.accept(ModItems.STEEL_AXE.get());
-                        pOutput.accept(ModItems.STEEL_SHOVEL.get());
-                        pOutput.accept(ModItems.STEEL_HOE.get());
+                                output.accept(ModItems.STEEL_SWORD.get());
+                                output.accept(ModItems.STEEL_PICKAXE.get());
+                                output.accept(ModItems.STEEL_AXE.get());
+                                output.accept(ModItems.STEEL_SHOVEL.get());
+                                output.accept(ModItems.STEEL_HOE.get());
 
-                        // === STONE ===
-                        pOutput.accept(ModItems.STONE_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.STONE_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.STONE_AXE_HEAD.get());
-                        pOutput.accept(ModItems.STONE_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.STONE_HOE_HEAD.get());
+                                // === STONE ===
+                                output.accept(ModItems.STONE_SWORD_BLADE.get());
+                                output.accept(ModItems.STONE_PICKAXE_HEAD.get());
+                                output.accept(ModItems.STONE_AXE_HEAD.get());
+                                output.accept(ModItems.STONE_SHOVEL_HEAD.get());
+                                output.accept(ModItems.STONE_HOE_HEAD.get());
 
-                        // === COPPER ===
-                        pOutput.accept(ModItems.COPPER_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.COPPER_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.COPPER_AXE_HEAD.get());
-                        pOutput.accept(ModItems.COPPER_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.COPPER_HOE_HEAD.get());
+                                // === COPPER ===
+                                output.accept(ModItems.COPPER_SWORD_BLADE.get());
+                                output.accept(ModItems.COPPER_PICKAXE_HEAD.get());
+                                output.accept(ModItems.COPPER_AXE_HEAD.get());
+                                output.accept(ModItems.COPPER_SHOVEL_HEAD.get());
+                                output.accept(ModItems.COPPER_HOE_HEAD.get());
 
-                        // === IRON ===
-                        pOutput.accept(ModItems.IRON_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.IRON_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.IRON_AXE_HEAD.get());
-                        pOutput.accept(ModItems.IRON_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.IRON_HOE_HEAD.get());
+                                // === IRON ===
+                                output.accept(ModItems.IRON_SWORD_BLADE.get());
+                                output.accept(ModItems.IRON_PICKAXE_HEAD.get());
+                                output.accept(ModItems.IRON_AXE_HEAD.get());
+                                output.accept(ModItems.IRON_SHOVEL_HEAD.get());
+                                output.accept(ModItems.IRON_HOE_HEAD.get());
 
-                        // === GOLD ===
-                        pOutput.accept(ModItems.GOLDEN_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.GOLDEN_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.GOLDEN_AXE_HEAD.get());
-                        pOutput.accept(ModItems.GOLDEN_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.GOLDEN_HOE_HEAD.get());
+                                // === GOLD ===
+                                output.accept(ModItems.GOLDEN_SWORD_BLADE.get());
+                                output.accept(ModItems.GOLDEN_PICKAXE_HEAD.get());
+                                output.accept(ModItems.GOLDEN_AXE_HEAD.get());
+                                output.accept(ModItems.GOLDEN_SHOVEL_HEAD.get());
+                                output.accept(ModItems.GOLDEN_HOE_HEAD.get());
 
-                        // === STEEL ===
-                        pOutput.accept(ModItems.STEEL_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.STEEL_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.STEEL_AXE_HEAD.get());
-                        pOutput.accept(ModItems.STEEL_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.STEEL_HOE_HEAD.get());
+                                // === STEEL ===
+                                output.accept(ModItems.STEEL_SWORD_BLADE.get());
+                                output.accept(ModItems.STEEL_PICKAXE_HEAD.get());
+                                output.accept(ModItems.STEEL_AXE_HEAD.get());
+                                output.accept(ModItems.STEEL_SHOVEL_HEAD.get());
+                                output.accept(ModItems.STEEL_HOE_HEAD.get());
 
-                        // === DIAMOND ===
-                       /* pOutput.accept(ModItems.DIAMOND_SWORD_BLADE.get());
-                        pOutput.accept(ModItems.DIAMOND_PICKAXE_HEAD.get());
-                        pOutput.accept(ModItems.DIAMOND_AXE_HEAD.get());
-                        pOutput.accept(ModItems.DIAMOND_SHOVEL_HEAD.get());
-                        pOutput.accept(ModItems.DIAMOND_HOE_HEAD.get());
-*/
-                        pOutput.accept(ModBlocks.STONE_SMITHING_ANVIL.get());
-                        pOutput.accept(ModBlocks.SMITHING_ANVIL.get());
-                        pOutput.accept(ModBlocks.TIER_A_SMITHING_ANVIL.get());
-                        pOutput.accept(ModBlocks.TIER_B_SMITHING_ANVIL.get());
-                        pOutput.accept(ModBlocks.STEEL_BLOCK.get());
-                        pOutput.accept(ModBlocks.DRAFTING_TABLE.get());
-                        pOutput.accept(ModBlocks.ALLOY_FURNACE.get());
-                        pOutput.accept(ModBlocks.NETHER_ALLOY_FURNACE.get());
-                        //pOutput.accept(ModBlocks.SMITHING_ANVIL_TEST.get());
-                        //pOutput.accept(ModBlocks.WATER_BARREL.get());
-                        //pOutput.accept(ModBlocks.WATER_BARREL_FULL.get());
+                                output.accept(ModBlocks.STONE_SMITHING_ANVIL.get());
+                                output.accept(ModBlocks.SMITHING_ANVIL.get());
+                                output.accept(ModBlocks.TIER_A_SMITHING_ANVIL.get());
+                                output.accept(ModBlocks.TIER_B_SMITHING_ANVIL.get());
+                                output.accept(ModBlocks.STEEL_BLOCK.get());
+                                output.accept(ModBlocks.DRAFTING_TABLE.get());
+                                output.accept(ModBlocks.ALLOY_FURNACE.get());
+                                output.accept(ModBlocks.NETHER_ALLOY_FURNACE.get());
+                            })
+                            .build());
 
-
-                        //pOutput.accept(Items.DIAMOND); //.get() only for custom items
-
-                    })
-                    .build());
-    public static final RegistryObject<CreativeModeTab> LINGERING_ARROWS_TAB =
+    public static final net.neoforged.neoforge.registries.DeferredHolder<CreativeModeTab, CreativeModeTab> LINGERING_ARROWS_TAB =
             CREATIVE_MODE_TABS.register("lingering_arrows_tab",
                     () -> CreativeModeTab.builder()
                             .icon(() -> new ItemStack(Blocks.FLETCHING_TABLE))
@@ -159,83 +146,53 @@ public class ModCreativeModeTabs {
                                 output.accept(ModItems.STEEL_UPGRADE_ARROW.get());
                                 output.accept(ModItems.DIAMOND_UPGRADE_ARROW.get());
 
-                                for (Potion potion : ForgeRegistries.POTIONS) {
-                                    if (potion == Potions.EMPTY) continue;
-
-                                    ItemStack arrow = new ItemStack(Items.TIPPED_ARROW);
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
-                                    output.accept(arrow);
-                                }
-
-                                for (Potion potion : ForgeRegistries.POTIONS) {
-                                    if (potion == Potions.EMPTY) continue;
-
+                                // === LINGERING ARROWS (with potions) ===
+                                for (Potion potion : BuiltInRegistries.POTION) {
                                     ItemStack arrow = new ItemStack(ModItems.LINGERING_ARROW.get());
-                                    arrow.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    arrow.set(DataComponents.POTION_CONTENTS, new PotionContents(BuiltInRegistries.POTION.wrapAsHolder(potion)));
                                     output.accept(arrow);
                                 }
 
-                                for (Potion potion : ForgeRegistries.POTIONS) {
-                                    if (potion == Potions.EMPTY) continue;
-
+                                // === IRON UPGRADE ARROWS (tipped + lingering) ===
+                                for (Potion potion : BuiltInRegistries.POTION) {
+                                    // Tipped version
                                     ItemStack iron = new ItemStack(ModItems.IRON_UPGRADE_ARROW.get());
-                                    iron.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    iron.set(DataComponents.POTION_CONTENTS, new PotionContents(BuiltInRegistries.POTION.wrapAsHolder(potion)));
                                     output.accept(iron);
 
+                                    // Lingering version
                                     ItemStack ironLingering = iron.copy();
-                                    ironLingering.getOrCreateTag().putBoolean("LingeringPotion", true);
+                                    ironLingering.set(ModComponents.LINGERING_STATUS, true);
                                     output.accept(ironLingering);
                                 }
 
-                                for (Potion potion : ForgeRegistries.POTIONS) {
-                                    if (potion == Potions.EMPTY) continue;
-
+                                // === STEEL UPGRADE ARROWS (tipped + lingering) ===
+                                for (Potion potion : BuiltInRegistries.POTION) {
+                                    // Tipped version
                                     ItemStack steel = new ItemStack(ModItems.STEEL_UPGRADE_ARROW.get());
-                                    steel.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    steel.set(DataComponents.POTION_CONTENTS, new PotionContents(BuiltInRegistries.POTION.wrapAsHolder(potion)));
                                     output.accept(steel);
 
+                                    // Lingering version
                                     ItemStack steelLingering = steel.copy();
-                                    steelLingering.getOrCreateTag().putBoolean("LingeringPotion", true);
+                                    steelLingering.set(ModComponents.LINGERING_STATUS, true);
                                     output.accept(steelLingering);
                                 }
 
-                                for (Potion potion : ForgeRegistries.POTIONS) {
-                                    if (potion == Potions.EMPTY) continue;
-
+                                // === DIAMOND UPGRADE ARROWS (tipped + lingering) ===
+                                for (Potion potion : BuiltInRegistries.POTION) {
+                                    // Tipped version
                                     ItemStack diamond = new ItemStack(ModItems.DIAMOND_UPGRADE_ARROW.get());
-                                    diamond.getOrCreateTag().putString("Potion", ForgeRegistries.POTIONS.getKey(potion).toString());
+                                    diamond.set(DataComponents.POTION_CONTENTS, new PotionContents(BuiltInRegistries.POTION.wrapAsHolder(potion)));
                                     output.accept(diamond);
 
+                                    // Lingering version
                                     ItemStack diamondLingering = diamond.copy();
-                                    diamondLingering.getOrCreateTag().putBoolean("LingeringPotion", true);
+                                    diamondLingering.set(ModComponents.LINGERING_STATUS, true);
                                     output.accept(diamondLingering);
                                 }
                             })
                             .build());
-
-    public static final RegistryObject<CreativeModeTab> BLUEPRINT_TAB = CREATIVE_MODE_TABS.register("blueprint_tab",
-            () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModItems.BLUEPRINT.get()))
-                    .title(Component.translatable("creativetab.overgeared.blueprint_tab"))
-                    .displayItems((parameters, output) -> {
-                        output.accept(ModItems.EMPTY_BLUEPRINT.get());
-                        // === Blueprint Variants ===
-                        for (ToolType toolType : ToolTypeRegistry.getRegisteredTypesAll()) {
-                            for (BlueprintQuality quality : BlueprintQuality.values()) {
-                                ItemStack blueprint = new ItemStack(ModItems.BLUEPRINT.get());
-                                CompoundTag tag = blueprint.getOrCreateTag();
-
-                                tag.putString("ToolType", toolType.getId());
-                                tag.putString("Quality", quality.name());
-                                tag.putInt("Uses", 0);
-                                tag.putInt("UsesToLevel", quality.getUse());
-
-                                blueprint.setTag(tag);
-                                output.accept(blueprint);
-                            }
-                        }
-                    })
-                    .build());
 
     public static void register(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);

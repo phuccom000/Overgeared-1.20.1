@@ -10,12 +10,10 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ConfigScreenHandler;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModLoadingContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
 
 import java.nio.file.Path;
@@ -28,8 +26,8 @@ import java.util.function.Supplier;
 public class OvergearedConfigScreen extends Screen {
     private final Screen parent;
     private CommentedFileConfig configFile;
-    private ForgeConfigSpec configSpec;
-    private double scrollPosition; // Add this field to store scroll position
+    private ModConfigSpec configSpec;
+    private double scrollPosition;
 
     private ConfigList configList;
 
@@ -63,27 +61,18 @@ public class OvergearedConfigScreen extends Screen {
         int listWidth = this.width; // Subtract padding from both sides
         int listHeight = this.height - 80;
         int listTop = 40;
-        int listLeft = 0; // Start at padding position instead of center
 
         this.configList = new ConfigList(
                 Minecraft.getInstance(),
                 listWidth, listHeight,
-                listTop, listTop + listHeight, 24
+                listTop, 24
         );
-        this.configList.setLeftPos(listLeft); // Set the centered position
         this.addWidget(configList);
 
         buildEntries();
 
-        // Save / Done button - keep your existing button code
         int btnW = 200;
         int btnH = 20;
-       /* this.addRenderableWidget(
-                Button.builder(Component.literal("Reset Configs"), b -> {
-                            resetAllToDefaults();
-                        }).bounds(this.width / 2 - btnW / 2, this.height - 30, btnW, btnH)
-                        .build()
-        );*/
         this.addRenderableWidget(
                 Button.builder(Component.literal("Done"), b -> {
                             save();
@@ -101,7 +90,7 @@ public class OvergearedConfigScreen extends Screen {
             try {
                 configFile.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                OvergearedMod.LOGGER.error("Error closing config file", e);
             }
         }
     }
@@ -114,7 +103,6 @@ public class OvergearedConfigScreen extends Screen {
     }
 
     private void buildEntries() {
-        //this.scrollPosition = configList.getScrollAmount();
         this.configList.setScrollAmount(this.scrollPosition);
         buildGeneralConfigs();
         buildLootQuality();
@@ -333,71 +321,71 @@ public class OvergearedConfigScreen extends Screen {
         configList.addConfigEntry(new HeaderEntry("Weapon Bonuses"));
 
         // Damage Bonuses - sorted from Poor to Master
-        buildWeaponBonus("Poor", "Weapon Bonuses.poorWeaponDamage", -10.0, 10.0);
-        buildWeaponBonus("Well", "Weapon Bonuses.wellWeaponDamage", -10.0, 10.0);
-        buildWeaponBonus("Expert", "Weapon Bonuses.expertWeaponDamage", -10.0, 10.0);
-        buildWeaponBonus("Perfect", "Weapon Bonuses.perfectWeaponDamage", -10.0, 10.0);
-        buildWeaponBonus("Master", "Weapon Bonuses.masterWeaponDamage", -10.0, 10.0);
+        buildWeaponBonus("Poor", "Weapon Bonuses.poorWeaponDamage");
+        buildWeaponBonus("Well", "Weapon Bonuses.wellWeaponDamage");
+        buildWeaponBonus("Expert", "Weapon Bonuses.expertWeaponDamage");
+        buildWeaponBonus("Perfect", "Weapon Bonuses.perfectWeaponDamage");
+        buildWeaponBonus("Master", "Weapon Bonuses.masterWeaponDamage");
         configList.addConfigEntry(new HeaderEntry(""));
         // Speed Bonuses - sorted from Poor to Master
-        buildWeaponSpeedBonus("Poor", "Weapon Bonuses.poorWeaponSpeed", -2.0, 2.0);
-        buildWeaponSpeedBonus("Well", "Weapon Bonuses.wellWeaponSpeed", -2.0, 2.0);
-        buildWeaponSpeedBonus("Expert", "Weapon Bonuses.expertWeaponSpeed", -2.0, 2.0);
-        buildWeaponSpeedBonus("Perfect", "Weapon Bonuses.perfectWeaponSpeed", -2.0, 2.0);
-        buildWeaponSpeedBonus("Master", "Weapon Bonuses.masterWeaponSpeed", -2.0, 2.0);
+        buildWeaponSpeedBonus("Poor", "Weapon Bonuses.poorWeaponSpeed");
+        buildWeaponSpeedBonus("Well", "Weapon Bonuses.wellWeaponSpeed");
+        buildWeaponSpeedBonus("Expert", "Weapon Bonuses.expertWeaponSpeed");
+        buildWeaponSpeedBonus("Perfect", "Weapon Bonuses.perfectWeaponSpeed");
+        buildWeaponSpeedBonus("Master", "Weapon Bonuses.masterWeaponSpeed");
     }
 
-    private void buildWeaponBonus(String quality, String path, double min, double max) {
+    private void buildWeaponBonus(String quality, String path) {
         configList.addConfigEntry(new DoubleEntry(
                 quality + " Weapon Damage Addition",
                 () -> getDouble(path),
                 v -> setDouble(path, v),
-                min, max
+                -10.0, 10.0
         ));
     }
 
-    private void buildWeaponSpeedBonus(String quality, String path, double min, double max) {
+    private void buildWeaponSpeedBonus(String quality, String path) {
         configList.addConfigEntry(new DoubleEntry(
                 quality + " Weapon Speed Addition",
                 () -> getDouble(path),
                 v -> setDouble(path, v),
-                min, max
+                -2.0, 2.0
         ));
     }
 
     private void buildArmorBonuses() {
         configList.addConfigEntry(new HeaderEntry("Armor Bonuses"));
-        buildArmorBonus("Poor", "Armor Bonuses.poorArmorBonus", -5.0, 5.0);
-        buildArmorBonus("Well", "Armor Bonuses.wellArmorBonus", -5.0, 5.0);
-        buildArmorBonus("Expert", "Armor Bonuses.expertArmorBonus", -5.0, 5.0);
-        buildArmorBonus("Perfect", "Armor Bonuses.perfectArmorBonus", -5.0, 5.0);
-        buildArmorBonus("Master", "Armor Bonuses.masterArmorBonus", -5.0, 5.0);
+        buildArmorBonus("Poor", "Armor Bonuses.poorArmorBonus");
+        buildArmorBonus("Well", "Armor Bonuses.wellArmorBonus");
+        buildArmorBonus("Expert", "Armor Bonuses.expertArmorBonus");
+        buildArmorBonus("Perfect", "Armor Bonuses.perfectArmorBonus");
+        buildArmorBonus("Master", "Armor Bonuses.masterArmorBonus");
     }
 
-    private void buildArmorBonus(String quality, String path, double min, double max) {
+    private void buildArmorBonus(String quality, String path) {
         configList.addConfigEntry(new DoubleEntry(
                 quality + " Armor Bonus Addition",
                 () -> getDouble(path),
                 v -> setDouble(path, v),
-                min, max
+                -5.0, 5.0
         ));
     }
 
     private void buildDurabilityBonuses() {
         configList.addConfigEntry(new HeaderEntry("Durability Bonuses"));
-        buildDurabilityBonus("Poor", "Durability Bonuses.poorDurabilityBonus", -5.0, 5.0);
-        buildDurabilityBonus("Well", "Durability Bonuses.wellDurabilityBonus", -5.0, 5.0);
-        buildDurabilityBonus("Expert", "Durability Bonuses.expertDurabilityBonus", -5.0, 5.0);
-        buildDurabilityBonus("Perfect", "Durability Bonuses.perfectDurabilityBonus", -5.0, 5.0);
-        buildDurabilityBonus("Master", "Durability Bonuses.masterDurabilityBonus", -5.0, 5.0);
+        buildDurabilityBonus("Poor", "Durability Bonuses.poorDurabilityBonus");
+        buildDurabilityBonus("Well", "Durability Bonuses.wellDurabilityBonus");
+        buildDurabilityBonus("Expert", "Durability Bonuses.expertDurabilityBonus");
+        buildDurabilityBonus("Perfect", "Durability Bonuses.perfectDurabilityBonus");
+        buildDurabilityBonus("Master", "Durability Bonuses.masterDurabilityBonus");
     }
 
-    private void buildDurabilityBonus(String quality, String path, double min, double max) {
+    private void buildDurabilityBonus(String quality, String path) {
         configList.addConfigEntry(new DoubleEntry(
                 quality + " Durability Bonus Multiplier",
                 () -> getDouble(path),
                 v -> setDouble(path, v),
-                min, max
+                -5.0, 5.0
         ));
     }
 
@@ -536,24 +524,20 @@ public class OvergearedConfigScreen extends Screen {
             configFile.save();
             configSpec.correct(configFile);
         } catch (Exception e) {
-            e.printStackTrace();
-            // Try to handle the error gracefully
-            System.err.println("Failed to save config: " + e.getMessage());
+          OvergearedMod.LOGGER.error("Failed to save config", e);
         }
     }
 
     @Override
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(gui);
+        this.renderBackground(gui, mouseX, mouseY, partialTicks);
+        super.render(gui, mouseX, mouseY, partialTicks);
         if (scrollPosition > 0) {
             configList.setScrollAmount(scrollPosition);
             scrollPosition = 0; // Reset immediately after applying
         }
 
         this.configList.render(gui, mouseX, mouseY, partialTicks);
-        super.
-
-                render(gui, mouseX, mouseY, partialTicks);
         gui.drawCenteredString(this.font, this.title, this.width / 2, 15, 0xFFFFFF);
     }
 
@@ -604,37 +588,18 @@ public class OvergearedConfigScreen extends Screen {
     }
 
     private static class ConfigList extends ObjectSelectionList<ConfigList.ConfigEntry> {
-        private final int entryPadding = 30; // Padding on left and right of each entry
-        private final int scrollbarPadding = 25; // Additional padding for scrollbar
 
-        public ConfigList(Minecraft mc, int width, int height, int top, int bottom, int itemHeight) {
-            super(mc, width, height, top, bottom, itemHeight);
-        }
-
-        // Add this method to set the horizontal position (like KeyBindsList)
-        public void setLeftPos(int left) {
-            this.x0 = left;
-            this.x1 = left + this.width;
+      public ConfigList(Minecraft mc, int width, int height, int y, int itemHeight) {
+            super(mc, width, height, y, itemHeight);
         }
 
         @Override
         public int getRowWidth() {
-            return this.width - (entryPadding * 2); // Reduce available width by padding
-        }
-
-        @Override
-        public int getRowLeft() {
-            return this.x0 + entryPadding; // Start drawing content after padding
+          return this.width - 60;
         }
 
         public void addConfigEntry(ConfigEntry entry) {
             super.addEntry(entry);
-        }
-
-        @Override
-        public int getScrollbarPosition() {
-            // Move scrollbar further right by adding padding
-            return this.x1 - scrollbarPadding;
         }
 
 
@@ -642,11 +607,6 @@ public class OvergearedConfigScreen extends Screen {
         @Override
         protected void renderSelection(GuiGraphics gui, int top, int width, int height, int outlineColor, int fillColor) {
             // Empty implementation to remove the selection background
-        }
-
-        @Override
-        public void setRenderSelection(boolean pRenderSelection) {
-            super.setRenderSelection(false);
         }
 
         public abstract static class ConfigEntry extends ObjectSelectionList.Entry<ConfigEntry> {
@@ -680,19 +640,12 @@ public class OvergearedConfigScreen extends Screen {
     }
 
     private class BooleanEntry extends ConfigList.ConfigEntry {
-        private final Supplier<Boolean> getter;
-        private final Consumer<Boolean> setter;
-        private final Boolean defaultValue;
-        private final Button toggle;
+      private final Button toggle;
         private final String label;
 
         public BooleanEntry(String label, Supplier<Boolean> getter, Consumer<Boolean> setter) {
             this.label = label;
-            this.getter = getter;
-            this.setter = setter;
-            this.defaultValue = getter.get(); // Store default value
-
-            this.toggle = Button.builder(Component.literal(getter.get().toString()), btn -> {
+          this.toggle = Button.builder(Component.literal(getter.get().toString()), btn -> {
                 boolean newVal = !getter.get();
                 setter.accept(newVal);
                 btn.setMessage(Component.literal(Boolean.toString(newVal)));
@@ -724,22 +677,13 @@ public class OvergearedConfigScreen extends Screen {
     }
 
     private class IntEntry extends ConfigList.ConfigEntry {
-        private final Supplier<Integer> getter;
-        private final Consumer<Integer> setter;
-        private final Integer defaultValue;
-        private final AbstractSliderButton slider;
+      private final AbstractSliderButton slider;
         private final String label;
-        private final int min, max;
 
-        public IntEntry(String label, Supplier<Integer> getter, Consumer<Integer> setter, int min, int max) {
+      public IntEntry(String label, Supplier<Integer> getter, Consumer<Integer> setter, int min, int max) {
             this.label = label;
-            this.getter = getter;
-            this.setter = setter;
-            this.defaultValue = getter.get();
-            this.min = min;
-            this.max = max;
 
-            double normalized = (getter.get() - min) / (double) (max - min);
+        double normalized = (getter.get() - min) / (double) (max - min);
             this.slider = new AbstractSliderButton(0, 0, 80, 20,
                     Component.literal(getter.get().toString()), normalized) {
                 @Override
@@ -784,22 +728,13 @@ public class OvergearedConfigScreen extends Screen {
     }
 
     private class DoubleEntry extends ConfigList.ConfigEntry {
-        private final Supplier<Double> getter;
-        private final Consumer<Double> setter;
-        private final Double defaultValue;
-        private final AbstractSliderButton slider;
+      private final AbstractSliderButton slider;
         private final String label;
-        private final double min, max;
 
-        public DoubleEntry(String label, Supplier<Double> getter, Consumer<Double> setter, double min, double max) {
+      public DoubleEntry(String label, Supplier<Double> getter, Consumer<Double> setter, double min, double max) {
             this.label = label;
-            this.getter = getter;
-            this.setter = setter;
-            this.defaultValue = getter.get();
-            this.min = min;
-            this.max = max;
 
-            double cur = getter.get();
+        double cur = getter.get();
             double normalized = (cur - min) / (max - min);
             this.slider = new AbstractSliderButton(0, 0, 80, 20,
                     Component.literal(String.format("%.2f", cur)), normalized) {
@@ -848,24 +783,19 @@ public class OvergearedConfigScreen extends Screen {
     }
 
     private class ManualInputEntry extends ConfigList.ConfigEntry {
-        private final String label;
-        private final Supplier<Double> getter;
-        private final Consumer<Double> setter;
-        private final EditBox editBox;
-        private final boolean acceptIntegers;
-        private boolean isFocused = false;
+      private final String label;
+      private final Supplier<Double> getter;
+      private final EditBox editBox;
 
-        public ManualInputEntry(String label, Supplier<Double> getter, Consumer<Double> setter) {
+      public ManualInputEntry(String label, Supplier<Double> getter, Consumer<Double> setter) {
             this(label, getter, setter, false);
         }
 
         public ManualInputEntry(String label, Supplier<Double> getter, Consumer<Double> setter, boolean acceptIntegers) {
             this.label = label;
             this.getter = getter;
-            this.setter = setter;
-            this.acceptIntegers = acceptIntegers;
 
-            // width 80 should be enough, adjust if needed
+          // width 80 should be enough, adjust if needed
             this.editBox = new EditBox(font, 0, 0, 80, 20, Component.literal(""));
             double cur = getter.get();
             if (acceptIntegers) {

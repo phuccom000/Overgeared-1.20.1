@@ -7,8 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.util.ModTags;
@@ -44,8 +44,8 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.STONE_AXE_HEAD.get(),
                         ModItems.STONE_SHOVEL_HEAD.get(),
                         ModItems.STONE_HOE_HEAD.get(),
-
-                        // Copper
+                        
+                       // Copper
                         ModItems.COPPER_HAMMER_HEAD.get(),
                         ModItems.COPPER_SWORD_BLADE.get(),
                         ModItems.COPPER_PICKAXE_HEAD.get(),
@@ -75,34 +75,11 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.STEEL_SHOVEL_HEAD.get(),
                         ModItems.STEEL_HOE_HEAD.get(),
 
-                        /*
-                        // Diamond (commented out)
-                        ModItems.DIAMOND_SWORD_BLADE.get(),
-                        ModItems.DIAMOND_PICKAXE_HEAD.get(),
-                        ModItems.DIAMOND_AXE_HEAD.get(),
-                        ModItems.DIAMOND_SHOVEL_HEAD.get(),
-                        ModItems.DIAMOND_HOE_HEAD.get()
-                        */
                         ModItems.IRON_ARROW_HEAD.get(),
                         ModItems.STEEL_ARROW_HEAD.get(),
                         ModItems.DIAMOND_SHARD.get()
                 );
 
-        this.tag(ItemTags.TOOLS)
-                .add(
-                        ModItems.WOODEN_TONGS.get(),
-                        ModItems.IRON_TONGS.get(),
-                        ModItems.STEEL_TONGS.get(),
-                        ModItems.SMITHING_HAMMER.get(),
-                        ModItems.COPPER_SMITHING_HAMMER.get()
-                );
-       /* this.tag(ModTags.Items.HEATABLE_METALS)
-                .add(
-                        ModItems.STEEL_INGOT.get(),
-                        Items.IRON_INGOT,
-                        ModItems.CRUDE_STEEL.get(),
-                        Items.COPPER_INGOT
-                );*/
         this.tag(ModTags.Items.HEATED_METALS)
                 .add(
                         ModItems.HEATED_STEEL_INGOT.get(),
@@ -117,31 +94,31 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.SMITHING_HAMMER.get(),
                         ModItems.COPPER_SMITHING_HAMMER.get()
                 );
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "ingots/steel")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:ingots/steel")))
                 .add(ModItems.STEEL_INGOT.get());
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "nuggets/steel")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:nuggets/steel")))
                 .add(ModItems.STEEL_NUGGET.get());
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "nuggets/copper")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:nuggets/copper")))
                 .add(ModItems.COPPER_NUGGET.get());
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "plates/copper")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:plates/copper")))
                 .add(ModItems.COPPER_PLATE.get());
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "plates/iron")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:plates/iron")))
                 .add(ModItems.IRON_PLATE.get());
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "plates/steel")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:plates/steel")))
                 .add(ModItems.STEEL_PLATE.get());
 
-        this.tag(Tags.Items.ARMORS_HELMETS)
+        this.tag(ItemTags.HEAD_ARMOR)
                 .add(ModItems.STEEL_HELMET.get())
                 .add(ModItems.COPPER_HELMET.get())
         ;
-        this.tag(Tags.Items.ARMORS_CHESTPLATES)
+        this.tag(ItemTags.CHEST_ARMOR)
                 .add(ModItems.STEEL_CHESTPLATE.get())
                 .add(ModItems.COPPER_CHESTPLATE.get());
-        this.tag(Tags.Items.ARMORS_LEGGINGS)
+        this.tag(ItemTags.LEG_ARMOR)
                 .add(ModItems.STEEL_LEGGINGS.get())
                 .add(ModItems.COPPER_LEGGINGS.get())
         ;
-        this.tag(Tags.Items.ARMORS_BOOTS)
+        this.tag(ItemTags.FOOT_ARMOR)
                 .add(ModItems.STEEL_BOOTS.get())
                 .add(ModItems.COPPER_BOOTS.get())
         ;
@@ -157,7 +134,12 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.COPPER_PICKAXE.get(),
                         ModItems.COPPER_HOE.get(),
                         ModItems.COPPER_SHOVEL.get(),
-                        ModItems.COPPER_SWORD.get()
+                        ModItems.COPPER_SWORD.get(),
+                        ModItems.WOODEN_TONGS.get(),
+                        ModItems.IRON_TONGS.get(),
+                        ModItems.STEEL_TONGS.get(),
+                        ModItems.SMITHING_HAMMER.get(),
+                        ModItems.COPPER_SMITHING_HAMMER.get()
                 );
         // Add to vanilla Minecraft tags
         this.tag(ItemTags.HOES)
@@ -178,30 +160,30 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                 .add(ModItems.COPPER_SWORD.get())
                 .add(ModItems.STEEL_SWORD.get());
         // Hoes
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "tools/hoes")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:tools/hoes")))
                 .add(ModItems.STEEL_HOE.get())
                 .add(ModItems.COPPER_HOE.get());
 
         // Axes
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "tools/axes")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:tools/axes")))
                 .add(ModItems.COPPER_AXE.get())
                 .add(ModItems.STEEL_AXE.get())
         ;
 
         // Pickaxes
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "tools/pickaxes")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:tools/pickaxes")))
                 .add(ModItems.COPPER_PICKAXE.get())
                 .add(ModItems.STEEL_PICKAXE.get())
         ;
 
         // Shovels
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "tools/shovels")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:tools/shovels")))
                 .add(ModItems.STEEL_SHOVEL.get())
                 .add(ModItems.COPPER_SHOVEL.get())
         ;
 
         // Swords
-        this.tag(ItemTags.create(ResourceLocation.tryBuild("forge", "tools/swords")))
+        this.tag(ItemTags.create(ResourceLocation.parse("c:tools/swords")))
                 .add(ModItems.STEEL_SWORD.get())
                 .add(ModItems.COPPER_SWORD.get())
         ;
@@ -220,7 +202,6 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ItemTags.ARROWS)
                 .add(
                         ModItems.LINGERING_ARROW.get(),
-                        //ModItems.MODULAR_ARROW.get(),
                         ModItems.IRON_UPGRADE_ARROW.get(),
                         ModItems.STEEL_UPGRADE_ARROW.get(),
                         ModItems.DIAMOND_UPGRADE_ARROW.get()

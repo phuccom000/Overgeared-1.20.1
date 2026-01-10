@@ -1,82 +1,62 @@
 package net.stirdrem.overgeared.item;
 
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.stirdrem.overgeared.OvergearedMod;
 
-import java.util.function.Supplier;
+import java.util.List;
+import java.util.Map;
 
-public enum ModArmorMaterials implements ArmorMaterial {
-    STEEL("steel", 26, new int[]{3, 7, 5, 2}, 12,
-            SoundEvents.ARMOR_EQUIP_IRON, 1f, 0f, () -> Ingredient.of(ModItems.STEEL_INGOT.get())),
+import static net.minecraft.world.item.Items.COPPER_INGOT;
 
-    COPPER("copper", 10, new int[]{1, 4, 3, 1}, 15,
-            SoundEvents.ARMOR_EQUIP_IRON, 0f, 0f, () -> Ingredient.of(Items.COPPER_INGOT));
+public final class ModArmorMaterials {
 
-    private final String name;
-    private final int durabilityMultiplier;
-    private final int[] protectionAmounts;
-    private final int enchantmentValue;
-    private final SoundEvent equipSound;
-    private final float toughness;
-    private final float knockbackResistance;
-    private final Supplier<Ingredient> repairIngredient;
+  public static final Holder<ArmorMaterial> STEEL = Holder.direct(new ArmorMaterial(
+          Map.of(
+                  ArmorItem.Type.HELMET, 3,
+                  ArmorItem.Type.CHESTPLATE, 7,
+                  ArmorItem.Type.LEGGINGS, 5,
+                  ArmorItem.Type.BOOTS, 2
+          ),
+          12,
+          SoundEvents.ARMOR_EQUIP_IRON,
+          () -> Ingredient.of(ModItems.STEEL_INGOT.get()),
+          List.of(
+                  new ArmorMaterial.Layer(OvergearedMod.loc("steel"))
+          ),
+          1f,
+          0f
+  ));
 
-    private static final int[] BASE_DURABILITY = {11, 16, 15, 13};
+  public static final Holder<ArmorMaterial> COPPER = Holder.direct(new ArmorMaterial(
+          Map.of(
+                  ArmorItem.Type.HELMET, 1,
+                  ArmorItem.Type.CHESTPLATE, 4,
+                  ArmorItem.Type.LEGGINGS, 3,
+                  ArmorItem.Type.BOOTS, 1
+          ),
+          15,
+          SoundEvents.ARMOR_EQUIP_IRON,
+          () -> Ingredient.of(COPPER_INGOT),
+          List.of(
+                  new ArmorMaterial.Layer(OvergearedMod.loc("copper"))
+          ),
+          0f,
+          0f
+  ));
 
-    ModArmorMaterials(String name, int durabilityMultiplier, int[] protectionAmounts, int enchantmentValue, SoundEvent equipSound,
-                      float toughness, float knockbackResistance, Supplier<Ingredient> repairIngredient) {
-        this.name = name;
-        this.durabilityMultiplier = durabilityMultiplier;
-        this.protectionAmounts = protectionAmounts;
-        this.enchantmentValue = enchantmentValue;
-        this.equipSound = equipSound;
-        this.toughness = toughness;
-        this.knockbackResistance = knockbackResistance;
-        this.repairIngredient = repairIngredient;
+  private static final int[] BASE_DURABILITY = {11, 16, 15, 13};
+
+  public static int getDurabilityForType(Holder<ArmorMaterial> material, ArmorItem.Type pType) {
+    int durabilityMultiplier = 0;
+    if (material.equals(STEEL)) {
+        durabilityMultiplier = 26;
+    } else if (material.equals(COPPER)) {
+        durabilityMultiplier = 10;
     }
-
-    @Override
-    public int getDurabilityForType(ArmorItem.Type pType) {
-        return BASE_DURABILITY[pType.ordinal()] * this.durabilityMultiplier;
-    }
-
-    @Override
-    public int getDefenseForType(ArmorItem.Type pType) {
-        return this.protectionAmounts[pType.ordinal()];
-    }
-
-    @Override
-    public int getEnchantmentValue() {
-        return enchantmentValue;
-    }
-
-    @Override
-    public SoundEvent getEquipSound() {
-        return this.equipSound;
-    }
-
-    @Override
-    public Ingredient getRepairIngredient() {
-        return this.repairIngredient.get();
-    }
-
-    @Override
-    public String getName() {
-        return OvergearedMod.MOD_ID + ":" + this.name;
-    }
-
-    @Override
-    public float getToughness() {
-        return this.toughness;
-    }
-
-    @Override
-    public float getKnockbackResistance() {
-        return this.knockbackResistance;
-    }
+    return BASE_DURABILITY[pType.ordinal()] * durabilityMultiplier;
+  }
 }

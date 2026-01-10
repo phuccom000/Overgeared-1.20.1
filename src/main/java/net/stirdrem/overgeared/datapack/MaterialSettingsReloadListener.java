@@ -5,10 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.core.Registry;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

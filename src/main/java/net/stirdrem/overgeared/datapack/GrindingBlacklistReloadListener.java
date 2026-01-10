@@ -1,16 +1,16 @@
 package net.stirdrem.overgeared.datapack;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,8 +63,11 @@ public class GrindingBlacklistReloadListener extends SimpleJsonResourceReloadLis
             throw new JsonSyntaxException("Missing 'item' for grinding blacklist entry");
         }
 
-        JsonElement itemElement = json.get("item");
-        return Ingredient.fromJson(itemElement);
+        JsonElement element = json.get("item");
+
+        return Ingredient.CODEC
+                .parse(JsonOps.INSTANCE, element)
+                .getOrThrow(JsonSyntaxException::new);
     }
 
     public static Map<ResourceLocation, Ingredient> getData() {

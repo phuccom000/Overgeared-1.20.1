@@ -2,46 +2,40 @@ package net.stirdrem.overgeared.networking.packet;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.stirdrem.overgeared.OvergearedMod;
-import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvilNew;
+import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvil;
 
-import java.util.function.Supplier;
+public record PacketSendCounterC2SPacket(String quality, BlockPos pos) implements CustomPacketPayload {
+    public static final ResourceLocation ID = OvergearedMod.loc("packet_send_counter");
+    public static final CustomPacketPayload.Type<PacketSendCounterC2SPacket> TYPE = new CustomPacketPayload.Type<>(ID);
 
-public class PacketSendCounterC2SPacket {
-    private final String quality;
-    private final BlockPos pos;
+    public static final StreamCodec<FriendlyByteBuf, PacketSendCounterC2SPacket> STREAM_CODEC = StreamCodec.of(
+            (buffer, packet) -> {
+                ByteBufCodecs.STRING_UTF8.encode(buffer, packet.quality);
+                BlockPos.STREAM_CODEC.encode(buffer, packet.pos);
+            },
+            buffer -> new PacketSendCounterC2SPacket(
+                    ByteBufCodecs.STRING_UTF8.decode(buffer),
+                    BlockPos.STREAM_CODEC.decode(buffer)
+            )
+    );
 
-    public PacketSendCounterC2SPacket(BlockPos pos, String quality) {
-        this.quality = quality;
-        this.pos = pos;
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public static void encode(PacketSendCounterC2SPacket pkt, FriendlyByteBuf buf) {
-        buf.writeBlockPos(pkt.pos);
-        buf.writeUtf(pkt.quality);
-    }
-
-    public static PacketSendCounterC2SPacket decode(FriendlyByteBuf buf) {
-        return new PacketSendCounterC2SPacket(buf.readBlockPos(), buf.readUtf());
-    }
-
-    public String getCounter() {
-        return quality;
-    }
-
-    public static void handle(PacketSendCounterC2SPacket msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer sender = ctx.get().getSender();
-            if (sender != null && sender.level().getBlockState(msg.pos).getBlock() instanceof AbstractSmithingAnvilNew) {
-                //sender.sendSystemMessage(Component.literal("Server Quality: " + msg.getCounter()));
-
-                // Call the static setter directly
-                AbstractSmithingAnvilNew.setQuality(msg.getCounter());
-            }
+    public static void handle(PacketSendCounterC2SPacket payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (!(context.player() instanceof ServerPlayer player)) return;
+            if (!(player.level().getBlockState(payload.pos).getBlock() instanceof AbstractSmithingAnvil)) return;
+            AbstractSmithingAnvil.setQuality(payload.quality);
         });
-        ctx.get().setPacketHandled(true);
     }
 }

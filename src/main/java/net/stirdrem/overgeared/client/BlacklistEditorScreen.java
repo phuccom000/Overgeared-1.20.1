@@ -7,8 +7,8 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,26 +17,20 @@ import java.util.function.Consumer;
 @OnlyIn(Dist.CLIENT)
 public class BlacklistEditorScreen extends Screen {
     private final String blacklistName;
-    private final List<String> originalItems;
-    private final Consumer<List<? extends String>> setter;
+  private final Consumer<List<? extends String>> setter;
     private final double savedScrollPosition;
     private final Screen parentScreen;
 
     private BlacklistEditorList itemList;
     private EditBox addItemField;
-    private Button addButton;
-    private Button doneButton;
-    private List<String> items;
+    private final List<String> items;
 
     public BlacklistEditorScreen(String blacklistName, List<? extends String> currentItems,
                                  Consumer<List<? extends String>> setter,
                                  double savedScrollPosition, Screen parentScreen) {
         super(Component.literal("Edit " + blacklistName));
         this.blacklistName = blacklistName;
-        this.originalItems = new ArrayList<>();
-        for (String item : currentItems) {
-            this.originalItems.add(item);
-        }
+        List<String> originalItems = new ArrayList<>(currentItems);
         this.setter = setter;
         this.savedScrollPosition = savedScrollPosition;
         this.parentScreen = parentScreen;
@@ -55,10 +49,9 @@ public class BlacklistEditorScreen extends Screen {
         this.itemList = new BlacklistEditorList(
                 Minecraft.getInstance(),
                 listWidth, listHeight,
-                40, 40 + listHeight,
+                40,
                 20
         );
-        this.itemList.setLeftPos((this.width - listWidth) / 2);
         this.addWidget(itemList);
 
         // Populate the list with current items
@@ -71,34 +64,34 @@ public class BlacklistEditorScreen extends Screen {
         this.addRenderableWidget(addItemField);
 
         // Add button
-        this.addButton = Button.builder(Component.literal("Add"), btn -> {
-            String newItem = addItemField.getValue().trim();
-            if (!newItem.isEmpty() && !items.contains(newItem)) {
-                items.add(newItem);
-                addItemField.setValue("");
-                refreshItemList();
-            }
-        }).bounds(centerX + 90, this.height - 50, 50, 20).build();
+      Button addButton = Button.builder(Component.literal("Add"), btn -> {
+        String newItem = addItemField.getValue().trim();
+        if (!newItem.isEmpty() && !items.contains(newItem)) {
+          items.add(newItem);
+          addItemField.setValue("");
+          refreshItemList();
+        }
+      }).bounds(centerX + 90, this.height - 50, 50, 20).build();
         this.addRenderableWidget(addButton);
 
         // Done button
-        this.doneButton = Button.builder(Component.literal("Done"), btn -> {
-            // Save the changes back to the config
-            setter.accept(items);
-            if (parentScreen instanceof OvergearedConfigScreen) {
-                OvergearedConfigScreen configScreen = (OvergearedConfigScreen) parentScreen;
-                configScreen.setScrollPosition(savedScrollPosition);
-                configScreen.restoreScrollPosition(); // Add this line
-            }
-            this.minecraft.setScreen(parentScreen);
-        }).bounds(centerX - 105, this.height - 25, 100, 20).build();
+      // Save the changes back to the config
+      // Add this line
+      Button doneButton = Button.builder(Component.literal("Done"), btn -> {
+        // Save the changes back to the config
+        setter.accept(items);
+        if (parentScreen instanceof OvergearedConfigScreen configScreen) {
+          configScreen.setScrollPosition(savedScrollPosition);
+          configScreen.restoreScrollPosition(); // Add this line
+        }
+        this.minecraft.setScreen(parentScreen);
+      }).bounds(centerX - 105, this.height - 25, 100, 20).build();
         this.addRenderableWidget(doneButton);
 
         // Cancel button
         Button cancelButton = Button.builder(Component.literal("Cancel"), btn -> {
-            if (parentScreen instanceof OvergearedConfigScreen) {
-                OvergearedConfigScreen configScreen = (OvergearedConfigScreen) parentScreen;
-                configScreen.setScrollPosition(savedScrollPosition);
+            if (parentScreen instanceof OvergearedConfigScreen configScreen) {
+              configScreen.setScrollPosition(savedScrollPosition);
                 configScreen.restoreScrollPosition(); // Add this line
             }
             this.minecraft.setScreen(parentScreen);
@@ -115,7 +108,7 @@ public class BlacklistEditorScreen extends Screen {
 
     @Override
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(gui);
+        this.renderBackground(gui, mouseX, mouseY, partialTicks);
         this.itemList.render(gui, mouseX, mouseY, partialTicks);
         super.render(gui, mouseX, mouseY, partialTicks);
 
@@ -193,25 +186,16 @@ public class BlacklistEditorScreen extends Screen {
 
     // Custom list for blacklist items
     private class BlacklistEditorList extends ObjectSelectionList<BlacklistItemEntry> {
-        private final int entryPadding = 30; // Padding on left and right of each entry
 
-        public BlacklistEditorList(Minecraft mc, int width, int height, int top, int bottom, int itemHeight) {
-            super(mc, width, height, top, bottom, itemHeight);
+      public BlacklistEditorList(Minecraft mc, int width, int height, int y, int itemHeight) {
+            super(mc, width, height, y, itemHeight);
         }
 
         @Override
         public int getRowWidth() {
-            return this.width - (entryPadding * 2); // Reduce available width by padding
-        }
-
-        @Override
-        public int getRowLeft() {
-            return this.x0 + entryPadding; // Start drawing content after padding
-        }
-
-        @Override
-        public int getScrollbarPosition() {
-            return this.x1 - 25; // Ensure scrollbar doesn't overlap buttons
+          // Padding on left and right of each entry
+          int entryPadding = 30;
+          return this.width - (entryPadding * 2); // Reduce available width by padding
         }
 
         public void addNewEntry(BlacklistItemEntry entry) {

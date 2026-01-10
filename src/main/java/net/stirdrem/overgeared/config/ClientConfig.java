@@ -1,22 +1,16 @@
 package net.stirdrem.overgeared.config;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.WritingMode;
-import net.minecraftforge.common.ForgeConfigSpec;
-
-import java.nio.file.Path;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ClientConfig {
 
-    public static final ForgeConfigSpec CLIENT_CONFIG;
+    public static final ModConfigSpec CLIENT_CONFIG;
 
-
-    public static final ForgeConfigSpec.IntValue MINIGAME_OVERLAY_HEIGHT;
-    public static final ForgeConfigSpec.BooleanValue POP_UP_TOGGLE;
-
+    public static final ModConfigSpec.IntValue MINIGAME_OVERLAY_HEIGHT;
+    public static final ModConfigSpec.BooleanValue POP_UP_TOGGLE;
 
     static {
-        final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         builder.push("Minigame Config");
 
         MINIGAME_OVERLAY_HEIGHT = builder
@@ -28,14 +22,6 @@ public class ClientConfig {
 
         builder.pop();
 
-
         CLIENT_CONFIG = builder.build();
     }
-
-    public static final void loadConfig(ForgeConfigSpec spec, Path path) {
-        final CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave().writingMode(WritingMode.REPLACE).build();
-        configData.load();
-        spec.setConfig(configData);
-    }
-
 }

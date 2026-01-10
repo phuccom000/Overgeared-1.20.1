@@ -1,22 +1,21 @@
 package net.stirdrem.overgeared.recipe;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.SimpleContainer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ShapedNetherAlloySmeltingRecipe implements Recipe<SimpleContainer>, INetherAlloyRecipe {
-    private final ResourceLocation id;
+public class ShapedNetherAlloySmeltingRecipe implements Recipe<RecipeInput>, INetherAlloyRecipe {
     private final String group;
     private final CraftingBookCategory category;
     private final NonNullList<Ingredient> pattern; // size 9
@@ -24,12 +23,11 @@ public class ShapedNetherAlloySmeltingRecipe implements Recipe<SimpleContainer>,
     private final float experience;
     private final int cookingTime;
 
-    public ShapedNetherAlloySmeltingRecipe(ResourceLocation id, String group, CraftingBookCategory category,
+    public ShapedNetherAlloySmeltingRecipe(String group, CraftingBookCategory category,
                                            NonNullList<Ingredient> pattern, ItemStack output,
                                            float experience, int cookingTime) {
         if (pattern.size() != 9)
             throw new IllegalArgumentException("Pattern for 3x3 alloy smelting must have exactly 9 ingredients");
-        this.id = id;
         this.group = group;
         this.category = category;
         this.pattern = pattern;
@@ -39,19 +37,19 @@ public class ShapedNetherAlloySmeltingRecipe implements Recipe<SimpleContainer>,
     }
 
     @Override
-    public boolean matches(SimpleContainer inv, Level level) {
+    public boolean matches(RecipeInput recipeInput, Level level) {
         if (level.isClientSide) return false;
 
         for (int i = 0; i < 9; i++) {
             Ingredient ingredient = pattern.get(i);
-            ItemStack stack = inv.getItem(i);
+            ItemStack stack = recipeInput.getItem(i);
             if (!ingredient.test(stack)) return false;
         }
         return true;
     }
 
     @Override
-    public ItemStack assemble(SimpleContainer inv, net.minecraft.core.RegistryAccess registryAccess) {
+    public ItemStack assemble(RecipeInput recipeInput, HolderLookup.Provider provider) {
         return output.copy();
     }
 
@@ -66,18 +64,13 @@ public class ShapedNetherAlloySmeltingRecipe implements Recipe<SimpleContainer>,
     }
 
     @Override
-    public ItemStack getResultItem(net.minecraft.core.RegistryAccess registryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
         return output.copy();
     }
 
     @Override
-    public ResourceLocation getId() {
-        return id;
-    }
-
-    @Override
     public RecipeSerializer<?> getSerializer() {
-        return ModRecipes.SHAPED_NETHER_ALLOY_SMELTING.get();
+        return ModRecipeSerializers.SHAPED_NETHER_ALLOY_SMELTING.get();
     }
 
     @Override
@@ -106,7 +99,7 @@ public class ShapedNetherAlloySmeltingRecipe implements Recipe<SimpleContainer>,
     }
 
     public static class Type implements RecipeType<ShapedNetherAlloySmeltingRecipe> {
-        public static final ShapedNetherAlloySmeltingRecipe.Type INSTANCE = new ShapedNetherAlloySmeltingRecipe.Type();
+        public static final Type INSTANCE = new Type();
         public static final String ID = "shaped_nether_alloy_smelting";
     }
 
@@ -114,68 +107,73 @@ public class ShapedNetherAlloySmeltingRecipe implements Recipe<SimpleContainer>,
     // Serializer
     // -----------------------------
     public static class Serializer implements RecipeSerializer<ShapedNetherAlloySmeltingRecipe> {
-        public static final Serializer INSTANCE = new Serializer();
+        public static final MapCodec<ShapedNetherAlloySmeltingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+                instance.group(
+                        Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedNetherAlloySmeltingRecipe::getGroup),
+                        CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC).forGetter(ShapedNetherAlloySmeltingRecipe::category),
+                        Codec.list(Codec.STRING).fieldOf("pattern").forGetter(r -> List.of("AAA", "AAA", "AAA")),
+                        Codec.unboundedMap(Codec.STRING, Ingredient.CODEC).fieldOf("key").forGetter(r -> Map.of()),
+                        ItemStack.CODEC.fieldOf("result").forGetter(r -> r.getResultItem(null)),
+                        Codec.FLOAT.optionalFieldOf("experience", 0.0F).forGetter(ShapedNetherAlloySmeltingRecipe::getExperience),
+                        Codec.INT.optionalFieldOf("cookingtime", 200).forGetter(ShapedNetherAlloySmeltingRecipe::getCookingTime)
+                ).apply(instance, (group, category, pattern, key, result, exp, time) -> {
+                    // Parse the pattern using the key map
+                    if (pattern.size() != 3) {
+                        throw new IllegalArgumentException("3x3 pattern must have exactly 3 rows");
+                    }
+                    
+                    NonNullList<Ingredient> ingredients = NonNullList.withSize(9, Ingredient.EMPTY);
+                    for (int y = 0; y < 3; y++) {
+                        String row = pattern.get(y);
+                        if (row.length() != 3) {
+                            throw new IllegalArgumentException("Each row must have exactly 3 characters");
+                        }
+                        for (int x = 0; x < 3; x++) {
+                            char c = row.charAt(x);
+                            String keyStr = String.valueOf(c);
+                            ingredients.set(y * 3 + x, key.getOrDefault(keyStr, Ingredient.EMPTY));
+                        }
+                    }
+                    return new ShapedNetherAlloySmeltingRecipe(group, category, ingredients, result, exp, time);
+                })
+        );
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, ShapedNetherAlloySmeltingRecipe> STREAM_CODEC =
+                StreamCodec.of(
+                        (buf, recipe) -> {
+                            // Encode
+                            ByteBufCodecs.STRING_UTF8.encode(buf, recipe.group);
+                            buf.writeEnum(recipe.category);
+                            for (Ingredient ingredient : recipe.pattern) {
+                                Ingredient.CONTENTS_STREAM_CODEC.encode(buf, ingredient);
+                            }
+                            ItemStack.STREAM_CODEC.encode(buf, recipe.output);
+                            ByteBufCodecs.FLOAT.encode(buf, recipe.experience);
+                            ByteBufCodecs.VAR_INT.encode(buf, recipe.cookingTime);
+                        },
+                        buf -> {
+                            // Decode
+                            String group = ByteBufCodecs.STRING_UTF8.decode(buf);
+                            CraftingBookCategory category = buf.readEnum(CraftingBookCategory.class);
+                            NonNullList<Ingredient> pattern = NonNullList.withSize(9, Ingredient.EMPTY);
+                            for (int i = 0; i < 9; i++) {
+                                pattern.set(i, Ingredient.CONTENTS_STREAM_CODEC.decode(buf));
+                            }
+                            ItemStack output = ItemStack.STREAM_CODEC.decode(buf);
+                            float experience = ByteBufCodecs.FLOAT.decode(buf);
+                            int cookingTime = ByteBufCodecs.VAR_INT.decode(buf);
+                            return new ShapedNetherAlloySmeltingRecipe(group, category, pattern, output, experience, cookingTime);
+                        }
+                );
 
         @Override
-        public ShapedNetherAlloySmeltingRecipe fromJson(ResourceLocation id, JsonObject json) {
-            String group = json.has("group") ? json.get("group").getAsString() : "";
-            CraftingBookCategory category = json.has("category")
-                    ? CraftingBookCategory.CODEC.byName(json.get("category").getAsString(), CraftingBookCategory.MISC)
-                    : CraftingBookCategory.MISC;
-
-            JsonArray patternArray = json.getAsJsonArray("pattern");
-            if (patternArray.size() != 3)
-                throw new JsonSyntaxException("3x3 alloy smelting requires exactly 3 rows in the pattern");
-
-            JsonObject keyJson = json.getAsJsonObject("key");
-            Map<Character, Ingredient> keyMap = new HashMap<>();
-            for (var entry : keyJson.entrySet()) {
-                if (entry.getKey().length() != 1) throw new JsonSyntaxException("Invalid key: " + entry.getKey());
-                keyMap.put(entry.getKey().charAt(0), Ingredient.fromJson(entry.getValue()));
-            }
-
-            NonNullList<Ingredient> ingredients = NonNullList.withSize(9, Ingredient.EMPTY);
-            for (int y = 0; y < 3; y++) {
-                String row = patternArray.get(y).getAsString();
-                if (row.length() != 3) throw new JsonSyntaxException("Each row in 3x3 pattern must have 3 characters");
-                for (int x = 0; x < 3; x++) {
-                    char c = row.charAt(x);
-                    ingredients.set(y * 3 + x, keyMap.getOrDefault(c, Ingredient.EMPTY));
-                }
-            }
-
-            ItemStack output = ShapedRecipe.itemStackFromJson(json.getAsJsonObject("result"));
-            float experience = json.has("experience") ? json.get("experience").getAsFloat() : 0.0F;
-            int cookingTime = json.has("cookingtime") ? json.get("cookingtime").getAsInt() : 200;
-
-            return new ShapedNetherAlloySmeltingRecipe(id, group, category, ingredients, output, experience, cookingTime);
+        public MapCodec<ShapedNetherAlloySmeltingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public ShapedNetherAlloySmeltingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-            String group = buf.readUtf();
-            CraftingBookCategory category = buf.readEnum(CraftingBookCategory.class);
-
-            NonNullList<Ingredient> pattern = NonNullList.withSize(9, Ingredient.EMPTY);
-            for (int i = 0; i < 9; i++) {
-                pattern.set(i, Ingredient.fromNetwork(buf));
-            }
-
-            ItemStack output = buf.readItem();
-            float experience = buf.readFloat();
-            int cookingTime = buf.readVarInt();
-
-            return new ShapedNetherAlloySmeltingRecipe(id, group, category, pattern, output, experience, cookingTime);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, ShapedNetherAlloySmeltingRecipe recipe) {
-            buf.writeUtf(recipe.group);
-            buf.writeEnum(recipe.category);
-            recipe.pattern.forEach(i -> i.toNetwork(buf));
-            buf.writeItem(recipe.output);
-            buf.writeFloat(recipe.experience);
-            buf.writeVarInt(recipe.cookingTime);
+        public StreamCodec<RegistryFriendlyByteBuf, ShapedNetherAlloySmeltingRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

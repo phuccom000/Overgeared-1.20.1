@@ -1,0 +1,15 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "oreganized"
+    }
+  ],
+  "type": "overgeared:cooling",
+  "input": {
+    "item": "overgeared:heated_silver_ingot"
+  },
+  "output": {
+    "id": "oreganized:silver_ingot"
+  }
+}

@@ -1,9 +1,0 @@
-{
-  "type": "overgeared:cooling",
-  "input": {
-    "item": "overgeared:heated_steel_ingot"
-  },
-  "output": {
-    "item": "overgeared:steel_ingot"
-  }
-}

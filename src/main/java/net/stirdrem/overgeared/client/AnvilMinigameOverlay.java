@@ -1,32 +1,38 @@
 package net.stirdrem.overgeared.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ClientConfig;
 import net.stirdrem.overgeared.event.AnvilMinigameEvents;
 
 @OnlyIn(Dist.CLIENT)
-public class AnvilMinigameOverlay {
+public class AnvilMinigameOverlay implements LayeredDraw.Layer {
+
+    public static final AnvilMinigameOverlay INSTANCE = new AnvilMinigameOverlay();
+    public static final ResourceLocation ID = OvergearedMod.loc("anvil_minigame");
 
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.tryBuild(OvergearedMod.MOD_ID, "textures/gui/smithing_anvil_minigame.png");
+            OvergearedMod.loc("textures/gui/smithing_anvil_minigame.png");
 
     // UI dimensions
     public static final int barTotalWidth = 184;
     private static final int ARROW_WIDTH = 8;
     private static final int ARROW_HEIGHT = 16;
 
-    public static final IGuiOverlay ANVIL_MG = ((gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
-
-        boolean showMainOverlay = AnvilMinigameEvents.isIsVisible();
+    @Override
+    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        boolean showMainOverlay = AnvilMinigameEvents.isVisible();
         if (!showMainOverlay) return; // Early return if not visible
+
+        int screenWidth = guiGraphics.guiWidth();
+        int screenHeight = guiGraphics.guiHeight();
 
         int imageWidth = 238;
         int imageHeight = 37;
@@ -81,6 +87,7 @@ public class AnvilMinigameOverlay {
                     perfectEndPx - perfectStartPx, barHeight,
                     textureWidth, textureHeight);
         }
+
         // Progress bar
         int progressLengthPx = (int) (222 * (1 - ((float) AnvilMinigameEvents.getHitsRemaining() / AnvilMinigameEvents.getMaxHits())));
 
@@ -97,7 +104,7 @@ public class AnvilMinigameOverlay {
                 ARROW_WIDTH, ARROW_HEIGHT,
                 textureWidth, textureHeight);
 
-        // Stats
+        /*
         int hitsRemain = AnvilMinigameEvents.getHitsRemaining();
         int perfect = AnvilMinigameEvents.getPerfectHits();
         int good = AnvilMinigameEvents.getGoodHits();
@@ -108,13 +115,14 @@ public class AnvilMinigameOverlay {
                 hitsRemain, perfect, good, miss
         );
 
-        /*guiGraphics.drawString(
+        guiGraphics.drawString(
                 Minecraft.getInstance().font,
                 stats,
                 x + 10,
                 y + 10,
                 0x404040,
                 false
-        );*/
-    });
+        );
+        */
+    }
 }

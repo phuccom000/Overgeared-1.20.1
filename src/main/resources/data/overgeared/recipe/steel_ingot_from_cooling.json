@@ -1,0 +1,9 @@
+{
+  "type": "overgeared:cooling",
+  "input": {
+    "item": "overgeared:heated_steel_ingot"
+  },
+  "output": {
+    "id": "overgeared:steel_ingot"
+  }
+}

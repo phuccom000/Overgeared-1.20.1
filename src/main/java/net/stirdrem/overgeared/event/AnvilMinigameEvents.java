@@ -4,13 +4,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.networking.ModMessages;
 import net.stirdrem.overgeared.networking.packet.SetMinigameVisibleC2SPacket;
 
 import java.util.Collections;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = OvergearedMod.MOD_ID, value = Dist.CLIENT)
 public class AnvilMinigameEvents {
     public static UUID ownerUUID = null;
     private static boolean isVisible = false;
@@ -56,7 +56,7 @@ public class AnvilMinigameEvents {
     // Popup system
     // ===============================
     private static final java.util.List<Popup> POPUPS = new java.util.ArrayList<>();
-    private static final float POPUP_DURATION_MS = 10000f;
+    private static final float POPUP_DURATION_MS = 1500f;
     private static int lastPerfect = 0;
     private static int lastGood = 0;
     private static int lastMiss = 0;
@@ -147,13 +147,12 @@ public class AnvilMinigameEvents {
 
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+    public static void onClientTick(ClientTickEvent.Post event) {
         ensureInitialized();
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         if (!mc.isPaused()) updatePopups();
-        if (mc.isPaused() || !isIsVisible()) return;
+        if (mc.isPaused() || !isVisible()) return;
 
         tickAccumulator++;
         if (tickAccumulator < TICKS_PER_PRINT) return;
@@ -175,10 +174,10 @@ public class AnvilMinigameEvents {
     }
 
     private static void updatePopups() {
-        // Age existing popups
+        // Age existing popups - each tick is 50ms (20 TPS)
         for (int i = 0; i < POPUPS.size(); i++) {
             Popup popup = POPUPS.get(i);
-            popup.age += Minecraft.getInstance().getDeltaFrameTime() * 1000f;
+            popup.age += 50f; // 50ms per tick
             if (popup.age >= POPUP_DURATION_MS) {
                 POPUPS.remove(i--);
             }
@@ -201,13 +200,13 @@ public class AnvilMinigameEvents {
         return arrowPosition;
     }
 
-    public static boolean isIsVisible() {
+    public static boolean isVisible() {
         return isVisible;
     }
 
     public static void setIsVisible(BlockPos pos, boolean isVisible) {
         AnvilMinigameEvents.isVisible = isVisible;
-        ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, isVisible));
+        PacketDistributor.sendToServer(new SetMinigameVisibleC2SPacket(isVisible, pos));
     }
 
     public static void resetPopUps() {
@@ -228,30 +227,14 @@ public class AnvilMinigameEvents {
         lastPerfect = 0;
         lastGood = 0;
         lastMiss = 0;
-        //POPUPS.clear();
 
-        setupForQuality(blueprintQuality); // 🔥 initialize from blueprint
+        setupForQuality(blueprintQuality == null ? "none" : blueprintQuality); // 🔥 initialize from blueprint
 
         randomizeCenter();
     }
 
     public static void reset() {
-        isVisible = false;
-        minigameStarted = false;
-        hitsRemaining = 0;
-        perfectHits = 0;
-        goodHits = 0;
-        missedHits = 0;
-        arrowPosition = 50;
-        movingDown = false;
-        lastPerfect = 0;
-        lastGood = 0;
-        lastMiss = 0;
-        //POPUPS.clear();
-
-        setupForQuality("none"); // 🔥 initialize from blueprint
-
-        randomizeCenter();
+        reset(null);
     }
 
     // Utility clamp
@@ -507,7 +490,7 @@ public class AnvilMinigameEvents {
         isVisible = false;
         BlockPos pos = ModItemInteractEvents.playerAnvilPositions.get(playerId);
         if (pos != null && !pos.equals(BlockPos.ZERO)) {
-            ModMessages.sendToServer(new SetMinigameVisibleC2SPacket(pos, false));
+            PacketDistributor.sendToServer(new SetMinigameVisibleC2SPacket(false, pos));
         }
         //clearAnvilPos(playerId);
     }

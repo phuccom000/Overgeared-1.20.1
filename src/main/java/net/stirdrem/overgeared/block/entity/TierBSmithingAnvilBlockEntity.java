@@ -1,28 +1,17 @@
 package net.stirdrem.overgeared.block.entity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.stirdrem.overgeared.AnvilTier;
-import net.stirdrem.overgeared.BlueprintQuality;
-import net.stirdrem.overgeared.ForgingQuality;
-import net.stirdrem.overgeared.block.custom.TierASmithingAnvil;
 import net.stirdrem.overgeared.block.custom.TierBSmithingAnvil;
-import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.screen.TierBSmithingAnvilMenu;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-
 public class TierBSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEntity {
-    private static final int BLUEPRINT_SLOT = 11;
 
     public TierBSmithingAnvilBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super((TierBSmithingAnvil) pBlockState.getBlock(), AnvilTier.ABOVE_B, ModBlockEntities.TIER_B_SMITHING_ANVIL_BE.get(), pPos, pBlockState);
@@ -30,7 +19,7 @@ public class TierBSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("gui.overgeared.smithing_anvil");
+        return Component.translatable("gui.overgeared.tier_b_smithing_anvil");
     }
 
     @Nullable
@@ -38,9 +27,9 @@ public class TierBSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
         if (!pPlayer.isCrouching()) {
             return new TierBSmithingAnvilMenu(pContainerId, pPlayerInventory, this, this.data);
-        } else return null;
+        }
+        return null;
     }
-
 
     @Override
     protected void craftItem() {
@@ -52,6 +41,4 @@ public class TierBSmithingAnvilBlockEntity extends AbstractSmithingAnvilBlockEnt
     public boolean hasRecipe() {
         return super.hasRecipeWithBlueprint();
     }
-
-
 }

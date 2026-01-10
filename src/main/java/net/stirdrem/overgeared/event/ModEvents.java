@@ -1,89 +1,65 @@
 package net.stirdrem.overgeared.event;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-
-import net.minecraftforge.event.ItemAttributeModifierEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerDestroyItemEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.stirdrem.overgeared.BlueprintQuality;
 import net.stirdrem.overgeared.ForgingQuality;
 import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
-import net.stirdrem.overgeared.item.ModItems;
+import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.config.ServerConfig;
-import net.stirdrem.overgeared.networking.ModMessages;
+import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.networking.packet.OnlyResetMinigameS2CPacket;
 import net.stirdrem.overgeared.networking.packet.ResetMinigameS2CPacket;
 import net.stirdrem.overgeared.util.ModTags;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = OvergearedMod.MOD_ID)
+@EventBusSubscriber(modid = OvergearedMod.MOD_ID)
 public class ModEvents {
     private static final int HEATED_ITEM_CHECK_INTERVAL = 20; // 1 second
-    private static final float BURN_DAMAGE = 1.0f;
-
-    //private static final Map<UUID, Integer> playerTimeoutCounters = new HashMap<>();
-
 
     private static int serverTick = 0;
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+    public static void onServerTick(ServerTickEvent.Post event) {
         serverTick++;
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-        if (event.side == LogicalSide.CLIENT) return;
-
-        ServerPlayer player = (ServerPlayer) event.player; // Safe cast
-        //handleAnvilMinigameSync(event, player);
-
-        // Refresh timeout counter if player is actively in minigame
-      /*  if (AnvilMinigameEvents.isIsVisible() && AnvilMinigameEvents.hasAnvilPosition()) {
-            playerTimeoutCounters.put(player.getUUID(), ServerConfig.MINIGAME_TIMEOUT_TICKS.get());
-        }*/
-
-
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
         if (serverTick % HEATED_ITEM_CHECK_INTERVAL != 0) return;
-
         Level level = player.level();
         handleAnvilDistance(player, level);
-
     }
 
     private static void handleAnvilDistance(ServerPlayer player, Level level) {
@@ -105,8 +81,8 @@ public class ModEvents {
     public static void onItemAttributes(ItemAttributeModifierEvent event) {
         ItemStack stack = event.getItemStack();
 
-        if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
-            String quality = stack.getTag().getString("ForgingQuality");
+        ForgingQuality quality = stack.get(ModComponents.FORGING_QUALITY);
+        if (quality != null && quality != ForgingQuality.NONE) {
             Item item = stack.getItem();
 
             if (isWeapon(item)) {
@@ -118,41 +94,44 @@ public class ModEvents {
         }
     }
 
-    private static void applyWeaponAttributes(ItemAttributeModifierEvent event, String quality) {
+    private static void applyWeaponAttributes(ItemAttributeModifierEvent event, ForgingQuality quality) {
         double damageBonus = getDamageBonusForQuality(quality);
         double speedBonus = getSpeedBonusForQuality(quality);
-        modifyAttribute(event, Attributes.ATTACK_DAMAGE, damageBonus);
-        modifyAttribute(event, Attributes.ATTACK_SPEED, speedBonus);
+        modifyAttribute(event, Attributes.ATTACK_DAMAGE.value(), damageBonus);
+        modifyAttribute(event, Attributes.ATTACK_SPEED.value(), speedBonus);
     }
 
-    private static void applyArmorAttributes(ItemAttributeModifierEvent event, String quality) {
+    private static void applyArmorAttributes(ItemAttributeModifierEvent event, ForgingQuality quality) {
         double armorBonus = getArmorBonusForQuality(quality);
-        modifyAttribute(event, Attributes.ARMOR, armorBonus);
-        modifyAttribute(event, Attributes.ARMOR_TOUGHNESS, armorBonus);
+        modifyAttribute(event, Attributes.ARMOR.value(), armorBonus);
+        modifyAttribute(event, Attributes.ARMOR_TOUGHNESS.value(), armorBonus);
     }
 
     private static void modifyAttribute(ItemAttributeModifierEvent event, Attribute attribute, double bonus) {
-        Multimap<Attribute, AttributeModifier> originalModifiers = event.getModifiers();
+        List<ItemAttributeModifiers.Entry> originalModifiers = event.getModifiers();
 
-        if (!originalModifiers.containsKey(attribute)) return;
+        Holder<Attribute> attributeHolder = new Holder.Direct<>(attribute);
 
-        // ✅ COPY before modifying
-        List<AttributeModifier> modifiers = List.copyOf(originalModifiers.get(attribute));
+        List<ItemAttributeModifiers.Entry> matchingEntries = originalModifiers.stream()
+                .filter(entry -> entry.attribute().equals(attributeHolder))
+                .toList();
 
-        for (AttributeModifier modifier : modifiers) {
-            if (modifier.getAmount() == 0) continue;
+        if (matchingEntries.isEmpty()) return;
 
-            event.removeModifier(attribute, modifier);
-            event.addModifier(attribute, createModifiedAttribute(modifier, bonus));
+        for (ItemAttributeModifiers.Entry entry : matchingEntries) {
+            AttributeModifier modifier = entry.modifier();
+            if (modifier.amount() == 0) continue;
+
+            event.removeModifier(attributeHolder, modifier.id());
+            event.addModifier(attributeHolder, createModifiedAttribute(modifier, bonus), entry.slot());
         }
     }
 
     private static AttributeModifier createModifiedAttribute(AttributeModifier original, double bonus) {
         return new AttributeModifier(
-                original.getId(),
-                "Overgeared",
-                original.getAmount() + bonus,
-                original.getOperation()
+                original.id(),
+                original.amount() + bonus,
+                original.operation()
         );
     }
 
@@ -165,36 +144,36 @@ public class ModEvents {
         return item instanceof ArmorItem;
     }
 
-    private static double getDamageBonusForQuality(String quality) {
-        return switch (quality.toLowerCase()) {
-            case "master" -> ServerConfig.MASTER_WEAPON_DAMAGE.get();
-            case "perfect" -> ServerConfig.PERFECT_WEAPON_DAMAGE.get();
-            case "expert" -> ServerConfig.EXPERT_WEAPON_DAMAGE.get();
-            case "well" -> ServerConfig.WELL_WEAPON_DAMAGE.get();
-            case "poor" -> ServerConfig.POOR_WEAPON_DAMAGE.get();
-            default -> 0.0;
+    private static double getDamageBonusForQuality(ForgingQuality quality) {
+        return switch (quality) {
+            case MASTER -> ServerConfig.MASTER_WEAPON_DAMAGE.get();
+            case PERFECT -> ServerConfig.PERFECT_WEAPON_DAMAGE.get();
+            case EXPERT -> ServerConfig.EXPERT_WEAPON_DAMAGE.get();
+            case WELL -> ServerConfig.WELL_WEAPON_DAMAGE.get();
+            case POOR -> ServerConfig.POOR_WEAPON_DAMAGE.get();
+            case NONE -> 0.0;
         };
     }
 
-    private static double getSpeedBonusForQuality(String quality) {
-        return switch (quality.toLowerCase()) {
-            case "master" -> ServerConfig.MASTER_WEAPON_SPEED.get();
-            case "perfect" -> ServerConfig.PERFECT_WEAPON_SPEED.get();
-            case "expert" -> ServerConfig.EXPERT_WEAPON_SPEED.get();
-            case "well" -> ServerConfig.WELL_WEAPON_SPEED.get();
-            case "poor" -> ServerConfig.POOR_WEAPON_SPEED.get();
-            default -> 0.0;
+    private static double getSpeedBonusForQuality(ForgingQuality quality) {
+        return switch (quality) {
+            case MASTER -> ServerConfig.MASTER_WEAPON_SPEED.get();
+            case PERFECT -> ServerConfig.PERFECT_WEAPON_SPEED.get();
+            case EXPERT -> ServerConfig.EXPERT_WEAPON_SPEED.get();
+            case WELL -> ServerConfig.WELL_WEAPON_SPEED.get();
+            case POOR -> ServerConfig.POOR_WEAPON_SPEED.get();
+            case NONE -> 0.0;
         };
     }
 
-    private static double getArmorBonusForQuality(String quality) {
-        return switch (quality.toLowerCase()) {
-            case "master" -> ServerConfig.MASTER_ARMOR_BONUS.get();
-            case "perfect" -> ServerConfig.PERFECT_ARMOR_BONUS.get();
-            case "expert" -> ServerConfig.EXPERT_ARMOR_BONUS.get();
-            case "well" -> ServerConfig.WELL_ARMOR_BONUS.get();
-            case "poor" -> ServerConfig.POOR_ARMOR_BONUS.get();
-            default -> 0.0;
+    private static double getArmorBonusForQuality(ForgingQuality quality) {
+        return switch (quality) {
+            case MASTER -> ServerConfig.MASTER_ARMOR_BONUS.get();
+            case PERFECT -> ServerConfig.PERFECT_ARMOR_BONUS.get();
+            case EXPERT -> ServerConfig.EXPERT_ARMOR_BONUS.get();
+            case WELL -> ServerConfig.WELL_ARMOR_BONUS.get();
+            case POOR -> ServerConfig.POOR_ARMOR_BONUS.get();
+            case NONE -> 0.0;
         };
     }
 
@@ -240,7 +219,7 @@ public class ModEvents {
     public static void resetMinigameForPlayer(ServerPlayer player) {
         if (player == null) return;
         UUID playerId = player.getUUID();
-        ModMessages.sendToPlayer(new OnlyResetMinigameS2CPacket(), player);
+        PacketDistributor.sendToPlayer(player, new OnlyResetMinigameS2CPacket());
         String blueprintQuality = BlueprintQuality.PERFECT.getDisplayName();
         if (ModItemInteractEvents.playerAnvilPositions.containsKey(player.getUUID())) {
             BlockPos anvilPos = ModItemInteractEvents.playerAnvilPositions.get(player.getUUID());
@@ -253,7 +232,7 @@ public class ModEvents {
                 anvil.setMinigameOn(false);
 
                 // Send reset packet to the specific player
-                ModMessages.sendToPlayer(new ResetMinigameS2CPacket(anvilPos), player);
+                PacketDistributor.sendToPlayer(player, new ResetMinigameS2CPacket(anvilPos));
                 ModItemInteractEvents.releaseAnvil(player, anvilPos);
                 ModItemInteractEvents.playerAnvilPositions.remove(playerId);
                 ModItemInteractEvents.playerMinigameVisibility.remove(playerId);
@@ -274,7 +253,7 @@ public class ModEvents {
     public static void resetMinigameForPlayer(ServerPlayer player, BlockPos anvilPos) {
         // Only execute on server side
         if (player == null) return;
-        ModMessages.sendToPlayer(new OnlyResetMinigameS2CPacket(), player);
+        PacketDistributor.sendToPlayer(player, new OnlyResetMinigameS2CPacket());
         BlockEntity be = player.level().getBlockEntity(anvilPos);
         String quality = "perfect";
         if (be instanceof AbstractSmithingAnvilBlockEntity anvil) {
@@ -287,13 +266,10 @@ public class ModEvents {
         Block block = player.level().getBlockState(anvilPos).getBlock();
 
         // Send reset packet to the specific player
-        //ModMessages.sendToPlayer(new ResetMinigameS2CPacket(anvilPos), player);
         ModItemInteractEvents.playerAnvilPositions.remove(player.getUUID());
         ModItemInteractEvents.playerMinigameVisibility.remove(player.getUUID());
     }
 
-    // In ModEvents.java
-    // In ModEvents.java
     public static void resetMinigameForAnvil(Level level, BlockPos anvilPos) {
         // Only execute on server side
         String quality = "perfect";
@@ -313,7 +289,7 @@ public class ModEvents {
 
             for (ServerPlayer player : serverLevel.getServer().getPlayerList().getPlayers()) {
                 UUID playerId = player.getUUID();
-                ModMessages.sendToPlayer(new ResetMinigameS2CPacket(anvilPos), player);
+                PacketDistributor.sendToPlayer(player, new ResetMinigameS2CPacket(anvilPos));
                 if (ModItemInteractEvents.playerAnvilPositions.getOrDefault(playerId, BlockPos.ZERO).equals(anvilPos)) {
                     // Send reset packet only to this specific player
 
@@ -335,15 +311,14 @@ public class ModEvents {
 
 
         // Add Forging Quality
-        if (stack.hasTag() && stack.getTag().contains("ForgingQuality")) {
-            String quality = stack.getTag().getString("ForgingQuality");
+        ForgingQuality quality = stack.get(ModComponents.FORGING_QUALITY);
+        if (quality != null) {
             Component qualityComponent = switch (quality) {
-                case "poor" -> Component.translatable("tooltip.overgeared.poor").withStyle(ChatFormatting.RED);
-                case "well" -> Component.translatable("tooltip.overgeared.well").withStyle(ChatFormatting.YELLOW);
-                case "expert" -> Component.translatable("tooltip.overgeared.expert").withStyle(ChatFormatting.BLUE);
-                case "perfect" -> Component.translatable("tooltip.overgeared.perfect").withStyle(ChatFormatting.GOLD);
-                case "master" ->
-                        Component.translatable("tooltip.overgeared.master").withStyle(ChatFormatting.LIGHT_PURPLE);
+                case MASTER -> Component.translatable("tooltip.overgeared.master").withStyle(ChatFormatting.LIGHT_PURPLE);
+                case PERFECT -> Component.translatable("tooltip.overgeared.perfect").withStyle(ChatFormatting.GOLD);
+                case EXPERT -> Component.translatable("tooltip.overgeared.expert").withStyle(ChatFormatting.BLUE);
+                case WELL -> Component.translatable("tooltip.overgeared.well").withStyle(ChatFormatting.YELLOW);
+                case POOR -> Component.translatable("tooltip.overgeared.poor").withStyle(ChatFormatting.RED);
                 default -> null;
             };
             if (qualityComponent != null) {
@@ -352,17 +327,17 @@ public class ModEvents {
         }
 
         // Add Polish status
-        if (stack.hasTag() && stack.getTag().contains("Polished")) {
-            boolean isPolished = stack.getTag().getBoolean("Polished");
+        Boolean isPolished = stack.get(ModComponents.POLISHED);
+        if (isPolished != null) {
             Component polishComponent = isPolished
                     ? Component.translatable("tooltip.overgeared.polished").withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)
                     : Component.translatable("tooltip.overgeared.unpolished").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC);
             tooltip.add(insertOffset++, polishComponent);
         }
-        if (stack.hasTag() && stack.getTag().contains("Heated")) {
+        if (Boolean.TRUE.equals(stack.get(ModComponents.HEATED_COMPONENT))) {
             tooltip.add(insertOffset++, Component.translatable("tooltip.overgeared.heated").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
         }
-        if (stack.hasTag() && stack.getTag().contains("failedResult")) {
+        if (Boolean.TRUE.equals(stack.get(ModComponents.FAILED_RESULT))) {
             tooltip.add(insertOffset, Component.translatable("tooltip.overgeared.failedResult")
                     .withStyle(ChatFormatting.RED));
         }
@@ -389,18 +364,11 @@ public class ModEvents {
 
         // 🔽 Add Potion Uses Left Tooltip
         if (stack.is(Items.POTION)) {
-            CompoundTag tag = stack.getTag();
             int maxUses = ServerConfig.MAX_POTION_TIPPING_USE.get();
-            int used = 0;
-
-            if (tag != null && tag.contains("TippedUsed", Tag.TAG_INT)) {
-                used = tag.getInt("TippedUsed");
-            }
+            Integer used = stack.getOrDefault(ModComponents.TIPPED_USES, 0);
 
             int left = Math.max(0, maxUses - used);
-            //PotionUtils.addPotionTooltip(stack, tooltip, 1 - (float) used / ServerConfig.MAX_POTION_TIPPING_USE.get());
             tooltip.add(Component.translatable("tooltip.overgeared.potion_uses", left, maxUses).withStyle(ChatFormatting.GRAY));
-
         }
         if (!ServerConfig.ENABLE_MOD_TOOLTIPS.get()) return;
 
@@ -435,14 +403,13 @@ public class ModEvents {
                     .withStyle(ChatFormatting.GRAY));
         }*/
 
-        if (stack.hasTag() && stack.getTag().contains("Creator")) {
-            String creatorName = stack.getTag().getString("Creator");
+        String creatorName = stack.get(ModComponents.CREATOR);
+        if (creatorName != null) {
             Component creatorComponent = Component.translatable("tooltip.overgeared.made_by")
                     .append(" ")
                     .append(creatorName)
                     .withStyle(ChatFormatting.GRAY);
             tooltip.add(insertOffset++, creatorComponent);
-
         }
     }
 
@@ -454,13 +421,11 @@ public class ModEvents {
         Player player = event.getEntity();
         if (!(player instanceof ServerPlayer serverPlayer)) return;
 
-        if (AnvilMinigameEvents.isIsVisible() && AnvilMinigameEvents.hasAnvilPosition(player.getUUID())) {
+        if (AnvilMinigameEvents.isVisible() && AnvilMinigameEvents.hasAnvilPosition(player.getUUID())) {
             BlockPos pos = AnvilMinigameEvents.getAnvilPos(player.getUUID());
             if (pos != null) {
                 resetMinigameForPlayer(serverPlayer);
             }
         }
     }
-
-
 }

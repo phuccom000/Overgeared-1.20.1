@@ -1,11 +1,11 @@
 package net.stirdrem.overgeared.recipe;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraftforge.common.brewing.IBrewingRecipe;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.neoforged.neoforge.common.brewing.IBrewingRecipe;
 
 public class BetterBrewingRecipe implements IBrewingRecipe {
     private final Potion input;
@@ -20,7 +20,10 @@ public class BetterBrewingRecipe implements IBrewingRecipe {
 
     @Override
     public boolean isInput(ItemStack input) {
-        return PotionUtils.getPotion(input) == this.input;
+        PotionContents contents = input.get(DataComponents.POTION_CONTENTS);
+        if (contents == null) return false;
+
+        return contents.potion().map(holder -> holder.value() == this.input).orElse(false);
     }
 
     @Override
@@ -30,11 +33,10 @@ public class BetterBrewingRecipe implements IBrewingRecipe {
 
     @Override
     public ItemStack getOutput(ItemStack input, ItemStack ingredient) {
-        return isInput(input) && isIngredient(ingredient) ? getOutput().copy() : ItemStack.EMPTY;
+        return isInput(input) && isIngredient(ingredient) ? this.output.copy() : ItemStack.EMPTY;
     }
 
     public ItemStack getOutput() {
         return output;
     }
-
 }

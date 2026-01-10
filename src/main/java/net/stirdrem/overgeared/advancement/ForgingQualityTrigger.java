@@ -1,38 +1,18 @@
 package net.stirdrem.overgeared.advancement;
 
-import com.google.gson.JsonObject;
-import net.minecraft.advancements.critereon.*;
-import net.minecraft.resources.ResourceLocation;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.advancements.critereon.ContextAwarePredicate;
+import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.GsonHelper;
-import net.stirdrem.overgeared.OvergearedMod;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 
-public class ForgingQualityTrigger
-        extends SimpleCriterionTrigger<ForgingQualityTrigger.TriggerInstance> {
-
-    public static final ResourceLocation ID =
-            new ResourceLocation(OvergearedMod.MOD_ID, "forging_quality");
+public class ForgingQualityTrigger extends SimpleCriterionTrigger<ForgingQualityTrigger.TriggerInstance> {
 
     @Override
-    public ResourceLocation getId() {
-        return ID;
-    }
-
-    @Override
-    protected TriggerInstance createInstance(
-            JsonObject json,
-            ContextAwarePredicate player,
-            DeserializationContext context
-    ) {
-        @Nullable String quality = null;
-
-        if (json.has("quality")) {
-            quality = GsonHelper.getAsString(json, "quality");
-        }
-
-        return new TriggerInstance(player, quality);
+    public Codec<TriggerInstance> codec() {
+        return TriggerInstance.CODEC;
     }
 
     /**
@@ -42,26 +22,17 @@ public class ForgingQualityTrigger
         this.trigger(player, inst -> inst.matches(forgedQuality));
     }
 
-    // ─────────────────────────────────────────────────────────────
-
-    public static class TriggerInstance
-            extends AbstractCriterionTriggerInstance {
-
-        @Nullable
-        private final String requiredQuality;
-
-        public TriggerInstance(ContextAwarePredicate player,
-                               @Nullable String requiredQuality) {
-            super(ID, player);
-            this.requiredQuality = requiredQuality;
-        }
+    public record TriggerInstance(Optional<ContextAwarePredicate> player, Optional<String> requiredQuality)
+            implements SimpleCriterionTrigger.SimpleInstance {
+        public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                ContextAwarePredicate.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
+                Codec.STRING.optionalFieldOf("quality").forGetter(TriggerInstance::requiredQuality))
+                .apply(instance, TriggerInstance::new));
 
         public boolean matches(String forgedQuality) {
             // No condition → always match
-            if (this.requiredQuality == null) {
-                return true;
-            }
-            return this.requiredQuality.equals(forgedQuality);
+            if (requiredQuality.isEmpty()) return true;
+            return requiredQuality.get().equals(forgedQuality);
         }
     }
 }

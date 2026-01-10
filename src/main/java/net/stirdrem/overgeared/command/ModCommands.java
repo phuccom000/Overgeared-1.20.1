@@ -7,8 +7,9 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-
+import net.stirdrem.overgeared.ForgingQuality;
+import net.stirdrem.overgeared.components.CastData;
+import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.util.ConfigHelper;
 
@@ -28,7 +29,10 @@ public class ModCommands {
                                     return b.buildFuture();
                                 })
                                 .executes(ctx -> {
-                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                    if (!(ctx.getSource().getEntity() instanceof ServerPlayer player)) {
+                                        ctx.getSource().sendFailure(Component.literal("This command can only be run by a player"));
+                                        return 0;
+                                    }
                                     String quality = StringArgumentType.getString(ctx, "quality").toLowerCase();
 
                                     ItemStack inHand = player.getMainHandItem();
@@ -37,8 +41,7 @@ public class ModCommands {
                                         return 0;
                                     }
 
-                                    CompoundTag tag = inHand.getOrCreateTag();
-                                    tag.putString("ForgingQuality", quality);
+                                    inHand.set(ModComponents.FORGING_QUALITY, ForgingQuality.fromString(quality));
 
                                     ctx.getSource().sendSuccess(
                                             () -> Component.literal("Set ForgingQuality to " + quality), false);
@@ -90,20 +93,20 @@ public class ModCommands {
     }
 
     private static int giveCast(CommandSourceStack source, String toolType, String quality, String material) {
-        ServerPlayer player = source.getPlayer();
+        if (!(source.getPlayer() instanceof ServerPlayer player)) return 0;
 
         ItemStack stack = material.equalsIgnoreCase("nether") ?
                 new ItemStack(ModItems.NETHER_TOOL_CAST.get()) :
                 new ItemStack(ModItems.CLAY_TOOL_CAST.get());
 
-        CompoundTag tag = stack.getOrCreateTag();
-        tag.putString("ToolType", toolType.toLowerCase());
-        tag.putInt("Amount", 0);
-        tag.putInt("MaxAmount", ConfigHelper.getMaxMaterialAmount(toolType));
-        tag.put("Materials", new CompoundTag()); // Empty compound instead of remove
-
-        if (!quality.equalsIgnoreCase("none"))
-            tag.putString("Quality", quality.toLowerCase());
+        stack.set(ModComponents.CAST_DATA, new CastData(
+                quality.equalsIgnoreCase("none") ? null : quality.toLowerCase(),
+                toolType.toLowerCase(),
+                null, 0,
+                ConfigHelper.getMaxMaterialAmount(toolType),
+                null,
+                null,
+                false));
 
         player.addItem(stack);
 
