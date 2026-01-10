@@ -73,7 +73,6 @@ public class KnappingEmiRecipe implements EmiRecipe {
     @Override
     public void addWidgets(WidgetHolder widgets) {
         // Draw grid of slots
-        // Centered mostly
         int startX = 4;
         int startY = 4;
         int slotSize = 18; // Standard EMI slot size

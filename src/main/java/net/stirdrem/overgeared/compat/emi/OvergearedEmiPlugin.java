@@ -22,6 +22,8 @@ import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.util.ModTags;
 import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
+import net.stirdrem.overgeared.recipe.AlloySmeltingRecipe;
+import net.stirdrem.overgeared.recipe.NetherAlloySmeltingRecipe;
 
 import java.util.*;
 
@@ -60,6 +62,30 @@ public class OvergearedEmiPlugin implements EmiPlugin {
         }
     };
     
+    public static final EmiStack ALLOY_WORKSTATION = EmiStack.of(ModBlocks.ALLOY_FURNACE.get());
+    public static final EmiRecipeCategory ALLOY_SMELTING_CATEGORY = new EmiRecipeCategory(
+            OvergearedMod.loc("alloy_smelting"),
+            ALLOY_WORKSTATION,
+            new EmiTexture(OvergearedMod.loc("textures/gui/brick_alloy_furnace.png"), 0, 0, 16, 16)
+    ) {
+        @Override
+        public Component getName() {
+            return Component.translatable("container.overgeared.alloy_smelter");
+        }
+    };
+
+    public static final EmiStack NETHER_ALLOY_WORKSTATION = EmiStack.of(ModBlocks.NETHER_ALLOY_FURNACE.get());
+    public static final EmiRecipeCategory NETHER_ALLOY_SMELTING_CATEGORY = new EmiRecipeCategory(
+            OvergearedMod.loc("nether_alloy_smelting"),
+            NETHER_ALLOY_WORKSTATION,
+            new EmiTexture(OvergearedMod.loc("textures/gui/nether_alloy_furnace.png"), 0, 0, 16, 16)
+    ) {
+        @Override
+        public Component getName() {
+            return Component.translatable("container.overgeared.nether_alloy_smelter");
+        }
+    };
+    
     // Priority for sorting recipes by category
     private static final Map<String, Integer> CATEGORY_PRIORITY = Map.of(
             "tool_head", 0,
@@ -88,6 +114,23 @@ public class OvergearedEmiPlugin implements EmiPlugin {
         
         for (RecipeHolder<RockKnappingRecipe> holder : registry.getRecipeManager().getAllRecipesFor(ModRecipeTypes.KNAPPING.get())) {
             registry.addRecipe(new KnappingEmiRecipe(holder));
+        }
+        
+        // Register Alloy Smelting
+        registry.addCategory(ALLOY_SMELTING_CATEGORY);
+        registry.addWorkstation(ALLOY_SMELTING_CATEGORY, ALLOY_WORKSTATION);
+        registry.addWorkstation(ALLOY_SMELTING_CATEGORY, NETHER_ALLOY_WORKSTATION); // Nether alloy smelter can also do basic alloy smelting? Usually yes.
+        
+        for (RecipeHolder<AlloySmeltingRecipe> holder : registry.getRecipeManager().getAllRecipesFor(ModRecipeTypes.ALLOY_SMELTING.get())) {
+            registry.addRecipe(new AlloySmeltingEmiRecipe(holder));
+        }
+
+        // Register Nether Alloy Smelting
+        registry.addCategory(NETHER_ALLOY_SMELTING_CATEGORY);
+        registry.addWorkstation(NETHER_ALLOY_SMELTING_CATEGORY, NETHER_ALLOY_WORKSTATION);
+        
+        for (RecipeHolder<NetherAlloySmeltingRecipe> holder : registry.getRecipeManager().getAllRecipesFor(ModRecipeTypes.NETHER_ALLOY_SMELTING.get())) {
+            registry.addRecipe(new NetherAlloySmeltingEmiRecipe(holder));
         }
         
         // Collect and sort all forging recipes
