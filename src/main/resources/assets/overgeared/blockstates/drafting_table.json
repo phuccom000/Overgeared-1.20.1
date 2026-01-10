@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "overgeared:block/drafting_table",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "overgeared:block/drafting_table"
+    },
+    "facing=south": {
+      "model": "overgeared:block/drafting_table",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "overgeared:block/drafting_table",
+      "y": 270
+    }
+  }
+}

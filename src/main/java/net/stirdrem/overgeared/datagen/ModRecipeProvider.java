@@ -147,10 +147,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         CompoundTag nbtTag = new CompoundTag();
         nbtTag.putString("heat",
                 "200");
-
-        //oreCampfire(pWriter, STEEL_SMELTABLES, RecipeCategory.MISC, ModItems.STEEL_INGOT.get(), 0.7f, 140, "");
-        //oreCampfire(pWriter, IRON_INGOT, RecipeCategory.MISC, ModItems.HEATED_IRON_INGOT.get(), 0.5f, 140, "iron_ingot");
-        //oreCampfire(pWriter, STEEL_INGOT, RecipeCategory.MISC, ModItems.HEATED_STEEL_INGOT.get(), 0.7f, 140, "steel_ingot");
         oreBlasting(pWriter, STEEL_SMELTABLES, RecipeCategory.MISC, ModItems.HEATED_CRUDE_STEEL.get(), 0, 100, "steel_ingot");
         oreBlasting(pWriter, COPPER_SMELTABLES, RecipeCategory.MISC, ModItems.HEATED_COPPER_INGOT.get(), 0, 70, "copper_ingot");
         oreBlasting(pWriter, IRON_SMELTABLES, RecipeCategory.MISC, ModItems.HEATED_IRON_INGOT.get(), 0, 100, "iron_ingot");
@@ -166,7 +162,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         oreBlasting(pWriter, STEEL_HEADS, RecipeCategory.MISC, ModItems.STEEL_NUGGET.get(), 0.1f, 200, null);
         oreSmelting(pWriter, COPPER_HEADS, RecipeCategory.MISC, ModItems.COPPER_NUGGET.get(), 0.1f, 200, null);
         oreBlasting(pWriter, COPPER_HEADS, RecipeCategory.MISC, ModItems.COPPER_NUGGET.get(), 0.1f, 100, null);
-        //oreBlasting(pWriter, STEEL_INGOT, RecipeCategory.MISC, ModItems.HEATED_STEEL_INGOT.get(), 0.7f, 100, "steel_ingot");
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.STEEL_INGOT.get())
                 .pattern("###")
@@ -376,25 +371,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .requires(ModItems.STEEL_INGOT.get())
                 .unlockedBy(getHasName(ModItems.STEEL_INGOT.get()), has(ModItems.STEEL_INGOT.get()))
                 .save(pWriter, OvergearedMod.MOD_ID + ":steel_nugget_from_ingot");
-
-
-
-        /*ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get(), 2)
-                .pattern("axa")
-                .pattern("aba")
-                .pattern("aaa")
-                .define('a', ModItems.STEEL_INGOT.get())
-                .define('b', Items.DIAMOND)
-                .define('x', ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get())
-                .unlockedBy(getHasName(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get()), has(ModItems.DIAMOND_UPGRADE_SMITHING_TEMPLATE.get()))
-                .save(pWriter);*/
-        /*ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.STEEL_BLOCK.get(), 5)
-                .pattern("###")
-                .pattern("###")
-                .pattern("###")
-                .define('#', ModItems.STEEL_INGOT.get())
-                .unlockedBy("has_steel_ingot", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel"))))
-                .save(pWriter, OvergearedMod.MOD_ID + ":" + getItemName(ModBlocks.STEEL_BLOCK.get()) + "_from_forging_" + getItemName(ModItems.STEEL_INGOT.get()));*/
 
         ShapedForgingRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IRON_PLATE.get(), 3)
                 .tier(AnvilTier.STONE)
@@ -1008,16 +984,16 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 ).unlocks("has_diamond", has(Items.DIAMOND))
                 .save(pWriter, OvergearedMod.loc("steel_boots_to_diamond_boots"));
 
-        /*FletchingRecipeBuilder.fletching(
+        FletchingRecipeBuilder.fletching(
                         Ingredient.of(Items.FLINT),
                         Ingredient.of(Items.STICK),
                         Ingredient.of(Items.FEATHER),
                         Items.ARROW,
                         4
                 ).withTippedResult(Items.TIPPED_ARROW)
-                .withLingeringResult("Potion", ModItems.LINGERING_ARROW.get())
+                .withLingeringResult(ModItems.LINGERING_ARROW.get())
                 .unlockedBy("has_flint", has(Items.FLINT))  // Add this unlock condition
-                .save(pWriter);*/
+                .save(pWriter);
 
         FletchingRecipeBuilder.fletching(
                         Ingredient.of(ModItems.IRON_ARROW_HEAD.get()),
