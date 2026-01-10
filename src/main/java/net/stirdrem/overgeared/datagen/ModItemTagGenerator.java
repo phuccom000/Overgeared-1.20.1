@@ -44,8 +44,8 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.STONE_AXE_HEAD.get(),
                         ModItems.STONE_SHOVEL_HEAD.get(),
                         ModItems.STONE_HOE_HEAD.get(),
-                        
-                       // Copper
+
+                        // Copper
                         ModItems.COPPER_HAMMER_HEAD.get(),
                         ModItems.COPPER_SWORD_BLADE.get(),
                         ModItems.COPPER_PICKAXE_HEAD.get(),
@@ -209,6 +209,11 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.HOT_ITEMS)
                 .add(
                         Items.LAVA_BUCKET
+                );
+        this.tag(ModTags.Items.TOOL_CAST)
+                .add(
+                        ModItems.CLAY_TOOL_CAST.get(),
+                        ModItems.NETHER_TOOL_CAST.get()
                 );
     }
 }

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "overgeared:block/casting_furnace_front_on",
+    "side": "overgeared:block/casting_furnace_side",
+    "top": "overgeared:block/casting_furnace_top"
+  }
+}

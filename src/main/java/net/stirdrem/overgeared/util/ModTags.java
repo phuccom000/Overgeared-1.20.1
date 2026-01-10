@@ -22,6 +22,7 @@ public class ModTags {
     }
 
     public static class Items {
+        public static final TagKey<Item> KNAPPABLES = tag("knappables");
         public static final TagKey<Item> TONGS = tag("tongs");
         public static final TagKey<Item> TOOL_PARTS = tag("tool_parts");
         public static final TagKey<Item> HEATED_METALS = tag("heated_metals");

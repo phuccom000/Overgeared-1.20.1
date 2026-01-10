@@ -28,7 +28,7 @@ public class CastingRecipe implements Recipe<RecipeInput> {
     private final ResourceLocation id;
     private final String group;
     private final CraftingBookCategory category;
-    private final Map<String, Double> requiredMaterials;
+    private final Map<String, Integer> requiredMaterials;
     private final ItemStack result;
     private final float experience;
     private final int cookingTime;
@@ -36,10 +36,10 @@ public class CastingRecipe implements Recipe<RecipeInput> {
     private final boolean needPolishing;
 
     // Constructor that matches Codec field order
-    private CastingRecipe(
+    public CastingRecipe(
             String group,
             CraftingBookCategory category,
-            Map<String, Double> requiredMaterials,
+            Map<String, Integer> requiredMaterials,
             ItemStack result,
             float experience,
             int cookingTime,
@@ -62,7 +62,7 @@ public class CastingRecipe implements Recipe<RecipeInput> {
             ResourceLocation id,
             String group,
             CraftingBookCategory category,
-            Map<String, Double> requiredMaterials,
+            Map<String, Integer> requiredMaterials,
             ItemStack result,
             float experience,
             int cookingTime,
@@ -84,7 +84,7 @@ public class CastingRecipe implements Recipe<RecipeInput> {
     public static CastingRecipe create(
             String group,
             CraftingBookCategory category,
-            Map<String, Double> requiredMaterials,
+            Map<String, Integer> requiredMaterials,
             ItemStack result,
             float experience,
             int cookingTime,
@@ -199,7 +199,7 @@ public class CastingRecipe implements Recipe<RecipeInput> {
     public @NotNull NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
 
-        // Convert Map<String, Double> to Map<String, Integer>
+        // Convert Map<String, Integer> to Map<String, Integer>
         Map<String, Integer> materialsInt = new HashMap<>();
         double total = 0;
         for (var e : requiredMaterials.entrySet()) {
@@ -266,7 +266,7 @@ public class CastingRecipe implements Recipe<RecipeInput> {
         return needPolishing;
     }
 
-    public Map<String, Double> getRequiredMaterials() {
+    public Map<String, Integer> getRequiredMaterials() {
         return requiredMaterials;
     }
 
@@ -288,9 +288,9 @@ public class CastingRecipe implements Recipe<RecipeInput> {
 
     public static class Serializer implements RecipeSerializer<CastingRecipe> {
 
-        // Codec for Map<String, Double>
-        private static final Codec<Map<String, Double>> MATERIALS_CODEC =
-                Codec.unboundedMap(Codec.STRING, Codec.DOUBLE);
+        // Codec for Map<String, Integer>
+        private static final Codec<Map<String, Integer>> MATERIALS_CODEC =
+                Codec.unboundedMap(Codec.STRING, Codec.INT);
 
         private static final MapCodec<CastingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
@@ -330,41 +330,64 @@ public class CastingRecipe implements Recipe<RecipeInput> {
         private static final StreamCodec<RegistryFriendlyByteBuf, CastingRecipe> STREAM_CODEC =
                 StreamCodec.of(
                         (buf, recipe) -> {
-                            // Encode
+                            // group
                             ByteBufCodecs.STRING_UTF8.encode(buf, recipe.getGroup());
-                            ByteBufCodecs.fromCodec(CraftingBookCategory.CODEC).encode(buf, recipe.category);
-                            ItemStack.STREAM_CODEC.encode(buf, recipe.result);
-                            buf.writeFloat(recipe.getExperience());
-                            ByteBufCodecs.VAR_INT.encode(buf, recipe.getCookingTime());
 
-                            // Encode materials map
+                            // category
+                            ByteBufCodecs.fromCodec(CraftingBookCategory.CODEC).encode(buf, recipe.category);
+
+                            // input (materials)
                             buf.writeInt(recipe.requiredMaterials.size());
                             recipe.requiredMaterials.forEach((k, v) -> {
                                 ByteBufCodecs.STRING_UTF8.encode(buf, k);
-                                buf.writeDouble(v);
+                                ByteBufCodecs.VAR_INT.encode(buf, v);
                             });
 
+                            // result
+                            ItemStack.STREAM_CODEC.encode(buf, recipe.result);
+
+                            // experience
+                            buf.writeFloat(recipe.getExperience());
+
+                            // cooking time
+                            ByteBufCodecs.VAR_INT.encode(buf, recipe.getCookingTime());
+
+                            // tool type
                             ByteBufCodecs.STRING_UTF8.encode(buf, recipe.toolType);
+
+                            // need_polishing
                             ByteBufCodecs.BOOL.encode(buf, recipe.needPolishing);
                         },
                         buf -> {
-                            // Decode
+                            // group
                             String group = ByteBufCodecs.STRING_UTF8.decode(buf);
-                            CraftingBookCategory category = ByteBufCodecs.fromCodec(CraftingBookCategory.CODEC).decode(buf);
-                            ItemStack result = ItemStack.STREAM_CODEC.decode(buf);
-                            float xp = buf.readFloat();
-                            int time = ByteBufCodecs.VAR_INT.decode(buf);
 
-                            // Decode materials map
+                            // category
+                            CraftingBookCategory category =
+                                    ByteBufCodecs.fromCodec(CraftingBookCategory.CODEC).decode(buf);
+
+                            // input (materials)
                             int size = buf.readInt();
-                            Map<String, Double> reqMaterials = new HashMap<>();
+                            Map<String, Integer> reqMaterials = new HashMap<>();
                             for (int i = 0; i < size; i++) {
                                 String key = ByteBufCodecs.STRING_UTF8.decode(buf);
-                                double value = buf.readDouble();
+                                int value = ByteBufCodecs.VAR_INT.decode(buf);
                                 reqMaterials.put(key, value);
                             }
 
+                            // result
+                            ItemStack result = ItemStack.STREAM_CODEC.decode(buf);
+
+                            // experience
+                            float xp = buf.readFloat();
+
+                            // cooking time
+                            int time = ByteBufCodecs.VAR_INT.decode(buf);
+
+                            // tool type
                             String toolType = ByteBufCodecs.STRING_UTF8.decode(buf);
+
+                            // need_polishing
                             boolean needPolish = ByteBufCodecs.BOOL.decode(buf);
 
                             return CastingRecipe.create(
