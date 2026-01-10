@@ -254,6 +254,11 @@ public class CastingRecipe implements Recipe<RecipeInput> {
         return ModRecipeTypes.CASTING.get();
     }
 
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
+
     public int getCookingTime() {
         return cookingTime;
     }
