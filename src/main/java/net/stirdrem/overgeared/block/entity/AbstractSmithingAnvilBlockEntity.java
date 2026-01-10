@@ -1,6 +1,7 @@
 package net.stirdrem.overgeared.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -12,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ArmorItem;
@@ -44,7 +46,7 @@ import java.util.*;
 
 import static net.stirdrem.overgeared.util.ItemUtils.getCooledItem;
 
-public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity implements MenuProvider {
+public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity implements MenuProvider, WorldlyContainer {
     protected static final int INPUT_SLOT = 0;
     protected static final int OUTPUT_SLOT = 10;
     protected final ItemStackHandler itemHandler = new ItemStackHandler(12) {
@@ -71,6 +73,10 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     private boolean minigameOn = false;
     protected AbstractSmithingAnvil anvilBlock;
     protected static final int BLUEPRINT_SLOT = 11;
+    // Define slot indices
+    private static final int[] TOP_SLOTS = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8}; // input grid
+    private static final int[] BOTTOM_SLOTS = new int[]{OUTPUT_SLOT};
+    private static final int[] SIDE_SLOTS = new int[0]; // nothing on sides
 
     public AbstractSmithingAnvilBlockEntity(AbstractSmithingAnvil anvilBlock, AnvilTier tier, BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
         super(type, pPos, pBlockState);
@@ -122,6 +128,33 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
     public Component getDisplayName() {
         return Component.translatable("gui.overgeared.smithing_anvil");
     }
+
+
+    @Override
+    public int[] getSlotsForFace(Direction side) {
+        return switch (side) {
+            case UP -> TOP_SLOTS;
+            case DOWN -> BOTTOM_SLOTS;
+            default -> SIDE_SLOTS;
+        };
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int index, ItemStack itemStack, @Nullable Direction side) {
+        // Only allow insertion from the top into input grid
+        if (side == Direction.UP) {
+            // Input slots should be indices 0–8
+            return index >= 0 && index < 9;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction side) {
+        // Only allow extraction from bottom from the output slot
+        return side == Direction.DOWN && index == OUTPUT_SLOT;
+    }
+
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
@@ -902,4 +935,62 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
             }
         }
     }
+
+    @Override
+    public int getContainerSize() {
+        return this.itemHandler.getSlots();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack stack = itemHandler.getStackInSlot(i);
+            if (!stack.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public ItemStack getItem(int slot) {
+        return itemHandler.getStackInSlot(slot);
+    }
+
+    @Override
+    public ItemStack removeItem(int slot, int amount) {
+        return itemHandler.extractItem(slot, amount, false);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int slot) {
+        // Extract the entire stack regardless of amount
+        ItemStack stack = itemHandler.getStackInSlot(slot).copy();
+        itemHandler.setStackInSlot(slot, ItemStack.EMPTY);
+        return stack;
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack stack) {
+        itemHandler.setStackInSlot(slot, stack);
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        // Standard check: player must be no farther than 8 blocks
+        if (this.level == null) return false;
+        return player.distanceToSqr(
+                this.worldPosition.getX() + 0.5,
+                this.worldPosition.getY() + 0.5,
+                this.worldPosition.getZ() + 0.5
+        ) <= 64.0;
+    }
+
+    @Override
+    public void clearContent() {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+        }
+    }
+
 }
