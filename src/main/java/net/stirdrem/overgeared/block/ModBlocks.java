@@ -53,6 +53,14 @@ public class ModBlocks {
                     .strength(3.5F, 6.0F)
                     .lightLevel(litBlockEmission())));
 
+    public static final DeferredHolder<Block, Block> CASTING_FURNACE = registerBlock("casting_furnace",
+            () -> new CastingSmelterBlock(BlockBehaviour.Properties
+                    .ofFullCopy(Blocks.RED_NETHER_BRICKS)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops()
+                    .strength(3.5F, 6.0F)
+                    .lightLevel(litBlockEmission())));
+
     private static ToIntFunction<BlockState> litBlockEmission() {
         return (p_50763_) -> p_50763_.getValue(BlockStateProperties.LIT) ? 13 : 0;
     }
