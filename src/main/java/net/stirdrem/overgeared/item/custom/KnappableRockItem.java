@@ -55,7 +55,7 @@ public class KnappableRockItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(
                 Component.translatable(
-                        "tooltip.overgeared.knappable_rock.tooltip")
+                                "tooltip.overgeared.knappable")
                         .withStyle(ChatFormatting.DARK_GRAY));
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }

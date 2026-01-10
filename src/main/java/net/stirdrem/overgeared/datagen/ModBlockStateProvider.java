@@ -15,63 +15,64 @@ import net.stirdrem.overgeared.OvergearedMod;
 import net.stirdrem.overgeared.block.ModBlocks;
 
 public class ModBlockStateProvider extends BlockStateProvider {
-  public ModBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
-    super(output, OvergearedMod.MOD_ID, exFileHelper);
-  }
+    public ModBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
+        super(output, OvergearedMod.MOD_ID, exFileHelper);
+    }
 
-  @Override
-  protected void registerStatesAndModels() {
-    blockWithItem(ModBlocks.STEEL_BLOCK);
+    @Override
+    protected void registerStatesAndModels() {
+        blockWithItem(ModBlocks.STEEL_BLOCK);
 
-    horizontalBlock(ModBlocks.SMITHING_ANVIL.get(),
-            new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
-    horizontalBlock(ModBlocks.TIER_A_SMITHING_ANVIL.get(),
-            new ModelFile.UncheckedModelFile(modLoc("block/tier_a_smithing_anvil")));
-    horizontalBlock(ModBlocks.TIER_B_SMITHING_ANVIL.get(),
-            new ModelFile.UncheckedModelFile(modLoc("block/tier_b_smithing_anvil")));
-    horizontalBlock(ModBlocks.STONE_SMITHING_ANVIL.get(),
-            new ModelFile.UncheckedModelFile(modLoc("block/stone_anvil")));
+        horizontalBlock(ModBlocks.SMITHING_ANVIL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
+        horizontalBlock(ModBlocks.TIER_A_SMITHING_ANVIL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/tier_a_smithing_anvil")));
+        horizontalBlock(ModBlocks.TIER_B_SMITHING_ANVIL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/tier_b_smithing_anvil")));
+        horizontalBlock(ModBlocks.STONE_SMITHING_ANVIL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/stone_anvil")));
 
-    // Register item models for anvils using their block models
-    simpleBlockItem(ModBlocks.SMITHING_ANVIL.get(),
-            new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
-    simpleBlockItem(ModBlocks.TIER_A_SMITHING_ANVIL.get(),
-            new ModelFile.UncheckedModelFile(modLoc("block/tier_a_smithing_anvil")));
-    simpleBlockItem(ModBlocks.TIER_B_SMITHING_ANVIL.get(),
-            new ModelFile.UncheckedModelFile(modLoc("block/tier_b_smithing_anvil")));
-    simpleBlockItem(ModBlocks.STONE_SMITHING_ANVIL.get(),
-            new ModelFile.UncheckedModelFile(modLoc("block/stone_anvil")));
+        // Register item models for anvils using their block models
+        simpleBlockItem(ModBlocks.SMITHING_ANVIL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/smithing_anvil")));
+        simpleBlockItem(ModBlocks.TIER_A_SMITHING_ANVIL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/tier_a_smithing_anvil")));
+        simpleBlockItem(ModBlocks.TIER_B_SMITHING_ANVIL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/tier_b_smithing_anvil")));
+        simpleBlockItem(ModBlocks.STONE_SMITHING_ANVIL.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/stone_anvil")));
 
-    facingLitBlock(ModBlocks.ALLOY_FURNACE.get(), "alloy_furnace", "alloy_furnace_on");
-    facingLitBlock(ModBlocks.NETHER_ALLOY_FURNACE.get(), "nether_alloy_furnace", "nether_alloy_furnace_on");
+        facingLitBlock(ModBlocks.ALLOY_FURNACE.get(), "alloy_furnace", "alloy_furnace_on");
+        facingLitBlock(ModBlocks.NETHER_ALLOY_FURNACE.get(), "nether_alloy_furnace", "nether_alloy_furnace_on");
+        facingLitBlock(ModBlocks.CASTING_FURNACE.get(), "casting_furnace", "casting_furnace_on");
 
-    // Drafting table has a manually-created blockstates/block model, just need the item model
-    simpleBlockItem(ModBlocks.DRAFTING_TABLE.get(),
-            new ModelFile.UncheckedModelFile(modLoc("block/drafting_table")));
-  }
+        // Drafting table has a manually-created blockstates/block model, just need the item model
+        simpleBlockItem(ModBlocks.DRAFTING_TABLE.get(),
+                new ModelFile.UncheckedModelFile(modLoc("block/drafting_table")));
+    }
 
-  // Generic method to work with DeferredHolder
-  private <T extends Block> void blockWithItem(DeferredHolder<Block, T> blockHolder) {
-    simpleBlockWithItem(blockHolder.get(), cubeAll(blockHolder.get()));
-  }
+    // Generic method to work with DeferredHolder
+    private <T extends Block> void blockWithItem(DeferredHolder<Block, T> blockHolder) {
+        simpleBlockWithItem(blockHolder.get(), cubeAll(blockHolder.get()));
+    }
 
-  protected void facingLitBlock(Block block, String baseModelName, String litModelName) {
-    DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-    BooleanProperty LIT = BlockStateProperties.LIT;
+    protected void facingLitBlock(Block block, String baseModelName, String litModelName) {
+        DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+        BooleanProperty LIT = BlockStateProperties.LIT;
 
-    ModelFile baseModel = models().getExistingFile(modLoc("block/" + baseModelName));
-    ModelFile litModel = models().getExistingFile(modLoc("block/" + litModelName));
+        ModelFile baseModel = models().getExistingFile(modLoc("block/" + baseModelName));
+        ModelFile litModel = models().getExistingFile(modLoc("block/" + litModelName));
 
-    getVariantBuilder(block).forAllStates(state -> {
-      Direction dir = state.getValue(FACING);
-      boolean lit = state.getValue(LIT);
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction dir = state.getValue(FACING);
+            boolean lit = state.getValue(LIT);
 
-      return ConfiguredModel.builder()
-              .modelFile(lit ? litModel : baseModel)
-              .rotationY(((int) dir.toYRot()) % 360)
-              .build();
-    });
+            return ConfiguredModel.builder()
+                    .modelFile(lit ? litModel : baseModel)
+                    .rotationY(((int) dir.toYRot()) % 360)
+                    .build();
+        });
 
-    simpleBlockItem(block, baseModel);
-  }
+        simpleBlockItem(block, baseModel);
+    }
 }

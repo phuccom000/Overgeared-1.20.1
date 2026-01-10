@@ -32,6 +32,8 @@ public class ModRecipeTypes {
             RECIPE_TYPES.register("cooling", () -> RecipeType.simple(OvergearedMod.loc("cooling")));
     public static final Supplier<RecipeType<GrindingRecipe>> GRINDING_RECIPE =
             RECIPE_TYPES.register("grinding", () -> RecipeType.simple(OvergearedMod.loc("grinding")));
+    public static final Supplier<RecipeType<CastingRecipe>> CASTING =
+            RECIPE_TYPES.register("casting", () -> RecipeType.simple(OvergearedMod.loc("casting")));
 
     public static void register(IEventBus eventBus) {
         RECIPE_TYPES.register(eventBus);

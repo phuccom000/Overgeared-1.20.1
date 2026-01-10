@@ -49,7 +49,7 @@ public class PopupOverlay implements LayeredDraw.Layer {
             float yOffset = i * 6f;
 
             // Always position in center of screen for popups
-            float popupY = screenHeight / 2f - 40 - floatUp - yOffset;
+            float popupY = screenHeight / 2f + 40 - floatUp - yOffset;
 
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(
