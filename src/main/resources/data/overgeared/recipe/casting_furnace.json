@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "xxx",
+    "x#x",
+    "xax"
+  ],
+  "key": {
+    "x": {
+      "item": "minecraft:red_nether_bricks"
+    },
+    "#": {
+      "item": "minecraft:blast_furnace"
+    },
+    "a": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "result": {
+    "id": "overgeared:casting_furnace"
+  }
+}
