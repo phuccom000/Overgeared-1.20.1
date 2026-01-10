@@ -12,9 +12,10 @@
   "tag.item.overgeared.grindable": "Grindable",
   "tag.item.overgeared.grinded": "Grinded",
   "tag.item.overgeared.tool_casts": "Tool Casts",
-  "tag.item.c.ingots/steel": "Steel Ingots",
-  "tag.item.c.nuggets/steel": "Steel Nuggets",
-  "tag.item.c.plates/steel": "Steel Plates",
+  "tag.item.c.ingots.steel": "Steel Ingots",
+  "tag.item.c.nuggets.steel": "Steel Nuggets",
+  "tag.item.c.plates.steel": "Steel Plates",
+
   "tag.block.overgeared.grindstones": "Grindstones",
   "tag.block.overgeared.stone_anvil_bases": "Stone Anvil Bases",
   "block.overgeared.smithing_anvil": "Smithing Anvil",
