@@ -121,7 +121,6 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
             @Override
             public void onTake(Player player, ItemStack stack) {
                 this.checkTakeAchievements(stack);
-                Container craftingContainer = AbstractSmithingAnvilMenu.this.container;
                 
                 // Create a RecipeInput wrapper for the block entity's item handler
                 IItemHandler handler = AbstractSmithingAnvilMenu.this.blockEntity.getItemHandler();
@@ -133,22 +132,28 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
                 
                 NonNullList<ItemStack> remainders = player.level()
                         .getRecipeManager().getRemainingItemsFor(ModRecipeTypes.FORGING.get(), recipeInput, player.level());
-                for (int i = 0; i < remainders.size(); ++i) {
-                    ItemStack toRemove = craftingContainer.getItem(i);
+                
+                // Only process remainders if there are items to process
+                // Use the handler slots 0-8 for crafting (not the empty container)
+                for (int i = 0; i < Math.min(remainders.size(), 9); ++i) {
+                    ItemStack toRemove = handler.getStackInSlot(i);
                     ItemStack toReplace = remainders.get(i);
+                    
                     if (!toRemove.isEmpty()) {
-                        craftingContainer.removeItem(i, 1);
-                        toRemove = craftingContainer.getItem(i);
+                        handler.extractItem(i, 1, false);
+                        toRemove = handler.getStackInSlot(i);
                     }
 
                     if (!toReplace.isEmpty()) {
-                        if (toRemove.isEmpty())
-                            craftingContainer.setItem(i, toRemove);
-                        else if (ItemStack.isSameItemSameComponents(toRemove, toReplace)) {
+                        if (toRemove.isEmpty()) {
+                            // Insert the replacement into the slot
+                            ((ItemStackHandler) handler).setStackInSlot(i, toReplace);
+                        } else if (ItemStack.isSameItemSameComponents(toRemove, toReplace)) {
                             toReplace.grow(toRemove.getCount());
-                            craftingContainer.setItem(i, toReplace);
-                        } else if (!player.getInventory().add(toReplace))
+                            ((ItemStackHandler) handler).setStackInSlot(i, toReplace);
+                        } else if (!player.getInventory().add(toReplace)) {
                             player.drop(toReplace, false);
+                        }
                     }
                 }
             }
