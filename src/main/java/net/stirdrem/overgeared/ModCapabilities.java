@@ -9,26 +9,64 @@ import net.stirdrem.overgeared.block.entity.ModBlockEntities;
 
 public class ModCapabilities {
 
-  public static void register(IEventBus modBus) {
-    modBus.addListener(ModCapabilities::registerCapabilities);
-  }
+    public static void register(IEventBus modBus) {
+        modBus.addListener(ModCapabilities::registerCapabilities);
+    }
 
-  private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    event.registerBlockEntity(
-            Capabilities.ItemHandler.BLOCK,
-            ModBlockEntities.ALLOY_FURNACE_BE.get(),
-            (blockEntity, side) -> {
-              if (side == null) {
-                return blockEntity.getItemHandler();
-              }
-              if (side == Direction.UP) {
-                return new SidedInvWrapper(blockEntity, Direction.UP);
-              } else if (side == Direction.DOWN) {
-                return new SidedInvWrapper(blockEntity, Direction.DOWN);
-              } else {
-                return new SidedInvWrapper(blockEntity, Direction.NORTH);
-              }
-            }
-    );
-  }
+    private static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.ALLOY_FURNACE_BE.get(),
+                (blockEntity, side) -> {
+                    if (side == null) {
+                        return blockEntity.getItemHandler();
+                    }
+                    if (side == Direction.UP) {
+                        return new SidedInvWrapper(blockEntity, Direction.UP);
+                    } else if (side == Direction.DOWN) {
+                        return new SidedInvWrapper(blockEntity, Direction.DOWN);
+                    } else {
+                        return new SidedInvWrapper(blockEntity, Direction.NORTH);
+                    }
+                }
+        );
+
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.NETHER_ALLOY_FURNACE_BE.get(),
+                (blockEntity, side) -> {
+                    if (side == null) {
+                        return blockEntity.getItemHandler();
+                    }
+                    if (side == Direction.UP) {
+                        return new SidedInvWrapper(blockEntity, Direction.UP);
+                    } else if (side == Direction.DOWN) {
+                        return new SidedInvWrapper(blockEntity, Direction.DOWN);
+                    } else {
+                        return new SidedInvWrapper(blockEntity, Direction.NORTH);
+                    }
+                }
+        );
+
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.STEEL_SMITHING_ANVIL_BE.get(),
+                SidedInvWrapper::new
+        );
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.STONE_SMITHING_ANVIL_BE.get(),
+                SidedInvWrapper::new
+        );
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.TIER_A_SMITHING_ANVIL_BE.get(),
+                SidedInvWrapper::new
+        );
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.TIER_B_SMITHING_ANVIL_BE.get(),
+                SidedInvWrapper::new
+        );
+    }
 }
