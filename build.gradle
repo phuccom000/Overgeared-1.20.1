@@ -27,6 +27,18 @@ repositories {
         name = "TerraformersMC"
         url = "https://maven.terraformersmc.com/"
     }
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 def generatedResources = file("src/generated")
@@ -58,6 +70,8 @@ dependencies {
 
     compileOnly "dev.emi:emi-neoforge:${emi_version}+${minecraft_version}:api"
     runtimeOnly "dev.emi:emi-neoforge:${emi_version}+${minecraft_version}"
+
+    modImplementation "maven.modrinth:polymorph:${polymorph_version}"
 }
 
 processResources {

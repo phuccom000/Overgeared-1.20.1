@@ -37,6 +37,7 @@ import net.stirdrem.overgeared.item.armor.model.CopperLeggings;
 import net.stirdrem.overgeared.item.custom.LingeringArrowItem;
 import net.stirdrem.overgeared.item.custom.UpgradeArrowItem;
 import net.stirdrem.overgeared.screen.*;
+import net.stirdrem.overgeared.compat.ModCompat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -52,6 +53,9 @@ public class ClientModEvents {
                 .registerExtensionPoint(
                         IConfigScreenFactory.class,
                         (container, parent) -> new OvergearedConfigScreen(parent));
+        
+        // Initialize client-side mod compatibility
+        ModCompat.initClient();
         
         event.enqueueWork(() -> {
             // Register item properties for arrow potion type variants

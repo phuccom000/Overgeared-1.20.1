@@ -35,6 +35,7 @@ import net.stirdrem.overgeared.block.custom.AbstractSmithingAnvil;
 import net.stirdrem.overgeared.components.BlueprintData;
 import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.config.ServerConfig;
+import net.stirdrem.overgeared.compat.polymorph.Polymorph;
 import net.stirdrem.overgeared.event.ModEvents;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.util.ModTags;
@@ -506,11 +507,18 @@ public abstract class AbstractSmithingAnvilBlockEntity extends BlockEntity imple
         recipeHandler.setStackInSlot(11, itemHandler.getStackInSlot(11));
 
         RecipeWrapper recipeInput = new RecipeWrapper(recipeHandler);
+        
+        // Try to use Polymorph's selected recipe if available
+        Optional<RecipeHolder<ForgingRecipe>> polymorphRecipe = Polymorph.getSelectedRecipe(this, recipeInput);
+        if (polymorphRecipe.isPresent()) {
+            return polymorphRecipe.filter(holder -> matchesRecipeExactly(holder.value()));
+        }
+        
+        // Fallback to best match when Polymorph is not available
         return ForgingRecipe.findBestMatchHolder(level, recipeInput)
-                .filter(holder -> matchesRecipeExactly(holder.value()))
-                //.filter(this::hasEnoughIngredients)
-                ;
+                .filter(holder -> matchesRecipeExactly(holder.value()));
     }
+
 
     protected boolean canInsertItemIntoOutputSlot(ItemStack stackToInsert) {
         ItemStack existing = this.itemHandler.getStackInSlot(OUTPUT_SLOT);

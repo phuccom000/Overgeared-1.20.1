@@ -17,6 +17,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
 import net.stirdrem.overgeared.block.entity.AbstractSmithingAnvilBlockEntity;
+import net.stirdrem.overgeared.compat.polymorph.Polymorph;
 import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
@@ -195,6 +196,14 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
     public List<Integer> getInputSlots() {
         return new ArrayList<>(craftingSlotIndices);
     }
+    
+    /**
+     * Gets the result slot directly.
+     * This is preferred over using slot index which varies based on blueprint presence.
+     */
+    public Slot getResultSlot() {
+        return this.resultSlot;
+    }
 
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
@@ -218,7 +227,7 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
     @Override
     public ItemStack quickMoveStack(Player playerIn, int pIndex) {
         Slot sourceSlot = slots.get(pIndex);
-        if (sourceSlot == null || !sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
+        if (!sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copyOfSourceStack = sourceStack.copy();
 
@@ -309,8 +318,22 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
     }
 
     public ItemStack getGhostResult() {
-        // Return the expected result based on current inputs
-        // This could be from a recipe match or your custom logic
+        // On client side, check if Polymorph has a selected output
+        if (level.isClientSide()) {
+            try {
+                if (Polymorph.LOADED) {
+                    Optional<ItemStack> polymorphOutput =
+                        Polymorph.getSelectedOutput();
+                    if (polymorphOutput.isPresent()) {
+                        return polymorphOutput.get();
+                    }
+                }
+            } catch (Exception e) {
+                // Polymorph not available - fall through to default behavior
+            }
+        }
+        
+        // Default behavior: return the expected result based on current inputs
         Optional<ForgingRecipe> recipeOptional = blockEntity.getCurrentRecipe();
         if (recipeOptional.isPresent()) {
             ForgingRecipe recipe = recipeOptional.get();
@@ -320,51 +343,4 @@ public class AbstractSmithingAnvilMenu extends AbstractContainerMenu {
         }
         return ItemStack.EMPTY;
     }
-
-    /*@Override
-    public void fillCraftSlotsStackedContents(StackedContents contents) {
-
-    }
-
-    @Override
-    public void clearCraftingContent() {
-
-    }
-
-
-    @Override
-    public boolean recipeMatches(Recipe<? super Container> pRecipe) {
-        return false;
-    }
-
-    @Override
-    public int getResultSlotIndex() {
-        return 11;
-    }
-
-    @Override
-    public int getGridWidth() {
-        return 3;
-    }
-
-    @Override
-    public int getGridHeight() {
-        return 3;
-    }
-
-    @Override
-    public int getSize() {
-        return 9;
-    }
-
-    @Override
-    public RecipeBookType getRecipeBookType() {
-        return ModRecipeBookTypes.FORGING;
-    }
-
-    @Override
-    public boolean shouldMoveToInventory(int pSlotIndex) {
-        return false;
-    }*/
-
 }

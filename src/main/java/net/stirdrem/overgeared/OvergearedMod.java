@@ -9,6 +9,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.stirdrem.overgeared.advancement.ModAdvancementTriggers;
 import net.stirdrem.overgeared.block.ModBlocks;
 import net.stirdrem.overgeared.block.entity.ModBlockEntities;
+import net.stirdrem.overgeared.compat.ModCompat;
 import net.stirdrem.overgeared.components.ModComponents;
 import net.stirdrem.overgeared.config.ClientConfig;
 import net.stirdrem.overgeared.config.ServerConfig;
@@ -42,6 +43,8 @@ public final class OvergearedMod {
 
         modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.SERVER_CONFIG);
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_CONFIG);
+
+        ModCompat.init();
     }
 
     public static ResourceLocation loc(String name) {
