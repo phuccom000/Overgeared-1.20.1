@@ -21,6 +21,7 @@ import net.stirdrem.overgeared.item.ModItems;
 import net.stirdrem.overgeared.recipe.ForgingRecipe;
 import net.stirdrem.overgeared.recipe.ModRecipeTypes;
 import net.stirdrem.overgeared.util.ModTags;
+import net.stirdrem.overgeared.recipe.RockKnappingRecipe;
 
 import java.util.*;
 
@@ -32,6 +33,7 @@ import java.util.*;
 public class OvergearedEmiPlugin implements EmiPlugin {
     
     private static final ResourceLocation TEXTURE = OvergearedMod.loc("textures/gui/smithing_anvil_jei.png");
+    private static final ResourceLocation KNAPPING_TEXTURE = OvergearedMod.loc("textures/gui/rock_knapping_gui.png");
     
     public static final EmiStack WORKSTATION = EmiStack.of(ModBlocks.SMITHING_ANVIL.get());
     
@@ -43,6 +45,18 @@ public class OvergearedEmiPlugin implements EmiPlugin {
         @Override
         public Component getName() {
             return Component.translatable("gui.overgeared.smithing_anvil");
+        }
+    };
+    
+    public static final EmiStack KNAPPING_WORKSTATION = EmiStack.of(ModItems.ROCK.get());
+    public static final EmiRecipeCategory KNAPPING_CATEGORY = new EmiRecipeCategory(
+            OvergearedMod.loc("rock_knapping"),
+            KNAPPING_WORKSTATION,
+            new EmiTexture(KNAPPING_TEXTURE, 0, 0, 16, 16)
+    ) {
+        @Override
+        public Component getName() {
+            return Component.translatable("gui.overgeared.rock_knapping");
         }
     };
     
@@ -67,6 +81,14 @@ public class OvergearedEmiPlugin implements EmiPlugin {
         registry.addWorkstation(FORGING_CATEGORY, EmiStack.of(ModBlocks.SMITHING_ANVIL.get()));
         registry.addWorkstation(FORGING_CATEGORY, EmiStack.of(ModBlocks.TIER_A_SMITHING_ANVIL.get()));
         registry.addWorkstation(FORGING_CATEGORY, EmiStack.of(ModBlocks.TIER_B_SMITHING_ANVIL.get()));
+        
+        // Register Knapping
+        registry.addCategory(KNAPPING_CATEGORY);
+        registry.addWorkstation(KNAPPING_CATEGORY, KNAPPING_WORKSTATION);
+        
+        for (RecipeHolder<RockKnappingRecipe> holder : registry.getRecipeManager().getAllRecipesFor(ModRecipeTypes.KNAPPING.get())) {
+            registry.addRecipe(new KnappingEmiRecipe(holder));
+        }
         
         // Collect and sort all forging recipes
         List<RecipeHolder<ForgingRecipe>> allRecipes = new ArrayList<>(
@@ -251,6 +273,93 @@ public class OvergearedEmiPlugin implements EmiPlugin {
                     .append(Component.literal(" "))
                     .append(Component.translatable(tierEnum.getLang()));
             widgets.addText(tierText, X_OFFSET + 82, 54, 0xFF808080, false);
+        }
+    }
+    
+    /**
+     * EMI recipe wrapper for RockKnappingRecipe.
+     */
+    public static class KnappingEmiRecipe implements EmiRecipe {
+        private final ResourceLocation id;
+        private final RockKnappingRecipe recipe;
+        private final List<EmiIngredient> inputs;
+        private final List<EmiStack> outputs;
+
+        public KnappingEmiRecipe(RecipeHolder<RockKnappingRecipe> holder) {
+            this.id = holder.id();
+            this.recipe = holder.value();
+            this.outputs = List.of(EmiStack.of(recipe.output()));
+            
+            // Build inputs based on pattern (true = Rock, false = Empty)
+            List<EmiIngredient> inputList = new ArrayList<>();
+            boolean[][] pattern = recipe.pattern();
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 3; col++) {
+                    if (pattern[row][col]) {
+                        inputList.add(EmiStack.of(ModItems.ROCK.get()));
+                    } else {
+                        inputList.add(EmiStack.EMPTY);
+                    }
+                }
+            }
+            this.inputs = inputList;
+        }
+
+        @Override
+        public EmiRecipeCategory getCategory() {
+            return KNAPPING_CATEGORY;
+        }
+
+        @Override
+        public ResourceLocation getId() {
+            return id;
+        }
+
+        @Override
+        public List<EmiIngredient> getInputs() {
+            return inputs;
+        }
+
+        @Override
+        public List<EmiStack> getOutputs() {
+            return outputs;
+        }
+
+        @Override
+        public int getDisplayWidth() {
+            return 130;
+        }
+
+        @Override
+        public int getDisplayHeight() {
+            return 60;
+        }
+
+        @Override
+        public void addWidgets(WidgetHolder widgets) {
+            // Draw grid of slots
+            // Centered mostly
+            int startX = 4;
+            int startY = 4;
+            int slotSize = 18; // Standard EMI slot size
+
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 3; col++) {
+                    int index = row * 3 + col;
+                    EmiIngredient input = inputs.get(index);
+                    
+                    // We only draw the slot if it's part of the "Required Rock" (true in pattern)
+                    // Or do we draw all slots to show empty space?
+                    // Showing all slots makes the "Shape" clearer.
+                    widgets.addSlot(input, startX + col * slotSize, startY + row * slotSize);
+                }
+            }
+
+            // Arrow
+            widgets.addTexture(EmiTexture.EMPTY_ARROW, startX + 3 * slotSize + 4, startY + slotSize);
+
+            // Output
+            widgets.addSlot(outputs.get(0), startX + 3 * slotSize + 32, startY + slotSize - 4).large(true).recipeContext(this);
         }
     }
 }
