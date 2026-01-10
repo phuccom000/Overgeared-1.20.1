@@ -17,14 +17,14 @@ version = "${mod_version}"
 modId = "neoforge"
 type = "required"
 versionRange = "${neoforge_version_range}"
-ordering = "NONE"
+ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.${ mod_id }]]
 modId = "minecraft"
 type = "required"
 versionRange = "${minecraft_version_range}"
-ordering = "NONE"
+ordering = "AFTER"
 side = "BOTH"
 
 [[mixins]]

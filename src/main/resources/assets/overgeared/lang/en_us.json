@@ -129,6 +129,7 @@
   "item.overgeared.diamond_arrow.lingering_named.no_effect": "Diamond Lingering Arrow",
   "item.overgeared.blueprint": "Smithing Blueprint",
   "item.overgeared.empty_blueprint": "Empty Blueprint",
+  "item.overgeared.diamond_upgrade_smithing_template": "Smithing Template",
   "item.overgeared.smithing_template.diamond_upgrade.additions_slot_description": "Add Diamond",
   "item.overgeared.smithing_template.diamond_upgrade.applies_to": "Steel Equipment",
   "item.overgeared.smithing_template.diamond_upgrade.base_slot_description": "Add steel armor, weapon, or tool",
