@@ -57,6 +57,7 @@ public class ModCreativeModeTabs {
                                 output.accept(ModItems.STONE_HAMMER_HEAD.get());
                                 output.accept(ModItems.COPPER_HAMMER_HEAD.get());
                                 output.accept(ModItems.STEEL_HAMMER_HEAD.get());
+                                output.accept(ModItems.COPPER_SMITHING_HAMMER.get());
                                 output.accept(ModItems.SMITHING_HAMMER.get());
                                 output.accept(ModItems.EMPTY_BLUEPRINT.get());
                                 output.accept(ModItems.BLUEPRINT.get());
