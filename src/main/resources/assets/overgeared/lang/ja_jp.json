@@ -277,5 +277,7 @@
   "block.overgeared.casting_furnace": "鋳造炉",
   "container.overgeared.casting_furnace": "鋳造炉",
   "gui.overgeared.jei.category.casting": "鋳造",
-  "overgeared.container.recipe_book.forgeable": "鍛造可能"
+  "overgeared.container.recipe_book.forgeable": "鍛造可能",
+  "message.overgeared.wrong_hammer": "Incorrect hammer tier",
+  "tooltip.overgeared.item_broken": "Broken"
 }

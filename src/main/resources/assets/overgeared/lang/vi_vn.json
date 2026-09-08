@@ -277,5 +277,7 @@
   "block.overgeared.casting_furnace": "Casting Furnace",
   "container.overgeared.casting_furnace": "Casting Furnace",
   "gui.overgeared.jei.category.casting": "Casting",
-  "overgeared.container.recipe_book.forgeable": "Forgeable"
+  "overgeared.container.recipe_book.forgeable": "Forgeable",
+  "message.overgeared.wrong_hammer": "Incorrect hammer tier",
+  "tooltip.overgeared.item_broken": "Broken"
 }
